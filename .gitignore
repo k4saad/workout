@@ -1,0 +1,27 @@
+# Flutter / Dart
+app/.dart_tool/
+app/.flutter-plugins-dependencies
+app/build/
+app/android/.gradle/
+app/android/local.properties
+app/**/generated_plugin_registrant.*
+*.iml
+.idea/
+
+# NEVER commit signing material
+**/key.properties
+*.jks
+*.keystore
+
+# NEVER commit progress media
+photos/
+clips/
+**/*.mp4
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+Thumbs.db
+desktop.ini

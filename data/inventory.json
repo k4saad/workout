@@ -1,0 +1,88 @@
+{
+  "_comment": "PLACEHOLDER VALUES. Replace from docs/04-calibration.md, then re-run tools/gen.py.",
+  "bars": [
+    {
+      "id": "barbell",
+      "name": "Standard spinlock barbell",
+      "weightKg": 9.0,
+      "measured": false
+    },
+    {
+      "id": "ezBar",
+      "name": "EZ curl bar",
+      "weightKg": 6.0,
+      "measured": false
+    },
+    {
+      "id": "dbHandle",
+      "name": "Dumbbell handle",
+      "weightKg": 2.0,
+      "measured": false
+    }
+  ],
+  "plates": [
+    {
+      "weightKg": 20.0,
+      "count": 2,
+      "bore": "standard"
+    },
+    {
+      "weightKg": 10.0,
+      "count": 4,
+      "bore": "standard"
+    },
+    {
+      "weightKg": 5.0,
+      "count": 8,
+      "bore": "standard"
+    },
+    {
+      "weightKg": 2.5,
+      "count": 8,
+      "bore": "standard"
+    },
+    {
+      "weightKg": 1.25,
+      "count": 8,
+      "bore": "standard"
+    },
+    {
+      "weightKg": 0.5,
+      "count": 8,
+      "bore": "standard"
+    },
+    {
+      "weightKg": 0.25,
+      "count": 8,
+      "bore": "standard"
+    }
+  ],
+  "fixedDumbbells": [
+    {
+      "weightKg": 2.0,
+      "count": 2
+    },
+    {
+      "weightKg": 3.0,
+      "count": 2
+    }
+  ],
+  "kettlebells": [
+    {
+      "weightKg": 8.0
+    }
+  ],
+  "collarWeightKg": 0.0,
+  "cable": {
+    "present": true,
+    "maxKg": null,
+    "incrementKg": null,
+    "note": "Wall-mounted single pulley. Measure the stack and increment."
+  },
+  "room": {
+    "ceilingLiftingCm": null,
+    "ceilingSkippingCm": null,
+    "pullUpClearanceCm": null,
+    "carryLengthM": null
+  }
+}

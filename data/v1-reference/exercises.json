@@ -1,0 +1,1450 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "notes": "Exercise library for the Keller Twelve. media.still and media.youtubeUrl are intentionally null — fill them in Phase 4 from a licence-clean source (see plan §7). stillSearchTerm is a hint for matching against free-exercise-db; it is not a verified slug.",
+  "exercises": [
+
+    {
+      "id": "barbell-back-squat",
+      "name": "Barbell back squat",
+      "aliases": ["back squat", "squat"],
+      "pattern": "squat",
+      "primaryMuscles": ["quads", "glutes"],
+      "secondaryMuscles": ["adductors", "spinalErectors", "abs"],
+      "equipment": ["barbell", "squatStand"],
+      "defaultLoadMode": "barbell",
+      "cues": [
+        "Bar rests on the rear delts, not the neck. Grip it hard and pull it into your back.",
+        "Big breath into the belly, brace as if someone is about to punch your stomach, then unrack and take two steps back.",
+        "Sit down between the hips. Knees travel forward and out, over the toes.",
+        "Drive the whole foot through the floor coming up — don't let the hips shoot up first."
+      ],
+      "commonErrors": [
+        "Hips rising before the chest out of the hole — the bar drifts forward and the lower back takes it.",
+        "Heels lifting. Usually ankle mobility; widen the stance slightly or elevate the heels.",
+        "Knees caving inwards under load. Drop the weight and cue 'knees out' deliberately.",
+        "Losing the brace at the bottom. Hold the breath through the whole rep, don't exhale on the way down."
+      ],
+      "soloSafety": "Set the stand's catch pins just below your bottom position before your first set. If you miss a rep you sit down and the bar lands on the pins. Stay 2 reps short of failure, always, and know how to dump the bar backwards.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "barbell squat", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["goblet-squat", "bulgarian-split-squat", "barbell-front-squat"],
+      "tags": ["mainLift"]
+    },
+
+    {
+      "id": "barbell-front-squat",
+      "name": "Barbell front squat",
+      "aliases": ["front squat"],
+      "pattern": "squat",
+      "primaryMuscles": ["quads"],
+      "secondaryMuscles": ["glutes", "abs", "upperBack"],
+      "equipment": ["barbell", "squatStand"],
+      "defaultLoadMode": "barbell",
+      "cues": [
+        "Bar sits on the front delts, not the hands. Fingers are a shelf, elbows high.",
+        "Elbows stay up the whole rep — the moment they drop, the bar rolls forward.",
+        "More upright torso than a back squat. Straight down, straight up."
+      ],
+      "commonErrors": [
+        "Elbows dropping at the bottom, dumping the bar.",
+        "Wrist pain from gripping instead of shelving — use a cross-arm hold if the rack position hurts."
+      ],
+      "soloSafety": "Easier to bail than a back squat — if you miss, let the bar roll forward off the shoulders and step back. Still set the pins.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "front squat", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["barbell-back-squat", "goblet-squat"],
+      "tags": []
+    },
+
+    {
+      "id": "goblet-squat",
+      "name": "Goblet squat",
+      "aliases": ["kettlebell squat", "KB goblet squat"],
+      "pattern": "squat",
+      "primaryMuscles": ["quads", "glutes"],
+      "secondaryMuscles": ["abs", "upperBack"],
+      "equipment": ["kettlebell"],
+      "defaultLoadMode": "kettlebell",
+      "cues": [
+        "Hold the bell against your sternum, elbows tucked inside the knees.",
+        "Heels stay planted, chest tall, sit down between the hips.",
+        "Go as deep as you can without the lower back rounding under you — that point is your depth for now."
+      ],
+      "commonErrors": [
+        "Letting the bell drift away from the chest, which pulls you forward.",
+        "Chasing depth at the cost of a rounded lower back."
+      ],
+      "soloSafety": "None. If you lose it, push the bell forward and away and step back.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "goblet squat", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["barbell-back-squat", "dumbbell-squat"],
+      "tags": ["beginnerFriendly"]
+    },
+
+    {
+      "id": "dumbbell-squat",
+      "name": "Dumbbell squat",
+      "aliases": [],
+      "pattern": "squat",
+      "primaryMuscles": ["quads", "glutes"],
+      "secondaryMuscles": ["grip"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": [
+        "Dumbbells hang at the sides, or one racked on each shoulder if grip is the limit.",
+        "Same squat pattern — hips back and down, knees out."
+      ],
+      "commonErrors": ["Grip failing before the legs — that means it's time for a barbell."],
+      "soloSafety": "None. Drop them sideways.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "dumbbell squat", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["goblet-squat", "barbell-back-squat"],
+      "tags": []
+    },
+
+    {
+      "id": "bulgarian-split-squat",
+      "name": "Bulgarian split squat",
+      "aliases": ["rear-foot-elevated split squat", "BSS"],
+      "pattern": "lunge",
+      "primaryMuscles": ["quads", "glutes"],
+      "secondaryMuscles": ["adductors", "abs"],
+      "equipment": ["bench", "dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": [
+        "Rear foot on the bench, front foot far enough forward that the front knee stays roughly over the ankle.",
+        "Drop straight down — the movement is vertical, not a lunge forward.",
+        "Torso slightly forward loads the glute; upright loads the quad. Pick one and stay consistent so you can track progress."
+      ],
+      "commonErrors": [
+        "Stance too short, which turns it into a knee-crusher.",
+        "Pushing off the back foot instead of driving through the front.",
+        "Losing balance and rushing the reps. Hold a wall for the first few sessions if needed."
+      ],
+      "soloSafety": "Dumbbells at the sides only — don't load this on your back while balancing on a bench alone.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "bulgarian split squat", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["reverse-lunge", "split-squat", "walking-lunge"],
+      "tags": ["unilateral"]
+    },
+
+    {
+      "id": "split-squat",
+      "name": "Split squat",
+      "aliases": ["static lunge"],
+      "pattern": "lunge",
+      "primaryMuscles": ["quads", "glutes"],
+      "secondaryMuscles": ["abs"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": [
+        "Both feet on the floor, one forward one back, and they stay there for the whole set.",
+        "Drop the back knee towards the floor without touching it."
+      ],
+      "commonErrors": ["Drifting the front foot forward rep by rep."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "split squat", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["bulgarian-split-squat", "reverse-lunge"],
+      "tags": ["unilateral", "beginnerFriendly"]
+    },
+
+    {
+      "id": "reverse-lunge",
+      "name": "Reverse lunge",
+      "aliases": ["backward lunge"],
+      "pattern": "lunge",
+      "primaryMuscles": ["quads", "glutes"],
+      "secondaryMuscles": ["hamstrings", "abs"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": [
+        "Step backwards rather than forwards — much kinder on the knees.",
+        "Back knee touches lightly, front foot drives you back to standing.",
+        "Torso stays tall; don't fold over the front leg."
+      ],
+      "commonErrors": ["Stepping too short and putting the knee under load in front of the toes."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "reverse lunge", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["walking-lunge", "bulgarian-split-squat", "split-squat"],
+      "tags": ["unilateral"]
+    },
+
+    {
+      "id": "walking-lunge",
+      "name": "Walking lunge",
+      "aliases": [],
+      "pattern": "lunge",
+      "primaryMuscles": ["quads", "glutes"],
+      "secondaryMuscles": ["hamstrings", "abs"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": ["Long steps, torso tall, control the descent rather than falling into it."],
+      "commonErrors": ["Needing more floor than the basement has. Reverse lunges if space is tight."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "walking lunge", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["reverse-lunge"],
+      "tags": ["unilateral"]
+    },
+
+    {
+      "id": "barbell-deadlift",
+      "name": "Barbell deadlift",
+      "aliases": ["deadlift", "conventional deadlift"],
+      "pattern": "hinge",
+      "primaryMuscles": ["glutes", "hamstrings", "spinalErectors"],
+      "secondaryMuscles": ["lats", "traps", "quads", "grip"],
+      "equipment": ["barbell"],
+      "defaultLoadMode": "barbell",
+      "cues": [
+        "Bar over the middle of the foot, shins almost touching it.",
+        "Take the slack out of the bar before you pull — you should hear it click.",
+        "Flat back, chest up, then push the floor away rather than yanking the bar up.",
+        "Set it down and reset between reps. Every rep starts dead."
+      ],
+      "commonErrors": [
+        "Rounding the lower back at the start — usually the bar is too far forward or the hips too low.",
+        "Hips shooting up first, turning it into a stiff-leg pull.",
+        "Yanking the slack out with a jerk. That's how backs get hurt on light weight.",
+        "Hyperextending at the top. Stand up, squeeze the glutes, stop."
+      ],
+      "soloSafety": "The safest heavy lift to do alone — a missed rep just stays on the floor. Never use a belt to cover up a rounding back, and never do this one for reps to failure.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "barbell deadlift", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["barbell-romanian-deadlift", "dumbbell-deadlift"],
+      "tags": ["mainLift"],
+      "equipmentNote": "Your plates are small-diameter, so a lightly loaded bar starts too low. Stack two 20 kg plates flat and rest each end of the bar on them until the working weight raises it naturally."
+    },
+
+    {
+      "id": "dumbbell-deadlift",
+      "name": "Dumbbell deadlift",
+      "aliases": [],
+      "pattern": "hinge",
+      "primaryMuscles": ["glutes", "hamstrings"],
+      "secondaryMuscles": ["spinalErectors", "grip"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": ["Dumbbells outside the feet, hinge down, flat back, drive up through the floor."],
+      "commonErrors": ["Squatting it instead of hinging."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "dumbbell deadlift", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["barbell-deadlift"],
+      "tags": []
+    },
+
+    {
+      "id": "barbell-romanian-deadlift",
+      "name": "Barbell Romanian deadlift",
+      "aliases": ["RDL", "Romanian deadlift"],
+      "pattern": "hinge",
+      "primaryMuscles": ["hamstrings", "glutes"],
+      "secondaryMuscles": ["spinalErectors", "lats", "grip"],
+      "equipment": ["barbell"],
+      "defaultLoadMode": "barbell",
+      "cues": [
+        "Soft knees, then push the hips backwards like you're closing a car door with them.",
+        "Bar stays in contact with the legs the whole way down — if it drifts forward, your lower back takes it.",
+        "Stop the moment the hamstrings go tight. That's the bottom, not the floor.",
+        "Squeeze the glutes to stand up rather than pulling with the lower back."
+      ],
+      "commonErrors": [
+        "Turning it into a squat by bending the knees.",
+        "Chasing depth past the hamstring stretch and rounding the back.",
+        "Letting the bar swing away from the thighs."
+      ],
+      "soloSafety": "Start light and stay conservative — this one punishes ego with a tweaked lower back more reliably than anything else in the programme.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "romanian deadlift", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["dumbbell-romanian-deadlift", "barbell-good-morning", "barbell-hip-thrust"],
+      "tags": ["mainLift"]
+    },
+
+    {
+      "id": "dumbbell-romanian-deadlift",
+      "name": "Dumbbell Romanian deadlift",
+      "aliases": ["DB RDL"],
+      "pattern": "hinge",
+      "primaryMuscles": ["hamstrings", "glutes"],
+      "secondaryMuscles": ["spinalErectors", "grip"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": [
+        "Soft knees, push the hips back, dumbbells drag down the front of the thighs.",
+        "Stop when the hamstrings scream. Back stays flat throughout."
+      ],
+      "commonErrors": ["Dumbbells drifting forward away from the legs.", "Rounding at the bottom to reach further."],
+      "soloSafety": "None. Set them down if the back position goes.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "dumbbell romanian deadlift", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["barbell-romanian-deadlift", "single-leg-rdl"],
+      "tags": ["beginnerFriendly"]
+    },
+
+    {
+      "id": "single-leg-rdl",
+      "name": "Single-leg Romanian deadlift",
+      "aliases": ["SL RDL"],
+      "pattern": "hinge",
+      "primaryMuscles": ["hamstrings", "glutes"],
+      "secondaryMuscles": ["abs", "ankleStabilisers"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellSingle",
+      "cues": ["Hinge over one leg, back leg extends behind as a counterweight.", "Hips stay square — don't let the back hip open to the ceiling."],
+      "commonErrors": ["Rotating open at the hip.", "Going too heavy to balance."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "single leg romanian deadlift", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["dumbbell-romanian-deadlift"],
+      "tags": ["unilateral"]
+    },
+
+    {
+      "id": "barbell-good-morning",
+      "name": "Barbell good morning",
+      "aliases": [],
+      "pattern": "hinge",
+      "primaryMuscles": ["hamstrings", "spinalErectors"],
+      "secondaryMuscles": ["glutes"],
+      "equipment": ["barbell", "squatStand"],
+      "defaultLoadMode": "barbell",
+      "cues": ["Bar on the back as for a squat, hinge forward with soft knees, flat back.", "Very light loads. This is a hamstring exercise, not a strength lift."],
+      "commonErrors": ["Using squat weight. Start with the empty bar or less."],
+      "soloSafety": "Stay very light. A failed good morning has nowhere to go but your spine.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "good morning exercise", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["barbell-romanian-deadlift"],
+      "tags": []
+    },
+
+    {
+      "id": "bodyweight-good-morning",
+      "name": "Bodyweight good morning",
+      "aliases": [],
+      "pattern": "warmup",
+      "primaryMuscles": ["hamstrings"],
+      "secondaryMuscles": ["spinalErectors"],
+      "equipment": [],
+      "defaultLoadMode": "bodyweight",
+      "cues": ["Hands behind the head, soft knees, hinge to about 45° and back up. Warm-up only."],
+      "commonErrors": [],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "bodyweight good morning", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["warmup"]
+    },
+
+    {
+      "id": "barbell-hip-thrust",
+      "name": "Barbell hip thrust",
+      "aliases": ["hip thrust"],
+      "pattern": "hinge",
+      "primaryMuscles": ["glutes"],
+      "secondaryMuscles": ["hamstrings", "abs"],
+      "equipment": ["barbell", "bench"],
+      "defaultLoadMode": "barbell",
+      "cues": [
+        "Shoulder blades on the bench edge, chin tucked, bar across the hips.",
+        "Drive through the heels and squeeze the glutes hard at the top for a full second.",
+        "Ribs stay down — don't arch the lower back to get higher."
+      ],
+      "commonErrors": [
+        "Hyperextending the lower back at the top instead of finishing with the glutes.",
+        "Bar digging into the hip bones. Fold the mat over the bar as a pad.",
+        "Pushing through the toes rather than the heels."
+      ],
+      "soloSafety": "Getting under and out from the bar alone is the awkward part. Load it light enough to roll it over your hips and back off unaided.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "barbell hip thrust", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["glute-bridge", "dumbbell-hip-thrust"],
+      "tags": []
+    },
+
+    {
+      "id": "dumbbell-hip-thrust",
+      "name": "Dumbbell hip thrust",
+      "aliases": [],
+      "pattern": "hinge",
+      "primaryMuscles": ["glutes"],
+      "secondaryMuscles": ["hamstrings"],
+      "equipment": ["dumbbells", "bench"],
+      "defaultLoadMode": "dumbbellSingle",
+      "cues": ["One heavy dumbbell held across the hips. Same pattern as the barbell version."],
+      "commonErrors": [],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "dumbbell hip thrust", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["barbell-hip-thrust", "glute-bridge"],
+      "tags": []
+    },
+
+    {
+      "id": "glute-bridge",
+      "name": "Glute bridge",
+      "aliases": [],
+      "pattern": "warmup",
+      "primaryMuscles": ["glutes"],
+      "secondaryMuscles": ["hamstrings"],
+      "equipment": ["mat"],
+      "defaultLoadMode": "bodyweight",
+      "cues": ["On the mat, feet flat, drive the hips up and squeeze at the top. Ribs down."],
+      "commonErrors": ["Arching the lower back instead of extending the hips."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "glute bridge", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["barbell-hip-thrust"],
+      "tags": ["warmup", "beginnerFriendly"]
+    },
+
+    {
+      "id": "nordic-curl-negative",
+      "name": "Nordic curl negative",
+      "aliases": ["nordic hamstring curl", "natural leg curl"],
+      "pattern": "hinge",
+      "primaryMuscles": ["hamstrings"],
+      "secondaryMuscles": ["glutes", "abs"],
+      "equipment": ["mat", "barbell"],
+      "defaultLoadMode": "bodyweight",
+      "cues": [
+        "Kneel on the mat and anchor your heels under a heavy loaded barbell.",
+        "Lower your torso as slowly as you can control, then catch yourself with your hands.",
+        "Push back up with the hands and reset. Only the lowering counts."
+      ],
+      "commonErrors": [
+        "Bending at the hips instead of staying in one line from knee to shoulder.",
+        "Going too fast — the whole exercise is the slow part."
+      ],
+      "soloSafety": "Expect to fall fast at first; that's normal. Keep your hands ready in front of you and do this on the mat, never on bare concrete.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "nordic hamstring curl", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["slider-hamstring-curl", "dumbbell-romanian-deadlift"],
+      "tags": ["advanced"]
+    },
+
+    {
+      "id": "slider-hamstring-curl",
+      "name": "Slider hamstring curl",
+      "aliases": ["towel hamstring curl"],
+      "pattern": "hinge",
+      "primaryMuscles": ["hamstrings"],
+      "secondaryMuscles": ["glutes"],
+      "equipment": ["mat"],
+      "defaultLoadMode": "bodyweight",
+      "cues": ["Lie on your back, heels on a towel or sliders, hips lifted. Slide the feet out and drag them back in with the hamstrings."],
+      "commonErrors": ["Letting the hips drop as the legs extend."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "hamstring slider curl", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["nordic-curl-negative"],
+      "tags": ["beginnerFriendly"]
+    },
+
+    {
+      "id": "barbell-bench-press",
+      "name": "Barbell bench press",
+      "aliases": ["bench press", "flat bench", "bench"],
+      "pattern": "horizontalPush",
+      "primaryMuscles": ["chest", "triceps"],
+      "secondaryMuscles": ["frontDelts"],
+      "equipment": ["barbell", "bench", "squatStand"],
+      "defaultLoadMode": "barbell",
+      "cues": [
+        "Feet planted, shoulder blades pinched back and down and held there the whole set.",
+        "Small natural arch in the lower back, glutes stay on the bench.",
+        "Bar comes down to the lower chest with elbows at 45–60°, not flared to 90°.",
+        "Drive up and slightly towards your face, not straight up over the shoulders."
+      ],
+      "commonErrors": [
+        "Elbows flared to 90° — the fastest route to shoulder pain in year two.",
+        "Losing the shoulder blade position and pressing off a loose, rounded upper back.",
+        "Bouncing the bar off the chest.",
+        "Hips lifting off the bench to grind a rep out."
+      ],
+      "soloSafety": "The most dangerous lift in the room for a solo lifter. Set the catch pins at chest height so a failed rep lands on them and not on you. Never take this to failure alone. When in doubt, floor press or use dumbbells — you can always drop those sideways.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "barbell bench press", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["dumbbell-bench-press", "dumbbell-floor-press", "push-up-handles"],
+      "tags": ["mainLift", "soloRisk"]
+    },
+
+    {
+      "id": "dumbbell-bench-press",
+      "name": "Dumbbell bench press",
+      "aliases": ["DB bench"],
+      "pattern": "horizontalPush",
+      "primaryMuscles": ["chest", "triceps"],
+      "secondaryMuscles": ["frontDelts"],
+      "equipment": ["dumbbells", "bench"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": [
+        "Shoulder blades pinched back into the pad, same as the barbell version.",
+        "Lower until you feel a stretch across the chest, press without banging the dumbbells together."
+      ],
+      "commonErrors": ["Pressing in an arc that finishes over the face.", "Dropping the elbows too low and stressing the shoulder."],
+      "soloSafety": "Much safer than the barbell alone — a failed rep gets dropped sideways onto the floor. Check the collars before every set.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "dumbbell bench press", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["barbell-bench-press", "dumbbell-floor-press"],
+      "tags": []
+    },
+
+    {
+      "id": "incline-dumbbell-press",
+      "name": "Incline dumbbell press",
+      "aliases": ["incline DB press"],
+      "pattern": "horizontalPush",
+      "primaryMuscles": ["chest", "frontDelts"],
+      "secondaryMuscles": ["triceps"],
+      "equipment": ["dumbbells", "bench"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": [
+        "Set the bench pad to its lower incline notch, roughly 30°.",
+        "Lower until you feel a stretch across the upper chest.",
+        "Press without banging the dumbbells together at the top."
+      ],
+      "commonErrors": ["Setting the incline too steep, turning it into a shoulder press.", "Bouncing out of the bottom."],
+      "soloSafety": "Getting heavy dumbbells into position on an incline is the awkward part. Kick them up one at a time from the thighs.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "incline dumbbell press", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["dumbbell-bench-press", "barbell-bench-press"],
+      "tags": []
+    },
+
+    {
+      "id": "dumbbell-floor-press",
+      "name": "Dumbbell floor press",
+      "aliases": ["floor press"],
+      "pattern": "horizontalPush",
+      "primaryMuscles": ["chest", "triceps"],
+      "secondaryMuscles": ["frontDelts"],
+      "equipment": ["dumbbells", "mat"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": [
+        "Lying on the mat, the upper arms stop when the triceps touch the floor.",
+        "Elbows at 45°, wrists stacked over the elbows.",
+        "Pause briefly on the floor, then press — no bouncing off it."
+      ],
+      "commonErrors": ["Slamming the elbows into the floor."],
+      "soloSafety": "The safest press you own. There is nowhere for the weight to fall. Use this whenever you're unsure about benching alone.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "dumbbell floor press", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["dumbbell-bench-press", "push-up-handles"],
+      "tags": ["beginnerFriendly", "soloSafe"]
+    },
+
+    {
+      "id": "push-up-handles",
+      "name": "Push-up on handles",
+      "aliases": ["push-up", "deficit push-up"],
+      "pattern": "horizontalPush",
+      "primaryMuscles": ["chest", "triceps"],
+      "secondaryMuscles": ["frontDelts", "abs"],
+      "equipment": ["pushUpHandles"],
+      "defaultLoadMode": "bodyweight",
+      "cues": [
+        "The handles let your chest drop below your hands, which is the whole point.",
+        "Body in one line from ear to ankle — squeeze the glutes.",
+        "Elbows about 45° from the ribs, not flared out wide."
+      ],
+      "commonErrors": [
+        "Hips sagging or piking up.",
+        "Head dropping forward to fake depth.",
+        "Half reps. Chest to handle height or the rep didn't happen."
+      ],
+      "soloSafety": "None. If 8 reps is impossible, put your hands on the bench and do them at an incline.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "push up", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["incline-push-up", "dumbbell-floor-press"],
+      "tags": ["beginnerFriendly"]
+    },
+
+    {
+      "id": "incline-push-up",
+      "name": "Incline push-up",
+      "aliases": ["hands-elevated push-up"],
+      "pattern": "horizontalPush",
+      "primaryMuscles": ["chest", "triceps"],
+      "secondaryMuscles": ["abs"],
+      "equipment": ["bench"],
+      "defaultLoadMode": "bodyweight",
+      "cues": ["Hands on the bench, feet on the floor. The higher the hands, the easier it gets."],
+      "commonErrors": ["Sagging hips."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "incline push up", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["push-up-handles"],
+      "tags": ["beginnerFriendly", "regression"]
+    },
+
+    {
+      "id": "barbell-overhead-press",
+      "name": "Standing barbell overhead press",
+      "aliases": ["overhead press", "OHP", "strict press", "military press"],
+      "pattern": "verticalPush",
+      "primaryMuscles": ["frontDelts", "triceps"],
+      "secondaryMuscles": ["sideDelts", "abs", "upperChest"],
+      "equipment": ["barbell"],
+      "defaultLoadMode": "barbell",
+      "cues": [
+        "Glutes and abs locked so the ribcage doesn't flare.",
+        "Head shifts back as the bar passes the face, then pushes through underneath at the top.",
+        "Finish with the bar over the middle of your feet, biceps by the ears."
+      ],
+      "commonErrors": [
+        "Leaning back to move the weight — that's a standing incline press and it hurts your lower back.",
+        "Pressing around the head instead of moving the head out of the way.",
+        "Stopping short of a full lockout overhead."
+      ],
+      "soloSafety": "Check the ceiling and the pipes before your first rep — the basement clearance is not the same everywhere. A failed rep comes down on your head, so stay 2 reps short and lower it to the shoulders under control.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "standing overhead press", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["dumbbell-overhead-press", "seated-dumbbell-press"],
+      "tags": ["mainLift"],
+      "equipmentNote": "This lift progresses in the smallest increments of anything in the programme. A second pair of 1.25 kg plates is the best €10 you'll spend."
+    },
+
+    {
+      "id": "dumbbell-overhead-press",
+      "name": "Standing dumbbell overhead press",
+      "aliases": ["DB shoulder press", "DB OHP"],
+      "pattern": "verticalPush",
+      "primaryMuscles": ["frontDelts", "triceps"],
+      "secondaryMuscles": ["sideDelts", "abs"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": [
+        "Check ceiling clearance first.",
+        "Ribs pulled down, glutes squeezed. If you're leaning back to move the weight, it's too heavy.",
+        "Press slightly back so the dumbbells finish over your ears."
+      ],
+      "commonErrors": ["Lower back arching.", "Elbows flaring straight out to the sides at the bottom."],
+      "soloSafety": "Safer than the barbell overhead — you can throw the dumbbells forward and away. Still check the ceiling.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "dumbbell shoulder press", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["barbell-overhead-press", "seated-dumbbell-press"],
+      "tags": ["beginnerFriendly"]
+    },
+
+    {
+      "id": "seated-dumbbell-press",
+      "name": "Seated dumbbell press",
+      "aliases": [],
+      "pattern": "verticalPush",
+      "primaryMuscles": ["frontDelts", "triceps"],
+      "secondaryMuscles": ["sideDelts"],
+      "equipment": ["dumbbells", "bench"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": ["Bench upright, back supported. Removes the lower back from the equation entirely."],
+      "commonErrors": ["Letting the head poke forward."],
+      "soloSafety": "Lower ceiling clearance needed than standing. Good option if the beams are in the way.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "seated dumbbell shoulder press", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["dumbbell-overhead-press"],
+      "tags": []
+    },
+
+    {
+      "id": "ring-dip",
+      "name": "Ring dip",
+      "aliases": ["dip"],
+      "pattern": "verticalPush",
+      "primaryMuscles": ["chest", "triceps"],
+      "secondaryMuscles": ["frontDelts", "abs"],
+      "equipment": ["rings"],
+      "defaultLoadMode": "bodyweight",
+      "cues": [
+        "Slight forward lean puts it on the chest; upright puts it on the triceps.",
+        "Stop when the upper arm reaches parallel — no deeper.",
+        "Rings turned out at the top, elbows locked but not hyperextended."
+      ],
+      "commonErrors": [
+        "Going too deep and wrecking the front of the shoulder.",
+        "Shoulders shrugging up towards the ears — keep them pulled down.",
+        "Rings wobbling out of control. Use bench dips until you can hold them still."
+      ],
+      "soloSafety": "Rings are unstable by design. Set them low enough that your feet can reach the floor if you lose it. Bench dips if you can't control the rings yet.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "ring dip", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["bench-dip", "dumbbell-floor-press"],
+      "tags": ["advanced"]
+    },
+
+    {
+      "id": "bench-dip",
+      "name": "Bench dip",
+      "aliases": ["tricep dip"],
+      "pattern": "verticalPush",
+      "primaryMuscles": ["triceps"],
+      "secondaryMuscles": ["chest", "frontDelts"],
+      "equipment": ["bench"],
+      "defaultLoadMode": "bodyweight",
+      "cues": ["Hands on the bench edge behind you, feet on the floor. Elbows travel straight back.", "Stop at upper-arm-parallel."],
+      "commonErrors": ["Shoulders rolling forward at the bottom.", "Going far too deep."],
+      "soloSafety": "None, but stop if you feel it in the front of the shoulder joint rather than the triceps.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "bench dips", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["ring-dip"],
+      "tags": ["beginnerFriendly", "regression"]
+    },
+
+    {
+      "id": "pull-up",
+      "name": "Pull-up",
+      "aliases": ["strict pull-up"],
+      "pattern": "verticalPull",
+      "primaryMuscles": ["lats", "biceps"],
+      "secondaryMuscles": ["upperBack", "abs", "grip"],
+      "equipment": ["pullUpBar"],
+      "defaultLoadMode": "bodyweight",
+      "cues": [
+        "Start from a dead hang, shoulders active not slack.",
+        "Pull the elbows down into your ribs, chest towards the bar.",
+        "Chin clears the bar, then lower all the way down under control."
+      ],
+      "commonErrors": ["Kipping and swinging.", "Half reps that never reach a dead hang.", "Shrugging the shoulders up instead of pulling them down."],
+      "soloSafety": "None. Your wall-mounted bar is bolted — check the bolts every few weeks.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "pull up", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["pull-up-assisted", "pull-up-negative", "ring-row"],
+      "tags": ["mainLift"]
+    },
+
+    {
+      "id": "pull-up-assisted",
+      "name": "Band-assisted pull-up",
+      "aliases": ["banded pull-up"],
+      "pattern": "verticalPull",
+      "primaryMuscles": ["lats", "biceps"],
+      "secondaryMuscles": ["upperBack", "grip"],
+      "equipment": ["pullUpBar", "bands"],
+      "defaultLoadMode": "banded",
+      "cues": [
+        "Loop the band over the bar and put one knee in it.",
+        "Always stop one rep before failure.",
+        "When you can do 8 assisted, move to a thinner band. When you get one strict rep, you've arrived."
+      ],
+      "commonErrors": ["Using a band so thick it does all the work.", "Letting the band snap the knee up at the bottom."],
+      "soloSafety": "Make sure the band is properly seated over the bar before you load it. A band slipping off mid-rep drops you.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "assisted pull up band", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["pull-up-negative", "pull-up", "ring-row"],
+      "tags": ["beginnerFriendly"],
+      "progressionNote": "Load progresses by band thickness, not kilograms. Log the band colour in the set note."
+    },
+
+    {
+      "id": "pull-up-negative",
+      "name": "Pull-up negative",
+      "aliases": ["eccentric pull-up"],
+      "pattern": "verticalPull",
+      "primaryMuscles": ["lats", "biceps"],
+      "secondaryMuscles": ["upperBack", "grip"],
+      "equipment": ["pullUpBar"],
+      "defaultLoadMode": "bodyweight",
+      "cues": [
+        "Jump or step up to the top position, chin over the bar.",
+        "Fight the way down for a full five seconds.",
+        "Four of those is a set. This is the single fastest route to your first strict pull-up."
+      ],
+      "commonErrors": ["Dropping in two seconds instead of five.", "Not starting from a genuine chin-over-bar position."],
+      "soloSafety": "None. Don't do these to total exhaustion — a failed negative is a fast drop.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "negative pull up", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["pull-up-assisted", "ring-row"],
+      "tags": ["beginnerFriendly"],
+      "progressionNote": "Progress by adding reps or lengthening the lower to 6–8 s, not by adding weight."
+    },
+
+    {
+      "id": "barbell-bent-over-row",
+      "name": "Barbell bent-over row",
+      "aliases": ["bent-over row", "barbell row"],
+      "pattern": "horizontalPull",
+      "primaryMuscles": ["upperBack", "lats"],
+      "secondaryMuscles": ["biceps", "spinalErectors", "grip"],
+      "equipment": ["barbell"],
+      "defaultLoadMode": "barbell",
+      "cues": [
+        "Torso at about 45°, back flat, knees soft.",
+        "Pull the bar to your belly button, not your chest.",
+        "Control it down. If your torso is rising with every rep, the weight is winning."
+      ],
+      "commonErrors": [
+        "Standing up rep by rep until it's a shrug.",
+        "Jerking the weight with the lower back.",
+        "Rounding the upper back at the bottom of each rep."
+      ],
+      "soloSafety": "Set it down between sets rather than holding it bent over. Strict beats heavy here for at least six months.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "barbell bent over row", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["one-arm-dumbbell-row", "chest-supported-dumbbell-row", "ring-row"],
+      "tags": ["mainLift"]
+    },
+
+    {
+      "id": "one-arm-dumbbell-row",
+      "name": "One-arm dumbbell row",
+      "aliases": ["single-arm row", "DB row"],
+      "pattern": "horizontalPull",
+      "primaryMuscles": ["lats", "upperBack"],
+      "secondaryMuscles": ["biceps", "grip", "abs"],
+      "equipment": ["dumbbells", "bench"],
+      "defaultLoadMode": "dumbbellSingle",
+      "cues": [
+        "Knee and same-side hand on the bench, back flat like a tabletop.",
+        "Pull the dumbbell to your hip pocket, not your armpit.",
+        "Hold for a full second at the top. Your elbow leads, your hand is just a hook."
+      ],
+      "commonErrors": ["Rotating the torso to heave the weight up.", "Pulling to the armpit, which turns it into a shrug."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "one arm dumbbell row", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["chest-supported-dumbbell-row", "barbell-bent-over-row", "ring-row"],
+      "tags": ["beginnerFriendly", "unilateral"]
+    },
+
+    {
+      "id": "chest-supported-dumbbell-row",
+      "name": "Chest-supported dumbbell row",
+      "aliases": ["incline bench row", "prone row"],
+      "pattern": "horizontalPull",
+      "primaryMuscles": ["upperBack", "lats"],
+      "secondaryMuscles": ["biceps", "rearDelts"],
+      "equipment": ["dumbbells", "bench"],
+      "defaultLoadMode": "dumbbellSingle",
+      "cues": [
+        "Lie face-down on the inclined bench so your lower back does nothing at all.",
+        "Pull the elbows back and behind you, pause for a second, lower slowly.",
+        "Pure upper-back work — no body English available."
+      ],
+      "commonErrors": ["Lifting the chest off the pad to cheat the rep."],
+      "soloSafety": "None. The safest rowing variation you own.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "chest supported dumbbell row", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["one-arm-dumbbell-row", "barbell-bent-over-row"],
+      "tags": ["soloSafe"]
+    },
+
+    {
+      "id": "ring-row",
+      "name": "Ring row",
+      "aliases": ["inverted row", "bodyweight row"],
+      "pattern": "horizontalPull",
+      "primaryMuscles": ["upperBack", "lats"],
+      "secondaryMuscles": ["biceps", "abs", "rearDelts"],
+      "equipment": ["rings"],
+      "defaultLoadMode": "bodyweight",
+      "cues": [
+        "Set the rings low, walk your feet forward and hang underneath.",
+        "The more horizontal your body, the harder it gets — that's your difficulty dial.",
+        "Pull until the rings touch your chest, shoulder blades pinched together."
+      ],
+      "commonErrors": ["Hips sagging so the body isn't a straight line.", "Half reps that never reach the chest."],
+      "soloSafety": "Check the ring straps and anchor before each session. Feet on the floor means a failed rep just sets you down.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "inverted row rings", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["one-arm-dumbbell-row", "chest-supported-dumbbell-row"],
+      "tags": ["beginnerFriendly", "soloSafe"],
+      "progressionNote": "Progress by lowering the rings or elevating the feet, not by adding weight. Log the setup in the set note."
+    },
+
+    {
+      "id": "band-face-pull",
+      "name": "Band face pull",
+      "aliases": ["face pull", "ring face pull"],
+      "pattern": "horizontalPull",
+      "primaryMuscles": ["rearDelts", "upperBack"],
+      "secondaryMuscles": ["rotatorCuff"],
+      "equipment": ["bands"],
+      "defaultLoadMode": "banded",
+      "cues": [
+        "Band around the bar at face height.",
+        "Pull towards your forehead with the elbows high and wide, rotating the hands back.",
+        "This little movement is the insurance policy on every press you do."
+      ],
+      "commonErrors": ["Turning it into a row by dropping the elbows.", "Going too heavy and losing the external rotation."],
+      "soloSafety": "None. Check the band for nicks and tears — they fail suddenly.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "face pull band", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["band-pull-apart"],
+      "tags": ["prehab"],
+      "progressionNote": "Progress by band colour or by stepping further back. Log the band in the set note."
+    },
+
+    {
+      "id": "band-pull-apart",
+      "name": "Band pull-apart",
+      "aliases": [],
+      "pattern": "warmup",
+      "primaryMuscles": ["rearDelts", "upperBack"],
+      "secondaryMuscles": ["rotatorCuff"],
+      "equipment": ["bands"],
+      "defaultLoadMode": "banded",
+      "cues": ["Arms straight out in front, pull the band apart to the chest, squeeze the shoulder blades."],
+      "commonErrors": ["Bending the elbows.", "Shrugging."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "band pull apart", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["band-face-pull"],
+      "tags": ["warmup", "prehab"]
+    },
+
+    {
+      "id": "ez-bar-curl",
+      "name": "EZ-bar curl",
+      "aliases": ["barbell curl", "curl"],
+      "pattern": "curl",
+      "primaryMuscles": ["biceps"],
+      "secondaryMuscles": ["forearms"],
+      "equipment": ["ezBar"],
+      "defaultLoadMode": "ezBar",
+      "cues": [
+        "Elbows pinned to the ribs and staying there.",
+        "No swinging, no leaning back.",
+        "Lower over 3 seconds — the negative is where the arm actually grows."
+      ],
+      "commonErrors": ["Swinging the whole torso.", "Elbows drifting forward, turning it into a front raise."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "ez bar curl", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["dumbbell-curl", "hammer-curl"],
+      "tags": []
+    },
+
+    {
+      "id": "dumbbell-curl",
+      "name": "Dumbbell curl",
+      "aliases": [],
+      "pattern": "curl",
+      "primaryMuscles": ["biceps"],
+      "secondaryMuscles": ["forearms"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": ["Elbows at the ribs, supinate as you curl, slow on the way down."],
+      "commonErrors": ["Swinging."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "dumbbell curl", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["ez-bar-curl", "hammer-curl"],
+      "tags": []
+    },
+
+    {
+      "id": "hammer-curl",
+      "name": "Hammer curl",
+      "aliases": ["neutral-grip curl"],
+      "pattern": "curl",
+      "primaryMuscles": ["brachialis", "biceps"],
+      "secondaryMuscles": ["forearms", "grip"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": [
+        "Neutral grip, thumbs up, the whole set.",
+        "Hits the brachialis underneath the biceps, which is what actually pushes the arm wider."
+      ],
+      "commonErrors": ["Rotating to a supinated grip mid-rep.", "Swinging."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "hammer curl", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["ez-bar-curl", "dumbbell-curl"],
+      "tags": []
+    },
+
+    {
+      "id": "ez-bar-skullcrusher",
+      "name": "EZ-bar skull crusher",
+      "aliases": ["lying triceps extension", "skullcrusher"],
+      "pattern": "extension",
+      "primaryMuscles": ["triceps"],
+      "secondaryMuscles": [],
+      "equipment": ["ezBar", "bench"],
+      "defaultLoadMode": "ezBar",
+      "cues": [
+        "Elbows stay pointed at the ceiling and don't drift back.",
+        "Lower the bar to just above the forehead or behind it, whichever your elbows prefer.",
+        "Extend without locking out hard."
+      ],
+      "commonErrors": ["Elbows flaring out wide.", "Turning it into a pullover by letting the elbows travel back."],
+      "soloSafety": "The bar is over your face. Stay conservative on load, and lower it behind the head rather than dropping it if a rep fails.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "skull crusher", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["overhead-dumbbell-extension", "bench-dip"],
+      "tags": ["soloRisk"]
+    },
+
+    {
+      "id": "overhead-dumbbell-extension",
+      "name": "Overhead dumbbell extension",
+      "aliases": ["French press"],
+      "pattern": "extension",
+      "primaryMuscles": ["triceps"],
+      "secondaryMuscles": [],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellSingle",
+      "cues": ["One dumbbell in both hands overhead, elbows close to the head, lower behind the neck and extend."],
+      "commonErrors": ["Elbows flaring wide."],
+      "soloSafety": "Check ceiling clearance. Keep the load modest.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "overhead triceps extension", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["ez-bar-skullcrusher"],
+      "tags": []
+    },
+
+    {
+      "id": "lateral-raise",
+      "name": "Lateral raise",
+      "aliases": ["side raise", "DB lateral"],
+      "pattern": "verticalPush",
+      "primaryMuscles": ["sideDelts"],
+      "secondaryMuscles": ["traps"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": [
+        "This is where the light purple dumbbells earn their place.",
+        "Lead with the elbows, raise to shoulder height, lower slowly over 3 seconds.",
+        "If you're swinging, go lighter — there is no such thing as a heavy lateral raise."
+      ],
+      "commonErrors": ["Swinging the weight up with the whole body.", "Going above shoulder height and shrugging.", "Using far too much weight. This is the single most ego-lifted movement in any gym."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "dumbbell lateral raise", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["band-lateral-raise"],
+      "tags": []
+    },
+
+    {
+      "id": "band-lateral-raise",
+      "name": "Band lateral raise",
+      "aliases": [],
+      "pattern": "verticalPush",
+      "primaryMuscles": ["sideDelts"],
+      "secondaryMuscles": [],
+      "equipment": ["bands"],
+      "defaultLoadMode": "banded",
+      "cues": ["Stand on the band, raise to the side with a straight arm."],
+      "commonErrors": ["Shrugging."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "band lateral raise", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["lateral-raise"],
+      "tags": []
+    },
+
+    {
+      "id": "standing-calf-raise",
+      "name": "Standing calf raise",
+      "aliases": ["calf raise"],
+      "pattern": "calf",
+      "primaryMuscles": ["calves"],
+      "secondaryMuscles": [],
+      "equipment": ["barbell", "plates"],
+      "defaultLoadMode": "barbell",
+      "cues": [
+        "Balls of the feet on the edge of the big tri-grip plate, bar on your back or a dumbbell in one hand.",
+        "Full stretch at the bottom, 2-second squeeze at the top.",
+        "No bouncing. All that skipping demands calves that can take it."
+      ],
+      "commonErrors": ["Bouncing through a tiny range.", "Not letting the heel drop below the plate at the bottom."],
+      "soloSafety": "Balancing a loaded bar on your back on the edge of a plate is fiddly. Hold a wall, or hold a dumbbell in one hand instead.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "standing calf raise", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["single-leg-calf-raise"],
+      "tags": []
+    },
+
+    {
+      "id": "single-leg-calf-raise",
+      "name": "Single-leg calf raise",
+      "aliases": [],
+      "pattern": "calf",
+      "primaryMuscles": ["calves"],
+      "secondaryMuscles": ["ankleStabilisers"],
+      "equipment": ["plates", "dumbbells"],
+      "defaultLoadMode": "dumbbellSingle",
+      "cues": ["One foot on the plate edge, dumbbell in the same-side hand, hold a wall for balance."],
+      "commonErrors": ["Using the wall to push."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "single leg calf raise", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["standing-calf-raise"],
+      "tags": ["unilateral"]
+    },
+
+    {
+      "id": "suitcase-carry",
+      "name": "Suitcase carry",
+      "aliases": ["single-arm carry"],
+      "pattern": "carry",
+      "primaryMuscles": ["obliques", "grip"],
+      "secondaryMuscles": ["traps", "abs", "glutes"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellSingle",
+      "cues": [
+        "One heavy dumbbell in one hand, walk the length of the basement without leaning away from it.",
+        "Shoulders level, ribs stacked over the hips.",
+        "Grip, obliques and posture in one movement — and it makes carrying your shopping home feel like nothing."
+      ],
+      "commonErrors": ["Leaning away from the weight.", "Hiking the loaded shoulder up."],
+      "soloSafety": "Check the collars — this one is all grip, and a plate sliding off mid-walk lands on your foot.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "suitcase carry", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["farmers-walk"],
+      "tags": ["unilateral", "timed"]
+    },
+
+    {
+      "id": "farmers-walk",
+      "name": "Farmer's walk",
+      "aliases": [],
+      "pattern": "carry",
+      "primaryMuscles": ["grip", "traps"],
+      "secondaryMuscles": ["abs", "glutes"],
+      "equipment": ["dumbbells"],
+      "defaultLoadMode": "dumbbellPair",
+      "cues": ["A dumbbell in each hand, tall posture, brisk walk."],
+      "commonErrors": ["Shrugging."],
+      "soloSafety": "Check collars.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "farmers walk", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["suitcase-carry"],
+      "tags": ["timed"]
+    },
+
+    {
+      "id": "plank",
+      "name": "Plank",
+      "aliases": ["front plank"],
+      "pattern": "core",
+      "primaryMuscles": ["abs"],
+      "secondaryMuscles": ["glutes", "shoulders"],
+      "equipment": ["mat"],
+      "defaultLoadMode": "timed",
+      "cues": [
+        "Squeeze the glutes hard, tuck the ribs down towards the hips.",
+        "The second your lower back sags, the set is over — stop and reset rather than holding a bad shape."
+      ],
+      "commonErrors": ["Hips sagging.", "Holding for time in a broken position."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "plank", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["dead-bug", "hollow-hold"],
+      "tags": ["timed", "beginnerFriendly"]
+    },
+
+    {
+      "id": "side-plank",
+      "name": "Side plank",
+      "aliases": [],
+      "pattern": "core",
+      "primaryMuscles": ["obliques"],
+      "secondaryMuscles": ["glutes", "shoulders"],
+      "equipment": ["mat"],
+      "defaultLoadMode": "timed",
+      "cues": ["Elbow under the shoulder, hips lifted and stacked, body in one line from ear to ankle."],
+      "commonErrors": ["Hips dropping.", "Rotating forward."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "side plank", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["plank"],
+      "tags": ["timed", "unilateral"]
+    },
+
+    {
+      "id": "dead-bug",
+      "name": "Dead bug",
+      "aliases": [],
+      "pattern": "core",
+      "primaryMuscles": ["abs"],
+      "secondaryMuscles": ["hipFlexors"],
+      "equipment": ["mat"],
+      "defaultLoadMode": "bodyweight",
+      "cues": [
+        "Lower back pressed flat into the mat the entire time.",
+        "Opposite arm and leg extend slowly; if the back lifts off, shorten the range."
+      ],
+      "commonErrors": ["Lower back arching off the mat.", "Rushing the reps."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "dead bug exercise", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["plank", "hollow-hold"],
+      "tags": ["beginnerFriendly", "unilateral"]
+    },
+
+    {
+      "id": "hollow-hold",
+      "name": "Hollow hold",
+      "aliases": ["hollow body hold"],
+      "pattern": "core",
+      "primaryMuscles": ["abs"],
+      "secondaryMuscles": ["hipFlexors"],
+      "equipment": ["mat"],
+      "defaultLoadMode": "timed",
+      "cues": ["Lower back pressed into the mat, shoulders and feet lifted, ribs pulled down.", "Bend the knees or bring the arms to the sides to make it easier."],
+      "commonErrors": ["Lower back arching — the whole point is that it doesn't."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "hollow body hold", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["dead-bug", "plank"],
+      "tags": ["timed"]
+    },
+
+    {
+      "id": "ab-wheel-knees",
+      "name": "Ab wheel from knees",
+      "aliases": ["ab rollout"],
+      "pattern": "core",
+      "primaryMuscles": ["abs"],
+      "secondaryMuscles": ["lats", "shoulders"],
+      "equipment": ["abWheel", "mat"],
+      "defaultLoadMode": "bodyweight",
+      "cues": [
+        "Roll out only as far as you can keep the lower back flat.",
+        "Pull back with the abs, not the arms.",
+        "The hardest and best core movement in the room."
+      ],
+      "commonErrors": ["Lower back arching at full extension — that's how you hurt it.", "Pulling with the shoulders."],
+      "soloSafety": "Start with a very short range. If your back arches at all, do planks instead until week 3.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "ab wheel rollout", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["plank", "hollow-hold"],
+      "tags": ["advanced"]
+    },
+
+    {
+      "id": "hanging-knee-raise",
+      "name": "Hanging knee raise",
+      "aliases": ["hanging leg raise"],
+      "pattern": "core",
+      "primaryMuscles": ["abs"],
+      "secondaryMuscles": ["hipFlexors", "grip"],
+      "equipment": ["pullUpBar"],
+      "defaultLoadMode": "bodyweight",
+      "cues": [
+        "Hang from the pull-up bar, no swinging at all.",
+        "Curl the pelvis up towards the ribs rather than just lifting the thighs — that's the difference between hip flexor work and actual abs."
+      ],
+      "commonErrors": ["Swinging and using momentum.", "Only lifting the knees without any pelvic tilt."],
+      "soloSafety": "None. Drop off if the grip goes.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "hanging knee raise", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["dead-bug", "hollow-hold"],
+      "tags": []
+    },
+
+    {
+      "id": "dead-hang",
+      "name": "Dead hang",
+      "aliases": ["passive hang"],
+      "pattern": "mobility",
+      "primaryMuscles": ["grip"],
+      "secondaryMuscles": ["lats", "shoulders"],
+      "equipment": ["pullUpBar", "rings"],
+      "defaultLoadMode": "timed",
+      "cues": ["Relax into it and let the shoulders stretch. Decompresses everything the squats and rows compressed all week."],
+      "commonErrors": [],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "dead hang", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["timed", "mobility"]
+    },
+
+    {
+      "id": "rope-skipping",
+      "name": "Rope skipping",
+      "aliases": ["jump rope", "skipping"],
+      "pattern": "conditioning",
+      "primaryMuscles": ["calves"],
+      "secondaryMuscles": ["shoulders", "forearms"],
+      "equipment": ["jumpRope"],
+      "defaultLoadMode": "timed",
+      "cues": [
+        "Skip on the interlocking foam mats, never on the bare concrete.",
+        "Stay on the balls of the feet with barely-bent knees.",
+        "Let the wrists turn the rope, not the arms — big arm circles mean the rope is too long."
+      ],
+      "commonErrors": ["Jumping far too high.", "Landing flat-footed and heavily.", "Going straight into 10 minutes of rope. That's how shin splints start."],
+      "soloSafety": "Measure the ceiling before your first session — standing under the rope you want at least 30 cm of clearance above your head, which the basement beams may not give you everywhere.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "jump rope", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["conditioning", "timed"]
+    },
+
+    {
+      "id": "heavy-bag-rounds",
+      "name": "Heavy bag rounds",
+      "aliases": ["bag work", "boxing rounds"],
+      "pattern": "conditioning",
+      "primaryMuscles": ["shoulders", "abs"],
+      "secondaryMuscles": ["calves", "back"],
+      "equipment": ["heavyBag"],
+      "defaultLoadMode": "timed",
+      "cues": [
+        "Wraps or gloves on, always.",
+        "Straight punches, move your feet, breathe out on every shot.",
+        "Conditioning that doesn't touch your legs before the next squat session."
+      ],
+      "commonErrors": ["Punching bare-knuckle. Wrist and knuckle injuries end training blocks.", "Standing flat-footed and arm-punching.", "Going all-out in round one and dying in round two."],
+      "soloSafety": "Check the ceiling mount and chain before each session. Wrap your hands even for light work.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "heavy bag boxing", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["rope-skipping"],
+      "tags": ["conditioning", "timed", "finisher"]
+    },
+
+    {
+      "id": "easy-run",
+      "name": "Easy run",
+      "aliases": ["Zone 2 run", "conversational run"],
+      "pattern": "conditioning",
+      "primaryMuscles": ["legs", "heart"],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "defaultLoadMode": "timed",
+      "cues": [
+        "Easy means easy — you should be able to speak a full sentence the whole way.",
+        "If you can't breathe through your nose, you're going too fast.",
+        "Aasee loop or the Promenade."
+      ],
+      "commonErrors": ["Running every run at a moderate-hard pace, which builds nothing and costs recovery."],
+      "soloSafety": "None. At your bodyweight, extra cardio is a cost, not a bonus — if a run ever costs you a lifting session, cut the run.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": null, "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["rope-skipping"],
+      "tags": ["conditioning", "timed"]
+    },
+
+    {
+      "id": "run-intervals",
+      "name": "Run intervals",
+      "aliases": ["interval run"],
+      "pattern": "conditioning",
+      "primaryMuscles": ["legs", "heart"],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "defaultLoadMode": "timed",
+      "cues": ["Hard efforts with genuine easy recovery between, not a moderate slog throughout."],
+      "commonErrors": ["Not recovering enough between efforts, which turns intervals into a tempo run."],
+      "soloSafety": "Warm up for at least 5 minutes first.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": null, "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["easy-run"],
+      "tags": ["conditioning", "timed"]
+    },
+
+    {
+      "id": "five-k-time-trial",
+      "name": "5K time trial",
+      "aliases": ["5K test"],
+      "pattern": "conditioning",
+      "primaryMuscles": ["legs", "heart"],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "defaultLoadMode": "distance",
+      "cues": ["Flat route, measured. Even pacing beats a fast first kilometre.", "Target 28–30 min at week 12."],
+      "commonErrors": ["Starting too fast."],
+      "soloSafety": "Warm up properly. This is the one hard run in the whole block.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": null, "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["conditioning", "test"]
+    },
+
+    {
+      "id": "bodyweight-squat",
+      "name": "Bodyweight squat",
+      "aliases": ["air squat"],
+      "pattern": "warmup",
+      "primaryMuscles": ["quads", "glutes"],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "defaultLoadMode": "bodyweight",
+      "cues": ["Full depth, controlled, as a rehearsal of the loaded pattern."],
+      "commonErrors": [],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "bodyweight squat", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["warmup"]
+    },
+
+    {
+      "id": "broomstick-pass-through",
+      "name": "Broomstick pass-through",
+      "aliases": ["shoulder pass-through", "dislocates"],
+      "pattern": "mobility",
+      "primaryMuscles": ["shoulders"],
+      "secondaryMuscles": ["chest"],
+      "equipment": ["dowel"],
+      "defaultLoadMode": "bodyweight",
+      "cues": ["The wooden dowel by the wall, wide grip, over the head and behind. Slow and controlled.", "Narrow the grip as the shoulders open up over the weeks."],
+      "commonErrors": ["Grip too narrow too soon, forcing the shoulder."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "shoulder pass through", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": ["band-pull-apart"],
+      "tags": ["warmup", "mobility"]
+    },
+
+    {
+      "id": "leg-swing",
+      "name": "Leg swing",
+      "aliases": [],
+      "pattern": "warmup",
+      "primaryMuscles": ["hipFlexors", "hamstrings"],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "defaultLoadMode": "bodyweight",
+      "cues": ["Hold a wall, swing one leg front to back, then side to side. Controlled range, not ballistic."],
+      "commonErrors": [],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "leg swings", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["warmup", "mobility"]
+    },
+
+    {
+      "id": "cat-cow",
+      "name": "Cat-cow",
+      "aliases": [],
+      "pattern": "mobility",
+      "primaryMuscles": ["spine"],
+      "secondaryMuscles": [],
+      "equipment": ["mat"],
+      "defaultLoadMode": "bodyweight",
+      "cues": ["On all fours, alternate arching and rounding the spine slowly, segment by segment."],
+      "commonErrors": [],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "cat cow stretch", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["warmup", "mobility"]
+    },
+
+    {
+      "id": "couch-stretch",
+      "name": "Couch stretch",
+      "aliases": ["hip flexor stretch"],
+      "pattern": "mobility",
+      "primaryMuscles": ["hipFlexors", "quads"],
+      "secondaryMuscles": [],
+      "equipment": ["mat"],
+      "defaultLoadMode": "timed",
+      "cues": ["Back knee down, rear foot elevated against the bench or wall. Squeeze the glute of the back leg and stay tall.", "45 s per side."],
+      "commonErrors": ["Arching the lower back to get deeper."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "couch stretch hip flexor", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["mobility", "timed"]
+    },
+
+    {
+      "id": "ninety-ninety-hip-switch",
+      "name": "90/90 hip switch",
+      "aliases": ["90/90 hip rotation"],
+      "pattern": "mobility",
+      "primaryMuscles": ["hips"],
+      "secondaryMuscles": [],
+      "equipment": ["mat"],
+      "defaultLoadMode": "timed",
+      "cues": ["Seated, both knees at 90°, rotate from one side to the other under control without using the hands."],
+      "commonErrors": [],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "90 90 hip stretch", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["mobility"]
+    },
+
+    {
+      "id": "thoracic-rotation",
+      "name": "Thoracic rotation",
+      "aliases": ["open book"],
+      "pattern": "mobility",
+      "primaryMuscles": ["thoracicSpine"],
+      "secondaryMuscles": ["chest"],
+      "equipment": ["mat"],
+      "defaultLoadMode": "timed",
+      "cues": ["Side-lying or quadruped, rotate the upper back open and follow the hand with the eyes. Hips stay still."],
+      "commonErrors": ["Rotating from the lower back instead of the ribcage."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "thoracic rotation stretch", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["mobility"]
+    },
+
+    {
+      "id": "standing-hamstring-stretch",
+      "name": "Standing hamstring stretch",
+      "aliases": [],
+      "pattern": "mobility",
+      "primaryMuscles": ["hamstrings"],
+      "secondaryMuscles": ["calves"],
+      "equipment": [],
+      "defaultLoadMode": "timed",
+      "cues": ["Heel on a low bench, hinge at the hips with a flat back until you feel the hamstring. 45 s per side."],
+      "commonErrors": ["Rounding the back instead of hinging."],
+      "soloSafety": "None.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "standing hamstring stretch", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["mobility", "timed"]
+    },
+
+    {
+      "id": "doorway-chest-stretch",
+      "name": "Doorway chest stretch",
+      "aliases": ["pec stretch"],
+      "pattern": "mobility",
+      "primaryMuscles": ["chest"],
+      "secondaryMuscles": ["frontDelts"],
+      "equipment": [],
+      "defaultLoadMode": "timed",
+      "cues": ["Forearm on the door frame at shoulder height, step through until you feel the chest open. 45 s per side."],
+      "commonErrors": ["Forcing it into the front of the shoulder joint."],
+      "soloSafety": "Stop if you feel it in the shoulder joint rather than the chest muscle.",
+      "media": { "still": null, "stillLicence": null, "stillSearchTerm": "doorway chest stretch", "youtubeUrl": null, "youtubeStartSec": 0 },
+      "substitutes": [],
+      "tags": ["mobility", "timed"]
+    }
+
+  ]
+}

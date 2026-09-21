@@ -1,0 +1,306 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kellertwelve.local/schema/programme.v2.json",
+  "title": "Keller Twelve programme (v2)",
+  "description": "Schema for a Keller Twelve training programme definition. v2 adds superset grouping, explicit units, per-side semantics, rep creep, lattice-valid loads, escalating nutrition phases and a completion action. Validated by `flutter test` (build plan Phase 1, gates V1-V11) and by tools/validate.py.",
+  "type": "object",
+  "required": ["id", "name", "schemaVersion", "revision", "startDate", "totalWeeks", "blocks"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "name": { "type": "string", "minLength": 1 },
+    "schemaVersion": { "type": "integer", "minimum": 2 },
+    "revision": { "type": "integer", "minimum": 1 },
+    "startDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "totalWeeks": { "type": "integer", "minimum": 1, "maximum": 104 },
+    "notes": { "type": ["string", "null"] },
+
+    "athlete": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "startWeightKg": { "type": "number", "exclusiveMinimum": 0 },
+        "heightCm": { "type": "integer", "exclusiveMinimum": 0 },
+        "targetWeightKg": { "type": "number", "exclusiveMinimum": 0 },
+        "ageYears": { "type": "integer", "minimum": 10, "maximum": 100 },
+        "sex": { "enum": ["male", "female"] },
+        "experience": { "enum": ["beginner", "intermediate", "advanced"] },
+        "trainsAlone": { "type": "boolean" }
+      }
+    },
+
+    "nutritionPhases": {
+      "description": "Escalating targets. TDEE rises with bodyweight, so a fixed number becomes maintenance by week 10. Replaces v1's single nutritionTargets object.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["weeks", "kcal"],
+        "additionalProperties": false,
+        "properties": {
+          "weeks": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 1 },
+          "kcal": { "type": "integer", "exclusiveMinimum": 0 },
+          "proteinG": { "type": "integer", "minimum": 0 },
+          "carbsG": { "type": "integer", "minimum": 0 },
+          "fatG": { "type": "integer", "minimum": 0 },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    },
+
+    "nutritionRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gainKgPerWeek": { "type": "number" },
+        "flatWeeksBeforeBump": { "type": "integer", "minimum": 1 },
+        "kcalBumpWhenFlat": { "type": "integer", "minimum": 0 },
+        "useRollingAverage": { "type": "boolean" },
+        "rollingAverageDays": { "type": "integer", "minimum": 1, "maximum": 28 },
+        "waistGrowthLimitCm": { "type": "number", "minimum": 0 },
+        "kcalCutWhenWaistGrows": { "type": "integer", "minimum": 0 }
+      }
+    },
+
+    "onComplete": {
+      "description": "What happens at week totalWeeks + 1. Without this the calendar returns null forever.",
+      "type": "object",
+      "required": ["action"],
+      "additionalProperties": false,
+      "properties": {
+        "action": { "enum": ["seedNextCycle", "repeat", "stop"] },
+        "skipBlocks": { "type": "array", "items": { "type": "string" } },
+        "seedFrom": { "type": ["string", "null"] },
+        "bodyweightTargetKg": { "type": ["number", "null"] }
+      }
+    },
+
+    "rules": { "type": "array", "items": { "type": "string" } },
+
+    "cardioProgression": {
+      "description": "Authoritative for every prescription whose progression.type is cardioTable. The prescription's own repsMin/repsMax are ignored in that case.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["weeks"],
+        "additionalProperties": false,
+        "properties": {
+          "weeks": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 1 },
+          "longRunMin": { "type": ["array", "null"], "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
+          "secondRunMin": { "type": ["array", "null"], "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
+          "skipping": { "type": ["string", "null"] },
+          "bag": { "type": ["string", "null"] },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    },
+
+    "checkpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["week", "items"],
+        "additionalProperties": false,
+        "properties": {
+          "week": { "type": "integer", "minimum": 1 },
+          "expectedWeightKg": { "type": ["array", "null"], "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "items": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        }
+      }
+    },
+
+    "strengthTargets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["exerciseId"],
+        "additionalProperties": false,
+        "properties": {
+          "exerciseId": { "type": "string" },
+          "week4Kg": { "type": ["array", "null"], "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "week12Kg": { "type": ["array", "null"], "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "reps": { "type": "integer", "minimum": 1 },
+          "isFloor": {
+            "description": "True means this is what the programme's own increments produce, not a goal. Missing it is not failure. The UI must label it.",
+            "type": "boolean"
+          },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    },
+
+    "blocks": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/block" } }
+  },
+
+  "definitions": {
+
+    "block": {
+      "type": "object",
+      "required": ["id", "name", "weeks", "days"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "name": { "type": "string", "minLength": 1 },
+        "weeks": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 1 },
+        "blockKind": { "enum": ["intro", "accumulation", "deload", "test"] },
+        "defaultRir": {
+          "description": "Inherited by any prescription whose targetRir is null. v1 declared this field and never consumed it.",
+          "type": ["integer", "null"], "minimum": 0, "maximum": 6
+        },
+        "loadMultiplier": { "type": "number", "exclusiveMinimum": 0, "maximum": 2 },
+        "setMultiplier": { "type": "number", "exclusiveMinimum": 0, "maximum": 2 },
+        "setRounding": {
+          "description": "How to resolve a fractional set count. Result is clamped to >= 1. v1 left this undefined, which made 3 x 0.5 sets a coin flip.",
+          "enum": ["up", "down", "nearest"]
+        },
+        "includeSupersets": {
+          "description": "False unwinds every groupId into straight sets. Used by the deload so nothing is rushed.",
+          "type": "boolean"
+        },
+        "includeFinishers": { "type": "boolean" },
+        "summary": { "type": ["string", "null"] },
+        "inheritsDaysFrom": { "type": ["string", "null"] },
+        "dayOverrides": { "type": "object" },
+        "days": { "type": "array", "items": { "$ref": "#/definitions/day" } }
+      }
+    },
+
+    "day": {
+      "type": "object",
+      "required": ["id", "weekday", "title", "kind", "sections"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "weekday": { "enum": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] },
+        "title": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["lift", "cardio", "rest", "mobility"] },
+        "optional": { "type": "boolean" },
+        "estMinutes": {
+          "description": "COMPUTED by tools/gen.py from the prescriptions, ramps and implement changes. Never typed by hand. Gate V11 fails the build if a lift day exceeds 60.",
+          "type": "integer", "minimum": 0
+        },
+        "note": { "type": ["string", "null"] },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["title", "body"],
+            "additionalProperties": false,
+            "properties": {
+              "title": { "type": "string" },
+              "body": { "type": "string" }
+            }
+          }
+        },
+        "sections": { "type": "array", "items": { "$ref": "#/definitions/section" } }
+      }
+    },
+
+    "section": {
+      "type": "object",
+      "required": ["type", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "enum": ["warmup", "main", "finisher", "cooldown", "cardio"] },
+        "title": { "type": "string", "minLength": 1 },
+        "estMinutes": { "type": "integer", "minimum": 0 },
+        "drills": {
+          "description": "Warm-up and cool-down items. Unlike v1's freeItems strings, each carries a real exerciseId, so every drill gets a detail page, cues and a demo. Drills are ticked, not logged.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["exerciseId", "order", "text"],
+            "additionalProperties": false,
+            "properties": {
+              "exerciseId": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+              "order": { "type": "integer", "minimum": 1 },
+              "text": { "type": "string", "minLength": 1 },
+              "note": { "type": ["string", "null"] }
+            }
+          }
+        },
+        "prescriptions": { "type": "array", "items": { "$ref": "#/definitions/prescription" } }
+      }
+    },
+
+    "prescription": {
+      "type": "object",
+      "required": ["id", "exerciseId", "order", "sets", "repsMin", "repsMax", "restSec", "loadMode"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "exerciseId": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "order": { "type": "integer", "minimum": 1 },
+
+        "groupId": {
+          "description": "Superset grouping. Members share a groupId, are performed alternating, and only the LAST member carries the rest. This is how a five-movement session fits in 60 minutes.",
+          "type": ["string", "null"], "pattern": "^[a-z0-9-]+$"
+        },
+        "unit": {
+          "description": "What repsMin/repsMax mean. v1 smuggled seconds through repsMin, so a 2-minute bag round rendered as '120 reps'.",
+          "enum": ["reps", "sec", "m"]
+        },
+
+        "sets": { "type": "integer", "minimum": 1, "maximum": 20 },
+        "repsMin": { "type": "integer", "minimum": 1 },
+        "repsMax": { "type": "integer", "minimum": 1 },
+        "repsCreepMax": {
+          "description": "Ceiling the rep range may extend to when one lattice step is a bigger jump than progression.maxJumpPct. Null disables rep creep. Without this the engine deadlocks on every light barbell lift.",
+          "type": ["integer", "null"], "minimum": 1
+        },
+
+        "restSec": { "type": "integer", "minimum": 0, "maximum": 600 },
+        "targetRir": { "type": ["integer", "null"], "minimum": 0, "maximum": 6 },
+
+        "loadMode": {
+          "enum": ["barbell", "ezBar", "dumbbellPair", "dumbbellSingle", "kettlebell",
+                   "cable", "bodyweight", "bodyweightLoaded", "banded", "timed", "distance"]
+        },
+        "startLoadKg": {
+          "description": "COLD-START value only, used when no history exists inside progression.historyWindowDays. MUST be lattice-valid for its loadMode against inventory.json — gate V6.",
+          "type": ["number", "null"], "minimum": 0
+        },
+
+        "perSide": {
+          "description": "Whether `sets` means sets per side. v1 could only say this in an unparseable coachNote.",
+          "type": "boolean"
+        },
+        "unilateral": { "type": "boolean" },
+        "warmupRamp": {
+          "description": "Generate lattice-aware ramp sets before the first work set. Ramp sets log is_warmup = 1 and are excluded from progression and volume.",
+          "type": "boolean"
+        },
+        "optional": {
+          "description": "Droppable when short on time, and the first thing the runner offers to cut at the 45-minute mark.",
+          "type": "boolean"
+        },
+
+        "progression": { "$ref": "#/definitions/progression" },
+        "substitutes": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9-]+$" } },
+        "coachNote": { "type": ["string", "null"] },
+        "tempo": { "type": ["string", "null"] }
+      }
+    },
+
+    "progression": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "enum": ["doubleProgression", "repsOnly", "timeOnly", "bandProgression", "cardioTable", "none"] },
+        "incrementKg": { "type": "number", "minimum": 0 },
+        "incrementSec": { "type": "integer", "minimum": 0 },
+        "deloadPct": { "type": "number", "minimum": 0, "maximum": 0.5 },
+        "stallLimit": { "type": "integer", "minimum": 1 },
+        "historyWindowDays": {
+          "description": "History older than this is ignored and startLoadKg is used instead. Makes the history-vs-cold-start precedence explicit rather than implied.",
+          "type": "integer", "minimum": 1, "maximum": 365
+        },
+        "maxJumpPct": {
+          "description": "Above this fraction of current load, a single lattice step is too big a jump and rep creep engages instead. The clamp must never reduce a jump below one lattice step.",
+          "type": "number", "minimum": 0, "maximum": 1
+        }
+      }
+    }
+  }
+}

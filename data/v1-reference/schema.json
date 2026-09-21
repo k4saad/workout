@@ -1,0 +1,200 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kellertwelve.local/schema/programme.json",
+  "title": "Keller Twelve programme",
+  "description": "Schema for a Keller Twelve training programme definition. Validated in CI-less life by `flutter test` (see plan Phase 1).",
+  "type": "object",
+  "required": ["id", "name", "schemaVersion", "revision", "startDate", "totalWeeks", "blocks"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "name": { "type": "string", "minLength": 1 },
+    "schemaVersion": { "type": "integer", "minimum": 1 },
+    "revision": { "type": "integer", "minimum": 1 },
+    "startDate": { "type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "totalWeeks": { "type": "integer", "minimum": 1, "maximum": 104 },
+    "notes": { "type": ["string", "null"] },
+
+    "athlete": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "startWeightKg": { "type": "number", "exclusiveMinimum": 0 },
+        "heightCm": { "type": "integer", "exclusiveMinimum": 0 },
+        "targetWeightKg": { "type": "number", "exclusiveMinimum": 0 },
+        "experience": { "enum": ["beginner", "intermediate", "advanced"] },
+        "trainsAlone": { "type": "boolean" }
+      }
+    },
+
+    "nutritionTargets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kcal": { "type": "integer", "exclusiveMinimum": 0 },
+        "proteinG": { "type": "integer", "minimum": 0 },
+        "carbsG": { "type": "integer", "minimum": 0 },
+        "fatG": { "type": "integer", "minimum": 0 },
+        "gainKgPerWeek": { "type": "number" },
+        "flatWeeksBeforeBump": { "type": "integer", "minimum": 1 },
+        "kcalBumpWhenFlat": { "type": "integer", "minimum": 0 }
+      }
+    },
+
+    "rules": { "type": "array", "items": { "type": "string" } },
+
+    "cardioProgression": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["weeks"],
+        "additionalProperties": false,
+        "properties": {
+          "weeks": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 1 },
+          "longRunMin": { "type": ["array", "null"], "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
+          "secondRunMin": { "type": ["array", "null"], "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
+          "skipping": { "type": ["string", "null"] },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    },
+
+    "checkpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["week", "items"],
+        "additionalProperties": false,
+        "properties": {
+          "week": { "type": "integer", "minimum": 1 },
+          "expectedWeightKg": { "type": ["array", "null"], "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "items": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        }
+      }
+    },
+
+    "strengthTargets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["exerciseId"],
+        "additionalProperties": false,
+        "properties": {
+          "exerciseId": { "type": "string" },
+          "week4Kg": { "type": ["array", "null"], "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "week12Kg": { "type": ["array", "null"], "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "reps": { "type": "integer", "minimum": 1 },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    },
+
+    "blocks": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/block" }
+    }
+  },
+
+  "definitions": {
+
+    "block": {
+      "type": "object",
+      "required": ["id", "name", "weeks", "days"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "name": { "type": "string", "minLength": 1 },
+        "weeks": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 1 },
+        "defaultRir": { "type": ["integer", "null"], "minimum": 0, "maximum": 6 },
+        "loadMultiplier": { "type": "number", "exclusiveMinimum": 0, "maximum": 2 },
+        "setMultiplier": { "type": "number", "exclusiveMinimum": 0, "maximum": 2 },
+        "includeFinishers": { "type": "boolean" },
+        "summary": { "type": ["string", "null"] },
+        "inheritsDaysFrom": { "type": ["string", "null"] },
+        "dayOverrides": { "type": "object" },
+        "days": { "type": "array", "items": { "$ref": "#/definitions/day" } }
+      }
+    },
+
+    "day": {
+      "type": "object",
+      "required": ["id", "weekday", "title", "kind", "sections"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "weekday": { "enum": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] },
+        "title": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["lift", "cardio", "rest", "mobility"] },
+        "optional": { "type": "boolean" },
+        "estMinutes": { "type": "integer", "minimum": 0 },
+        "note": { "type": ["string", "null"] },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["title", "body"],
+            "additionalProperties": false,
+            "properties": {
+              "title": { "type": "string" },
+              "body": { "type": "string" }
+            }
+          }
+        },
+        "sections": { "type": "array", "items": { "$ref": "#/definitions/section" } }
+      }
+    },
+
+    "section": {
+      "type": "object",
+      "required": ["type", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "enum": ["warmup", "main", "finisher", "cooldown", "cardio"] },
+        "title": { "type": "string", "minLength": 1 },
+        "estMinutes": { "type": "integer", "minimum": 0 },
+        "freeItems": { "type": "array", "items": { "type": "string" } },
+        "prescriptions": { "type": "array", "items": { "$ref": "#/definitions/prescription" } }
+      }
+    },
+
+    "prescription": {
+      "type": "object",
+      "required": ["id", "exerciseId", "order", "sets", "repsMin", "repsMax", "restSec", "loadMode"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "exerciseId": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "order": { "type": "integer", "minimum": 1 },
+        "sets": { "type": "integer", "minimum": 1, "maximum": 20 },
+        "repsMin": { "type": "integer", "minimum": 1 },
+        "repsMax": { "type": "integer", "minimum": 1 },
+        "restSec": { "type": "integer", "minimum": 0, "maximum": 600 },
+        "targetRir": { "type": ["integer", "null"], "minimum": 0, "maximum": 6 },
+        "loadMode": {
+          "enum": ["barbell", "ezBar", "dumbbellPair", "dumbbellSingle", "kettlebell",
+                   "bodyweight", "bodyweightLoaded", "banded", "timed", "distance"]
+        },
+        "startLoadKg": { "type": ["number", "null"], "minimum": 0 },
+        "progression": { "$ref": "#/definitions/progression" },
+        "substitutes": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9-]+$" } },
+        "coachNote": { "type": ["string", "null"] },
+        "tempo": { "type": ["string", "null"] },
+        "unilateral": { "type": "boolean" }
+      }
+    },
+
+    "progression": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "enum": ["doubleProgression", "repsOnly", "timeOnly", "bandProgression", "cardioTable", "none"] },
+        "incrementKg": { "type": "number", "minimum": 0 },
+        "incrementSec": { "type": "integer", "minimum": 0 },
+        "deloadPct": { "type": "number", "minimum": 0, "maximum": 0.5 },
+        "stallLimit": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}
