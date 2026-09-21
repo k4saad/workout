@@ -1,0 +1,254 @@
+import 'dart:io';
+
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+
+import 'tables.dart';
+
+part 'database.g.dart';
+
+/// The training log.
+///
+/// Every set is persisted the moment it is logged, never batched to the end of
+/// a session — phones die, and a session you cannot recover is a session the
+/// progression engine will never see.
+@DriftDatabase(
+  tables: [
+    Sessions,
+    SetLogs,
+    StallCounters,
+    Bodyweights,
+    CardioLogs,
+    FoodLogs,
+    Niggles,
+  ],
+)
+class AppDatabase extends _$AppDatabase {
+  AppDatabase(super.e);
+
+  /// In-memory instance for tests. No device, no files.
+  AppDatabase.memory() : super(NativeDatabase.memory());
+
+  @override
+  int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) async {
+      await m.createAll();
+    },
+    onUpgrade: (m, from, to) async {
+      // Every schema bump lands on a device holding real training data, so a
+      // migration runs only after backupBeforeMigration() has taken a copy.
+      // Add steps here as the schema grows; never drop a column that holds
+      // logged sets.
+    },
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
+
+  // ---------------------------------------------------------------- sessions
+
+  Future<Session?> sessionById(int id) =>
+      (select(sessions)..where((s) => s.id.equals(id))).getSingleOrNull();
+
+  /// The session currently in progress, if any. Checked on every launch so a
+  /// killed app resumes exactly where it was.
+  Future<Session?> inProgressSession() =>
+      (select(sessions)
+            ..where((s) => s.status.equalsValue(SessionStatus.inProgress))
+            ..orderBy([(s) => OrderingTerm.desc(s.startedAt)])
+            ..limit(1))
+          .getSingleOrNull();
+
+  Future<Session?> sessionForDay(String dayId, DateTime plannedDate) {
+    final d = DateTime(plannedDate.year, plannedDate.month, plannedDate.day);
+    return (select(sessions)
+          ..where((s) => s.dayId.equals(dayId) & s.plannedDate.equals(d))
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
+  Future<List<Session>> sessionsBetween(DateTime from, DateTime to) =>
+      (select(sessions)
+            ..where((s) => s.scheduledDate.isBetweenValues(from, to))
+            ..orderBy([(s) => OrderingTerm.asc(s.scheduledDate)]))
+          .get();
+
+  Future<List<Session>> completedSessions({int limit = 200}) =>
+      (select(sessions)
+            ..where((s) => s.status.equalsValue(SessionStatus.completed))
+            ..orderBy([(s) => OrderingTerm.desc(s.scheduledDate)])
+            ..limit(limit))
+          .get();
+
+  // ---------------------------------------------------------------- set logs
+
+  Future<List<SetLog>> setsForSession(int sessionId) =>
+      (select(setLogs)
+            ..where((l) => l.sessionId.equals(sessionId))
+            ..orderBy([
+              (l) => OrderingTerm.asc(l.prescriptionId),
+              (l) => OrderingTerm.asc(l.setIndex),
+            ]))
+          .get();
+
+  /// Working sets (never ramp sets) from the most recent session that logged
+  /// [prescriptionId].
+  ///
+  /// This is the primary history lookup. Keying on the prescription — not just
+  /// the exercise — is what stops two prescriptions of the same lift in one
+  /// week from driving each other's suggestions.
+  Future<List<SetLog>> lastSetsForPrescription(String prescriptionId) async {
+    final last =
+        await (select(setLogs)
+              ..where(
+                (l) =>
+                    l.prescriptionId.equals(prescriptionId) &
+                    l.isWarmup.equals(false),
+              )
+              ..orderBy([(l) => OrderingTerm.desc(l.completedAt)])
+              ..limit(1))
+            .getSingleOrNull();
+    if (last == null) return const [];
+    return _setsFromSameSession(
+      last,
+      (l) => l.prescriptionId.equals(prescriptionId),
+    );
+  }
+
+  /// Fallback history lookup, by exercise. Used when a prescription is new —
+  /// after a swap, or when the programme was edited.
+  Future<List<SetLog>> lastSetsForExercise(String exerciseId) async {
+    final last =
+        await (select(setLogs)
+              ..where(
+                (l) =>
+                    l.exerciseId.equals(exerciseId) & l.isWarmup.equals(false),
+              )
+              ..orderBy([(l) => OrderingTerm.desc(l.completedAt)])
+              ..limit(1))
+            .getSingleOrNull();
+    if (last == null) return const [];
+    return _setsFromSameSession(last, (l) => l.exerciseId.equals(exerciseId));
+  }
+
+  Future<List<SetLog>> _setsFromSameSession(
+    SetLog anchor,
+    Expression<bool> Function($SetLogsTable) extra,
+  ) =>
+      (select(setLogs)
+            ..where(
+              (l) =>
+                  l.sessionId.equals(anchor.sessionId) &
+                  l.isWarmup.equals(false) &
+                  extra(l),
+            )
+            ..orderBy([(l) => OrderingTerm.asc(l.setIndex)]))
+          .get();
+
+  /// Every logged set for one exercise, newest first. Drives the per-lift
+  /// history screen and the e1RM trend.
+  Future<List<SetLog>> historyForExercise(
+    String exerciseId, {
+    int limit = 500,
+  }) =>
+      (select(setLogs)
+            ..where(
+              (l) => l.exerciseId.equals(exerciseId) & l.isWarmup.equals(false),
+            )
+            ..orderBy([(l) => OrderingTerm.desc(l.completedAt)])
+            ..limit(limit))
+          .get();
+
+  // ----------------------------------------------------------------- stalls
+
+  Future<StallCounter?> stallFor(String exerciseId, String prescriptionId) =>
+      (select(stallCounters)..where(
+            (s) =>
+                s.exerciseId.equals(exerciseId) &
+                s.prescriptionId.equals(prescriptionId),
+          ))
+          .getSingleOrNull();
+
+  Future<void> setStall(String exerciseId, String prescriptionId, int count) =>
+      into(stallCounters).insertOnConflictUpdate(
+        StallCountersCompanion.insert(
+          exerciseId: exerciseId,
+          prescriptionId: prescriptionId,
+          count: Value(count),
+          updatedAt: DateTime.now(),
+        ),
+      );
+
+  // ------------------------------------------------------------- bodyweight
+
+  Future<List<Bodyweight>> bodyweightHistory({int limit = 400}) =>
+      (select(bodyweights)
+            ..orderBy([(b) => OrderingTerm.desc(b.measuredOn)])
+            ..limit(limit))
+          .get();
+
+  Future<void> upsertBodyweight(DateTime on, double kg, {String? note}) {
+    final d = DateTime(on.year, on.month, on.day);
+    return into(bodyweights).insertOnConflictUpdate(
+      BodyweightsCompanion.insert(measuredOn: d, kg: kg, note: Value(note)),
+    );
+  }
+
+  /// Bodyweight nearest [date] within +/- [withinDays]. Used to caption a
+  /// progress photo without making you type the number twice.
+  Future<Bodyweight?> bodyweightNear(
+    DateTime date, {
+    int withinDays = 2,
+  }) async {
+    final lo = DateTime(date.year, date.month, date.day - withinDays);
+    final hi = DateTime(date.year, date.month, date.day + withinDays);
+    final rows = await (select(
+      bodyweights,
+    )..where((b) => b.measuredOn.isBetweenValues(lo, hi))).get();
+    if (rows.isEmpty) return null;
+    rows.sort(
+      (a, b) => (a.measuredOn.difference(date).inHours.abs()).compareTo(
+        b.measuredOn.difference(date).inHours.abs(),
+      ),
+    );
+    return rows.first;
+  }
+
+  // ----------------------------------------------------------------- admin
+
+  /// Every table, cleared. Used by restore before importing a backup.
+  Future<void> wipe() async {
+    await transaction(() async {
+      for (final t in allTables) {
+        await delete(t).go();
+      }
+    });
+  }
+}
+
+/// Opens the on-device database, taking a backup copy before any migration.
+///
+/// A Drift migration that goes wrong on a device holding ten weeks of logs is
+/// unrecoverable without this.
+LazyDatabase openConnection() {
+  return LazyDatabase(() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dir.path, 'keller_twelve.sqlite'));
+    if (file.existsSync()) {
+      final backup = File(
+        p.join(dir.path, 'keller_twelve.premigration.sqlite'),
+      );
+      try {
+        await file.copy(backup.path);
+      } catch (_) {
+        // A failed pre-migration copy must not stop the app opening.
+      }
+    }
+    return NativeDatabase.createInBackground(file);
+  });
+}

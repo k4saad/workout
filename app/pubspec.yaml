@@ -23,6 +23,23 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.1
 
+  # database
+  drift: ^2.28.2
+  sqlite3_flutter_libs: ^0.5.42
+
+  # timers, notifications, wakelock
+  flutter_local_notifications: ^19.4.2
+  wakelock_plus: ^1.3.2
+  audioplayers: ^6.5.1
+
+  # backup / export
+  archive: ^4.0.7
+  share_plus: ^12.0.1
+  file_picker: ^10.3.3
+
+  # ids
+  uuid: ^4.5.1
+
   # formatting
   intl: ^0.20.2
 
@@ -35,6 +52,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
   # codegen
+  drift_dev: ^2.28.2
   build_runner: ^2.4.15
   riverpod_generator: ^3.0.3
   custom_lint: ^0.8.1
@@ -42,6 +60,9 @@ dev_dependencies:
 
   # used by the schema-validation test (gate V1)
   json_schema: ^5.2.1
+
+  # in-memory sqlite for domain tests, no device needed
+  sqlite3: ^2.9.1
 
 flutter:
   uses-material-design: true
