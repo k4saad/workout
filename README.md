@@ -10,6 +10,18 @@ cable, heavy bag, jump rope, ab wheel, kettlebell, step platform, mats
 
 ---
 
+## Toolchain recorded
+
+| | |
+|---|---|
+| Flutter | 3.47.5 · stable · Dart 3.13.4 |
+| JDK running Gradle | **unset — system default is Java 25.** See *Three things only you can do*. |
+| minSdk / target | 24 / Flutter default |
+| App version | 0.10.0+10 |
+
+Known deviations from the build plan are listed at the end of
+[docs/03-build-plan.md](docs/03-build-plan.md).
+
 ## Read these in order
 
 | # | Document | What it is |
@@ -87,9 +99,9 @@ balance        both upper days 10 push / 10 pull
 - [x] Phase 10 — hardening + release — tag `v0.10-phase10`
 - [ ] `v1.0` — after the on-device checks in the release checklist below
 
-### Two things only you can do
+### Three things only you can do
 
-**1. Accept the Android SDK licences.** Flutter 3.47.5, JDK 17 and the Android
+**1. Accept the Android SDK licences.** Flutter 3.47.5 and the Android
 command-line tools are installed, but installing SDK packages means accepting
 Google's licence agreements, which is yours to accept, not the assistant's.
 One script does the rest:
@@ -102,7 +114,23 @@ Until that runs there is no APK, so no phase can meet its "installed on the
 phone" definition of done. Everything else — the tests, `flutter analyze`,
 the data gates — passes without it.
 
-**2. Week-1 calibration** ([docs/04-calibration.md](docs/04-calibration.md)).
+**2. Install and pin JDK 17.** The system default here is **Java 25**, and
+there is no JDK 17 on the machine (only 21 and 25). The build plan calls for
+17 and warns that a too-new JDK fails with cryptic Kotlin and AGP errors that
+look like anything except a JDK problem. `android/app/build.gradle.kts`
+already *targets* 17 bytecode — this is about which JDK Gradle itself runs on.
+
+After installing it, uncomment the matching line in
+`app/android/gradle.properties`:
+
+```
+org.gradle.java.home=C:\Program Files\Java\jdk-17
+```
+
+If you would rather not install anything, try pointing it at the JDK 21 that
+is already there first — but 17 is what the plan asks for.
+
+**3. Week-1 calibration** ([docs/04-calibration.md](docs/04-calibration.md)).
 The app runs on placeholder bar weights and says so on every screen until you
 weigh them. Edit `INVENTORY` at the top of `tools/gen.py`, re-run the two
 commands below, and every load moves onto your real lattice.
@@ -121,7 +149,7 @@ progress photo.
 ## Building and installing
 
 Everything below assumes the Android SDK licences have been accepted once
-(see **Two things only you can do**, above).
+(see **Three things only you can do**, above).
 
 ### Check it first
 

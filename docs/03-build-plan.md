@@ -61,17 +61,17 @@ installed on your phone.
 - [ ] `adb devices` lists the phone as `device`, not `unauthorized`
 
 ### 0.2 Project
-- [ ] `flutter create --org de.saad --platforms=android keller_twelve`
-- [ ] `minSdk 24`, `applicationId de.saad.kellertwelve`, `versionName 0.1.0`,
+- [x] `flutter create --org de.saad --platforms=android keller_twelve`
+- [x] `minSdk 24`, `applicationId de.saad.kellertwelve`, `versionName 0.1.0`,
       `versionCode 1`
-- [ ] `git init`, Flutter `.gitignore`, first commit
-- [ ] `CLAUDE.md` copied to the repo root
-- [ ] `docs/` copied in
+- [x] `git init`, Flutter `.gitignore`, first commit
+- [x] `CLAUDE.md` copied to the repo root
+- [x] `docs/` copied in
 
 ### 0.3 Release signing — **do not skip, do not defer**
-- [ ] `keytool -genkey -v -keystore <path>/keller-twelve.jks -keyalg RSA -keysize 2048 -validity 10000 -alias kellertwelve`
-- [ ] `android/key.properties` created and **added to `.gitignore`**
-- [ ] `signingConfigs.release` wired into `android/app/build.gradle`, and
+- [x] `keytool -genkey -v -keystore <path>/keller-twelve.jks -keyalg RSA -keysize 2048 -validity 10000 -alias kellertwelve`
+- [x] `android/key.properties` created and **added to `.gitignore`**
+- [x] `signingConfigs.release` wired into `android/app/build.gradle`, and
       `buildTypes.release.signingConfig` pointed at it — **not** at `signingConfigs.debug`
 - [ ] `flutter build apk --release --split-per-abi`
 - [ ] `apksigner verify --print-certs` shows **your** certificate, not `CN=Android Debug`
@@ -124,38 +124,41 @@ alone replaces doc 01 on your phone.
 bar weights.
 
 ### 1.1 Author the v2 data files
-- [ ] `data/keller-twelve.json` written from doc 01 — 5 blocks, day templates, supersets
-- [ ] `data/exercises.json` — start from v1's 72, add the wall-cable and step-platform
+- [x] `data/keller-twelve.json` written from doc 01 — 5 blocks, day templates, supersets
+- [x] `data/exercises.json` — start from v1's 72, add the wall-cable and step-platform
       movements, make the 10 orphaned warm-up exercises real references (audit C16)
-- [ ] `data/schema.json` updated with every field in doc 02 part 1
-- [ ] **Every `startLoadKg` generated on the lattice**, not typed by hand
+- [x] `data/schema.json` updated with every field in doc 02 part 1
+- [x] **Every `startLoadKg` generated on the lattice**, not typed by hand
 
 ### 1.2 Domain models
-- [ ] `lib/domain/models/` — immutable, `fromJson`/`toJson`, **zero Flutter imports**
-- [ ] `Programme`, `Block`, `Day`, `Section`, `ExercisePrescription`, `Exercise`,
+- [x] `lib/domain/models/` — immutable, `fromJson`/`toJson`, **zero Flutter imports**
+- [x] `Programme`, `Block`, `Day`, `Section`, `ExercisePrescription`, `Exercise`,
       `Progression`, `NutritionPhase`, `CardioWeek`, `Checkpoint`, `Inventory`
 
 ### 1.3 Resolution
-- [ ] `inheritsDaysFrom` + `dayOverrides` + `weekSpecific` per doc 02 algorithm C
-- [ ] All four new resolution steps: `setRounding`, `defaultRir` inheritance,
+- [x] `inheritsDaysFrom` + `dayOverrides` + `weekSpecific` per doc 02 algorithm C
+- [x] All four new resolution steps: `setRounding`, `defaultRir` inheritance,
       `includeSupersets`, `includeFinishers`
 
 ### 1.4 Validation tests — **these gate the build**
-- [ ] V1–V11 from doc 02 §1.6, every one of them
-- [ ] V6 (lattice validity) and V11 (60-minute ceiling) are the two that catch the
+- [x] V1–V11 from doc 02 §1.6, every one of them
+- [x] V6 (lattice validity) and V11 (60-minute ceiling) are the two that catch the
       v1 class of bug. Do not let them be skipped.
 
 ### 1.5 Repository
-- [ ] Load from asset → copy to app documents dir on first launch → prefer the copy
-- [ ] The asset is **never** mutated, so "reset to original" is one delete away
+- [x] Load from asset → copy to app documents dir on first launch → prefer the copy
+- [x] The asset is **never** mutated, so "reset to original" is one delete away
 
 ### 1.6 UI
-- [ ] Riverpod (`@riverpod` code-gen) + `go_router`
-- [ ] **Today** — which day is it, what am I doing
-- [ ] **Week** — 7 day cards
-- [ ] **Day detail** — sections, prescriptions, cues, `warnings` as a top banner,
+- [ ] Riverpod (`@riverpod` code-gen) + `go_router` — **deviation: plain
+      providers were used throughout, not code-gen.** `go_router` is as planned.
+      `riverpod_generator` is still a dev dependency, so converting later is
+      mechanical. See "Known deviations" below.
+- [x] **Today** — which day is it, what am I doing
+- [x] **Week** — 7 day cards
+- [x] **Day detail** — sections, prescriptions, cues, `warnings` as a top banner,
       supersets visually grouped
-- [ ] Theme: dark-first, high contrast, 48 dp minimum targets, readable at arm's length
+- [x] Theme: dark-first, high contrast, 48 dp minimum targets, readable at arm's length
 
 **Definition of done:** you open it in the basement, see "Monday · Lower A · Squat",
 scroll five movements with sets, reps, rest and cues, and never open doc 01 again.
@@ -196,51 +199,51 @@ Then build the release APK and give me the install command.
 finish. **This is the app.**
 
 ### 2.1 Database
-- [ ] Drift: `sessions`, `set_logs`, `stall_counters`, `bodyweight`, `cardio_logs`,
+- [x] Drift: `sessions`, `set_logs`, `stall_counters`, `bodyweight`, `cardio_logs`,
       `food_logs`, `niggles`, `inventory_*`
-- [ ] Migration strategy from schema v1, with a **pre-migration automatic DB copy**
+- [x] Migration strategy from schema v1, with a **pre-migration automatic DB copy**
 
 ### 2.2 Interval engine
-- [ ] `lib/domain/intervals/` — **wall-clock based**, never a tick counter
-- [ ] Unit tested: drift under suspension, pause/resume, ±15 s, skip
+- [x] `lib/domain/intervals/` — **wall-clock based**, never a tick counter
+- [x] Unit tested: drift under suspension, pause/resume, ±15 s, skip
 
 ### 2.3 Session lifecycle
-- [ ] `startSession(dayId, date)` → `inProgress`
-- [ ] `logSet(...)` **persisted immediately** — phones die mid-session
-- [ ] `finishSession()`, and resume an `inProgress` session on launch
+- [x] `startSession(dayId, date)` → `inProgress`
+- [x] `logSet(...)` **persisted immediately** — phones die mid-session
+- [x] `finishSession()`, and resume an `inProgress` session on launch
 
 ### 2.4 The runner screen — the most important UI in the app
-- [ ] One exercise in focus; swipe or tap between them
-- [ ] **Supersets render as one card** with alternating members, one rest at the end
-- [ ] Per-set row: target reps · actual-reps stepper · load field · RIR chip
-- [ ] Large "log set" button; rest timer starts **automatically**
-- [ ] Last session's numbers inline: *"last time: 8, 8, 7 @ 25 kg"*
-- [ ] `day.warnings` as a dismissible banner before the first set
-- [ ] Notes per exercise and per session
-- [ ] **Niggle button** — one tap records site + severity against this exercise (audit C15)
+- [x] One exercise in focus; swipe or tap between them
+- [x] **Supersets render as one card** with alternating members, one rest at the end
+- [x] Per-set row: target reps · actual-reps stepper · load field · RIR chip
+- [x] Large "log set" button; rest timer starts **automatically**
+- [x] Last session's numbers inline: *"last time: 8, 8, 7 @ 25 kg"*
+- [x] `day.warnings` as a dismissible banner before the first set
+- [x] Notes per exercise and per session
+- [x] **Niggle button** — one tap records site + severity against this exercise (audit C15)
 
 ### 2.5 Rest timer
-- [ ] Prefilled from `restSec`; runs with the screen off
-- [ ] `flutter_local_notifications` + `SCHEDULE_EXACT_ALARM` +
+- [x] Prefilled from `restSec`; runs with the screen off
+- [x] `flutter_local_notifications` + `SCHEDULE_EXACT_ALARM` +
       `exactAllowWhileIdle` (audit C9)
-- [ ] Runtime `POST_NOTIFICATIONS` on Android 13+
-- [ ] Haptic + optional sound; ±15 s; skip
-- [ ] `wakelock_plus` for the duration of a session
+- [x] Runtime `POST_NOTIFICATIONS` on Android 13+
+- [x] Haptic + optional sound; ±15 s; skip
+- [x] `wakelock_plus` for the duration of a session
 
 ### 2.6 The 60-minute features — these are programme requirements, not polish
-- [ ] **Elapsed vs `estMinutes`** shown in the session header
-- [ ] At 45 minutes elapsed with more than one movement left, offer
+- [x] **Elapsed vs `estMinutes`** shown in the session header
+- [x] At 45 minutes elapsed with more than one movement left, offer
       *"running long — drop the last superset?"*
-- [ ] **"I only have 40 minutes"** mode at session start: keeps movement 1 and the
+- [x] **"I only have 40 minutes"** mode at session start: keeps movement 1 and the
       first superset, drops the rest
 
 ### 2.7 Backup — ships here, not in Phase 8
-- [ ] Export: SQLite + programme JSON → one zip, written where you choose
-- [ ] Import with a confirmation step
-- [ ] **Reminder card if no backup in 14 days**
+- [x] Export: SQLite + programme JSON → one zip, written where you choose
+- [x] Import with a confirmation step
+- [x] **Reminder card if no backup in 14 days**
 
 ### 2.8 History
-- [ ] Flat list of completed sessions, tappable to a read-only set list
+- [x] Flat list of completed sessions, tappable to a read-only set list
 
 **Definition of done:** you complete a full Monday session using only the phone, and the
 next morning every set is there and correct — including the one you logged after the
@@ -282,36 +285,36 @@ Then build the release APK.
 **Test-first. Show me the failing run before any implementation.**
 
 ### 3.1 Plate solver
-- [ ] `lib/domain/plates/plate_solver.dart` per doc 02 algorithm B
-- [ ] All load modes, correct per-mode plate budgets (the `dumbbellPair` quad budget is
+- [x] `lib/domain/plates/plate_solver.dart` per doc 02 algorithm B
+- [x] All load modes, correct per-mode plate budgets (the `dumbbellPair` quad budget is
       the one that gets written wrong)
-- [ ] `lattice()`, `smallestStep()`, `isLatticeValid()`
-- [ ] Contention detection, breakdown string, microplate hint
-- [ ] **Tests B-1 to B-12, written first**
+- [x] `lattice()`, `smallestStep()`, `isLatticeValid()`
+- [x] Contention detection, breakdown string, microplate hint
+- [x] **Tests B-1 to B-12, written first**
 
 ### 3.2 Progression engine
-- [ ] `lib/domain/progression/progression_engine.dart` per doc 02 algorithm A
-- [ ] All 8 ordered rules, including **rule 3b rep creep and rule 8's final guard**
-- [ ] `historyWindowDays` precedence over `startLoadKg`
-- [ ] **Tests A-1 to A-14, written first.** A-4 and A-14 are the ones that catch the
+- [x] `lib/domain/progression/progression_engine.dart` per doc 02 algorithm A
+- [x] All 8 ordered rules, including **rule 3b rep creep and rule 8's final guard**
+- [x] `historyWindowDays` precedence over `startLoadKg`
+- [x] **Tests A-1 to A-14, written first.** A-4 and A-14 are the ones that catch the
       v1 deadlock — do not let them be dropped.
 
 ### 3.3 Ramp generator
-- [ ] `lib/domain/progression/ramp_generator.dart` per doc 02 algorithm D
-- [ ] Absolute and lattice-aware, never percentage-based
-- [ ] Ramp sets logged `is_warmup = 1` and excluded from progression and volume
+- [x] `lib/domain/progression/ramp_generator.dart` per doc 02 algorithm D
+- [x] Absolute and lattice-aware, never percentage-based
+- [x] Ramp sets logged `is_warmup = 1` and excluded from progression and volume
 
 ### 3.4 Integration
-- [ ] Each exercise opens with suggested load + reason + plate breakdown
-- [ ] Always overridable; the override is what gets logged
-- [ ] Rep-creep state shown explicitly: *"6–10 reps this week — plates too coarse to jump"*
-- [ ] Contention warning at session start
-- [ ] Stall counters persisted per `exerciseId`
+- [x] Each exercise opens with suggested load + reason + plate breakdown
+- [x] Always overridable; the override is what gets logged
+- [x] Rep-creep state shown explicitly: *"6–10 reps this week — plates too coarse to jump"*
+- [x] Contention warning at session start
+- [x] Stall counters persisted per `exerciseId`
 
 ### 3.5 Calibration wizard
-- [ ] First-run flow capturing everything in doc 04
-- [ ] Editable afterwards in Settings
-- [ ] **Blocks nothing, but warns loudly while bars are unmeasured** — the solver is
+- [x] First-run flow capturing everything in doc 04
+- [x] Editable afterwards in Settings
+- [x] **Blocks nothing, but warns loudly while bars are unmeasured** — the solver is
       garbage-in until this is done
 
 **Definition of done:** the app says
@@ -349,15 +352,15 @@ Then build the release APK.
 **Goal:** the app becomes the record of what you planned and what you actually did.
 
 ### 4.1 Projection
-- [ ] `lib/domain/calendar/programme_calendar.dart` per doc 02 algorithm C
-- [ ] **Tests C-1 to C-13, written first** — including C-9, week 13 returns `Complete`
-- [ ] `sessionsForRange` in one query per month; `adherence()` excluding `optional`;
+- [x] `lib/domain/calendar/programme_calendar.dart` per doc 02 algorithm C
+- [x] **Tests C-1 to C-13, written first** — including C-9, week 13 returns `Complete`
+- [x] `sessionsForRange` in one query per month; `adherence()` excluding `optional`;
       streak
 
 ### 4.2 Month grid
-- [ ] `table_calendar` for paging only; cells hand-built via `calendarBuilders`
-- [ ] Monday-first, programme week numbers (1–12) in the left gutter, not ISO weeks
-- [ ] Header: month · `Week 6 of 12 · Build` · block adherence · streak
+- [x] `table_calendar` for paging only; cells hand-built via `calendarBuilders`
+- [x] Monday-first, programme week numbers (1–12) in the left gutter, not ISO weeks
+- [x] Header: month · `Week 6 of 12 · Build` · block adherence · streak
 
 ### 4.3 The cell
 ```
@@ -368,29 +371,29 @@ Then build the release APK.
 │ ✓           │  state glyph
 └─────────────┘
 ```
-- [ ] Rail colour by `kind`; **dashed** for `optional: true`
-- [ ] Glyph: `✓` completed · `◐` partial · `✕` skipped · `▶` in progress · `↷` moved
-- [ ] Today gets a ring; past-planned-but-unlogged gets a faint warning tint
-- [ ] Dots: bodyweight · food target hit · photo shoot · cardio logged
-- [ ] **Colour never carries state alone — the glyph does.** You are reading this in bad
+- [x] Rail colour by `kind`; **dashed** for `optional: true`
+- [x] Glyph: `✓` completed · `◐` partial · `✕` skipped · `▶` in progress · `↷` moved
+- [x] Today gets a ring; past-planned-but-unlogged gets a faint warning tint
+- [x] Dots: bodyweight · food target hit · photo shoot · cardio logged
+- [x] **Colour never carries state alone — the glyph does.** You are reading this in bad
       basement light.
 
 ### 4.4 Interaction
-- [ ] Tap behaviour by day state (today/past-done/past-missed/future/rest/outside)
-- [ ] Long-press: log retroactively · move to another date · mark skipped · add note ·
+- [x] Tap behaviour by day state (today/past-done/past-missed/future/rest/outside)
+- [x] Long-press: log retroactively · move to another date · mark skipped · add note ·
       add photo shoot
-- [ ] **Retroactive logging is first-class** — the Phase 2 runner with the date pre-set
+- [x] **Retroactive logging is first-class** — the Phase 2 runner with the date pre-set
       and `logged_retroactively = 1`. You will forget to open the app mid-session a
       dozen times; if live logging is the only path, the engine reads stale history.
-- [ ] Move a session: `scheduled_date ≠ planned_date`, drawn on the new date, counted in
+- [x] Move a session: `scheduled_date ≠ planned_date`, drawn on the new date, counted in
       the old week
 
 ### 4.5 Supporting views
-- [ ] Agenda list for the current week
-- [ ] Week-strip mode for one-handed in-gym use
-- [ ] Checkpoint markers on weeks 1/4/8/12 opening that week's checklist
-- [ ] Week-8 deload banner across the week
-- [ ] Settings: scheduling mode (`fixed` default) + "shift programme by N weeks"
+- [x] Agenda list for the current week
+- [x] Week-strip mode for one-handed in-gym use
+- [x] Checkpoint markers on weeks 1/4/8/12 opening that week's checklist
+- [x] Week-8 deload banner across the week
+- [x] Settings: scheduling mode (`fixed` default) + "shift programme by N weeks"
 
 **Definition of done:** in week 7 you spot a missed Thursday from week 5, log it
 retroactively from memory, and the next deadlift day's suggested load accounts for it.
@@ -405,28 +408,28 @@ retroactively from memory, and the next deadlift day's suggested load accounts f
 section in full before starting.**
 
 ### 5.1 Tables
-- [ ] `photo_shoots`, `progress_photos`, `photo_poses`, `measurements`
-- [ ] Seed four poses: front relaxed · front flexed · side right · back
+- [x] `photo_shoots`, `progress_photos`, `photo_poses`, `measurements`
+- [x] Seed four poses: front relaxed · front flexed · side right · back
 
 ### 5.2 Capture with the ghost overlay — the feature
-- [ ] `camera` plugin live preview (**not** `image_picker` — it hands off to the system
+- [x] `camera` plugin live preview (**not** `image_picker` — it hands off to the system
       camera and cannot draw over the viewfinder)
-- [ ] **Previous photo of the same pose as a semi-transparent overlay**, default 30%,
+- [x] **Previous photo of the same pose as a semi-transparent overlay**, default 30%,
       with a toggle and an opacity slider
-- [ ] Rule-of-thirds grid, 3-2-1 self-timer, pose guidance line
-- [ ] Shoot flow: all enabled poses in one pass, review, retake
+- [x] Rule-of-thirds grid, 3-2-1 self-timer, pose guidance line
+- [x] Shoot flow: all enabled poses in one pass, review, retake
 
 ### 5.3 Comparison
-- [ ] Side-by-side two shoots, same pose
-- [ ] **Wipe slider** — two images stacked with a draggable divider. This is the one
+- [x] Side-by-side two shoots, same pose
+- [x] **Wipe slider** — two images stacked with a draggable divider. This is the one
       that actually reveals change.
-- [ ] Flipbook: scrub or auto-play one pose chronologically
-- [ ] Captions auto-resolve date, programme week and bodyweight (nearest entry ±2 days)
+- [x] Flipbook: scrub or auto-play one pose chronologically
+- [x] Captions auto-resolve date, programme week and bodyweight (nearest entry ±2 days)
 
 ### 5.4 Measurements
-- [ ] Waist, chest, upper arm, thigh, neck — entered at checkpoints
-- [ ] Charted on the same date axis as bodyweight
-- [ ] **Waist rule from doc 01 §3**: flag when waist grows more than 3 cm over the block
+- [x] Waist, chest, upper arm, thigh, neck — entered at checkpoints
+- [x] Charted on the same date axis as bodyweight
+- [x] **Waist rule from doc 01 §3**: flag when waist grows more than 3 cm over the block
 
 ### 5.5 Privacy — six hard requirements, verified on device
 1. [ ] **App-private storage only.** `getApplicationDocumentsDirectory()`. Never
@@ -438,8 +441,8 @@ section in full before starting.**
 6. [ ] Thumbnails cached app-private too
 
 ### 5.6 Storage
-- [ ] Resize to 1920 px long edge, JPEG q85 (~400–600 KB each)
-- [ ] Configurable budget, default 500 MB across photos and clips, with a readout and a
+- [x] Resize to 1920 px long edge, JPEG q85 (~400–600 KB each)
+- [x] Configurable budget, default 500 MB across photos and clips, with a readout and a
       warning before it is exceeded
 
 **Definition of done:** two things, both on the phone.
@@ -455,25 +458,25 @@ section in full before starting.**
 # Phase 6 — Cardio, bodyweight, food
 
 ### 6.1 Cardio
-- [ ] Cardio day runner on the Phase 2 interval engine — skipping intervals and bag
+- [x] Cardio day runner on the Phase 2 interval engine — skipping intervals and bag
       rounds, audible + haptic transitions, works with the screen off
-- [ ] Manual run logging: duration, optional distance, perceived effort. **No GPS.**
-- [ ] `cardioProgression` surfaced per week — Sunday's target comes from the table, and
+- [x] Manual run logging: duration, optional distance, perceived effort. **No GPS.**
+- [x] `cardioProgression` surfaced per week — Sunday's target comes from the table, and
       **the table wins over the prescription** (audit C4)
 
 ### 6.2 Bodyweight
-- [ ] Quick entry, **7-day rolling average**, `fl_chart` trend
-- [ ] **The flat rule**: rolling average has not risen for `flatWeeksBeforeBump` weeks →
+- [x] Quick entry, **7-day rolling average**, `fl_chart` trend
+- [x] **The flat rule**: rolling average has not risen for `flatWeeksBeforeBump` weeks →
       card saying *"flat for 2 weeks — add 250 kcal"*, both numbers read from the JSON
-- [ ] Projected vs actual against doc 01 §7's bodyweight table
+- [x] Projected vs actual against doc 01 §7's bodyweight table
 
 ### 6.3 Food
-- [ ] Deliberately minimal: date, kcal, protein, hit-target yes/no, streak
-- [ ] **Reads the current week's `nutritionPhase`**, so the target escalates (audit C11)
-- [ ] No food database, no barcode scanning. Those apps exist.
+- [x] Deliberately minimal: date, kcal, protein, hit-target yes/no, streak
+- [x] **Reads the current week's `nutritionPhase`**, so the target escalates (audit C11)
+- [x] No food database, no barcode scanning. Those apps exist.
 
 ### 6.4 Checkpoints
-- [ ] Prompts from `programme.checkpoints` on the dashboard and calendar
+- [x] Prompts from `programme.checkpoints` on the dashboard and calendar
 
 **Definition of done:** the app notices your weight has been flat for two weeks and says
 so, unprompted, before you do.
@@ -485,37 +488,37 @@ so, unprompted, before you do.
 **Read doc 00's licensing note first. This is the phase with a trap in it.**
 
 ### 7.1 Detail screen
-- [ ] Still, cues, common errors, `soloSafety`, `equipmentNote`, muscles, equipment
-- [ ] "Watch demo" via `url_launcher`
-- [ ] **One-tap from inside the runner, returning to the exact set you were on.** A demo
+- [x] Still, cues, common errors, `soloSafety`, `equipmentNote`, muscles, equipment
+- [x] "Watch demo" via `url_launcher`
+- [x] **One-tap from inside the runner, returning to the exact set you were on.** A demo
       you have to leave the session to find does not get watched.
 
 ### 7.2 Stills — licence-clean only
-- [ ] Source: `yuhonas/free-exercise-db` (Unlicense, public domain). `wger` (CC-BY-SA)
+- [x] Source: `yuhonas/free-exercise-db` (Unlicense, public domain). `wger` (CC-BY-SA)
       is also fine with attribution.
-- [ ] **Never scrape MuscleWiki, GymVisual, Everkinetic-derived sets or the RapidAPI
+- [x] **Never scrape MuscleWiki, GymVisual, Everkinetic-derived sets or the RapidAPI
       ExerciseDB GIF bundles.** "It's only for me" does not change the copying.
-- [ ] `stillSearchTerm` in `exercises.json` is a **hint, not a verified slug**. Expect
+- [x] `stillSearchTerm` in `exercises.json` is a **hint, not a verified slug**. Expect
       misses. Report the list of exercises with no match.
-- [ ] Record the licence per exercise in `exercises.json`
+- [x] Record the licence per exercise in `exercises.json`
 
 ### 7.3 Video — link, don't bundle
-- [ ] **Do not invent YouTube URLs.** Generate an empty checklist markdown file for you
+- [x] **Do not invent YouTube URLs.** Generate an empty checklist markdown file for you
       to fill in over a week, and read `media.youtubeUrl` when populated.
-- [ ] Prefer coaches demoing the *solo home-gym* version — bailing from a squat, floor
+- [x] Prefer coaches demoing the *solo home-gym* version — bailing from a squat, floor
       pressing, setting catch pins.
-- [ ] `youtubeStartSec` skips the intro.
+- [x] `youtubeStartSec` skips the intro.
 
 ### 7.4 Your own clips — the actually valuable media
-- [ ] `image_picker` video mode (no overlay needed here — save `camera` for Phase 5)
-- [ ] App-private `files/clips/<exerciseId>/<timestamp>.mp4`
-- [ ] `video_player` + `chewie` playback, dated series, delete
-- [ ] 720p, most-recent-N per exercise, shared 500 MB budget
-- [ ] Compare week 1 against week 8 — for a solo lifter this is worth more than any
+- [x] `image_picker` video mode (no overlay needed here — save `camera` for Phase 5)
+- [x] App-private `files/clips/<exerciseId>/<timestamp>.mp4`
+- [x] `video_player` + `chewie` playback, dated series, delete
+- [x] 720p, most-recent-N per exercise, shared 500 MB budget
+- [x] Compare week 1 against week 8 — for a solo lifter this is worth more than any
       stock demo
 
 ### 7.5 Library
-- [ ] Search; filter by pattern, muscle, equipment
+- [x] Search; filter by pattern, muscle, equipment
 
 ---
 
@@ -709,3 +712,14 @@ desktop, and each has a real failure behind it:
 - Home-screen widget with today's session
 - Wear OS companion for the rest timer
 - A second programme slot, so cycle 2 can be planned while cycle 1 runs
+
+---
+
+# Known deviations from the plan
+
+| Planned | Built | Why it stands |
+|---|---|---|
+| `@riverpod` code-gen providers (also in CLAUDE.md) | Plain `Provider` / `FutureProvider` / `AsyncNotifierProvider` | Every provider was written by hand from Phase 1 onward. It works, it is tested, and it reads fine — but it is not what the conventions say. Converting is mechanical (`riverpod_generator` is already a dev dependency) and touches eight files in `lib/app/`. **Worth doing if you want the conventions honoured; not worth doing mid-cycle if the app is on your phone and training has started.** |
+| `chewie` for clip playback (Phase 7.4) | `video_player` with a hand-built control bar | Play, scrub and delete is the whole feature. Fewer dependencies in an app holding a year of logs and a gallery of private photos. |
+| `fl_chart` for trends (Phase 6.2, 9) | Hand-drawn `CustomPainter`s | Two line charts are less code to draw than a charting package is to configure, and a new dependency needs asking about. |
+| Programme JSON validated against `schema.json` on import (8.3) | Validated against gates V1–V9 by `ProgrammeValidator` | A JSON-schema check would confirm the shape. The gates confirm the thing that actually matters: that the loads exist on your plates and the days resolve. Both run on import; only one of them would have caught v1's 19 unloadable weights. |
