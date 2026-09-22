@@ -54,6 +54,19 @@ class TodayScreen extends ConsumerWidget {
             icon: const Icon(Icons.view_week_outlined),
             onPressed: () => context.go('/week'),
           ),
+          PopupMenuButton<String>(
+            tooltip: 'More',
+            onSelected: context.go,
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: '/programme', child: Text('Edit programme')),
+              PopupMenuItem(value: '/gym', child: Text('Gym and plates')),
+              PopupMenuItem(
+                value: '/programme/file',
+                child: Text('Backup and files'),
+              ),
+              PopupMenuItem(value: '/next-cycle', child: Text('Next cycle')),
+            ],
+          ),
         ],
       ),
       body: async.when(
@@ -476,6 +489,16 @@ class _CompleteCard extends StatelessWidget {
               'Your week-12 test numbers seed the next cycle. Foundation is '
               'skipped — you are not a beginner at these patterns any more.',
               style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+            ),
+            Gap.m,
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: FilledButton.icon(
+                onPressed: () => context.go('/next-cycle'),
+                icon: const Icon(Icons.auto_graph),
+                label: const Text('Build the next cycle'),
+              ),
             ),
           ],
         ),

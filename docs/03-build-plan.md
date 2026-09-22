@@ -522,29 +522,29 @@ so, unprompted, before you do.
 # Phase 8 — Programme editor and cycle 2
 
 ### 8.1 Editor
-- [ ] Edit any prescription: sets, rep range, rest, RIR, increment, start load
-- [ ] Swap an exercise (offering `substitutes` first), **history preserved** — `set_logs`
+- [x] Edit any prescription: sets, rep range, rest, RIR, increment, start load
+- [x] Swap an exercise (offering `substitutes` first), **history preserved** — `set_logs`
       keep their own `exercise_id`, and the engine looks up by `exercise_id`, never by
       prescription id. **Test this.**
-- [ ] Reorder within a section; add/remove exercises; edit superset grouping
-- [ ] Add/remove/rename days; change a day's weekday or kind
-- [ ] Edit `day.warnings` and `coachNote`
-- [ ] **Detach and duplicate** an inheriting block — materialise the resolved days and
+- [x] Reorder within a section; add/remove exercises; edit superset grouping
+- [x] Add/remove/rename days; change a day's weekday or kind
+- [x] Edit `day.warnings` and `coachNote`
+- [x] **Detach and duplicate** an inheriting block — materialise the resolved days and
       clear the inheritance
-- [ ] Writes to the user override JSON, never the bundled asset. Bumps `revision`.
+- [x] Writes to the user override JSON, never the bundled asset. Bumps `revision`.
 
 ### 8.2 Cycle 2 seeding — the week-13 answer
-- [ ] `lib/domain/progression/cycle_seeder.dart` per doc 02 algorithm E, **tested first**
-- [ ] Test-week results → e1RM → new `startLoadKg`, all lattice-valid
-- [ ] Foundation removed, weeks renumbered from 1, `startDate` set to the Monday after
-- [ ] **Shown as a diff before it applies**
+- [x] `lib/domain/progression/cycle_seeder.dart` per doc 02 algorithm E, **tested first**
+- [x] Test-week results → e1RM → new `startLoadKg`, all lattice-valid
+- [x] Foundation removed, weeks renumbered from 1, `startDate` set to the Monday after
+- [x] **Shown as a diff before it applies**
 
 ### 8.3 Import / export
-- [ ] Programme JSON via `file_picker` + `share_plus`, validated against `schema.json`,
+- [x] Programme JSON via `file_picker` + `share_plus`, validated against `schema.json`,
       diff summary before applying
-- [ ] Revision conflict warning when importing over newer local edits
-- [ ] "Reset to shipped programme" — delete the override, re-copy the asset
-- [ ] Full backup/restore extended to include photos and clips (Phase 2 shipped the
+- [x] Revision conflict warning when importing over newer local edits
+- [x] "Reset to shipped programme" — delete the override, re-copy the asset
+- [x] Full backup/restore extended to include photos and clips (Phase 2 shipped the
       DB + JSON half)
 
 **Definition of done:** you decide mid-block that Bulgarian split squats are wrecking
@@ -552,6 +552,25 @@ your knee, swap them for reverse lunges on the phone in the basement, and your s
 history is intact.
 
 ---
+
+### What shipped
+
+All of 8.1–8.3, plus three things the phase exposed:
+
+- **`lastSetsForPrescription` now matches the exercise as well as the slot.** It did
+  not, so swapping Bulgarian split squats for reverse lunges would have suggested the
+  split squat's load for a movement never performed. `test/data/exercise_swap_test.dart`
+  is the regression test; the failing run came first.
+- **`ProgrammeValidator`** (`lib/domain/programme/programme_validator.dart`) runs gates
+  V1–V9 at runtime against *edited* programmes, not just authored ones. `tools/validate.py`
+  guards what we write; this guards what gets edited in the basement and what arrives
+  through import. Same gate names on both sides.
+- Phase 2 shipped `BackupService` with no UI. `/programme/file` is that UI: programme
+  export/import with a diff, reset to shipped, and the full zip including photos and
+  clips.
+
+A save is never refused on a validation error — it is saved and flagged in place. A
+half-finished edit the app will not store is worse than one it stores and shows you.
 
 # Phase 9 — Stats and dashboard
 

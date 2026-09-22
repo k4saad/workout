@@ -630,7 +630,17 @@ class _FocusCard extends ConsumerWidget {
     final t = Theme.of(context).textTheme;
     final p = item.prescription;
     final next = item.nextSet;
-    final lastTime = ref.watch(lastTimeProvider(p.id)).asData?.value ?? [];
+    final lastTime =
+        ref
+            .watch(
+              lastTimeProvider((
+                prescriptionId: p.id,
+                exerciseId: p.exerciseId,
+              )),
+            )
+            .asData
+            ?.value ??
+        [];
     final suggestion = ref
         .watch(suggestionProvider((p: p, mult: blockMultiplier)))
         .asData

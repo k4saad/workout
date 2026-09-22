@@ -120,7 +120,10 @@ void main() {
           at: DateTime(2026, 11, 2, 18, 44),
         );
 
-        final sets = await db.lastSetsForPrescription('b-mon-1');
+        final sets = await db.lastSetsForPrescription(
+          'b-mon-1',
+          'barbell-back-squat',
+        );
         expect(sets, hasLength(2));
         expect(
           sets.every((s) => s.loadKg == 21),
@@ -135,7 +138,10 @@ void main() {
       await logSet(id, setIndex: 0, reps: 8, loadKg: 9, isWarmup: true);
       await logSet(id, setIndex: 1, reps: 5, loadKg: 21);
 
-      final sets = await db.lastSetsForPrescription('b-mon-1');
+      final sets = await db.lastSetsForPrescription(
+        'b-mon-1',
+        'barbell-back-squat',
+      );
       expect(sets, hasLength(1));
       expect(sets.single.loadKg, 21);
     });
@@ -164,8 +170,14 @@ void main() {
         at: DateTime(2026, 11, 5, 19),
       );
 
-      final monHistory = await db.lastSetsForPrescription('b-mon-3b');
-      final thuHistory = await db.lastSetsForPrescription('b-thu-3b');
+      final monHistory = await db.lastSetsForPrescription(
+        'b-mon-3b',
+        'single-leg-calf-raise',
+      );
+      final thuHistory = await db.lastSetsForPrescription(
+        'b-thu-3b',
+        'single-leg-calf-raise',
+      );
       expect(monHistory.single.reps, 15);
       expect(thuHistory.single.reps, 20);
 
@@ -187,7 +199,10 @@ void main() {
       );
 
       // A brand-new prescription id has no history of its own...
-      expect(await db.lastSetsForPrescription('b-mon-3a-v2'), isEmpty);
+      expect(
+        await db.lastSetsForPrescription('b-mon-3a-v2', 'reverse-lunge'),
+        isEmpty,
+      );
       // ...but the exercise does.
       final byExercise = await db.lastSetsForExercise('reverse-lunge');
       expect(byExercise, hasLength(1));

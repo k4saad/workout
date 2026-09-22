@@ -251,6 +251,7 @@ class Day {
     bool? optional,
     int? estMinutes,
     String? note,
+    bool clearNote = false,
     List<DayWarning>? warnings,
     List<Section>? sections,
   }) => Day(
@@ -260,7 +261,7 @@ class Day {
     kind: kind ?? this.kind,
     optional: optional ?? this.optional,
     estMinutes: estMinutes ?? this.estMinutes,
-    note: note ?? this.note,
+    note: clearNote ? null : (note ?? this.note),
     warnings: warnings ?? this.warnings,
     sections: sections ?? this.sections,
   );

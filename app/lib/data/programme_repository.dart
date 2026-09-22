@@ -136,6 +136,13 @@ class ProgrammeRepository {
     return current['revision'] != shipped['revision'];
   }
 
+  /// Forget the cached programme only.
+  ///
+  /// After an edit, the exercise library and the plate inventory have not
+  /// changed — re-reading seventy-six exercises out of the asset bundle to
+  /// learn that a set count went from four to five is pure waste.
+  void invalidateProgramme() => _programme = null;
+
   void invalidate() {
     _programme = null;
     _library = null;

@@ -278,6 +278,7 @@ class Prescription {
     Progression? progression,
     List<String>? substitutes,
     String? coachNote,
+    bool clearCoachNote = false,
     String? tempo,
   }) => Prescription(
     id: id ?? this.id,
@@ -299,7 +300,7 @@ class Prescription {
     optional: optional ?? this.optional,
     progression: progression ?? this.progression,
     substitutes: substitutes ?? this.substitutes,
-    coachNote: coachNote ?? this.coachNote,
+    coachNote: clearCoachNote ? null : (coachNote ?? this.coachNote),
     tempo: tempo ?? this.tempo,
   );
 

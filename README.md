@@ -80,9 +80,9 @@ balance        both upper days 10 push / 10 pull
 - [x] Phase 3 — plate solver + progression engine — tag `v0.3-phase3`
 - [x] Phase 4 — calendar + retroactive logging — tag `v0.4-phase4`
 - [x] Phase 5 — progress photos + measurements — tag `v0.5-phase5`
-- [ ] Phase 6 — cardio, bodyweight, food
-- [ ] Phase 7 — exercise demos + form clips
-- [ ] Phase 8 — programme editor + next-cycle seeding
+- [x] Phase 6 — cardio, bodyweight, food — tag `v0.6-phase6`
+- [x] Phase 7 — exercise demos + form clips — tag `v0.7-phase7`
+- [x] Phase 8 — programme editor + next-cycle seeding — tag `v0.8-phase8`
 - [ ] Phase 9 — stats + dashboard
 - [ ] Phase 10 — hardening + release
 

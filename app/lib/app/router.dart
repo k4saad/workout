@@ -4,6 +4,8 @@ import '../features/body/body_screen.dart';
 import '../features/calendar/calendar_screen.dart';
 import '../features/cardio/cardio_screen.dart';
 import '../features/day/day_detail_screen.dart';
+import '../features/editor/cycle_seed_screen.dart';
+import '../features/editor/programme_editor_screen.dart';
 import '../features/exercises/exercise_detail_screen.dart';
 import '../features/exercises/exercise_library_screen.dart';
 import '../features/history/history_screen.dart';
@@ -11,6 +13,7 @@ import '../features/progress/capture_screen.dart';
 import '../features/progress/progress_screen.dart';
 import '../features/session/session_runner_screen.dart';
 import '../features/settings/calibration_screen.dart';
+import '../features/settings/programme_file_screen.dart';
 import '../features/today/today_screen.dart';
 import '../features/week/week_screen.dart';
 
@@ -59,5 +62,14 @@ final appRouter = GoRouter(
       ),
     ),
     GoRoute(path: '/gym', builder: (_, _) => const CalibrationScreen()),
+    GoRoute(
+      path: '/programme',
+      builder: (_, _) => const ProgrammeEditorScreen(),
+    ),
+    GoRoute(
+      path: '/programme/file',
+      builder: (_, _) => const ProgrammeFileScreen(),
+    ),
+    GoRoute(path: '/next-cycle', builder: (_, _) => const CycleSeedScreen()),
   ],
 );

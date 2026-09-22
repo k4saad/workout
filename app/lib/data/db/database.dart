@@ -108,17 +108,26 @@ class AppDatabase extends _$AppDatabase {
           .get();
 
   /// Working sets (never ramp sets) from the most recent session that logged
-  /// [prescriptionId].
+  /// [prescriptionId] **doing [exerciseId]**.
   ///
   /// This is the primary history lookup. Keying on the prescription — not just
   /// the exercise — is what stops two prescriptions of the same lift in one
   /// week from driving each other's suggestions.
-  Future<List<SetLog>> lastSetsForPrescription(String prescriptionId) async {
+  ///
+  /// Matching the exercise as well is what makes an editor swap safe. The slot
+  /// keeps its id when you trade Bulgarian split squats for reverse lunges;
+  /// without this clause the lunge would be suggested at the split squat's
+  /// load, which is how someone training alone gets hurt.
+  Future<List<SetLog>> lastSetsForPrescription(
+    String prescriptionId,
+    String exerciseId,
+  ) async {
     final last =
         await (select(setLogs)
               ..where(
                 (l) =>
                     l.prescriptionId.equals(prescriptionId) &
+                    l.exerciseId.equals(exerciseId) &
                     l.isWarmup.equals(false),
               )
               ..orderBy([(l) => OrderingTerm.desc(l.completedAt)])
@@ -127,7 +136,9 @@ class AppDatabase extends _$AppDatabase {
     if (last == null) return const [];
     return _setsFromSameSession(
       last,
-      (l) => l.prescriptionId.equals(prescriptionId),
+      (l) =>
+          l.prescriptionId.equals(prescriptionId) &
+          l.exerciseId.equals(exerciseId),
     );
   }
 

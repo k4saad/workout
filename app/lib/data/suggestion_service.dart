@@ -22,8 +22,8 @@ class SuggestionService {
 
   /// History lookup precedence (docs/02, algorithm A):
   ///
-  ///   1. the SAME prescription id      <- the normal path
-  ///   2. the same exercise id           <- only when 1 is empty (a swap, or
+  ///   1. the same prescription id DOING THE SAME EXERCISE  <- the normal path
+  ///   2. the same exercise id anywhere  <- only when 1 is empty (a swap, or
   ///                                        a brand-new prescription)
   ///   3. nothing, so the engine cold-starts
   ///
@@ -31,7 +31,7 @@ class SuggestionService {
   /// single-leg calf raise at 3x15 Monday and 3x20 Thursday — from driving
   /// each other's suggestions.
   Future<List<LoggedSet>> historyFor(Prescription p) async {
-    var rows = await db.lastSetsForPrescription(p.id);
+    var rows = await db.lastSetsForPrescription(p.id, p.exerciseId);
     if (rows.isEmpty) {
       rows = await db.lastSetsForExercise(p.exerciseId);
     }

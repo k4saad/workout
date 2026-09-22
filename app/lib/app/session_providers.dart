@@ -84,11 +84,11 @@ final sessionSetsProvider = FutureProvider.family<List<SetLog>, int>(
 ///
 /// Shown inline in the runner as "last time: 8, 8, 7 @ 25 kg" — the single
 /// most useful number on the screen when you are deciding what to load.
-final lastTimeProvider = FutureProvider.family<List<SetLog>, String>((
-  ref,
-  prescriptionId,
-) async {
-  final db = ref.watch(databaseProvider);
-  final own = await db.lastSetsForPrescription(prescriptionId);
-  return own;
-});
+final lastTimeProvider =
+    FutureProvider.family<
+      List<SetLog>,
+      ({String prescriptionId, String exerciseId})
+    >((ref, key) async {
+      final db = ref.watch(databaseProvider);
+      return db.lastSetsForPrescription(key.prescriptionId, key.exerciseId);
+    });
