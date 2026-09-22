@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 
+import '../features/calendar/calendar_screen.dart';
 import '../features/day/day_detail_screen.dart';
 import '../features/history/history_screen.dart';
 import '../features/session/session_runner_screen.dart';
@@ -31,6 +32,7 @@ final appRouter = GoRouter(
             : DateTime.parse(state.uri.queryParameters['date']!),
       ),
     ),
+    GoRoute(path: '/calendar', builder: (_, _) => const CalendarScreen()),
     GoRoute(path: '/history', builder: (_, _) => const HistoryScreen()),
     GoRoute(path: '/gym', builder: (_, _) => const CalibrationScreen()),
   ],
