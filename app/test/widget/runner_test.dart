@@ -357,6 +357,12 @@ class _SilentNotifications implements NotificationService {
     int max = 24,
   }) async {}
   @override
+  Future<void> scheduleSessionReminders(
+    List<({DateTime at, String title, String body})> reminders,
+  ) async {}
+  @override
+  Future<void> cancelSessionReminders() async {}
+  @override
   Future<void> cancelRest() async {}
   @override
   Future<void> cancelIntervals() async {}

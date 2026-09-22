@@ -83,7 +83,7 @@ balance        both upper days 10 push / 10 pull
 - [x] Phase 6 — cardio, bodyweight, food — tag `v0.6-phase6`
 - [x] Phase 7 — exercise demos + form clips — tag `v0.7-phase7`
 - [x] Phase 8 — programme editor + next-cycle seeding — tag `v0.8-phase8`
-- [ ] Phase 9 — stats + dashboard
+- [x] Phase 9 — stats + dashboard — tag `v0.9-phase9`
 - [ ] Phase 10 — hardening + release
 
 ### Two things only you can do

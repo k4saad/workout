@@ -91,8 +91,9 @@ void main() {
   });
 
   testWidgets('Today warns that the bars are still guesses', (tester) async {
-    // Tall viewport: ListView builds lazily, and the nag sits below the fold.
-    phoneSized(tester, const Size(400, 2000));
+    // Tall viewport: ListView builds lazily, and the nag sits below the fold,
+    // now under the dashboard strip as well.
+    phoneSized(tester, const Size(400, 2600));
     await draw(tester, const TodayScreen());
     // inventory.json ships with measured:false. Until the bars are weighed,
     // every load in the app is fiction and it must say so.

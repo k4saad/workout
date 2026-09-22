@@ -108,3 +108,23 @@ final blockAdherenceProvider = FutureProvider<AdherenceStats>((ref) async {
     ref.watch(todayProvider),
   );
 });
+
+/// Sessions done against sessions required, for one programme week.
+///
+/// "Done" counts partial sessions: a forty-minute version on a bad evening is
+/// a session you turned up for.
+final weekProgressProvider =
+    FutureProvider.family<({int done, int planned}), int>((ref, weekNo) async {
+      final merge = await ref.watch(calendarMergeProvider.future);
+      final records = await ref.watch(allRecordsProvider.future);
+      final stats = merge.adherence(
+        weekNo,
+        weekNo,
+        records,
+        ref.watch(todayProvider),
+      );
+      return (
+        done: stats.completed + stats.partial,
+        planned: merge.calendar.requiredSessionsInWeek(weekNo),
+      );
+    });

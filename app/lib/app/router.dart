@@ -12,8 +12,11 @@ import '../features/history/history_screen.dart';
 import '../features/progress/capture_screen.dart';
 import '../features/progress/progress_screen.dart';
 import '../features/session/session_runner_screen.dart';
+import '../features/stats/lift_detail_screen.dart';
+import '../features/stats/stats_screen.dart';
 import '../features/settings/calibration_screen.dart';
 import '../features/settings/programme_file_screen.dart';
+import '../features/settings/settings_screen.dart';
 import '../features/today/today_screen.dart';
 import '../features/week/week_screen.dart';
 
@@ -71,5 +74,12 @@ final appRouter = GoRouter(
       builder: (_, _) => const ProgrammeFileScreen(),
     ),
     GoRoute(path: '/next-cycle', builder: (_, _) => const CycleSeedScreen()),
+    GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+    GoRoute(path: '/stats', builder: (_, _) => const StatsScreen()),
+    GoRoute(
+      path: '/stats/:id',
+      builder: (_, state) =>
+          LiftDetailScreen(exerciseId: state.pathParameters['id']!),
+    ),
   ],
 );

@@ -144,10 +144,16 @@ class InfoChip extends StatelessWidget {
             Icon(icon, size: 15, color: AppTheme.textDim),
             const SizedBox(width: 5),
           ],
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelLarge
-                ?.copyWith(color: emphasis ? AppTheme.text : AppTheme.textDim),
+          // Flexible, not a bare Text: inside a Wrap the chip is handed the
+          // full row width, and a long label on a 400 px phone would
+          // otherwise overflow its own pill.
+          Flexible(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: emphasis ? AppTheme.text : AppTheme.textDim,
+              ),
+            ),
           ),
         ],
       ),

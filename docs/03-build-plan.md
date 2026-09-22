@@ -574,22 +574,56 @@ half-finished edit the app will not store is worse than one it stores and shows 
 
 # Phase 9 — Stats and dashboard
 
-- [ ] `lib/domain/metrics/` — pure, tested: Epley e1RM (**labelled as an estimate**),
+- [x] `lib/domain/metrics/` — pure, tested: Epley e1RM (**labelled as an estimate**),
       best set, tonnage, weekly sets per muscle group from `exercise.primaryMuscles`
-- [ ] Dashboard: current week and block · streak · week progress · bodyweight sparkline ·
+- [x] Dashboard: current week and block · streak · week progress · bodyweight sparkline ·
       next session · checkpoint card when due
-- [ ] Per-lift detail: e1RM trend, best set, volume, full log history
-- [ ] **Weekly sets per muscle group** — the number that actually drives hypertrophy.
+- [x] Per-lift detail: e1RM trend, best set, volume, full log history
+- [x] **Weekly sets per muscle group** — the number that actually drives hypertrophy.
       Flag when any muscle drops below 8 or above 20 sets.
-- [ ] `strengthTargets` rendered as progress against doc 01 §7's projections, **labelled
+- [x] `strengthTargets` rendered as progress against doc 01 §7's projections, **labelled
       as floors** so missing one is not read as failure
-- [ ] **Plate-gap report**: *"smallest jump on overhead press is 19% — buy 0.5 kg
+- [x] **Plate-gap report**: *"smallest jump on overhead press is 19% — buy 0.5 kg
       microplates"*
-- [ ] **Niggle timeline** — which joints complained, when, against which exercise
-- [ ] Session duration stats — is 60 minutes real, or is it 80?
-- [ ] Optional evening reminder on planned session days, off by default
+- [x] **Niggle timeline** — which joints complained, when, against which exercise
+- [x] Session duration stats — is 60 minutes real, or is it 80?
+- [x] Optional evening reminder on planned session days, off by default
 
 ---
+
+### What shipped
+
+`lib/domain/metrics/` gained four pure, tested modules — `strength_metrics`
+(Epley e1RM, best set, per-day trend, tonnage), `volume_metrics` (weekly sets
+per muscle, flagged below 8 and above 20), `plate_gap` and `session_stats` —
+plus `lib/domain/calendar/session_reminders.dart` for the evening nudge.
+`StatsService` is the only place they meet the database.
+
+Charts are hand-drawn `CustomPainter`s, matching the Phase 6 bodyweight chart.
+No charting package was added: two line charts are less code to draw than a
+library is to configure, and a new dependency needs asking about.
+
+Three things worth knowing:
+
+- **Every e1RM is labelled an estimate, everywhere it appears**, and a lift
+  with no load never gets one invented. An empty chart is honest; a fabricated
+  maximum is not.
+- **A retroactively logged session contributes no duration.** It has no honest
+  start time, and a zero would drag the median down and make the hour look
+  safer than it is.
+- The **plate-gap report** exists because "you are stalling" and "the smallest
+  plate you own is 19% of the bar" look identical in a log and need opposite
+  responses.
+
+Fixed in passing: `InfoChip` could overflow its own pill with a long label at
+400 px (a Wrap hands its child the full row width), the Today header hardcoded
+`of 12` — a programme value in a widget, which the hard rules forbid, and cycle
+two is eight weeks — and the strength-target rows fell back to a raw exercise id
+for any lift with no logged history.
+
+The evening reminder is **off by default** and stored in `preferences.json`
+rather than the database: it is a convenience, and a schema migration to hold
+one boolean would put twelve weeks of logs at risk for nothing.
 
 # Phase 10 — Hardening and release
 

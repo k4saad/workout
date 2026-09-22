@@ -35,6 +35,15 @@ class NotificationService {
   static const restNotificationId = 1001;
   static const intervalBaseId = 2000;
 
+  static const reminderChannelId = 'session_reminder';
+  static const reminderChannelName = 'Session reminder';
+  static const reminderBaseId = 3000;
+
+  /// Fourteen days of reminders is plenty — the app reschedules on every
+  /// launch, and a phone that has not been opened in two weeks has bigger
+  /// problems than a missing nudge.
+  static const reminderHorizonDays = 14;
+
   bool _ready = false;
   bool _canScheduleExact = false;
 
@@ -224,6 +233,38 @@ class NotificationService {
       return (raw as dynamic).identifier as String;
     } catch (_) {
       return raw.toString();
+    }
+  }
+
+  /// An evening nudge on days the programme plans a session.
+  ///
+  /// Off by default, and deliberately quiet: one line saying what is on, at a
+  /// time you chose. It never nags on a rest day and it never fires for a
+  /// session already logged.
+  Future<void> scheduleSessionReminders(
+    List<({DateTime at, String title, String body})> reminders,
+  ) => _guard(() async {
+    await _cancelReminders();
+    final now = DateTime.now();
+    var id = reminderBaseId;
+    for (final r in reminders.take(reminderHorizonDays)) {
+      if (!r.at.isAfter(now)) continue;
+      await _zonedSchedule(
+        id: id++,
+        at: r.at,
+        channelId: reminderChannelId,
+        channelName: reminderChannelName,
+        title: r.title,
+        body: r.body,
+      );
+    }
+  });
+
+  Future<void> cancelSessionReminders() => _guard(_cancelReminders);
+
+  Future<void> _cancelReminders() async {
+    for (var i = 0; i < reminderHorizonDays + 2; i++) {
+      await _plugin.cancel(reminderBaseId + i);
     }
   }
 

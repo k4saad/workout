@@ -10,6 +10,7 @@ import '../../domain/calendar/programme_calendar.dart';
 import '../../domain/models/enums.dart';
 import '../../domain/models/programme.dart';
 import '../common/widgets.dart';
+import 'widgets/dashboard_strip.dart';
 
 /// The home screen: what am I doing today, and is the rest of it on track.
 class TodayScreen extends ConsumerWidget {
@@ -58,13 +59,9 @@ class TodayScreen extends ConsumerWidget {
             tooltip: 'More',
             onSelected: context.go,
             itemBuilder: (_) => const [
+              PopupMenuItem(value: '/stats', child: Text('Numbers')),
               PopupMenuItem(value: '/programme', child: Text('Edit programme')),
-              PopupMenuItem(value: '/gym', child: Text('Gym and plates')),
-              PopupMenuItem(
-                value: '/programme/file',
-                child: Text('Backup and files'),
-              ),
-              PopupMenuItem(value: '/next-cycle', child: Text('Next cycle')),
+              PopupMenuItem(value: '/settings', child: Text('Settings')),
             ],
           ),
         ],
@@ -85,8 +82,17 @@ class TodayScreen extends ConsumerWidget {
           return ListView(
             padding: Gap.pagePadding,
             children: [
-              _DateHeader(date: today, planned: planned),
+              _DateHeader(
+                date: today,
+                planned: planned,
+                totalWeeks: b.programme.totalWeeks,
+              ),
               const _ResumeBanner(),
+              if (planned.status == ProgrammeStatus.active &&
+                  planned.weekNo != null) ...[
+                Gap.m,
+                DashboardStrip(programme: b.programme, weekNo: planned.weekNo!),
+              ],
               Gap.l,
               switch (planned.status) {
                 ProgrammeStatus.before => _BeforeCard(
@@ -163,10 +169,18 @@ class _ResumeBanner extends ConsumerWidget {
 }
 
 class _DateHeader extends StatelessWidget {
-  const _DateHeader({required this.date, required this.planned});
+  const _DateHeader({
+    required this.date,
+    required this.planned,
+    required this.totalWeeks,
+  });
 
   final DateTime date;
   final PlannedDay planned;
+
+  /// From the programme. Twelve weeks is this cycle's length, not a fact
+  /// about the app — cycle 2 is eight.
+  final int totalWeeks;
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +198,7 @@ class _DateHeader extends StatelessWidget {
         if (planned.weekNo != null && planned.block != null) ...[
           Gap.xs,
           Text(
-            'Week ${planned.weekNo} of 12 · ${planned.block!.name}',
+            'Week ${planned.weekNo} of $totalWeeks · ${planned.block!.name}',
             style: t.titleMedium?.copyWith(color: AppTheme.textDim),
           ),
         ],
