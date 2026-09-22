@@ -29,16 +29,12 @@ class ProgrammeEditorScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.today_outlined),
-          onPressed: () => context.go('/'),
-        ),
         title: const Text('Edit programme'),
         actions: [
           IconButton(
             tooltip: 'File',
             icon: const Icon(Icons.folder_outlined),
-            onPressed: () => context.go('/programme/file'),
+            onPressed: () => context.go('/more/settings/files'),
           ),
         ],
       ),

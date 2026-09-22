@@ -32,7 +32,7 @@ class BackupNag extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 12),
       child: InkWell(
-        onTap: () => context.go('/programme/file'),
+        onTap: () => context.go('/more/settings/files'),
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.all(14),

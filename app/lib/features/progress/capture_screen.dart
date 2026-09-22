@@ -168,7 +168,7 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
         });
         await _loadGhost();
       } else {
-        if (mounted) context.go('/progress');
+        if (mounted) context.go('/body/progress');
       }
     } catch (e) {
       if (mounted) {

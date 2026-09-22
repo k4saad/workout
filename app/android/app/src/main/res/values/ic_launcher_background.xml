@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- AppTheme.bg. The icon and the app's first frame are the same colour,
+         so launching does not flash. -->
+    <color name="ic_launcher_background">#0A0A0C</color>
+</resources>

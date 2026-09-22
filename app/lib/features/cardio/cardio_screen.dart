@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../app/body_providers.dart';
 import '../../app/providers.dart';
@@ -38,13 +37,7 @@ class _CardioScreenState extends ConsumerState<CardioScreen> {
     final logs = ref.watch(cardioLogsProvider).asData?.value ?? [];
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.today_outlined),
-          onPressed: () => context.go('/'),
-        ),
-        title: const Text('Cardio'),
-      ),
+      appBar: AppBar(title: const Text('Cardio')),
       body: ListView(
         padding: Gap.pagePadding,
         children: [

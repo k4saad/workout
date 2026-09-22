@@ -10,29 +10,46 @@ import '../../domain/models/enums.dart';
 ///  - type large enough to read from the floor while racked
 ///  - colour is NEVER the only carrier of meaning; every state also has a glyph
 abstract final class AppTheme {
-  // Day-kind rails. Chosen to stay distinguishable under a bare bulb and to
-  // survive the most common colour-vision deficiencies — but always paired
-  // with a glyph, never load-bearing on their own.
-  static const oxblood = Color(0xFFB4413C); // lift
-  static const moss = Color(0xFF6E9457); // cardio
-  static const slate = Color(0xFF5A6169); // rest
-  static const dusk = Color(0xFF7A6EA8); // mobility
+  // Black, grey, crimson. One accent colour, used sparingly, so that when
+  // something IS crimson it means "this is the thing".
+  static const crimson = Color(0xFFD81E3F);
+  static const crimsonDeep = Color(0xFF7E1024);
 
-  static const bg = Color(0xFF0E1012);
-  static const surface = Color(0xFF181B1F);
-  static const surfaceHigh = Color(0xFF23272D);
-  static const outline = Color(0xFF3A4048);
-  static const text = Color(0xFFF2F4F6);
-  static const textDim = Color(0xFFA8B0B8);
+  /// Kept as an alias so older call sites keep compiling. Crimson is the
+  /// accent now; there is no second red.
+  static const oxblood = crimson;
 
-  static const warn = Color(0xFFE8B84B);
-  static const good = Color(0xFF6BBF8A);
+  // Day-kind rails. Distinguishable under a bare bulb by LIGHTNESS as much as
+  // hue, which is what survives both bad light and colour-vision deficiency —
+  // and always paired with a glyph, never load-bearing on their own.
+  static const kindLift = crimson; // the main event
+  static const kindCardio = Color(0xFFB9553F); // rust — crimson family, dimmer
+  static const kindRest = Color(0xFF4E535C); // cool dark grey
+  static const kindMobility = Color(0xFF8E8E99); // neutral light grey
+
+  static const moss = kindCardio;
+  static const slate = kindRest;
+  static const dusk = kindMobility;
+
+  // Near-black, not black: pure #000 on OLED smears on scroll and hides every
+  // elevation boundary.
+  static const bg = Color(0xFF0A0A0C);
+  static const surface = Color(0xFF151518);
+  static const surfaceHigh = Color(0xFF1F1F24);
+  static const outline = Color(0xFF34343C);
+  static const text = Color(0xFFF4F4F6);
+  static const textDim = Color(0xFFA0A0AA);
+
+  // Semantic states only, never chrome. Amber and green are what "careful"
+  // and "good" mean to everyone, and both are backed by a glyph anyway.
+  static const warn = Color(0xFFE0A93B);
+  static const good = Color(0xFF5FA37B);
 
   static Color forKind(DayKind kind) => switch (kind) {
-    DayKind.lift => oxblood,
-    DayKind.cardio => moss,
-    DayKind.rest => slate,
-    DayKind.mobility => dusk,
+    DayKind.lift => kindLift,
+    DayKind.cardio => kindCardio,
+    DayKind.rest => kindRest,
+    DayKind.mobility => kindMobility,
   };
 
   /// The glyph that carries the meaning when the colour cannot.
@@ -45,12 +62,15 @@ abstract final class AppTheme {
 
   static ThemeData get dark {
     const scheme = ColorScheme.dark(
-      primary: oxblood,
+      primary: crimson,
       onPrimary: Colors.white,
-      secondary: moss,
+      primaryContainer: crimsonDeep,
+      onPrimaryContainer: text,
+      secondary: Color(0xFF6E7078),
       onSecondary: Colors.white,
       surface: surface,
       onSurface: text,
+      surfaceContainerHighest: surfaceHigh,
       error: Color(0xFFE5645C),
       onError: Colors.white,
       outline: outline,
@@ -155,6 +175,29 @@ abstract final class AppTheme {
           color: text,
         ),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+        indicatorColor: crimson.withValues(alpha: 0.20),
+        // 68 not 80: the bar is permanent, and every pixel it takes is a pixel
+        // of the session not on screen.
+        height: 68,
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => TextStyle(
+            fontSize: 12.5,
+            fontWeight: states.contains(WidgetState.selected)
+                ? FontWeight.w700
+                : FontWeight.w500,
+            color: states.contains(WidgetState.selected) ? text : textDim,
+          ),
+        ),
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            size: 25,
+            color: states.contains(WidgetState.selected) ? crimson : textDim,
+          ),
+        ),
       ),
       snackBarTheme: const SnackBarThemeData(
         backgroundColor: surfaceHigh,

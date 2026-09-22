@@ -27,43 +27,9 @@ class TodayScreen extends ConsumerWidget {
         title: const Text('The Keller Twelve'),
         actions: [
           IconButton(
-            tooltip: 'Exercises',
-            icon: const Icon(Icons.menu_book_outlined),
-            onPressed: () => context.go('/exercises'),
-          ),
-          IconButton(
-            tooltip: 'Body',
-            icon: const Icon(Icons.monitor_weight_outlined),
-            onPressed: () => context.go('/body'),
-          ),
-          IconButton(
-            tooltip: 'Progress',
-            icon: const Icon(Icons.photo_library_outlined),
-            onPressed: () => context.go('/progress'),
-          ),
-          IconButton(
-            tooltip: 'Calendar',
-            icon: const Icon(Icons.calendar_month_outlined),
-            onPressed: () => context.go('/calendar'),
-          ),
-          IconButton(
             tooltip: 'History',
             icon: const Icon(Icons.history),
             onPressed: () => context.go('/history'),
-          ),
-          IconButton(
-            tooltip: 'This week',
-            icon: const Icon(Icons.view_week_outlined),
-            onPressed: () => context.go('/week'),
-          ),
-          PopupMenuButton<String>(
-            tooltip: 'More',
-            onSelected: context.go,
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: '/stats', child: Text('Numbers')),
-              PopupMenuItem(value: '/programme', child: Text('Edit programme')),
-              PopupMenuItem(value: '/settings', child: Text('Settings')),
-            ],
           ),
         ],
       ),
@@ -299,7 +265,7 @@ class _ActiveBody extends StatelessWidget {
                     Gap.s,
                     if (day.kind == DayKind.cardio)
                       OutlinedButton.icon(
-                        onPressed: () => context.go('/cardio'),
+                        onPressed: () => context.go('/more/cardio'),
                         icon: const Icon(Icons.timer_outlined),
                         label: const Text('Interval timers'),
                       )
@@ -461,10 +427,6 @@ class _BeforeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    final days = ProgrammeCalendar.daysBetween(
-      DateTime.now(),
-      programme.startDate,
-    );
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -472,13 +434,19 @@ class _BeforeCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Starts in $days day${days == 1 ? '' : 's'}',
+              'Week 1 starts',
+              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+            ),
+            Gap.xs,
+            // The date, not a countdown. "In six days" is a number you have
+            // to do arithmetic on to use; a date is one you can look at a
+            // calendar and act on.
+            Text(
+              DateFormat('EEEE d MMMM').format(programme.startDate),
               style: t.headlineSmall,
             ),
-            Gap.s,
+            Gap.m,
             Text(
-              'Week 1 begins '
-              '${DateFormat('EEEE d MMMM').format(programme.startDate)}. '
               'Before then: weigh both bars, count the plates, and take the '
               'four baseline photos — you cannot shoot week 1 later.',
               style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
@@ -516,7 +484,7 @@ class _CompleteCard extends StatelessWidget {
               width: double.infinity,
               height: 52,
               child: FilledButton.icon(
-                onPressed: () => context.go('/next-cycle'),
+                onPressed: () => context.go('/more/settings/next-cycle'),
                 icon: const Icon(Icons.auto_graph),
                 label: const Text('Build the next cycle'),
               ),
@@ -537,7 +505,7 @@ class _CalibrationNag extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     return InkWell(
-      onTap: () => context.go('/gym'),
+      onTap: () => context.go('/more/settings/gym'),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(14),

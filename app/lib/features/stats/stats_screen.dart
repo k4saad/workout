@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/providers.dart';
@@ -27,13 +26,7 @@ class StatsScreen extends ConsumerWidget {
     final async = ref.watch(bundleProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.today_outlined),
-          onPressed: () => context.go('/'),
-        ),
-        title: const Text('Numbers'),
-      ),
+      appBar: AppBar(title: const Text('Numbers')),
       body: async.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => AsyncScaffoldBody(

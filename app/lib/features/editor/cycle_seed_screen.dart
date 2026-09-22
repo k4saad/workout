@@ -23,13 +23,7 @@ class CycleSeedScreen extends ConsumerWidget {
     final library = ref.watch(exerciseLibraryProvider).asData?.value;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.today_outlined),
-          onPressed: () => context.go('/'),
-        ),
-        title: const Text('Next cycle'),
-      ),
+      appBar: AppBar(title: const Text('Next cycle')),
       body: async.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => AsyncScaffoldBody(

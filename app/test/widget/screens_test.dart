@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:keller_twelve/app/providers.dart';
 import 'package:keller_twelve/core/theme/app_theme.dart';
 import 'package:keller_twelve/data/programme_repository.dart';
@@ -189,13 +190,21 @@ void main() {
     expect(find.textContaining('Twelve weeks, done'), findsOneWidget);
   });
 
-  testWidgets('before the start it counts down instead of showing nothing', (
+  testWidgets('before the start it names the date, not a countdown', (
     tester,
   ) async {
     phoneSized(tester);
     final before = ProgrammeCalendar.addDays(bundle.programme.startDate, -3);
     await draw(tester, const TodayScreen(), today: before);
-    expect(find.textContaining('Starts in'), findsOneWidget);
+
+    // "In three days" is a number you have to do arithmetic on before you can
+    // use it. A date is one you can hold against a calendar.
+    expect(find.text('Week 1 starts'), findsOneWidget);
+    expect(
+      find.text(DateFormat('EEEE d MMMM').format(bundle.programme.startDate)),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Starts in'), findsNothing);
   });
 
   testWidgets('day detail shows per-side reps for unilateral work', (

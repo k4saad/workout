@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/body/body_screen.dart';
@@ -9,77 +10,187 @@ import '../features/editor/programme_editor_screen.dart';
 import '../features/exercises/exercise_detail_screen.dart';
 import '../features/exercises/exercise_library_screen.dart';
 import '../features/history/history_screen.dart';
+import '../features/more/more_screen.dart';
 import '../features/progress/capture_screen.dart';
 import '../features/progress/progress_screen.dart';
 import '../features/session/session_runner_screen.dart';
-import '../features/stats/lift_detail_screen.dart';
-import '../features/stats/stats_screen.dart';
 import '../features/settings/calibration_screen.dart';
 import '../features/settings/programme_file_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/stats/lift_detail_screen.dart';
+import '../features/stats/stats_screen.dart';
 import '../features/today/today_screen.dart';
 import '../features/week/week_screen.dart';
+import 'shell.dart';
 
-/// Routes are deep-linkable so Phase 4's calendar can jump straight into a
-/// session, and Phase 7's demo handoff can come back to the exact set.
-final appRouter = GoRouter(
-  initialLocation: '/',
-  routes: [
-    GoRoute(path: '/', builder: (_, _) => const TodayScreen()),
-    GoRoute(path: '/week', builder: (_, _) => const WeekScreen()),
-    GoRoute(
-      path: '/week/:week/day/:dayId',
-      builder: (_, state) => DayDetailScreen(
-        weekNo: int.parse(state.pathParameters['week']!),
-        dayId: state.pathParameters['dayId']!,
+/// Five tabs, each with its own navigator, plus two full-screen routes.
+///
+/// The session runner and the camera sit OUTSIDE the shell deliberately: mid
+/// set, a tab bar is four ways to lose your place, and the capture screen
+/// needs every pixel for the ghost overlay.
+///
+/// Routes stay deep-linkable so the calendar can jump straight into a session
+/// and the demo handoff can come back to the exact set.
+///
+/// Built by a function rather than held as one global: a GoRouter carries the
+/// per-branch navigator stacks, so a shared instance leaks a tab's position
+/// from one widget test into the next.
+GoRouter buildRouter() {
+  final rootKey = GlobalKey<NavigatorState>();
+  return GoRouter(
+    navigatorKey: rootKey,
+    initialLocation: '/',
+    routes: [
+      StatefulShellRoute.indexedStack(
+        builder: (_, _, shell) => AppShell(shell: shell),
+        branches: [
+          // ---- 1. Today ----------------------------------------------------
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (_, _) => const TodayScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'history',
+                    builder: (_, _) => const HistoryScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // ---- 2. Week -----------------------------------------------------
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/week',
+                builder: (_, _) => const WeekScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'calendar',
+                    builder: (_, _) => const CalendarScreen(),
+                  ),
+                  GoRoute(
+                    path: ':week/day/:dayId',
+                    builder: (_, state) => DayDetailScreen(
+                      weekNo: int.parse(state.pathParameters['week']!),
+                      dayId: state.pathParameters['dayId']!,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // ---- 3. Numbers --------------------------------------------------
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/stats',
+                builder: (_, _) => const StatsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'lift/:id',
+                    builder: (_, state) => LiftDetailScreen(
+                      exerciseId: state.pathParameters['id']!,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // ---- 4. Body -----------------------------------------------------
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/body',
+                builder: (_, _) => const BodyScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'progress',
+                    builder: (_, _) => const ProgressScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // ---- 5. More -----------------------------------------------------
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/more',
+                builder: (_, _) => const MoreScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'exercises',
+                    builder: (_, _) => const ExerciseLibraryScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        builder: (_, state) => ExerciseDetailScreen(
+                          exerciseId: state.pathParameters['id']!,
+                        ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'cardio',
+                    builder: (_, _) => const CardioScreen(),
+                  ),
+                  GoRoute(
+                    path: 'settings',
+                    builder: (_, _) => const SettingsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'gym',
+                        builder: (_, _) => const CalibrationScreen(),
+                      ),
+                      GoRoute(
+                        path: 'programme',
+                        builder: (_, _) => const ProgrammeEditorScreen(),
+                      ),
+                      GoRoute(
+                        path: 'files',
+                        builder: (_, _) => const ProgrammeFileScreen(),
+                      ),
+                      GoRoute(
+                        path: 'next-cycle',
+                        builder: (_, _) => const CycleSeedScreen(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
-    ),
-    GoRoute(
-      path: '/run/:week/:dayId',
-      builder: (_, state) => SessionRunnerScreen(
-        weekNo: int.parse(state.pathParameters['week']!),
-        dayId: state.pathParameters['dayId']!,
-        retroDate: state.uri.queryParameters['date'] == null
-            ? null
-            : DateTime.parse(state.uri.queryParameters['date']!),
+
+      // ---- Full screen, no tab bar -----------------------------------------
+      GoRoute(
+        path: '/run/:week/:dayId',
+        parentNavigatorKey: rootKey,
+        builder: (_, state) => SessionRunnerScreen(
+          weekNo: int.parse(state.pathParameters['week']!),
+          dayId: state.pathParameters['dayId']!,
+          retroDate: state.uri.queryParameters['date'] == null
+              ? null
+              : DateTime.parse(state.uri.queryParameters['date']!),
+        ),
       ),
-    ),
-    GoRoute(path: '/calendar', builder: (_, _) => const CalendarScreen()),
-    GoRoute(path: '/history', builder: (_, _) => const HistoryScreen()),
-    GoRoute(
-      path: '/exercises',
-      builder: (_, _) => const ExerciseLibraryScreen(),
-    ),
-    GoRoute(
-      path: '/exercise/:id',
-      builder: (_, state) =>
-          ExerciseDetailScreen(exerciseId: state.pathParameters['id']!),
-    ),
-    GoRoute(path: '/body', builder: (_, _) => const BodyScreen()),
-    GoRoute(path: '/cardio', builder: (_, _) => const CardioScreen()),
-    GoRoute(path: '/progress', builder: (_, _) => const ProgressScreen()),
-    GoRoute(
-      path: '/progress/capture',
-      builder: (_, state) => CaptureScreen(
-        weekNo: int.tryParse(state.uri.queryParameters['week'] ?? ''),
+      GoRoute(
+        path: '/capture',
+        parentNavigatorKey: rootKey,
+        builder: (_, state) => CaptureScreen(
+          weekNo: int.tryParse(state.uri.queryParameters['week'] ?? ''),
+        ),
       ),
-    ),
-    GoRoute(path: '/gym', builder: (_, _) => const CalibrationScreen()),
-    GoRoute(
-      path: '/programme',
-      builder: (_, _) => const ProgrammeEditorScreen(),
-    ),
-    GoRoute(
-      path: '/programme/file',
-      builder: (_, _) => const ProgrammeFileScreen(),
-    ),
-    GoRoute(path: '/next-cycle', builder: (_, _) => const CycleSeedScreen()),
-    GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
-    GoRoute(path: '/stats', builder: (_, _) => const StatsScreen()),
-    GoRoute(
-      path: '/stats/:id',
-      builder: (_, state) =>
-          LiftDetailScreen(exerciseId: state.pathParameters['id']!),
-    ),
-  ],
-);
+    ],
+  );
+}
+
+/// The app's router. One per process.
+final appRouter = buildRouter();

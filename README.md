@@ -10,6 +10,21 @@ cable, heavy bag, jump rope, ab wheel, kettlebell, step platform, mats
 
 ---
 
+## Getting around
+
+Five tabs along the bottom, where your thumb is:
+
+| Tab | What is in it |
+|---|---|
+| **Today** | What you are doing now, the resume banner, week progress, bodyweight trend. History sits behind the top-right icon. |
+| **Week** | The seven day cards, and the month calendar behind the top-right icon. |
+| **Numbers** | Sets per muscle, session length, plate gaps, niggles, every lift. |
+| **Body** | Weigh-ins, the trend, measurements. Progress photos behind the top-right icon. |
+| **More** | Exercise library, cardio timer, and Settings (bars and plates, the programme editor, backups, next cycle). |
+
+Back walks up the tab you are in, then to Today, then asks before closing.
+Tapping the tab you are already on jumps back to the top of it.
+
 ## Toolchain recorded
 
 | | |
@@ -17,7 +32,7 @@ cable, heavy bag, jump rope, ab wheel, kettlebell, step platform, mats
 | Flutter | 3.47.5 · stable · Dart 3.13.4 |
 | JDK running Gradle | Temurin 17.0.20.1, via `flutter config --jdk-dir` (system default java is 25) |
 | minSdk / target | 24 / Flutter default |
-| App version | 0.10.0+10 |
+| App version | 0.11.0+11 |
 
 Known deviations from the build plan are listed at the end of
 [docs/03-build-plan.md](docs/03-build-plan.md).

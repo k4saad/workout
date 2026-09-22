@@ -29,11 +29,14 @@ class BodyScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.today_outlined),
-          onPressed: () => context.go('/'),
-        ),
         title: const Text('Body'),
+        actions: [
+          IconButton(
+            tooltip: 'Progress photos',
+            icon: const Icon(Icons.photo_library_outlined),
+            onPressed: () => context.go('/body/progress'),
+          ),
+        ],
       ),
       body: entriesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../app/exercise_providers.dart';
 import '../../core/theme/app_theme.dart';
@@ -48,13 +47,7 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
     results.sort((a, b) => a.name.compareTo(b.name));
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.today_outlined),
-          onPressed: () => context.go('/'),
-        ),
-        title: const Text('Exercises'),
-      ),
+      appBar: AppBar(title: const Text('Exercises')),
       body: Column(
         children: [
           Padding(

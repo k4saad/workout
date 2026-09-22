@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/calendar_providers.dart';
@@ -28,11 +27,6 @@ class CalendarScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.today_outlined),
-          tooltip: 'Today',
-          onPressed: () => context.go('/'),
-        ),
         title: Text(DateFormat('MMMM yyyy').format(month)),
         actions: [
           IconButton(

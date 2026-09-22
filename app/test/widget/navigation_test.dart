@@ -1,0 +1,199 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:keller_twelve/app/providers.dart';
+import 'package:keller_twelve/app/router.dart';
+import 'package:keller_twelve/app/session_providers.dart';
+import 'package:keller_twelve/app/shell.dart';
+import 'package:keller_twelve/core/theme/app_theme.dart';
+import 'package:keller_twelve/data/db/database.dart';
+import 'package:keller_twelve/data/programme_repository.dart';
+
+/// Navigation, from the report that started it: "if back button is pressed it
+/// exits the application, there is no main page".
+///
+/// Both had the same cause — every screen navigated with `context.go`, which
+/// REPLACES the stack, so there was never anything behind the current screen.
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  late Directory tmp;
+  late AppDatabase db;
+  late ProgrammeRepository repo;
+  late GoRouter router;
+
+  setUp(() async {
+    tmp = Directory.systemTemp.createTempSync('kt_nav_');
+    db = AppDatabase.memory();
+    repo = ProgrammeRepository(documentsDir: tmp);
+    await repo.ensureSeeded();
+    await repo.loadLibrary();
+    await repo.loadInventory();
+    await repo.loadProgramme();
+    // A fresh router per test: it holds the per-branch navigator stacks, so a
+    // shared one would carry one test's tab position into the next.
+    router = buildRouter();
+  });
+
+  tearDown(() async {
+    await db.close();
+    try {
+      if (tmp.existsSync()) tmp.deleteSync(recursive: true);
+    } on FileSystemException {
+      // Windows keeps the handle a moment longer.
+    }
+  });
+
+  Future<void> settle(WidgetTester tester) async {
+    for (var i = 0; i < 6; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+  }
+
+  Future<void> pumpApp(WidgetTester tester) async {
+    tester.view.physicalSize = const Size(400, 2000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          programmeRepositoryProvider.overrideWithValue(repo),
+          databaseProvider.overrideWithValue(db),
+        ],
+        child: MaterialApp.router(theme: AppTheme.dark, routerConfig: router),
+      ),
+    );
+    await settle(tester);
+    await settle(tester);
+  }
+
+  /// The Android hardware back button, as the framework delivers it.
+  Future<void> pressBack(WidgetTester tester) async {
+    await tester.binding.handlePopRoute();
+    await settle(tester);
+  }
+
+  Future<void> tapTab(WidgetTester tester, String label) async {
+    await tester.tap(find.widgetWithText(NavigationDestination, label));
+    await settle(tester);
+  }
+
+  testWidgets('the bottom bar is present and thumb-reachable', (tester) async {
+    await pumpApp(tester);
+
+    expect(find.byType(NavigationBar), findsOneWidget);
+    for (final d in AppShell.destinations) {
+      expect(find.text(d.label), findsWidgets);
+    }
+
+    // It must sit in the bottom third — the whole point is the thumb.
+    final bar = tester.getRect(find.byType(NavigationBar));
+    final screen = tester.getRect(find.byType(MaterialApp));
+    expect(bar.top, greaterThan(screen.height * 0.66));
+  });
+
+  testWidgets('every tab opens its own screen', (tester) async {
+    await pumpApp(tester);
+
+    for (final (label, heading) in const [
+      ('Week', 'Week'),
+      ('Numbers', 'Numbers'),
+      ('Body', 'Body'),
+      ('More', 'More'),
+    ]) {
+      await tapTab(tester, label);
+      expect(
+        find.widgetWithText(AppBar, heading),
+        findsOneWidget,
+        reason: 'the $label tab did not open',
+      );
+    }
+  });
+
+  testWidgets('back from a drilled-in screen returns, it does not quit', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await tapTab(tester, 'More');
+    expect(find.widgetWithText(AppBar, 'More'), findsOneWidget);
+
+    await tester.tap(find.text('Exercises'));
+    await settle(tester);
+    expect(find.widgetWithText(AppBar, 'Exercises'), findsOneWidget);
+
+    await pressBack(tester);
+
+    // This is the bug: it used to leave the app entirely.
+    expect(
+      find.widgetWithText(AppBar, 'More'),
+      findsOneWidget,
+      reason: 'back should walk up the tab stack, not close the app',
+    );
+    expect(find.byType(NavigationBar), findsOneWidget);
+  });
+
+  testWidgets('back from a tab root returns to Today', (tester) async {
+    await pumpApp(tester);
+    await tapTab(tester, 'Numbers');
+    expect(find.widgetWithText(AppBar, 'Numbers'), findsOneWidget);
+
+    await pressBack(tester);
+
+    expect(find.widgetWithText(AppBar, 'The Keller Twelve'), findsOneWidget);
+  });
+
+  testWidgets('back on Today asks before closing rather than just going', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    expect(find.widgetWithText(AppBar, 'The Keller Twelve'), findsOneWidget);
+
+    await pressBack(tester);
+
+    expect(find.text('Close the app?'), findsOneWidget);
+    await tester.tap(find.text('Stay'));
+    await settle(tester);
+    expect(find.widgetWithText(AppBar, 'The Keller Twelve'), findsOneWidget);
+  });
+
+  testWidgets('a tab remembers where it was while you visit another', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+
+    await tapTab(tester, 'More');
+    await tester.tap(find.text('Exercises'));
+    await settle(tester);
+    expect(find.widgetWithText(AppBar, 'Exercises'), findsOneWidget);
+
+    await tapTab(tester, 'Today');
+    expect(find.widgetWithText(AppBar, 'The Keller Twelve'), findsOneWidget);
+
+    await tapTab(tester, 'More');
+    expect(
+      find.widgetWithText(AppBar, 'Exercises'),
+      findsOneWidget,
+      reason: 'each tab keeps its own stack',
+    );
+  });
+
+  testWidgets('tapping the tab you are on pops it back to its root', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await tapTab(tester, 'More');
+    await tester.tap(find.text('Exercises'));
+    await settle(tester);
+    expect(find.widgetWithText(AppBar, 'Exercises'), findsOneWidget);
+
+    await tapTab(tester, 'More');
+    expect(find.widgetWithText(AppBar, 'More'), findsOneWidget);
+  });
+}

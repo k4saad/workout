@@ -30,10 +30,6 @@ class ProgressScreen extends ConsumerWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.today_outlined),
-            onPressed: () => context.go('/'),
-          ),
           title: const Text('Progress'),
           bottom: const TabBar(
             tabs: [
@@ -44,7 +40,7 @@ class ProgressScreen extends ConsumerWidget {
           ),
         ),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => context.go('/progress/capture?week=$week'),
+          onPressed: () => context.go('/capture?week=$week'),
           icon: const Icon(Icons.photo_camera),
           label: const Text('New shoot'),
         ),

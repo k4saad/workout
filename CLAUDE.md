@@ -65,6 +65,24 @@ One user, one programme, no backend, no accounts, no network.
 - Riverpod code-gen providers (`@riverpod`). No global mutable state.
 - Every new domain function gets a unit test in the same change.
 
+## Navigation and chrome
+
+- **Five tabs in a bottom `NavigationBar`**: Today · Week · Numbers · Body ·
+  More. The top of a phone is the furthest point from the thumb of the hand
+  holding it; anything reached between sets belongs at the bottom.
+- **Every tab owns its navigator** (`StatefulShellRoute.indexedStack`).
+  Drill-downs navigate to a NESTED route so the stack builds and back walks up
+  it. `context.go` to a sibling top-level route REPLACES the stack — that is
+  what made back quit the app, and it must not come back.
+- The session runner and the photo capture screen are **outside the shell**,
+  full screen. Mid-set, a tab bar is four ways to lose your place.
+- **No "home" arrow in an app bar.** The bottom bar is the way home.
+- **Palette: black, grey, crimson.** One accent, used sparingly, so crimson
+  always means "this is the thing". Amber and green appear only as semantic
+  states and always carry a glyph too.
+- The launch screen and the app icon background are both `AppTheme.bg`, so
+  opening the app does not flash.
+
 ## Device reality
 
 I train alone in a basement, in poor light, with chalky hands, between heavy sets, on a

@@ -16,13 +16,7 @@ class SettingsScreen extends ConsumerWidget {
     final prefs = ref.watch(preferencesProvider).asData?.value;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.today_outlined),
-          onPressed: () => context.go('/'),
-        ),
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         padding: Gap.pagePadding,
         children: [
@@ -68,25 +62,25 @@ class SettingsScreen extends ConsumerWidget {
             icon: Icons.straighten,
             title: 'Bars, plates and the lattice',
             body: 'Every suggested load is computed from these numbers.',
-            onTap: () => context.go('/gym'),
+            onTap: () => context.go('/more/settings/gym'),
           ),
           _Link(
             icon: Icons.edit_note,
             title: 'Edit the programme',
             body: 'Sets, reps, rest, and swapping a movement out.',
-            onTap: () => context.go('/programme'),
+            onTap: () => context.go('/more/settings/programme'),
           ),
           _Link(
             icon: Icons.folder_outlined,
             title: 'Backup and files',
             body: 'Export, import, and reset to the shipped programme.',
-            onTap: () => context.go('/programme/file'),
+            onTap: () => context.go('/more/settings/files'),
           ),
           _Link(
             icon: Icons.auto_graph,
             title: 'Next cycle',
             body: 'What the week-12 test results seed.',
-            onTap: () => context.go('/next-cycle'),
+            onTap: () => context.go('/more/settings/next-cycle'),
           ),
           Gap.xl,
         ],

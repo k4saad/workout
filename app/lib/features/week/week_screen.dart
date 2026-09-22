@@ -21,12 +21,14 @@ class WeekScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.today_outlined),
-          tooltip: 'Today',
-          onPressed: () => context.go('/'),
-        ),
         title: const Text('Week'),
+        actions: [
+          IconButton(
+            tooltip: 'Calendar',
+            icon: const Icon(Icons.calendar_month_outlined),
+            onPressed: () => context.go('/week/calendar'),
+          ),
+        ],
       ),
       body: async.when(
         loading: () => const AsyncScaffoldBody(
