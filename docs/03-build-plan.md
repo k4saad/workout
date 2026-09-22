@@ -53,11 +53,11 @@ pacing: each phase gets tested in the room it is for.
 installed on your phone.
 
 ### 0.1 Toolchain
-- [ ] Flutter SDK on the stable channel; `flutter --version` recorded in the README
-- [ ] `flutter doctor -v` with no red on Android
-- [ ] **JDK 17** confirmed (`java -version`). If the system default is 21, set
+- [x] Flutter SDK on the stable channel; `flutter --version` recorded in the README
+- [x] `flutter doctor -v` with no red on Android
+- [x] **JDK 17** confirmed (`java -version`). If the system default is 21, set
       `org.gradle.java.home` in `android/gradle.properties`
-- [ ] `flutter doctor --android-licenses` accepted — release builds fail late otherwise
+- [x] `flutter doctor --android-licenses` accepted — release builds fail late otherwise
 - [ ] `adb devices` lists the phone as `device`, not `unauthorized`
 
 ### 0.2 Project
@@ -73,8 +73,8 @@ installed on your phone.
 - [x] `android/key.properties` created and **added to `.gitignore`**
 - [x] `signingConfigs.release` wired into `android/app/build.gradle`, and
       `buildTypes.release.signingConfig` pointed at it — **not** at `signingConfigs.debug`
-- [ ] `flutter build apk --release --split-per-abi`
-- [ ] `apksigner verify --print-certs` shows **your** certificate, not `CN=Android Debug`
+- [x] `flutter build apk --release --split-per-abi`
+- [x] `apksigner verify --print-certs` shows **your** certificate, not `CN=Android Debug`
 - [ ] **Keystore backed up to two locations that are not this PC.** Do this tonight.
 
 ### 0.4 Install
@@ -88,7 +88,12 @@ and the APK is running on the phone.
 - JDK 21 + older Gradle gives cryptic Kotlin failures. Pin 17.
 - Xiaomi / Redmi / Realme: also enable "Install via USB" in Developer options and
   disable MIUI optimisation. This wastes hours if you do not know it.
-- `--split-per-abi` gives ~8 MB arm64 instead of ~20 MB fat.
+- `--split-per-abi` splits by architecture. **The ~8 MB figure written here
+  originally was wrong** — that is a bare Flutter counter app. The real arm64
+  APK is **27.6 MB**: 11.8 MB Flutter engine, 10.0 MB compiled Dart
+  (`libapp.so`), 1.5 MB sqlite3, 2.9 MB post-R8 dex, 1.7 MB assets. Nothing is
+  bloated; there is simply that much app. A fat APK would be ~85 MB, so the
+  split still earns its place.
 - Wireless: `adb pair <ip>:<port>` then `adb connect <ip>:<port>`.
 
 ### Prompt
@@ -668,20 +673,52 @@ one boolean would put twelve weeks of logs at risk for nothing.
   so every backup manifest named a build that never existed. Both are now
   0.10.0+10 and a test keeps them together.
 
+### The build, actually run
+
+Done on 2026-09-22, not left as an instruction:
+
+- SDK licences accepted, `platform-tools` + `platforms;android-36` +
+  `build-tools;36.0.0` installed, Flutter pointed at the SDK and at Temurin
+  JDK 17. `flutter doctor` green on Android.
+- `flutter build apk --release --split-per-abi` **succeeds.**
+- `apksigner verify --print-certs` prints
+  `CN=Saad, OU=Keller Twelve, O=Personal, L=Muenster, C=DE` — the real key,
+  not `CN=Android Debug`.
+- R8 ran and the keep rules held: `seeds.txt` lists 7 entries for
+  `ScheduledNotificationReceiver`, 3 for the boot receiver, 23 for the camera
+  plugin, 157 for CameraX and 1808 for Gson. The classes that are reached only
+  by name survived minification.
+
+**The first attempt failed**, and it was worth having:
+
+```
+Dependency ':flutter_local_notifications' requires core library desugaring
+to be enabled for :app.
+```
+
+`flutter_local_notifications` 19.x calls `java.time`, which does not exist
+below API 26 while `minSdk` is 24. Desugaring back-ports it. This failure
+appears **only** in a release build — every test on the machine passed while
+no APK could be produced. `isCoreLibraryDesugaringEnabled = true` plus
+`coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")` fixes it,
+and `privacy_audit_test.dart` now fails if either is removed.
+
 ### What is still owed, and only you can do it
 
 These need the phone and a signed build. None of them can be faked from a
 desktop, and each has a real failure behind it:
 
-1. A **full session on the release APK**, rest timer running with the screen
+1. `adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`
+   — no phone was connected when the build ran.
+2. A **full session on the release APK**, rest timer running with the screen
    off. Debug builds are not minified and prove nothing about R8.
-2. A **full photo shoot on the release APK** — CameraX resolves by name.
-3. **Open the gallery and Google Photos and confirm the progress photos are
+3. A **full photo shoot on the release APK** — CameraX resolves by name.
+4. **Open the gallery and Google Photos and confirm the progress photos are
    not there.** This is the Phase 5.5 requirement and the single most likely
    privacy mistake in the app.
-4. Exempt the app from battery optimisation on the device.
-5. Export a backup and open the zip on the PC.
-6. Then, and only then, `git tag v1.0`.
+5. Exempt the app from battery optimisation on the device.
+6. Export a backup and open the zip on the PC.
+7. Then, and only then, `git tag v1.0`.
 
 ---
 

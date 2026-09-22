@@ -15,7 +15,7 @@ cable, heavy bag, jump rope, ab wheel, kettlebell, step platform, mats
 | | |
 |---|---|
 | Flutter | 3.47.5 · stable · Dart 3.13.4 |
-| JDK running Gradle | **unset — system default is Java 25.** See *Three things only you can do*. |
+| JDK running Gradle | Temurin 17.0.20.1, via `flutter config --jdk-dir` (system default java is 25) |
 | minSdk / target | 24 / Flutter default |
 | App version | 0.10.0+10 |
 
@@ -99,38 +99,23 @@ balance        both upper days 10 push / 10 pull
 - [x] Phase 10 — hardening + release — tag `v0.10-phase10`
 - [ ] `v1.0` — after the on-device checks in the release checklist below
 
-### Three things only you can do
+**The signed release APK builds and is signed with your key.** What remains is
+installing it and running the on-device checks.
 
-**1. Accept the Android SDK licences.** Flutter 3.47.5 and the Android
-command-line tools are installed, but installing SDK packages means accepting
-Google's licence agreements, which is yours to accept, not the assistant's.
-One script does the rest:
+### Toolchain setup — done
 
-```bash
-powershell -ExecutionPolicy Bypass -File tools\finish-android-setup.ps1
-```
+The Android SDK licences are accepted and the packages are installed
+(`platform-tools`, `platforms;android-36`, `build-tools;36.0.0`). Flutter is
+pointed at `C:\Users\Saad\Android\Sdk` and at Temurin JDK 17 via
+`flutter config --jdk-dir`. `flutter doctor` reports the Android toolchain
+green.
 
-Until that runs there is no APK, so no phase can meet its "installed on the
-phone" definition of done. Everything else — the tests, `flutter analyze`,
-the data gates — passes without it.
+`tools/finish-android-setup.ps1` is kept only as a record of what was run; you
+do not need it again unless the SDK is reinstalled.
 
-**2. Install and pin JDK 17.** The system default here is **Java 25**, and
-there is no JDK 17 on the machine (only 21 and 25). The build plan calls for
-17 and warns that a too-new JDK fails with cryptic Kotlin and AGP errors that
-look like anything except a JDK problem. `android/app/build.gradle.kts`
-already *targets* 17 bytecode — this is about which JDK Gradle itself runs on.
+### Still owed: week-1 calibration
 
-After installing it, uncomment the matching line in
-`app/android/gradle.properties`:
-
-```
-org.gradle.java.home=C:\Program Files\Java\jdk-17
-```
-
-If you would rather not install anything, try pointing it at the JDK 21 that
-is already there first — but 17 is what the plan asks for.
-
-**3. Week-1 calibration** ([docs/04-calibration.md](docs/04-calibration.md)).
+([docs/04-calibration.md](docs/04-calibration.md)).
 The app runs on placeholder bar weights and says so on every screen until you
 weigh them. Edit `INVENTORY` at the top of `tools/gen.py`, re-run the two
 commands below, and every load moves onto your real lattice.
@@ -148,8 +133,8 @@ progress photo.
 
 ## Building and installing
 
-Everything below assumes the Android SDK licences have been accepted once
-(see **Three things only you can do**, above).
+Everything below works as-is; the toolchain is set up
+(see *Toolchain setup*, above).
 
 ### Check it first
 
@@ -170,9 +155,10 @@ Warnings are errors here.
 cd app && flutter build apk --release --split-per-abi
 ```
 
-`--split-per-abi` gives a ~8 MB arm64 APK instead of a ~20 MB fat one. The
-file lands at
-`app/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`.
+`--split-per-abi` builds one APK per architecture. The one for your phone is
+`app/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` — **27.6 MB**
+(11.8 MB Flutter engine, 10.0 MB your compiled Dart, 1.5 MB sqlite3, 2.9 MB
+dex after R8, 1.7 MB assets). A single fat APK would be ~85 MB.
 
 ### Confirm it is signed with YOUR key
 
@@ -180,7 +166,13 @@ file lands at
 apksigner verify --print-certs app/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
-It must print your certificate. If it prints `CN=Android Debug`, **stop** —
+It must print your certificate. It currently prints:
+
+```
+CN=Saad, OU=Keller Twelve, O=Personal, L=Muenster, C=DE
+```
+
+If it ever prints `CN=Android Debug`, **stop** —
 installing that build and later switching keys forces an uninstall, and an
 uninstall deletes the training database and every progress photo.
 

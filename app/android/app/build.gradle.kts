@@ -22,6 +22,11 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // flutter_local_notifications 19.x uses java.time on minSdk 24, which
+        // only exists from API 26. Desugaring back-ports it. Without this the
+        // release build fails at :app:checkReleaseAarMetadata, and the rest
+        // timer is the feature that depends on it.
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -71,4 +76,10 @@ kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
+}
+
+dependencies {
+    // Required by the compileOptions block above. Keep in step with what
+    // flutter_local_notifications asks for; it currently needs 2.1.4+.
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

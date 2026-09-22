@@ -210,6 +210,16 @@ void main() {
       expect(rules, contains('io.flutter.plugins.camera'));
     });
 
+    test('core library desugaring stays enabled', () {
+      // flutter_local_notifications uses java.time, which does not exist
+      // below API 26 while minSdk is 24. Without desugaring the RELEASE build
+      // fails at :app:checkReleaseAarMetadata — and it fails there only, so
+      // every test on this machine passes while no APK can be produced.
+      final gradle = read('android/app/build.gradle.kts');
+      expect(gradle, contains('isCoreLibraryDesugaringEnabled = true'));
+      expect(gradle, contains('coreLibraryDesugaring('));
+    });
+
     test('secrets are not in the repository', () {
       expect(File('android/key.properties').existsSync(), isTrue);
       final ignore = read('../.gitignore');
