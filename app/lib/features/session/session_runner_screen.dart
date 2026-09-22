@@ -15,6 +15,7 @@ import '../common/widgets.dart';
 import 'session_controller.dart';
 import 'widgets/rest_timer_bar.dart';
 import 'widgets/set_input.dart';
+import 'widgets/suggestion_card.dart';
 
 /// The session runner: press start, walk through the work, log every set.
 ///
@@ -325,6 +326,14 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
                     library: library,
                     pending: _pending,
                     latticeStep: bundle!.lattice.nominalBarbellStep ?? 1.0,
+                    // The prescription's startLoadKg already has the block
+                    // multiplier applied, but logged history does not — so
+                    // the engine needs it separately.
+                    blockMultiplier:
+                        bundle.programme
+                            .blockForWeek(widget.weekNo)
+                            ?.loadMultiplier ??
+                        1.0,
                     onPendingChanged: (v) => setState(() => _pending = v),
                     onFocus: (i) => setState(() {
                       _state = ref.read(runnerControllerProvider).focusOn(s, i);
@@ -469,6 +478,7 @@ class _RunnerBody extends StatelessWidget {
     required this.library,
     required this.pending,
     required this.latticeStep,
+    required this.blockMultiplier,
     required this.onPendingChanged,
     required this.onFocus,
     required this.onLog,
@@ -479,6 +489,10 @@ class _RunnerBody extends StatelessWidget {
   final ExerciseLibrary library;
   final PendingSet pending;
   final double latticeStep;
+
+  /// The block's loadMultiplier. The prescription's own startLoadKg already
+  /// has it applied, but history does not — so the engine needs it too.
+  final double blockMultiplier;
   final ValueChanged<PendingSet> onPendingChanged;
   final ValueChanged<int> onFocus;
   final void Function(RunnerItem, Exercise, {bool warmup}) onLog;
@@ -520,6 +534,7 @@ class _RunnerBody extends StatelessWidget {
             exercise: library.resolve(state.focus!.prescription.exerciseId),
             pending: pending,
             latticeStep: latticeStep,
+            blockMultiplier: blockMultiplier,
             onPendingChanged: onPendingChanged,
             onLog: onLog,
             onUndo: onUndo,
@@ -594,6 +609,7 @@ class _FocusCard extends ConsumerWidget {
     required this.exercise,
     required this.pending,
     required this.latticeStep,
+    required this.blockMultiplier,
     required this.onPendingChanged,
     required this.onLog,
     required this.onUndo,
@@ -603,6 +619,7 @@ class _FocusCard extends ConsumerWidget {
   final Exercise exercise;
   final PendingSet pending;
   final double latticeStep;
+  final double blockMultiplier;
   final ValueChanged<PendingSet> onPendingChanged;
   final void Function(RunnerItem, Exercise, {bool warmup}) onLog;
   final VoidCallback onUndo;
@@ -613,6 +630,10 @@ class _FocusCard extends ConsumerWidget {
     final p = item.prescription;
     final next = item.nextSet;
     final lastTime = ref.watch(lastTimeProvider(p.id)).asData?.value ?? [];
+    final suggestion = ref
+        .watch(suggestionProvider((p: p, mult: blockMultiplier)))
+        .asData
+        ?.value;
 
     return Card(
       child: Padding(
@@ -656,6 +677,11 @@ class _FocusCard extends ConsumerWidget {
                   .toList(),
               unit: p.unit,
             ),
+
+            if (suggestion != null) ...[
+              Gap.m,
+              SuggestionCard(suggestion: suggestion),
+            ],
 
             if (p.coachNote != null) ...[
               Gap.m,

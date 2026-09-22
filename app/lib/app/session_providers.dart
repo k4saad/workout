@@ -4,7 +4,11 @@ import '../data/backup_service.dart';
 import '../data/db/database.dart';
 import '../data/notification_service.dart';
 import '../data/session_service.dart';
+import '../data/suggestion_service.dart';
+import '../domain/models/prescription.dart';
+import '../domain/progression/progression_engine.dart';
 import '../features/session/session_controller.dart';
+import 'providers.dart';
 
 /// The one database instance. Opened lazily, closed when the app dies.
 final databaseProvider = Provider<AppDatabase>((ref) {
@@ -34,6 +38,29 @@ final backupServiceProvider = Provider<BackupService>(
   (ref) =>
       BackupService(db: ref.watch(databaseProvider), appVersion: appVersion),
 );
+
+/// Bridges the database to the progression engine.
+final suggestionServiceProvider = FutureProvider<SuggestionService>((
+  ref,
+) async {
+  final bundle = await ref.watch(bundleProvider.future);
+  return SuggestionService(
+    db: ref.watch(databaseProvider),
+    inventory: bundle.inventory,
+  );
+});
+
+/// What to load next for one prescription, with the plate breakdown and the
+/// reason, so the runner can say "27 kg, bar 9 + 5 + 2.5 + 1.25 per side,
+/// earned the jump" rather than just a number.
+final suggestionProvider =
+    FutureProvider.family<LoadSuggestion, ({Prescription p, double mult})>((
+      ref,
+      args,
+    ) async {
+      final svc = await ref.watch(suggestionServiceProvider.future);
+      return svc.suggest(args.p, blockLoadMultiplier: args.mult);
+    });
 
 /// The session that was in progress when the app was last killed, if any.
 ///

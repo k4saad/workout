@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../features/day/day_detail_screen.dart';
 import '../features/history/history_screen.dart';
 import '../features/session/session_runner_screen.dart';
+import '../features/settings/calibration_screen.dart';
 import '../features/today/today_screen.dart';
 import '../features/week/week_screen.dart';
 
@@ -31,5 +32,6 @@ final appRouter = GoRouter(
       ),
     ),
     GoRoute(path: '/history', builder: (_, _) => const HistoryScreen()),
+    GoRoute(path: '/gym', builder: (_, _) => const CalibrationScreen()),
   ],
 );

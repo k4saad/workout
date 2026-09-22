@@ -511,14 +511,17 @@ never more than 3 ramp sets  (the 60-minute ceiling)
 rest between ramp sets: 60 s, or 75 s on the deadlift
 ```
 
-Worked examples on a 9 kg bar with a 1 kg lattice:
+Worked examples on a 9 kg bar with the shipped 0.5 kg lattice:
 
 | Working set | Ramp |
 |---|---|
-| 17 kg bench | bar × 8, 12 × 5, 15 × 3 |
-| 21 kg squat | bar × 8, 14 × 5, 18 × 3 |
-| 39 kg deadlift | bar × 8, 22 × 5, 31 × 3 |
+| 11.5 kg | bar × 8 — under a 4 kg gap there is nothing worth ramping |
+| 17 kg bench | bar × 8, 13 × 5 |
+| 39 kg deadlift | bar × 8, 22.5 × 5, 31.5 × 3 |
 | 69 kg deadlift | bar × 8, 36 × 5, 54 × 3 |
+
+Rest between ramp sets is 60 s, or 75 s on a deadlift — it is the heaviest
+thing in the room and the setup takes longer.
 
 Ramp sets are logged with `is_warmup = 1` and are **excluded from every progression
 decision and every volume statistic.**

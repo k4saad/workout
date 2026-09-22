@@ -463,38 +463,43 @@ class _CalibrationNag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.warn.withValues(alpha: 0.10),
-        border: Border.all(color: AppTheme.warn.withValues(alpha: 0.45)),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.straighten, color: AppTheme.warn, size: 22),
-          Gap.m,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Bar weights are still estimates',
-                  style: t.titleMedium?.copyWith(color: AppTheme.warn),
-                ),
-                Gap.xs,
-                Text(
-                  'Every load below is computed from a guessed bar weight. '
-                  'Put both bars on the bathroom scale and correct them in '
-                  'Settings — it takes five minutes and it makes every '
-                  'number in this app real.',
-                  style: t.bodyMedium,
-                ),
-              ],
+    return InkWell(
+      onTap: () => context.go('/gym'),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppTheme.warn.withValues(alpha: 0.10),
+          border: Border.all(color: AppTheme.warn.withValues(alpha: 0.45)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.straighten, color: AppTheme.warn, size: 22),
+            Gap.m,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Bar weights are still estimates',
+                    style: t.titleMedium?.copyWith(color: AppTheme.warn),
+                  ),
+                  Gap.xs,
+                  Text(
+                    'Every load below is computed from a guessed bar weight. '
+                    'Put both bars on the bathroom scale and correct them — '
+                    'it takes five minutes and it makes every number in this '
+                    'app real. Tap to do it now.',
+                    style: t.bodyMedium,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            const Icon(Icons.chevron_right, color: AppTheme.warn),
+          ],
+        ),
       ),
     );
   }

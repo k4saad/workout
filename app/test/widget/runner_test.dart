@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:keller_twelve/app/providers.dart';
 import 'package:keller_twelve/app/session_providers.dart';
 import 'package:keller_twelve/core/theme/app_theme.dart';
 import 'package:keller_twelve/data/db/database.dart';
+import 'package:keller_twelve/data/db/tables.dart';
 import 'package:keller_twelve/data/notification_service.dart';
 import 'package:keller_twelve/data/programme_repository.dart';
 import 'package:keller_twelve/domain/calendar/programme_calendar.dart';
@@ -239,6 +241,99 @@ void main() {
     await open(tester, 'b-mon', week: 8);
     // 21 * 0.70 = 14.7
     expect(find.text('14.7'), findsWidgets);
+  });
+
+  group('the progression engine reaches the screen', () {
+    testWidgets('a cold start says so and shows the plate breakdown', (
+      tester,
+    ) async {
+      await open(tester, 'b-mon');
+      expect(find.textContaining('Programme start'), findsOneWidget);
+      // 21 kg = bar 9 + 6 per side
+      expect(find.textContaining('bar 9'), findsOneWidget);
+      expect(find.textContaining('per side'), findsOneWidget);
+    });
+
+    testWidgets('an earned jump is explained, not just applied', (
+      tester,
+    ) async {
+      // Seed a clean session last week: every set at the top with RIR met.
+      final session = await db
+          .into(db.sessions)
+          .insert(
+            SessionsCompanion.insert(
+              programmeId: 'keller-twelve',
+              blockId: 'build',
+              dayId: 'b-mon',
+              weekNo: 4,
+              plannedDate: DateTime.now().subtract(const Duration(days: 7)),
+              scheduledDate: DateTime.now().subtract(const Duration(days: 7)),
+              status: const Value(SessionStatus.completed),
+            ),
+          );
+      for (var i = 1; i <= 4; i++) {
+        await db
+            .into(db.setLogs)
+            .insert(
+              SetLogsCompanion.insert(
+                sessionId: session,
+                prescriptionId: 'b-mon-1',
+                exerciseId: 'barbell-back-squat',
+                setIndex: i,
+                reps: const Value(5),
+                loadKg: const Value(21),
+                rir: const Value(2),
+                targetRepsMin: const Value(5),
+                targetRepsMax: const Value(5),
+                completedAt: DateTime.now().subtract(const Duration(days: 7)),
+              ),
+            );
+      }
+
+      await open(tester, 'b-mon');
+      expect(find.textContaining('Earned'), findsOneWidget);
+      // 21 + 2.5 = 23.5, which is on the 0.5 kg lattice.
+      expect(find.textContaining('23.5 kg'), findsWidgets);
+    });
+
+    testWidgets('a stall is explained rather than silently repeated', (
+      tester,
+    ) async {
+      final session = await db
+          .into(db.sessions)
+          .insert(
+            SessionsCompanion.insert(
+              programmeId: 'keller-twelve',
+              blockId: 'build',
+              dayId: 'b-mon',
+              weekNo: 4,
+              plannedDate: DateTime.now().subtract(const Duration(days: 7)),
+              scheduledDate: DateTime.now().subtract(const Duration(days: 7)),
+              status: const Value(SessionStatus.completed),
+            ),
+          );
+      for (final reps in [5, 4, 3, 3]) {
+        await db
+            .into(db.setLogs)
+            .insert(
+              SetLogsCompanion.insert(
+                sessionId: session,
+                prescriptionId: 'b-mon-1',
+                exerciseId: 'barbell-back-squat',
+                setIndex: reps,
+                reps: Value(reps),
+                loadKg: const Value(21),
+                rir: const Value(0),
+                targetRepsMin: const Value(5),
+                targetRepsMax: const Value(5),
+                completedAt: DateTime.now().subtract(const Duration(days: 7)),
+              ),
+            );
+      }
+
+      await open(tester, 'b-mon');
+      expect(find.textContaining('stall 1 of 2'), findsOneWidget);
+    });
   });
 }
 
