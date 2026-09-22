@@ -12,6 +12,7 @@ import '../../data/db/tables.dart';
 import '../../domain/models/day.dart';
 import '../../domain/models/exercise.dart';
 import '../common/widgets.dart';
+import '../exercises/exercise_detail_screen.dart';
 import 'session_controller.dart';
 import 'widgets/rest_timer_bar.dart';
 import 'widgets/set_input.dart';
@@ -641,7 +642,25 @@ class _FocusCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(exercise.name, style: t.headlineSmall),
+            Row(
+              children: [
+                Expanded(child: Text(exercise.name, style: t.headlineSmall)),
+                // One tap to the demo and back. A demo you have to leave the
+                // session to find does not get watched — and this pushes a
+                // route rather than replacing one, so you come back to the
+                // exact set you were on.
+                IconButton(
+                  tooltip: 'How do I do this?',
+                  icon: const Icon(Icons.help_outline),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) =>
+                          ExerciseDetailScreen(exerciseId: p.exerciseId),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             Gap.s,
             Wrap(
               spacing: 8,

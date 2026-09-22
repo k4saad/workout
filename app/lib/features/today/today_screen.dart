@@ -25,6 +25,11 @@ class TodayScreen extends ConsumerWidget {
         title: const Text('The Keller Twelve'),
         actions: [
           IconButton(
+            tooltip: 'Exercises',
+            icon: const Icon(Icons.menu_book_outlined),
+            onPressed: () => context.go('/exercises'),
+          ),
+          IconButton(
             tooltip: 'Body',
             icon: const Icon(Icons.monitor_weight_outlined),
             onPressed: () => context.go('/body'),

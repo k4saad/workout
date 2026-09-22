@@ -79,8 +79,8 @@
       ],
       "soloSafety": "None. Check the band for nicks and tears — they fail suddenly.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/band-face-pull.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Face_Pull",
         "stillSearchTerm": "face pull band",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -153,8 +153,8 @@
       ],
       "soloSafety": "None.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/band-pull-apart.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Band_Pull_Apart",
         "stillSearchTerm": "band pull apart",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -205,8 +205,8 @@
       ],
       "soloSafety": "Set the stand's catch pins just below your bottom position before your first set. If you miss a rep you sit down and the bar lands on the pins. Stay 2 reps short of failure, always, and know how to dump the bar backwards.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/barbell-back-squat.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Barbell_Squat",
         "stillSearchTerm": "barbell squat",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -309,8 +309,8 @@
       ],
       "soloSafety": "Set it down between sets rather than holding it bent over. Strict beats heavy here for at least six months.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/barbell-bent-over-row.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Bent_Over_Barbell_Row",
         "stillSearchTerm": "barbell bent over row",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -363,8 +363,8 @@
       ],
       "soloSafety": "The safest heavy lift to do alone — a missed rep just stays on the floor. Never use a belt to cover up a rounding back, and never do this one for reps to failure.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/barbell-deadlift.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Barbell_Deadlift",
         "stillSearchTerm": "barbell deadlift",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -410,8 +410,8 @@
       ],
       "soloSafety": "Easier to bail than a back squat — if you miss, let the bar roll forward off the shoulders and step back. Still set the pins.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/barbell-front-squat.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Front_Barbell_Squat",
         "stillSearchTerm": "front squat",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -494,8 +494,8 @@
       ],
       "soloSafety": "Getting under and out from the bar alone is the awkward part. Load it light enough to roll it over your hips and back off unaided.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/barbell-hip-thrust.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Barbell_Hip_Thrust",
         "stillSearchTerm": "barbell hip thrust",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -593,8 +593,8 @@
       ],
       "soloSafety": "Start light and stay conservative — this one punishes ego with a tweaked lower back more reliably than anything else in the programme.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/barbell-romanian-deadlift.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Romanian_Deadlift",
         "stillSearchTerm": "romanian deadlift",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -638,8 +638,8 @@
       ],
       "soloSafety": "None, but stop if you feel it in the front of the shoulder joint rather than the triceps.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/bench-dip.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Bench_Dips",
         "stillSearchTerm": "bench dips",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -706,8 +706,8 @@
       "commonErrors": [],
       "soloSafety": "None.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/bodyweight-squat.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Bodyweight_Squat",
         "stillSearchTerm": "bodyweight squat",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -842,8 +842,8 @@
       ],
       "soloSafety": "As safe as it gets. Nothing can fall on you.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/cable-face-pull.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Face_Pull",
         "stillSearchTerm": "cable face pull",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -1047,8 +1047,8 @@
       ],
       "soloSafety": "None.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/dead-bug.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Dead_Bug",
         "stillSearchTerm": "dead bug exercise",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -1169,8 +1169,8 @@
       ],
       "soloSafety": "Much safer than the barbell alone — a failed rep gets dropped sideways onto the floor. Check the collars before every set.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/dumbbell-bench-press.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Dumbbell_Bench_Press",
         "stillSearchTerm": "dumbbell bench press",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -1287,8 +1287,8 @@
       ],
       "soloSafety": "The safest press you own. There is nowhere for the weight to fall. Use this whenever you're unsure about benching alone.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/dumbbell-floor-press.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Dumbbell_Floor_Press",
         "stillSearchTerm": "dumbbell floor press",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -1371,8 +1371,8 @@
       ],
       "soloSafety": "Safer than the barbell overhead — you can throw the dumbbells forward and away. Still check the ceiling.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/dumbbell-overhead-press.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Dumbbell_Shoulder_Press",
         "stillSearchTerm": "dumbbell shoulder press",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -1457,8 +1457,8 @@
       ],
       "soloSafety": "None. Drop them sideways.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/dumbbell-squat.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Dumbbell_Squat",
         "stillSearchTerm": "dumbbell squat",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -1541,8 +1541,8 @@
       ],
       "soloSafety": "None.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/ez-bar-curl.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Barbell_Curl",
         "stillSearchTerm": "ez bar curl",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -1624,8 +1624,8 @@
       ],
       "soloSafety": "Check collars.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/farmers-walk.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Farmers_Walk",
         "stillSearchTerm": "farmers walk",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -1746,8 +1746,8 @@
       ],
       "soloSafety": "None. If you lose it, push the bell forward and away and step back.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/goblet-squat.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Goblet_Squat",
         "stillSearchTerm": "goblet squat",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -1968,8 +1968,8 @@
       ],
       "soloSafety": "Getting heavy dumbbells into position on an incline is the awkward part. Kick them up one at a time from the thighs.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/incline-dumbbell-press.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Incline_Dumbbell_Press",
         "stillSearchTerm": "incline dumbbell press",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -2008,8 +2008,8 @@
       ],
       "soloSafety": "None.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/incline-push-up.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Incline_Push-Up",
         "stillSearchTerm": "incline push up",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -2213,8 +2213,8 @@
       ],
       "soloSafety": "None.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/one-arm-dumbbell-row.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id One-Arm_Dumbbell_Row",
         "stillSearchTerm": "one arm dumbbell row",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -2295,8 +2295,8 @@
       ],
       "soloSafety": "None.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/plank.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Plank",
         "stillSearchTerm": "plank",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -2392,8 +2392,8 @@
       ],
       "soloSafety": "Make sure the band is properly seated over the bar before you load it. A band slipping off mid-rep drops you.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/pull-up-assisted.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Band_Assisted_Pull-Up",
         "stillSearchTerm": "assisted pull up band",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -2628,8 +2628,8 @@
       ],
       "soloSafety": "Check the ring straps and anchor before each session. Feet on the floor means a failed rep just sets you down.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/ring-row.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Inverted_Row",
         "stillSearchTerm": "inverted row rings",
         "youtubeUrl": null,
         "youtubeStartSec": 0
@@ -2753,8 +2753,8 @@
       ],
       "soloSafety": "Lower ceiling clearance needed than standing. Good option if the beams are in the way.",
       "media": {
-        "still": null,
-        "stillLicence": null,
+        "still": "assets/exercises/img/seated-dumbbell-press.jpg",
+        "stillLicence": "Unlicense (public domain) - yuhonas/free-exercise-db, source id Seated_Dumbbell_Press",
         "stillSearchTerm": "seated dumbbell shoulder press",
         "youtubeUrl": null,
         "youtubeStartSec": 0

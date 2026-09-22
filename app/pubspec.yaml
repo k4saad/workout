@@ -43,6 +43,15 @@ dependencies:
   # off to the system camera app and cannot draw the ghost overlay over the
   # viewfinder — and the overlay is the entire point of the feature.
   camera: ^0.11.2
+
+  # form clips: record via the system camera (no overlay needed here, so
+  # image_picker is fine) and play back locally.
+  image_picker: ^1.2.0
+  video_player: ^2.11.0
+
+  # opens a YouTube demo in the browser. An intent handoff, so it needs no
+  # INTERNET permission of our own.
+  url_launcher: ^6.3.2
   image: ^4.5.4
   local_auth: ^2.3.0
 
@@ -78,3 +87,4 @@ flutter:
   assets:
     - assets/programmes/
     - assets/exercises/
+    - assets/exercises/img/
