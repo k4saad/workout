@@ -7,6 +7,7 @@ import '../../app/providers.dart';
 import '../../app/session_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/calendar/programme_calendar.dart';
+import '../../domain/models/enums.dart';
 import '../../domain/models/programme.dart';
 import '../common/widgets.dart';
 
@@ -23,6 +24,11 @@ class TodayScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('The Keller Twelve'),
         actions: [
+          IconButton(
+            tooltip: 'Body',
+            icon: const Icon(Icons.monitor_weight_outlined),
+            onPressed: () => context.go('/body'),
+          ),
           IconButton(
             tooltip: 'Progress',
             icon: const Icon(Icons.photo_library_outlined),
@@ -252,10 +258,18 @@ class _ActiveBody extends StatelessWidget {
                       label: const Text('Start session'),
                     ),
                     Gap.s,
-                    OutlinedButton(
-                      onPressed: () => context.go('/week/$week/day/${day.id}'),
-                      child: const Text('Just show me the plan'),
-                    ),
+                    if (day.kind == DayKind.cardio)
+                      OutlinedButton.icon(
+                        onPressed: () => context.go('/cardio'),
+                        icon: const Icon(Icons.timer_outlined),
+                        label: const Text('Interval timers'),
+                      )
+                    else
+                      OutlinedButton(
+                        onPressed: () =>
+                            context.go('/week/$week/day/${day.id}'),
+                        child: const Text('Just show me the plan'),
+                      ),
                   ],
                 ],
               ),

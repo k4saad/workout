@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 
+import '../features/body/body_screen.dart';
 import '../features/calendar/calendar_screen.dart';
+import '../features/cardio/cardio_screen.dart';
 import '../features/day/day_detail_screen.dart';
 import '../features/history/history_screen.dart';
 import '../features/progress/capture_screen.dart';
@@ -36,6 +38,8 @@ final appRouter = GoRouter(
     ),
     GoRoute(path: '/calendar', builder: (_, _) => const CalendarScreen()),
     GoRoute(path: '/history', builder: (_, _) => const HistoryScreen()),
+    GoRoute(path: '/body', builder: (_, _) => const BodyScreen()),
+    GoRoute(path: '/cardio', builder: (_, _) => const CardioScreen()),
     GoRoute(path: '/progress', builder: (_, _) => const ProgressScreen()),
     GoRoute(
       path: '/progress/capture',
