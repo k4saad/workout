@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Belt and braces alongside android:allowBackup="false".
+
+  Progress photos are shirtless photos of one person. They must never leave
+  the device by any path the athlete did not explicitly choose. If allowBackup
+  is ever flipped back on, these exclusions still stand.
+-->
+<full-backup-content>
+    <exclude domain="file" path="photos/" />
+    <exclude domain="file" path="clips/" />
+    <exclude domain="file" path="thumbs/" />
+    <exclude domain="database" path="keller_twelve.sqlite" />
+</full-backup-content>

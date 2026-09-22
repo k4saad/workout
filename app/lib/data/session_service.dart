@@ -51,9 +51,14 @@ class SetEntry {
 ///  2. **An unfinished session is resumable.** Kill the app between sets,
 ///     reopen it, and you continue exactly where you were.
 class SessionService {
-  SessionService(this.db);
+  SessionService(this.db, {DateTime Function()? clock})
+    : _clock = clock ?? DateTime.now;
 
   final AppDatabase db;
+
+  /// Injectable so elapsed-time behaviour is testable. A service that reaches
+  /// for DateTime.now() directly cannot be tested at all.
+  final DateTime Function() _clock;
 
   /// Starts (or resumes) the session for [day] on [date].
   ///
@@ -95,7 +100,7 @@ class SessionService {
             weekNo: weekNo,
             plannedDate: planned,
             scheduledDate: planned,
-            startedAt: Value(retroactive ? null : DateTime.now()),
+            startedAt: Value(retroactive ? null : _clock()),
             status: const Value(SessionStatus.inProgress),
             loggedRetroactively: Value(retroactive),
           ),
@@ -161,7 +166,7 @@ class SessionService {
   }) async {
     await (db.update(db.sessions)..where((s) => s.id.equals(sessionId))).write(
       SessionsCompanion(
-        finishedAt: Value(DateTime.now()),
+        finishedAt: Value(_clock()),
         status: Value(
           partial ? SessionStatus.partial : SessionStatus.completed,
         ),
@@ -181,7 +186,7 @@ class SessionService {
       (db.update(db.sessions)..where((s) => s.id.equals(sessionId))).write(
         SessionsCompanion(
           status: const Value(SessionStatus.skipped),
-          finishedAt: Value(DateTime.now()),
+          finishedAt: Value(_clock()),
           note: note == null ? const Value.absent() : Value(note),
         ),
       );

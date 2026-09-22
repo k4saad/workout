@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ equivalent of backup_rules.xml. See that file for why. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="photos/" />
+        <exclude domain="file" path="clips/" />
+        <exclude domain="file" path="thumbs/" />
+        <exclude domain="database" path="keller_twelve.sqlite" />
+    </cloud-backup>
+    <device-transfer>
+        <!-- A direct phone-to-phone transfer is the athlete moving their own
+             device, not a cloud upload, so the training log may come along.
+             Photos still do not. -->
+        <exclude domain="file" path="photos/" />
+        <exclude domain="file" path="clips/" />
+    </device-transfer>
+</data-extraction-rules>

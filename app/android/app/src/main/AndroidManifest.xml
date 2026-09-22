@@ -1,8 +1,48 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Rest-timer notifications. Android 13+ asks at runtime. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <!--
+      EXACT alarms. Without these the rest timer fires late or not at all on
+      Android 12+, which is the difference between a 2:30 rest and "whenever
+      Android feels like it". v1's plan mentioned POST_NOTIFICATIONS only.
+      USE_EXACT_ALARM is granted at install for an alarm/timer app; the
+      SCHEDULE_EXACT_ALARM fallback covers older targets.
+    -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+
+    <!-- Re-arm a pending rest timer after a reboot. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+    <!-- Keeps the screen on while a session is in progress. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <!-- Ask to be exempt from battery optimisation, or OEM killers stop the timer. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+
+    <!--
+      NO INTERNET PERMISSION. Not a mistake.
+      This app holds a year of training data and a gallery of shirtless photos.
+      It makes exactly one outbound call — url_launcher opening a YouTube demo
+      — and that hands off to the browser, which needs no permission here.
+      Adding android.permission.INTERNET is a decision to discuss, not a fix.
+    -->
+
     <application
-        android:label="keller_twelve"
+        android:label="Keller Twelve"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:allowBackup="false">
+        <!--
+          allowBackup="false" is a HARD requirement, not a preference.
+          Left at the default, Android silently uploads app-private storage —
+          including every progress photo — to the user's Google Drive backup.
+          The backup_rules files are belt and braces for the same thing.
+        -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -12,10 +52,6 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
-            <!-- Specifies an Android theme to apply to this Activity as soon as
-                 the Android process has started. This theme is visible to the user
-                 while the Flutter UI initializes. After that, this theme continues
-                 to determine the Window background behind the Flutter UI. -->
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
@@ -25,17 +61,27 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- Don't delete the meta-data below.
-             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+
+        <!-- flutter_local_notifications: fire while the screen is off. -->
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
+
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-    <!-- Required to query activities that can process text, see:
-         https://developer.android.com/training/package-visibility and
-         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
 
-         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>

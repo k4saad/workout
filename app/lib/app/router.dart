@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 
 import '../features/day/day_detail_screen.dart';
+import '../features/history/history_screen.dart';
+import '../features/session/session_runner_screen.dart';
 import '../features/today/today_screen.dart';
 import '../features/week/week_screen.dart';
 
@@ -18,5 +20,16 @@ final appRouter = GoRouter(
         dayId: state.pathParameters['dayId']!,
       ),
     ),
+    GoRoute(
+      path: '/run/:week/:dayId',
+      builder: (_, state) => SessionRunnerScreen(
+        weekNo: int.parse(state.pathParameters['week']!),
+        dayId: state.pathParameters['dayId']!,
+        retroDate: state.uri.queryParameters['date'] == null
+            ? null
+            : DateTime.parse(state.uri.queryParameters['date']!),
+      ),
+    ),
+    GoRoute(path: '/history', builder: (_, _) => const HistoryScreen()),
   ],
 );

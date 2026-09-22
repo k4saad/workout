@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../core/theme/app_theme.dart';
@@ -48,7 +49,12 @@ class DayDetailScreen extends ConsumerWidget {
           if (day == null) {
             return const Center(child: Text('No session on that day.'));
           }
-          return _DayBody(day: day, library: b.library, blockName: block.name);
+          return _DayBody(
+            day: day,
+            library: b.library,
+            blockName: block.name,
+            weekNo: weekNo,
+          );
         },
       ),
     );
@@ -60,11 +66,13 @@ class _DayBody extends StatelessWidget {
     required this.day,
     required this.library,
     required this.blockName,
+    required this.weekNo,
   });
 
   final Day day;
   final ExerciseLibrary library;
   final String blockName;
+  final int weekNo;
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +116,15 @@ class _DayBody extends StatelessWidget {
 
         // Warnings come BEFORE the work, always.
         for (final w in day.warnings) ...[Gap.m, WarningBanner(warning: w)],
+
+        if (day.isTrainingDay) ...[
+          Gap.l,
+          FilledButton.icon(
+            onPressed: () => context.go('/run/$weekNo/${day.id}'),
+            icon: const Icon(Icons.play_arrow_rounded),
+            label: const Text('Start session'),
+          ),
+        ],
 
         for (final section in day.sections) ...[
           Gap.l,

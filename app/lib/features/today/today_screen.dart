@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/providers.dart';
+import '../../app/session_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/calendar/programme_calendar.dart';
 import '../../domain/models/programme.dart';
@@ -22,6 +23,11 @@ class TodayScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('The Keller Twelve'),
         actions: [
+          IconButton(
+            tooltip: 'History',
+            icon: const Icon(Icons.history),
+            onPressed: () => context.go('/history'),
+          ),
           IconButton(
             tooltip: 'This week',
             icon: const Icon(Icons.view_week_outlined),
@@ -46,6 +52,7 @@ class TodayScreen extends ConsumerWidget {
             padding: Gap.pagePadding,
             children: [
               _DateHeader(date: today, planned: planned),
+              const _ResumeBanner(),
               Gap.l,
               switch (planned.status) {
                 ProgrammeStatus.before => _BeforeCard(
@@ -68,6 +75,54 @@ class TodayScreen extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// A session the app was killed during. You should never lose one because
+/// the phone reclaimed memory between sets.
+class _ResumeBanner extends ConsumerWidget {
+  const _ResumeBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final resumable = ref.watch(resumableSessionProvider).asData?.value;
+    if (resumable == null) return const SizedBox.shrink();
+    final t = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppTheme.oxblood.withValues(alpha: 0.15),
+          border: Border.all(color: AppTheme.oxblood),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.play_circle_outline, color: AppTheme.oxblood),
+            Gap.m,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Session in progress', style: t.titleMedium),
+                  Text(
+                    'Week ${resumable.weekNo} · ${resumable.dayId}',
+                    style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+                  ),
+                ],
+              ),
+            ),
+            FilledButton(
+              onPressed: () =>
+                  context.go('/run/${resumable.weekNo}/${resumable.dayId}'),
+              style: FilledButton.styleFrom(minimumSize: const Size(96, 48)),
+              child: const Text('Resume'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -182,9 +237,14 @@ class _ActiveBody extends StatelessWidget {
                   if (day.isTrainingDay) ...[
                     Gap.m,
                     FilledButton.icon(
-                      onPressed: () => context.go('/week/$week/day/${day.id}'),
+                      onPressed: () => context.go('/run/$week/${day.id}'),
                       icon: const Icon(Icons.play_arrow_rounded),
-                      label: const Text('Open session'),
+                      label: const Text('Start session'),
+                    ),
+                    Gap.s,
+                    OutlinedButton(
+                      onPressed: () => context.go('/week/$week/day/${day.id}'),
+                      child: const Text('Just show me the plan'),
                     ),
                   ],
                 ],
