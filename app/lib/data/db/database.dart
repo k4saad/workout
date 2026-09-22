@@ -36,8 +36,12 @@ class AppDatabase extends _$AppDatabase {
   /// In-memory instance for tests. No device, no files.
   AppDatabase.memory() : super(NativeDatabase.memory());
 
+  /// Bump this and add an `onUpgrade` branch. Never drop a column that holds
+  /// logged sets.
+  static const currentSchema = 2;
+
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => currentSchema;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -324,22 +328,57 @@ class AppDatabase extends _$AppDatabase {
   }
 }
 
+/// The schema version recorded inside an SQLite file, without opening it.
+///
+/// SQLite stores `user_version` as a big-endian 32-bit integer at byte 60 of
+/// the file header. Reading it directly means the launch path can decide
+/// whether a migration is coming BEFORE handing the file to Drift — and
+/// therefore whether it needs to copy it first.
+///
+/// Returns null when the file is missing, truncated, or not an SQLite file.
+int? schemaVersionOf(File file) {
+  try {
+    if (!file.existsSync()) return null;
+    final raf = file.openSync();
+    try {
+      if (raf.lengthSync() < 64) return null;
+      raf.setPositionSync(60);
+      final bytes = raf.readSync(4);
+      if (bytes.length < 4) return null;
+      return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+    } finally {
+      raf.closeSync();
+    }
+  } catch (_) {
+    return null;
+  }
+}
+
 /// Opens the on-device database, taking a backup copy before any migration.
 ///
 /// A Drift migration that goes wrong on a device holding ten weeks of logs is
 /// unrecoverable without this.
+///
+/// The copy is taken ONLY when the file on disk is behind the current schema,
+/// so an ordinary launch does not duplicate the whole database every time.
 LazyDatabase openConnection() {
   return LazyDatabase(() async {
     final dir = await getApplicationDocumentsDirectory();
     final file = File(p.join(dir.path, 'keller_twelve.sqlite'));
-    if (file.existsSync()) {
+
+    final onDisk = schemaVersionOf(file);
+    final migrationComing =
+        onDisk != null && onDisk > 0 && onDisk < AppDatabase.currentSchema;
+
+    if (migrationComing) {
       final backup = File(
-        p.join(dir.path, 'keller_twelve.premigration.sqlite'),
+        p.join(dir.path, 'keller_twelve.premigration.v$onDisk.sqlite'),
       );
       try {
         await file.copy(backup.path);
       } catch (_) {
-        // A failed pre-migration copy must not stop the app opening.
+        // A failed pre-migration copy must not stop the app opening. The
+        // alternative — refusing to launch — loses the session either way.
       }
     }
     return NativeDatabase.createInBackground(file);

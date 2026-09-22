@@ -10,6 +10,7 @@ import '../../domain/calendar/programme_calendar.dart';
 import '../../domain/models/enums.dart';
 import '../../domain/models/programme.dart';
 import '../common/widgets.dart';
+import 'widgets/backup_nag.dart';
 import 'widgets/dashboard_strip.dart';
 
 /// The home screen: what am I doing today, and is the rest of it on track.
@@ -88,6 +89,12 @@ class TodayScreen extends ConsumerWidget {
                 totalWeeks: b.programme.totalWeeks,
               ),
               const _ResumeBanner(),
+              BackupNag(
+                hasTrainingData:
+                    (ref.watch(completedSessionCountProvider).asData?.value ??
+                        0) >
+                    0,
+              ),
               if (planned.status == ProgrammeStatus.active &&
                   planned.weekNo != null) ...[
                 Gap.m,

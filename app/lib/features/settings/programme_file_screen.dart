@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../app/editor_providers.dart';
+import '../../app/settings_providers.dart';
 import '../../app/session_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/backup_service.dart';
@@ -210,6 +211,7 @@ class _ProgrammeFileScreenState extends ConsumerState<ProgrammeFileScreen> {
     await SharePlus.instance.share(
       ShareParams(files: [XFile(file.path)], subject: 'Keller Twelve backup'),
     );
+    await ref.read(preferencesProvider.notifier).markBackedUp(DateTime.now());
     _say('Exported $name (${_size(file)}).');
   });
 

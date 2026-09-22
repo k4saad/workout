@@ -15,6 +15,7 @@ class Preferences {
     this.eveningReminder = false,
     this.reminderHour = 18,
     this.reminderMinute = 30,
+    this.lastBackupAt,
   });
 
   /// Off by default. An app that starts by nagging gets uninstalled.
@@ -22,6 +23,22 @@ class Preferences {
 
   final int reminderHour;
   final int reminderMinute;
+
+  /// When a full backup was last written. Null means never.
+  final DateTime? lastBackupAt;
+
+  /// How long the app stays quiet about backups.
+  static const staleAfterDays = 14;
+
+  /// True when there is training data worth losing and no recent copy of it.
+  bool backupIsStale(DateTime now) {
+    final last = lastBackupAt;
+    if (last == null) return true;
+    return now.difference(last).inDays >= staleAfterDays;
+  }
+
+  int? daysSinceBackup(DateTime now) =>
+      lastBackupAt == null ? null : now.difference(lastBackupAt!).inDays;
 
   String get reminderLabel =>
       '${reminderHour.toString().padLeft(2, '0')}:'
@@ -31,22 +48,28 @@ class Preferences {
     bool? eveningReminder,
     int? reminderHour,
     int? reminderMinute,
+    DateTime? lastBackupAt,
   }) => Preferences(
     eveningReminder: eveningReminder ?? this.eveningReminder,
     reminderHour: reminderHour ?? this.reminderHour,
     reminderMinute: reminderMinute ?? this.reminderMinute,
+    lastBackupAt: lastBackupAt ?? this.lastBackupAt,
   );
 
   factory Preferences.fromJson(Map<String, dynamic> j) => Preferences(
     eveningReminder: j['eveningReminder'] as bool? ?? false,
     reminderHour: (j['reminderHour'] as num?)?.toInt() ?? 18,
     reminderMinute: (j['reminderMinute'] as num?)?.toInt() ?? 30,
+    lastBackupAt: j['lastBackupAt'] == null
+        ? null
+        : DateTime.tryParse(j['lastBackupAt'] as String),
   );
 
   Map<String, dynamic> toJson() => {
     'eveningReminder': eveningReminder,
     'reminderHour': reminderHour,
     'reminderMinute': reminderMinute,
+    'lastBackupAt': lastBackupAt?.toIso8601String(),
   };
 }
 

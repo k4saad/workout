@@ -627,14 +627,58 @@ one boolean would put twelve weeks of logs at risk for nothing.
 
 # Phase 10 — Hardening and release
 
-- [ ] R8/ProGuard sanity check — **run the signed APK through a full session AND a photo
-      shoot on the device** and confirm Drift and `camera` both survive minification
-- [ ] Version ritual documented: bump `versionName`/`versionCode` → build → `adb install -r`
-- [ ] Drift migration rehearsed against a **copy of the real device DB**, not an empty one
-- [ ] Battery-optimisation exemption prompt + README note
-- [ ] `README.md`: build, install, update, keystore location warning, backup/restore,
-      and the reminder that progress photos exist only on this device and in your backups
-- [ ] Tag `v1.0`
+- [x] R8/ProGuard rules written, with a keep rule for every class reached by
+      name rather than by reference — **the device run is yours** (see below)
+- [x] Version ritual documented in the README, and enforced by
+      `test/version_test.dart`
+- [x] Drift migration rehearsed against a **populated** database, not an empty
+      one — `test/data/migration_test.dart`
+- [x] Battery-optimisation exemption documented (it cannot be requested from
+      inside the app on modern Android)
+- [x] `README.md`: build, install, update, keystore warning, backup/restore,
+      and where the photos actually live
+- [ ] Tag `v1.0` — **after** the on-device checks below
+
+### What shipped
+
+- **`proguard-rules.pro` rewritten.** The previous file kept four things. R8
+  strips anything it cannot see referenced, and three of this app's plugins are
+  reached by name: the two notification receivers named as strings in the
+  manifest, Gson inside `flutter_local_notifications`, and CameraX. Each rule
+  carries the failure it prevents.
+- **Migration rehearsal.** `migration_test.dart` builds a v1 database with
+  sessions, sets, weigh-ins and a stall counter, winds `user_version` back,
+  reopens it and asserts nothing was lost and the cascades still fire. An empty
+  database migrates cleanly by definition; the one on the phone in week nine
+  is the one that matters.
+- **The pre-migration copy now only runs when a migration is actually due.**
+  It was copying the whole database on every launch. `schemaVersionOf()` reads
+  `user_version` straight out of the SQLite header without opening the file.
+- **`privacy_audit_test.dart`** — fifteen checks that fail the build if
+  `allowBackup` flips, an `INTERNET` permission appears, any Dart file
+  mentions `MediaStore` or `/sdcard/`, an analytics package lands in the
+  pubspec, or the release build points at the debug key.
+- **The 14-day backup reminder finally exists.** Phase 2 specified it and it
+  was never built. `lastBackupAt` lives in `preferences.json` and the card on
+  Today appears once there are finished sessions and no recent copy of them.
+- **`appVersion` and `pubspec.yaml` had drifted** — 0.2.0+2 against 0.1.0+1 —
+  so every backup manifest named a build that never existed. Both are now
+  0.10.0+10 and a test keeps them together.
+
+### What is still owed, and only you can do it
+
+These need the phone and a signed build. None of them can be faked from a
+desktop, and each has a real failure behind it:
+
+1. A **full session on the release APK**, rest timer running with the screen
+   off. Debug builds are not minified and prove nothing about R8.
+2. A **full photo shoot on the release APK** — CameraX resolves by name.
+3. **Open the gallery and Google Photos and confirm the progress photos are
+   not there.** This is the Phase 5.5 requirement and the single most likely
+   privacy mistake in the app.
+4. Exempt the app from battery optimisation on the device.
+5. Export a backup and open the zip on the PC.
+6. Then, and only then, `git tag v1.0`.
 
 ---
 

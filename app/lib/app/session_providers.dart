@@ -32,7 +32,12 @@ final notificationServiceProvider = Provider<NotificationService>(
   (ref) => NotificationService(),
 );
 
-const appVersion = '0.2.0+2';
+/// Stamped into every backup manifest, so a zip found on the PC in a year
+/// says which build wrote it.
+///
+/// MUST match `version:` in pubspec.yaml — `test/version_test.dart` fails the
+/// build if the two drift apart, which they already did once.
+const appVersion = '0.10.0+10';
 
 final backupServiceProvider = Provider<BackupService>(
   (ref) =>
@@ -92,3 +97,12 @@ final lastTimeProvider =
       final db = ref.watch(databaseProvider);
       return db.lastSetsForPrescription(key.prescriptionId, key.exerciseId);
     });
+
+/// How many sessions have actually been finished.
+///
+/// Drives the backup reminder: there is no point nagging about losing data
+/// before any exists.
+final completedSessionCountProvider = FutureProvider<int>((ref) async {
+  final db = ref.watch(databaseProvider);
+  return (await db.completedSessions()).length;
+});

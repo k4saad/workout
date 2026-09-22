@@ -55,6 +55,16 @@ class PreferencesNotifier extends AsyncNotifier<Preferences> {
     await notifications.scheduleSessionReminders(reminders);
   }
 
+  /// Records that a full backup just landed somewhere.
+  Future<void> markBackedUp(DateTime at) async {
+    final current = state.asData?.value ?? const Preferences();
+    state = AsyncData(
+      await ref
+          .read(preferencesServiceProvider)
+          .save(current.copyWith(lastBackupAt: at)),
+    );
+  }
+
   /// Safe to call on every launch.
   Future<void> refreshSchedule() async {
     await future;
