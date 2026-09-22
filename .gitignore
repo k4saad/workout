@@ -26,3 +26,6 @@ __pycache__/
 Thumbs.db
 desktop.ini
 tools/.fedb-cache.json
+
+# Built APKs. The keystore signs them; they do not belong in git.
+apk/
