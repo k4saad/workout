@@ -39,6 +39,13 @@ dependencies:
   share_plus: ^12.0.1
   file_picker: ^10.3.3
 
+  # progress photos. `camera` (not image_picker) because image_picker hands
+  # off to the system camera app and cannot draw the ghost overlay over the
+  # viewfinder — and the overlay is the entire point of the feature.
+  camera: ^0.11.2
+  image: ^4.5.4
+  local_auth: ^2.3.0
+
   # ids
   uuid: ^4.5.1
 

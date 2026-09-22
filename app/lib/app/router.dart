@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../features/calendar/calendar_screen.dart';
 import '../features/day/day_detail_screen.dart';
 import '../features/history/history_screen.dart';
+import '../features/progress/capture_screen.dart';
+import '../features/progress/progress_screen.dart';
 import '../features/session/session_runner_screen.dart';
 import '../features/settings/calibration_screen.dart';
 import '../features/today/today_screen.dart';
@@ -34,6 +36,13 @@ final appRouter = GoRouter(
     ),
     GoRoute(path: '/calendar', builder: (_, _) => const CalendarScreen()),
     GoRoute(path: '/history', builder: (_, _) => const HistoryScreen()),
+    GoRoute(path: '/progress', builder: (_, _) => const ProgressScreen()),
+    GoRoute(
+      path: '/progress/capture',
+      builder: (_, state) => CaptureScreen(
+        weekNo: int.tryParse(state.uri.queryParameters['week'] ?? ''),
+      ),
+    ),
     GoRoute(path: '/gym', builder: (_, _) => const CalibrationScreen()),
   ],
 );

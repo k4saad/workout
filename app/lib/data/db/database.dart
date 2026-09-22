@@ -23,6 +23,11 @@ part 'database.g.dart';
     CardioLogs,
     FoodLogs,
     Niggles,
+    PhotoShoots,
+    ProgressPhotos,
+    PhotoPoses,
+    Measurements,
+    FormClips,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -32,7 +37,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -40,10 +45,16 @@ class AppDatabase extends _$AppDatabase {
       await m.createAll();
     },
     onUpgrade: (m, from, to) async {
-      // Every schema bump lands on a device holding real training data, so a
-      // migration runs only after backupBeforeMigration() has taken a copy.
-      // Add steps here as the schema grows; never drop a column that holds
-      // logged sets.
+      // Every schema bump lands on a device holding real training data, and
+      // openConnection() has already taken a copy before we get here. Never
+      // drop a column that holds logged sets.
+      if (from < 2) {
+        await m.createTable(photoShoots);
+        await m.createTable(progressPhotos);
+        await m.createTable(photoPoses);
+        await m.createTable(measurements);
+        await m.createTable(formClips);
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
@@ -217,6 +228,77 @@ class AppDatabase extends _$AppDatabase {
       ),
     );
     return rows.first;
+  }
+
+  // ------------------------------------------------------------ progress
+
+  Future<List<PhotoPose>> enabledPoses() =>
+      (select(photoPoses)
+            ..where((p) => p.enabled.equals(true))
+            ..orderBy([(p) => OrderingTerm.asc(p.orderIndex)]))
+          .get();
+
+  Future<List<PhotoShoot>> shoots() => (select(
+    photoShoots,
+  )..orderBy([(s) => OrderingTerm.desc(s.shotOn)])).get();
+
+  Future<List<ProgressPhoto>> photosForShoot(String shootId) =>
+      (select(progressPhotos)..where((p) => p.shootId.equals(shootId))).get();
+
+  /// Every photo of one pose, oldest first. This is the flipbook.
+  Future<List<ProgressPhoto>> photosForPose(String poseId) =>
+      (select(progressPhotos)
+            ..where((p) => p.poseId.equals(poseId))
+            ..orderBy([(p) => OrderingTerm.asc(p.takenAt)]))
+          .get();
+
+  /// The most recent photo of a pose — the ghost the next one aligns against.
+  Future<ProgressPhoto?> latestForPose(String poseId) =>
+      (select(progressPhotos)
+            ..where((p) => p.poseId.equals(poseId))
+            ..orderBy([(p) => OrderingTerm.desc(p.takenAt)])
+            ..limit(1))
+          .getSingleOrNull();
+
+  Future<List<Measurement>> measurementsFor(MeasurementSite site) =>
+      (select(measurements)
+            ..where((m) => m.site.equalsValue(site))
+            ..orderBy([(m) => OrderingTerm.asc(m.measuredOn)]))
+          .get();
+
+  Future<void> upsertMeasurement(
+    DateTime on,
+    MeasurementSite site,
+    double cm, {
+    String? note,
+  }) {
+    final d = DateTime(on.year, on.month, on.day);
+    return into(measurements).insert(
+      MeasurementsCompanion.insert(
+        measuredOn: d,
+        site: site,
+        cm: cm,
+        note: Value(note),
+      ),
+      onConflict: DoUpdate(
+        (_) => MeasurementsCompanion(cm: Value(cm), note: Value(note)),
+        target: [measurements.measuredOn, measurements.site],
+      ),
+    );
+  }
+
+  Future<List<FormClip>> clipsForExercise(String exerciseId) =>
+      (select(formClips)
+            ..where((c) => c.exerciseId.equals(exerciseId))
+            ..orderBy([(c) => OrderingTerm.desc(c.recordedAt)]))
+          .get();
+
+  /// Bytes held by photos and clips, for the storage budget.
+  Future<int> mediaBytes() async {
+    final photos = await select(progressPhotos).get();
+    final clips = await select(formClips).get();
+    return photos.fold<int>(0, (a, p) => a + p.bytes) +
+        clips.fold<int>(0, (a, c) => a + c.bytes);
   }
 
   // ----------------------------------------------------------------- admin

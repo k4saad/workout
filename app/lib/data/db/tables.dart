@@ -145,3 +145,91 @@ class Niggles extends Table {
   TextColumn get note => text().nullable()();
   DateTimeColumn get resolvedOn => dateTime().nullable()();
 }
+
+/// A measurement site. Waist is the one that tells you whether the surplus is
+/// too big — if it grows faster than the lifts, trim the calories.
+enum MeasurementSite { waist, chest, upperArm, thigh, neck, hips, calf }
+
+/// One pass in front of the phone.
+///
+/// A SHOOT is the unit you compare, not an individual photo: four poses on
+/// one date, so a comparison is like for like.
+class PhotoShoots extends Table {
+  TextColumn get id => text()(); // uuid
+  DateTimeColumn get shotOn => dateTime()();
+  IntColumn get weekNo => integer().nullable()();
+
+  /// Resolved from the bodyweight table within +/- 2 days, so a caption is
+  /// never empty and you never type the number twice.
+  RealColumn get bodyweightKg => real().nullable()();
+  TextColumn get note => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// One photo.
+///
+/// [filePath] is ALWAYS app-private. Never a MediaStore uri, never anything
+/// under /sdcard/Pictures. These are shirtless photos of one person and the
+/// storage design is part of the feature, not a preference.
+class ProgressPhotos extends Table {
+  TextColumn get id => text()();
+  TextColumn get shootId =>
+      text().references(PhotoShoots, #id, onDelete: KeyAction.cascade)();
+  TextColumn get poseId => text()();
+
+  /// Relative to the app documents directory, so a restore onto a different
+  /// device with a different sandbox path still finds the file.
+  TextColumn get relativePath => text()();
+
+  IntColumn get width => integer().withDefault(const Constant(0))();
+  IntColumn get height => integer().withDefault(const Constant(0))();
+  IntColumn get bytes => integer().withDefault(const Constant(0))();
+  DateTimeColumn get takenAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// The poses to shoot. Editable, but four is the right number: enough to see
+/// change from every angle, few enough to do in ninety seconds.
+class PhotoPoses extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  IntColumn get orderIndex => integer()();
+  TextColumn get guidance => text().nullable()();
+  BoolColumn get enabled => boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+class Measurements extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get measuredOn => dateTime()();
+  TextColumn get site => textEnum<MeasurementSite>()();
+  RealColumn get cm => real()();
+  TextColumn get note => text().nullable()();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {measuredOn, site},
+  ];
+}
+
+/// A filmed working set. For a lifter with no coach this is worth more than
+/// any stock demo — week 1 against week 8 catches a depth drift that no cue
+/// list will.
+class FormClips extends Table {
+  TextColumn get id => text()();
+  TextColumn get exerciseId => text()();
+  TextColumn get relativePath => text()();
+  DateTimeColumn get recordedAt => dateTime()();
+  IntColumn get durationSec => integer().withDefault(const Constant(0))();
+  IntColumn get bytes => integer().withDefault(const Constant(0))();
+  TextColumn get note => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
