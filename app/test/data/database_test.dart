@@ -60,7 +60,7 @@ void main() {
 
   test('opens an in-memory database and creates every table', () async {
     // 7 training tables + 5 progress tables (schema v2).
-    expect(db.allTables, hasLength(12));
+    expect(db.allTables, hasLength(18));
     for (final t in db.allTables) {
       await db.select(t).get(); // must not throw
     }

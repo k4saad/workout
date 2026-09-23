@@ -16,7 +16,16 @@ class Preferences {
     this.reminderHour = 18,
     this.reminderMinute = 30,
     this.lastBackupAt,
+    this.athleteName = defaultAthleteName,
+    this.launchQuote = true,
+    this.recentQuoteIds = const [],
   });
+
+  static const defaultAthleteName = 'Saad';
+
+  /// How many recent quotes are remembered so the launch screen does not
+  /// repeat itself.
+  static const quoteMemory = 40;
 
   /// Off by default. An app that starts by nagging gets uninstalled.
   final bool eveningReminder;
@@ -26,6 +35,15 @@ class Preferences {
 
   /// When a full backup was last written. Null means never.
   final DateTime? lastBackupAt;
+
+  /// Who the launch screen and the greetings address.
+  final String athleteName;
+
+  /// Whether a quote greets you on a cold start.
+  final bool launchQuote;
+
+  /// Quote ids shown recently, newest first, at most [quoteMemory].
+  final List<String> recentQuoteIds;
 
   /// How long the app stays quiet about backups.
   static const staleAfterDays = 14;
@@ -49,11 +67,25 @@ class Preferences {
     int? reminderHour,
     int? reminderMinute,
     DateTime? lastBackupAt,
+    String? athleteName,
+    bool? launchQuote,
+    List<String>? recentQuoteIds,
   }) => Preferences(
     eveningReminder: eveningReminder ?? this.eveningReminder,
     reminderHour: reminderHour ?? this.reminderHour,
     reminderMinute: reminderMinute ?? this.reminderMinute,
     lastBackupAt: lastBackupAt ?? this.lastBackupAt,
+    athleteName: athleteName ?? this.athleteName,
+    launchQuote: launchQuote ?? this.launchQuote,
+    recentQuoteIds: recentQuoteIds ?? this.recentQuoteIds,
+  );
+
+  /// Remembers [id] as just shown, newest first, capped at [quoteMemory].
+  Preferences withQuoteShown(String id) => copyWith(
+    recentQuoteIds: [
+      id,
+      ...recentQuoteIds.where((q) => q != id),
+    ].take(quoteMemory).toList(),
   );
 
   factory Preferences.fromJson(Map<String, dynamic> j) => Preferences(
@@ -63,6 +95,15 @@ class Preferences {
     lastBackupAt: j['lastBackupAt'] == null
         ? null
         : DateTime.tryParse(j['lastBackupAt'] as String),
+    athleteName: switch (j['athleteName']) {
+      final String n when n.trim().isNotEmpty => n.trim(),
+      _ => defaultAthleteName,
+    },
+    launchQuote: j['launchQuote'] as bool? ?? true,
+    recentQuoteIds: [
+      for (final q in (j['recentQuoteIds'] as List?) ?? const [])
+        if (q is String) q,
+    ],
   );
 
   Map<String, dynamic> toJson() => {
@@ -70,6 +111,9 @@ class Preferences {
     'reminderHour': reminderHour,
     'reminderMinute': reminderMinute,
     'lastBackupAt': lastBackupAt?.toIso8601String(),
+    'athleteName': athleteName,
+    'launchQuote': launchQuote,
+    'recentQuoteIds': recentQuoteIds,
   };
 }
 

@@ -130,7 +130,7 @@ class _ResumeBanner extends ConsumerWidget {
             ),
             FilledButton(
               onPressed: () =>
-                  context.go('/run/${resumable.weekNo}/${resumable.dayId}'),
+                  context.push('/run/${resumable.weekNo}/${resumable.dayId}'),
               style: FilledButton.styleFrom(minimumSize: const Size(96, 48)),
               child: const Text('Resume'),
             ),
@@ -258,7 +258,7 @@ class _ActiveBody extends StatelessWidget {
                   if (day.isTrainingDay) ...[
                     Gap.m,
                     FilledButton.icon(
-                      onPressed: () => context.go('/run/$week/${day.id}'),
+                      onPressed: () => context.push('/run/$week/${day.id}'),
                       icon: const Icon(Icons.play_arrow_rounded),
                       label: const Text('Start session'),
                     ),

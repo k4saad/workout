@@ -9,10 +9,12 @@ import '../features/editor/cycle_seed_screen.dart';
 import '../features/editor/programme_editor_screen.dart';
 import '../features/exercises/exercise_detail_screen.dart';
 import '../features/exercises/exercise_library_screen.dart';
+import '../features/fuel/fuel_screen.dart';
 import '../features/history/history_screen.dart';
 import '../features/more/more_screen.dart';
 import '../features/progress/capture_screen.dart';
 import '../features/progress/progress_screen.dart';
+import '../features/progress_hub/progress_hub_screen.dart';
 import '../features/session/session_runner_screen.dart';
 import '../features/settings/calibration_screen.dart';
 import '../features/settings/programme_file_screen.dart';
@@ -23,7 +25,12 @@ import '../features/today/today_screen.dart';
 import '../features/week/week_screen.dart';
 import 'shell.dart';
 
-/// Five tabs, each with its own navigator, plus two full-screen routes.
+/// Five tabs — Today · Week · Fuel · Progress · More — each with its own
+/// navigator, plus the full-screen routes that live outside the shell.
+///
+/// v3 gave Fuel a tab of its own (meals are logged six times a day; that is
+/// the most-reached thing in the app) and folded the old Numbers and Body
+/// tabs into one Progress hub: body, photos, lifts and runs.
 ///
 /// The session runner and the camera sit OUTSIDE the shell deliberately: mid
 /// set, a tab bar is four ways to lose your place, and the capture screen
@@ -41,8 +48,12 @@ GoRouter buildRouter() {
     navigatorKey: rootKey,
     initialLocation: '/',
     routes: [
-      StatefulShellRoute.indexedStack(
+      StatefulShellRoute(
         builder: (_, _, shell) => AppShell(shell: shell),
+        navigatorContainerBuilder: (_, shell, children) => FadeBranchContainer(
+          currentIndex: shell.currentIndex,
+          children: children,
+        ),
         branches: [
           // ---- 1. Today ----------------------------------------------------
           StatefulShellBranch(
@@ -83,34 +94,36 @@ GoRouter buildRouter() {
             ],
           ),
 
-          // ---- 3. Numbers --------------------------------------------------
+          // ---- 3. Fuel -----------------------------------------------------
           StatefulShellBranch(
             routes: [
-              GoRoute(
-                path: '/stats',
-                builder: (_, _) => const StatsScreen(),
-                routes: [
-                  GoRoute(
-                    path: 'lift/:id',
-                    builder: (_, state) => LiftDetailScreen(
-                      exerciseId: state.pathParameters['id']!,
-                    ),
-                  ),
-                ],
-              ),
+              GoRoute(path: '/fuel', builder: (_, _) => const FuelScreen()),
             ],
           ),
 
-          // ---- 4. Body -----------------------------------------------------
+          // ---- 4. Progress -------------------------------------------------
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/body',
-                builder: (_, _) => const BodyScreen(),
+                path: '/progress',
+                builder: (_, _) => const ProgressHubScreen(),
                 routes: [
+                  GoRoute(path: 'body', builder: (_, _) => const BodyScreen()),
                   GoRoute(
-                    path: 'progress',
+                    path: 'photos',
                     builder: (_, _) => const ProgressScreen(),
+                  ),
+                  GoRoute(
+                    path: 'lifts',
+                    builder: (_, _) => const StatsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        builder: (_, state) => LiftDetailScreen(
+                          exerciseId: state.pathParameters['id']!,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

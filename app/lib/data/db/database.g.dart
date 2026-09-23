@@ -5927,6 +5927,3308 @@ class FormClipsCompanion extends UpdateCompanion<FormClip> {
   }
 }
 
+class $RunsTable extends Runs with TableInfo<$RunsTable, Run> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RunsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<int> sessionId = GeneratedColumn<int>(
+    'session_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES sessions (id) ON DELETE SET NULL',
+    ),
+  );
+  static const VerificationMeta _weekNoMeta = const VerificationMeta('weekNo');
+  @override
+  late final GeneratedColumn<int> weekNo = GeneratedColumn<int>(
+    'week_no',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dayIdMeta = const VerificationMeta('dayId');
+  @override
+  late final GeneratedColumn<String> dayId = GeneratedColumn<String>(
+    'day_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _prescriptionIdMeta = const VerificationMeta(
+    'prescriptionId',
+  );
+  @override
+  late final GeneratedColumn<String> prescriptionId = GeneratedColumn<String>(
+    'prescription_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _exerciseIdMeta = const VerificationMeta(
+    'exerciseId',
+  );
+  @override
+  late final GeneratedColumn<String> exerciseId = GeneratedColumn<String>(
+    'exercise_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _setLogIdMeta = const VerificationMeta(
+    'setLogId',
+  );
+  @override
+  late final GeneratedColumn<int> setLogId = GeneratedColumn<int>(
+    'set_log_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _runOnMeta = const VerificationMeta('runOn');
+  @override
+  late final GeneratedColumn<DateTime> runOn = GeneratedColumn<DateTime>(
+    'run_on',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startedAtMsMeta = const VerificationMeta(
+    'startedAtMs',
+  );
+  @override
+  late final GeneratedColumn<int> startedAtMs = GeneratedColumn<int>(
+    'started_at_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endedAtMsMeta = const VerificationMeta(
+    'endedAtMs',
+  );
+  @override
+  late final GeneratedColumn<int> endedAtMs = GeneratedColumn<int>(
+    'ended_at_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _movingMsMeta = const VerificationMeta(
+    'movingMs',
+  );
+  @override
+  late final GeneratedColumn<int> movingMs = GeneratedColumn<int>(
+    'moving_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _distanceMMeta = const VerificationMeta(
+    'distanceM',
+  );
+  @override
+  late final GeneratedColumn<double> distanceM = GeneratedColumn<double>(
+    'distance_m',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _maxSpeedMpsMeta = const VerificationMeta(
+    'maxSpeedMps',
+  );
+  @override
+  late final GeneratedColumn<double> maxSpeedMps = GeneratedColumn<double>(
+    'max_speed_mps',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _elevGainMMeta = const VerificationMeta(
+    'elevGainM',
+  );
+  @override
+  late final GeneratedColumn<double> elevGainM = GeneratedColumn<double>(
+    'elev_gain_m',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startLatMeta = const VerificationMeta(
+    'startLat',
+  );
+  @override
+  late final GeneratedColumn<double> startLat = GeneratedColumn<double>(
+    'start_lat',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startLngMeta = const VerificationMeta(
+    'startLng',
+  );
+  @override
+  late final GeneratedColumn<double> startLng = GeneratedColumn<double>(
+    'start_lng',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _endLatMeta = const VerificationMeta('endLat');
+  @override
+  late final GeneratedColumn<double> endLat = GeneratedColumn<double>(
+    'end_lat',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _endLngMeta = const VerificationMeta('endLng');
+  @override
+  late final GeneratedColumn<double> endLng = GeneratedColumn<double>(
+    'end_lng',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _effortMeta = const VerificationMeta('effort');
+  @override
+  late final GeneratedColumn<int> effort = GeneratedColumn<int>(
+    'effort',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<RunStatus, String> status =
+      GeneratedColumn<String>(
+        'status',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('recording'),
+      ).withConverter<RunStatus>($RunsTable.$converterstatus);
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sessionId,
+    weekNo,
+    dayId,
+    prescriptionId,
+    exerciseId,
+    setLogId,
+    runOn,
+    startedAtMs,
+    endedAtMs,
+    movingMs,
+    distanceM,
+    maxSpeedMps,
+    elevGainM,
+    startLat,
+    startLng,
+    endLat,
+    endLng,
+    effort,
+    status,
+    note,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'runs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Run> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    }
+    if (data.containsKey('week_no')) {
+      context.handle(
+        _weekNoMeta,
+        weekNo.isAcceptableOrUnknown(data['week_no']!, _weekNoMeta),
+      );
+    }
+    if (data.containsKey('day_id')) {
+      context.handle(
+        _dayIdMeta,
+        dayId.isAcceptableOrUnknown(data['day_id']!, _dayIdMeta),
+      );
+    }
+    if (data.containsKey('prescription_id')) {
+      context.handle(
+        _prescriptionIdMeta,
+        prescriptionId.isAcceptableOrUnknown(
+          data['prescription_id']!,
+          _prescriptionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('exercise_id')) {
+      context.handle(
+        _exerciseIdMeta,
+        exerciseId.isAcceptableOrUnknown(data['exercise_id']!, _exerciseIdMeta),
+      );
+    }
+    if (data.containsKey('set_log_id')) {
+      context.handle(
+        _setLogIdMeta,
+        setLogId.isAcceptableOrUnknown(data['set_log_id']!, _setLogIdMeta),
+      );
+    }
+    if (data.containsKey('run_on')) {
+      context.handle(
+        _runOnMeta,
+        runOn.isAcceptableOrUnknown(data['run_on']!, _runOnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_runOnMeta);
+    }
+    if (data.containsKey('started_at_ms')) {
+      context.handle(
+        _startedAtMsMeta,
+        startedAtMs.isAcceptableOrUnknown(
+          data['started_at_ms']!,
+          _startedAtMsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_startedAtMsMeta);
+    }
+    if (data.containsKey('ended_at_ms')) {
+      context.handle(
+        _endedAtMsMeta,
+        endedAtMs.isAcceptableOrUnknown(data['ended_at_ms']!, _endedAtMsMeta),
+      );
+    }
+    if (data.containsKey('moving_ms')) {
+      context.handle(
+        _movingMsMeta,
+        movingMs.isAcceptableOrUnknown(data['moving_ms']!, _movingMsMeta),
+      );
+    }
+    if (data.containsKey('distance_m')) {
+      context.handle(
+        _distanceMMeta,
+        distanceM.isAcceptableOrUnknown(data['distance_m']!, _distanceMMeta),
+      );
+    }
+    if (data.containsKey('max_speed_mps')) {
+      context.handle(
+        _maxSpeedMpsMeta,
+        maxSpeedMps.isAcceptableOrUnknown(
+          data['max_speed_mps']!,
+          _maxSpeedMpsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('elev_gain_m')) {
+      context.handle(
+        _elevGainMMeta,
+        elevGainM.isAcceptableOrUnknown(data['elev_gain_m']!, _elevGainMMeta),
+      );
+    }
+    if (data.containsKey('start_lat')) {
+      context.handle(
+        _startLatMeta,
+        startLat.isAcceptableOrUnknown(data['start_lat']!, _startLatMeta),
+      );
+    }
+    if (data.containsKey('start_lng')) {
+      context.handle(
+        _startLngMeta,
+        startLng.isAcceptableOrUnknown(data['start_lng']!, _startLngMeta),
+      );
+    }
+    if (data.containsKey('end_lat')) {
+      context.handle(
+        _endLatMeta,
+        endLat.isAcceptableOrUnknown(data['end_lat']!, _endLatMeta),
+      );
+    }
+    if (data.containsKey('end_lng')) {
+      context.handle(
+        _endLngMeta,
+        endLng.isAcceptableOrUnknown(data['end_lng']!, _endLngMeta),
+      );
+    }
+    if (data.containsKey('effort')) {
+      context.handle(
+        _effortMeta,
+        effort.isAcceptableOrUnknown(data['effort']!, _effortMeta),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Run map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Run(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}session_id'],
+      ),
+      weekNo: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}week_no'],
+      ),
+      dayId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day_id'],
+      ),
+      prescriptionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}prescription_id'],
+      ),
+      exerciseId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}exercise_id'],
+      ),
+      setLogId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}set_log_id'],
+      ),
+      runOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}run_on'],
+      )!,
+      startedAtMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}started_at_ms'],
+      )!,
+      endedAtMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ended_at_ms'],
+      ),
+      movingMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}moving_ms'],
+      )!,
+      distanceM: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}distance_m'],
+      )!,
+      maxSpeedMps: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}max_speed_mps'],
+      ),
+      elevGainM: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}elev_gain_m'],
+      ),
+      startLat: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}start_lat'],
+      ),
+      startLng: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}start_lng'],
+      ),
+      endLat: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}end_lat'],
+      ),
+      endLng: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}end_lng'],
+      ),
+      effort: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}effort'],
+      ),
+      status: $RunsTable.$converterstatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}status'],
+        )!,
+      ),
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+    );
+  }
+
+  @override
+  $RunsTable createAlias(String alias) {
+    return $RunsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<RunStatus, String, String> $converterstatus =
+      const EnumNameConverter<RunStatus>(RunStatus.values);
+}
+
+class Run extends DataClass implements Insertable<Run> {
+  final int id;
+  final int? sessionId;
+  final int? weekNo;
+  final String? dayId;
+  final String? prescriptionId;
+  final String? exerciseId;
+
+  /// The set this run was logged as, when it came from the session runner.
+  final int? setLogId;
+
+  /// Local midnight of the start: the calendar key.
+  final DateTime runOn;
+  final int startedAtMs;
+  final int? endedAtMs;
+
+  /// Time actually moving: elapsed minus pauses.
+  final int movingMs;
+  final double distanceM;
+  final double? maxSpeedMps;
+  final double? elevGainM;
+  final double? startLat;
+  final double? startLng;
+  final double? endLat;
+  final double? endLng;
+
+  /// 1-10 RPE, asked at the end.
+  final int? effort;
+  final RunStatus status;
+  final String? note;
+  const Run({
+    required this.id,
+    this.sessionId,
+    this.weekNo,
+    this.dayId,
+    this.prescriptionId,
+    this.exerciseId,
+    this.setLogId,
+    required this.runOn,
+    required this.startedAtMs,
+    this.endedAtMs,
+    required this.movingMs,
+    required this.distanceM,
+    this.maxSpeedMps,
+    this.elevGainM,
+    this.startLat,
+    this.startLng,
+    this.endLat,
+    this.endLng,
+    this.effort,
+    required this.status,
+    this.note,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || sessionId != null) {
+      map['session_id'] = Variable<int>(sessionId);
+    }
+    if (!nullToAbsent || weekNo != null) {
+      map['week_no'] = Variable<int>(weekNo);
+    }
+    if (!nullToAbsent || dayId != null) {
+      map['day_id'] = Variable<String>(dayId);
+    }
+    if (!nullToAbsent || prescriptionId != null) {
+      map['prescription_id'] = Variable<String>(prescriptionId);
+    }
+    if (!nullToAbsent || exerciseId != null) {
+      map['exercise_id'] = Variable<String>(exerciseId);
+    }
+    if (!nullToAbsent || setLogId != null) {
+      map['set_log_id'] = Variable<int>(setLogId);
+    }
+    map['run_on'] = Variable<DateTime>(runOn);
+    map['started_at_ms'] = Variable<int>(startedAtMs);
+    if (!nullToAbsent || endedAtMs != null) {
+      map['ended_at_ms'] = Variable<int>(endedAtMs);
+    }
+    map['moving_ms'] = Variable<int>(movingMs);
+    map['distance_m'] = Variable<double>(distanceM);
+    if (!nullToAbsent || maxSpeedMps != null) {
+      map['max_speed_mps'] = Variable<double>(maxSpeedMps);
+    }
+    if (!nullToAbsent || elevGainM != null) {
+      map['elev_gain_m'] = Variable<double>(elevGainM);
+    }
+    if (!nullToAbsent || startLat != null) {
+      map['start_lat'] = Variable<double>(startLat);
+    }
+    if (!nullToAbsent || startLng != null) {
+      map['start_lng'] = Variable<double>(startLng);
+    }
+    if (!nullToAbsent || endLat != null) {
+      map['end_lat'] = Variable<double>(endLat);
+    }
+    if (!nullToAbsent || endLng != null) {
+      map['end_lng'] = Variable<double>(endLng);
+    }
+    if (!nullToAbsent || effort != null) {
+      map['effort'] = Variable<int>(effort);
+    }
+    {
+      map['status'] = Variable<String>(
+        $RunsTable.$converterstatus.toSql(status),
+      );
+    }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    return map;
+  }
+
+  RunsCompanion toCompanion(bool nullToAbsent) {
+    return RunsCompanion(
+      id: Value(id),
+      sessionId: sessionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sessionId),
+      weekNo: weekNo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(weekNo),
+      dayId: dayId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dayId),
+      prescriptionId: prescriptionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(prescriptionId),
+      exerciseId: exerciseId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(exerciseId),
+      setLogId: setLogId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(setLogId),
+      runOn: Value(runOn),
+      startedAtMs: Value(startedAtMs),
+      endedAtMs: endedAtMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAtMs),
+      movingMs: Value(movingMs),
+      distanceM: Value(distanceM),
+      maxSpeedMps: maxSpeedMps == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maxSpeedMps),
+      elevGainM: elevGainM == null && nullToAbsent
+          ? const Value.absent()
+          : Value(elevGainM),
+      startLat: startLat == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startLat),
+      startLng: startLng == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startLng),
+      endLat: endLat == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endLat),
+      endLng: endLng == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endLng),
+      effort: effort == null && nullToAbsent
+          ? const Value.absent()
+          : Value(effort),
+      status: Value(status),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+    );
+  }
+
+  factory Run.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Run(
+      id: serializer.fromJson<int>(json['id']),
+      sessionId: serializer.fromJson<int?>(json['sessionId']),
+      weekNo: serializer.fromJson<int?>(json['weekNo']),
+      dayId: serializer.fromJson<String?>(json['dayId']),
+      prescriptionId: serializer.fromJson<String?>(json['prescriptionId']),
+      exerciseId: serializer.fromJson<String?>(json['exerciseId']),
+      setLogId: serializer.fromJson<int?>(json['setLogId']),
+      runOn: serializer.fromJson<DateTime>(json['runOn']),
+      startedAtMs: serializer.fromJson<int>(json['startedAtMs']),
+      endedAtMs: serializer.fromJson<int?>(json['endedAtMs']),
+      movingMs: serializer.fromJson<int>(json['movingMs']),
+      distanceM: serializer.fromJson<double>(json['distanceM']),
+      maxSpeedMps: serializer.fromJson<double?>(json['maxSpeedMps']),
+      elevGainM: serializer.fromJson<double?>(json['elevGainM']),
+      startLat: serializer.fromJson<double?>(json['startLat']),
+      startLng: serializer.fromJson<double?>(json['startLng']),
+      endLat: serializer.fromJson<double?>(json['endLat']),
+      endLng: serializer.fromJson<double?>(json['endLng']),
+      effort: serializer.fromJson<int?>(json['effort']),
+      status: $RunsTable.$converterstatus.fromJson(
+        serializer.fromJson<String>(json['status']),
+      ),
+      note: serializer.fromJson<String?>(json['note']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'sessionId': serializer.toJson<int?>(sessionId),
+      'weekNo': serializer.toJson<int?>(weekNo),
+      'dayId': serializer.toJson<String?>(dayId),
+      'prescriptionId': serializer.toJson<String?>(prescriptionId),
+      'exerciseId': serializer.toJson<String?>(exerciseId),
+      'setLogId': serializer.toJson<int?>(setLogId),
+      'runOn': serializer.toJson<DateTime>(runOn),
+      'startedAtMs': serializer.toJson<int>(startedAtMs),
+      'endedAtMs': serializer.toJson<int?>(endedAtMs),
+      'movingMs': serializer.toJson<int>(movingMs),
+      'distanceM': serializer.toJson<double>(distanceM),
+      'maxSpeedMps': serializer.toJson<double?>(maxSpeedMps),
+      'elevGainM': serializer.toJson<double?>(elevGainM),
+      'startLat': serializer.toJson<double?>(startLat),
+      'startLng': serializer.toJson<double?>(startLng),
+      'endLat': serializer.toJson<double?>(endLat),
+      'endLng': serializer.toJson<double?>(endLng),
+      'effort': serializer.toJson<int?>(effort),
+      'status': serializer.toJson<String>(
+        $RunsTable.$converterstatus.toJson(status),
+      ),
+      'note': serializer.toJson<String?>(note),
+    };
+  }
+
+  Run copyWith({
+    int? id,
+    Value<int?> sessionId = const Value.absent(),
+    Value<int?> weekNo = const Value.absent(),
+    Value<String?> dayId = const Value.absent(),
+    Value<String?> prescriptionId = const Value.absent(),
+    Value<String?> exerciseId = const Value.absent(),
+    Value<int?> setLogId = const Value.absent(),
+    DateTime? runOn,
+    int? startedAtMs,
+    Value<int?> endedAtMs = const Value.absent(),
+    int? movingMs,
+    double? distanceM,
+    Value<double?> maxSpeedMps = const Value.absent(),
+    Value<double?> elevGainM = const Value.absent(),
+    Value<double?> startLat = const Value.absent(),
+    Value<double?> startLng = const Value.absent(),
+    Value<double?> endLat = const Value.absent(),
+    Value<double?> endLng = const Value.absent(),
+    Value<int?> effort = const Value.absent(),
+    RunStatus? status,
+    Value<String?> note = const Value.absent(),
+  }) => Run(
+    id: id ?? this.id,
+    sessionId: sessionId.present ? sessionId.value : this.sessionId,
+    weekNo: weekNo.present ? weekNo.value : this.weekNo,
+    dayId: dayId.present ? dayId.value : this.dayId,
+    prescriptionId: prescriptionId.present
+        ? prescriptionId.value
+        : this.prescriptionId,
+    exerciseId: exerciseId.present ? exerciseId.value : this.exerciseId,
+    setLogId: setLogId.present ? setLogId.value : this.setLogId,
+    runOn: runOn ?? this.runOn,
+    startedAtMs: startedAtMs ?? this.startedAtMs,
+    endedAtMs: endedAtMs.present ? endedAtMs.value : this.endedAtMs,
+    movingMs: movingMs ?? this.movingMs,
+    distanceM: distanceM ?? this.distanceM,
+    maxSpeedMps: maxSpeedMps.present ? maxSpeedMps.value : this.maxSpeedMps,
+    elevGainM: elevGainM.present ? elevGainM.value : this.elevGainM,
+    startLat: startLat.present ? startLat.value : this.startLat,
+    startLng: startLng.present ? startLng.value : this.startLng,
+    endLat: endLat.present ? endLat.value : this.endLat,
+    endLng: endLng.present ? endLng.value : this.endLng,
+    effort: effort.present ? effort.value : this.effort,
+    status: status ?? this.status,
+    note: note.present ? note.value : this.note,
+  );
+  Run copyWithCompanion(RunsCompanion data) {
+    return Run(
+      id: data.id.present ? data.id.value : this.id,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      weekNo: data.weekNo.present ? data.weekNo.value : this.weekNo,
+      dayId: data.dayId.present ? data.dayId.value : this.dayId,
+      prescriptionId: data.prescriptionId.present
+          ? data.prescriptionId.value
+          : this.prescriptionId,
+      exerciseId: data.exerciseId.present
+          ? data.exerciseId.value
+          : this.exerciseId,
+      setLogId: data.setLogId.present ? data.setLogId.value : this.setLogId,
+      runOn: data.runOn.present ? data.runOn.value : this.runOn,
+      startedAtMs: data.startedAtMs.present
+          ? data.startedAtMs.value
+          : this.startedAtMs,
+      endedAtMs: data.endedAtMs.present ? data.endedAtMs.value : this.endedAtMs,
+      movingMs: data.movingMs.present ? data.movingMs.value : this.movingMs,
+      distanceM: data.distanceM.present ? data.distanceM.value : this.distanceM,
+      maxSpeedMps: data.maxSpeedMps.present
+          ? data.maxSpeedMps.value
+          : this.maxSpeedMps,
+      elevGainM: data.elevGainM.present ? data.elevGainM.value : this.elevGainM,
+      startLat: data.startLat.present ? data.startLat.value : this.startLat,
+      startLng: data.startLng.present ? data.startLng.value : this.startLng,
+      endLat: data.endLat.present ? data.endLat.value : this.endLat,
+      endLng: data.endLng.present ? data.endLng.value : this.endLng,
+      effort: data.effort.present ? data.effort.value : this.effort,
+      status: data.status.present ? data.status.value : this.status,
+      note: data.note.present ? data.note.value : this.note,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Run(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('weekNo: $weekNo, ')
+          ..write('dayId: $dayId, ')
+          ..write('prescriptionId: $prescriptionId, ')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('setLogId: $setLogId, ')
+          ..write('runOn: $runOn, ')
+          ..write('startedAtMs: $startedAtMs, ')
+          ..write('endedAtMs: $endedAtMs, ')
+          ..write('movingMs: $movingMs, ')
+          ..write('distanceM: $distanceM, ')
+          ..write('maxSpeedMps: $maxSpeedMps, ')
+          ..write('elevGainM: $elevGainM, ')
+          ..write('startLat: $startLat, ')
+          ..write('startLng: $startLng, ')
+          ..write('endLat: $endLat, ')
+          ..write('endLng: $endLng, ')
+          ..write('effort: $effort, ')
+          ..write('status: $status, ')
+          ..write('note: $note')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    sessionId,
+    weekNo,
+    dayId,
+    prescriptionId,
+    exerciseId,
+    setLogId,
+    runOn,
+    startedAtMs,
+    endedAtMs,
+    movingMs,
+    distanceM,
+    maxSpeedMps,
+    elevGainM,
+    startLat,
+    startLng,
+    endLat,
+    endLng,
+    effort,
+    status,
+    note,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Run &&
+          other.id == this.id &&
+          other.sessionId == this.sessionId &&
+          other.weekNo == this.weekNo &&
+          other.dayId == this.dayId &&
+          other.prescriptionId == this.prescriptionId &&
+          other.exerciseId == this.exerciseId &&
+          other.setLogId == this.setLogId &&
+          other.runOn == this.runOn &&
+          other.startedAtMs == this.startedAtMs &&
+          other.endedAtMs == this.endedAtMs &&
+          other.movingMs == this.movingMs &&
+          other.distanceM == this.distanceM &&
+          other.maxSpeedMps == this.maxSpeedMps &&
+          other.elevGainM == this.elevGainM &&
+          other.startLat == this.startLat &&
+          other.startLng == this.startLng &&
+          other.endLat == this.endLat &&
+          other.endLng == this.endLng &&
+          other.effort == this.effort &&
+          other.status == this.status &&
+          other.note == this.note);
+}
+
+class RunsCompanion extends UpdateCompanion<Run> {
+  final Value<int> id;
+  final Value<int?> sessionId;
+  final Value<int?> weekNo;
+  final Value<String?> dayId;
+  final Value<String?> prescriptionId;
+  final Value<String?> exerciseId;
+  final Value<int?> setLogId;
+  final Value<DateTime> runOn;
+  final Value<int> startedAtMs;
+  final Value<int?> endedAtMs;
+  final Value<int> movingMs;
+  final Value<double> distanceM;
+  final Value<double?> maxSpeedMps;
+  final Value<double?> elevGainM;
+  final Value<double?> startLat;
+  final Value<double?> startLng;
+  final Value<double?> endLat;
+  final Value<double?> endLng;
+  final Value<int?> effort;
+  final Value<RunStatus> status;
+  final Value<String?> note;
+  const RunsCompanion({
+    this.id = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.weekNo = const Value.absent(),
+    this.dayId = const Value.absent(),
+    this.prescriptionId = const Value.absent(),
+    this.exerciseId = const Value.absent(),
+    this.setLogId = const Value.absent(),
+    this.runOn = const Value.absent(),
+    this.startedAtMs = const Value.absent(),
+    this.endedAtMs = const Value.absent(),
+    this.movingMs = const Value.absent(),
+    this.distanceM = const Value.absent(),
+    this.maxSpeedMps = const Value.absent(),
+    this.elevGainM = const Value.absent(),
+    this.startLat = const Value.absent(),
+    this.startLng = const Value.absent(),
+    this.endLat = const Value.absent(),
+    this.endLng = const Value.absent(),
+    this.effort = const Value.absent(),
+    this.status = const Value.absent(),
+    this.note = const Value.absent(),
+  });
+  RunsCompanion.insert({
+    this.id = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.weekNo = const Value.absent(),
+    this.dayId = const Value.absent(),
+    this.prescriptionId = const Value.absent(),
+    this.exerciseId = const Value.absent(),
+    this.setLogId = const Value.absent(),
+    required DateTime runOn,
+    required int startedAtMs,
+    this.endedAtMs = const Value.absent(),
+    this.movingMs = const Value.absent(),
+    this.distanceM = const Value.absent(),
+    this.maxSpeedMps = const Value.absent(),
+    this.elevGainM = const Value.absent(),
+    this.startLat = const Value.absent(),
+    this.startLng = const Value.absent(),
+    this.endLat = const Value.absent(),
+    this.endLng = const Value.absent(),
+    this.effort = const Value.absent(),
+    this.status = const Value.absent(),
+    this.note = const Value.absent(),
+  }) : runOn = Value(runOn),
+       startedAtMs = Value(startedAtMs);
+  static Insertable<Run> custom({
+    Expression<int>? id,
+    Expression<int>? sessionId,
+    Expression<int>? weekNo,
+    Expression<String>? dayId,
+    Expression<String>? prescriptionId,
+    Expression<String>? exerciseId,
+    Expression<int>? setLogId,
+    Expression<DateTime>? runOn,
+    Expression<int>? startedAtMs,
+    Expression<int>? endedAtMs,
+    Expression<int>? movingMs,
+    Expression<double>? distanceM,
+    Expression<double>? maxSpeedMps,
+    Expression<double>? elevGainM,
+    Expression<double>? startLat,
+    Expression<double>? startLng,
+    Expression<double>? endLat,
+    Expression<double>? endLng,
+    Expression<int>? effort,
+    Expression<String>? status,
+    Expression<String>? note,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sessionId != null) 'session_id': sessionId,
+      if (weekNo != null) 'week_no': weekNo,
+      if (dayId != null) 'day_id': dayId,
+      if (prescriptionId != null) 'prescription_id': prescriptionId,
+      if (exerciseId != null) 'exercise_id': exerciseId,
+      if (setLogId != null) 'set_log_id': setLogId,
+      if (runOn != null) 'run_on': runOn,
+      if (startedAtMs != null) 'started_at_ms': startedAtMs,
+      if (endedAtMs != null) 'ended_at_ms': endedAtMs,
+      if (movingMs != null) 'moving_ms': movingMs,
+      if (distanceM != null) 'distance_m': distanceM,
+      if (maxSpeedMps != null) 'max_speed_mps': maxSpeedMps,
+      if (elevGainM != null) 'elev_gain_m': elevGainM,
+      if (startLat != null) 'start_lat': startLat,
+      if (startLng != null) 'start_lng': startLng,
+      if (endLat != null) 'end_lat': endLat,
+      if (endLng != null) 'end_lng': endLng,
+      if (effort != null) 'effort': effort,
+      if (status != null) 'status': status,
+      if (note != null) 'note': note,
+    });
+  }
+
+  RunsCompanion copyWith({
+    Value<int>? id,
+    Value<int?>? sessionId,
+    Value<int?>? weekNo,
+    Value<String?>? dayId,
+    Value<String?>? prescriptionId,
+    Value<String?>? exerciseId,
+    Value<int?>? setLogId,
+    Value<DateTime>? runOn,
+    Value<int>? startedAtMs,
+    Value<int?>? endedAtMs,
+    Value<int>? movingMs,
+    Value<double>? distanceM,
+    Value<double?>? maxSpeedMps,
+    Value<double?>? elevGainM,
+    Value<double?>? startLat,
+    Value<double?>? startLng,
+    Value<double?>? endLat,
+    Value<double?>? endLng,
+    Value<int?>? effort,
+    Value<RunStatus>? status,
+    Value<String?>? note,
+  }) {
+    return RunsCompanion(
+      id: id ?? this.id,
+      sessionId: sessionId ?? this.sessionId,
+      weekNo: weekNo ?? this.weekNo,
+      dayId: dayId ?? this.dayId,
+      prescriptionId: prescriptionId ?? this.prescriptionId,
+      exerciseId: exerciseId ?? this.exerciseId,
+      setLogId: setLogId ?? this.setLogId,
+      runOn: runOn ?? this.runOn,
+      startedAtMs: startedAtMs ?? this.startedAtMs,
+      endedAtMs: endedAtMs ?? this.endedAtMs,
+      movingMs: movingMs ?? this.movingMs,
+      distanceM: distanceM ?? this.distanceM,
+      maxSpeedMps: maxSpeedMps ?? this.maxSpeedMps,
+      elevGainM: elevGainM ?? this.elevGainM,
+      startLat: startLat ?? this.startLat,
+      startLng: startLng ?? this.startLng,
+      endLat: endLat ?? this.endLat,
+      endLng: endLng ?? this.endLng,
+      effort: effort ?? this.effort,
+      status: status ?? this.status,
+      note: note ?? this.note,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<int>(sessionId.value);
+    }
+    if (weekNo.present) {
+      map['week_no'] = Variable<int>(weekNo.value);
+    }
+    if (dayId.present) {
+      map['day_id'] = Variable<String>(dayId.value);
+    }
+    if (prescriptionId.present) {
+      map['prescription_id'] = Variable<String>(prescriptionId.value);
+    }
+    if (exerciseId.present) {
+      map['exercise_id'] = Variable<String>(exerciseId.value);
+    }
+    if (setLogId.present) {
+      map['set_log_id'] = Variable<int>(setLogId.value);
+    }
+    if (runOn.present) {
+      map['run_on'] = Variable<DateTime>(runOn.value);
+    }
+    if (startedAtMs.present) {
+      map['started_at_ms'] = Variable<int>(startedAtMs.value);
+    }
+    if (endedAtMs.present) {
+      map['ended_at_ms'] = Variable<int>(endedAtMs.value);
+    }
+    if (movingMs.present) {
+      map['moving_ms'] = Variable<int>(movingMs.value);
+    }
+    if (distanceM.present) {
+      map['distance_m'] = Variable<double>(distanceM.value);
+    }
+    if (maxSpeedMps.present) {
+      map['max_speed_mps'] = Variable<double>(maxSpeedMps.value);
+    }
+    if (elevGainM.present) {
+      map['elev_gain_m'] = Variable<double>(elevGainM.value);
+    }
+    if (startLat.present) {
+      map['start_lat'] = Variable<double>(startLat.value);
+    }
+    if (startLng.present) {
+      map['start_lng'] = Variable<double>(startLng.value);
+    }
+    if (endLat.present) {
+      map['end_lat'] = Variable<double>(endLat.value);
+    }
+    if (endLng.present) {
+      map['end_lng'] = Variable<double>(endLng.value);
+    }
+    if (effort.present) {
+      map['effort'] = Variable<int>(effort.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(
+        $RunsTable.$converterstatus.toSql(status.value),
+      );
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RunsCompanion(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('weekNo: $weekNo, ')
+          ..write('dayId: $dayId, ')
+          ..write('prescriptionId: $prescriptionId, ')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('setLogId: $setLogId, ')
+          ..write('runOn: $runOn, ')
+          ..write('startedAtMs: $startedAtMs, ')
+          ..write('endedAtMs: $endedAtMs, ')
+          ..write('movingMs: $movingMs, ')
+          ..write('distanceM: $distanceM, ')
+          ..write('maxSpeedMps: $maxSpeedMps, ')
+          ..write('elevGainM: $elevGainM, ')
+          ..write('startLat: $startLat, ')
+          ..write('startLng: $startLng, ')
+          ..write('endLat: $endLat, ')
+          ..write('endLng: $endLng, ')
+          ..write('effort: $effort, ')
+          ..write('status: $status, ')
+          ..write('note: $note')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $RunPointsTable extends RunPoints
+    with TableInfo<$RunPointsTable, RunPoint> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RunPointsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _runIdMeta = const VerificationMeta('runId');
+  @override
+  late final GeneratedColumn<int> runId = GeneratedColumn<int>(
+    'run_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES runs (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _seqMeta = const VerificationMeta('seq');
+  @override
+  late final GeneratedColumn<int> seq = GeneratedColumn<int>(
+    'seq',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tMsMeta = const VerificationMeta('tMs');
+  @override
+  late final GeneratedColumn<int> tMs = GeneratedColumn<int>(
+    't_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _latMeta = const VerificationMeta('lat');
+  @override
+  late final GeneratedColumn<double> lat = GeneratedColumn<double>(
+    'lat',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lngMeta = const VerificationMeta('lng');
+  @override
+  late final GeneratedColumn<double> lng = GeneratedColumn<double>(
+    'lng',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _accuracyMMeta = const VerificationMeta(
+    'accuracyM',
+  );
+  @override
+  late final GeneratedColumn<double> accuracyM = GeneratedColumn<double>(
+    'accuracy_m',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _altitudeMMeta = const VerificationMeta(
+    'altitudeM',
+  );
+  @override
+  late final GeneratedColumn<double> altitudeM = GeneratedColumn<double>(
+    'altitude_m',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _speedMpsMeta = const VerificationMeta(
+    'speedMps',
+  );
+  @override
+  late final GeneratedColumn<double> speedMps = GeneratedColumn<double>(
+    'speed_mps',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _segmentStartMeta = const VerificationMeta(
+    'segmentStart',
+  );
+  @override
+  late final GeneratedColumn<bool> segmentStart = GeneratedColumn<bool>(
+    'segment_start',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("segment_start" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    runId,
+    seq,
+    tMs,
+    lat,
+    lng,
+    accuracyM,
+    altitudeM,
+    speedMps,
+    segmentStart,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'run_points';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RunPoint> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('run_id')) {
+      context.handle(
+        _runIdMeta,
+        runId.isAcceptableOrUnknown(data['run_id']!, _runIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_runIdMeta);
+    }
+    if (data.containsKey('seq')) {
+      context.handle(
+        _seqMeta,
+        seq.isAcceptableOrUnknown(data['seq']!, _seqMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_seqMeta);
+    }
+    if (data.containsKey('t_ms')) {
+      context.handle(
+        _tMsMeta,
+        tMs.isAcceptableOrUnknown(data['t_ms']!, _tMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tMsMeta);
+    }
+    if (data.containsKey('lat')) {
+      context.handle(
+        _latMeta,
+        lat.isAcceptableOrUnknown(data['lat']!, _latMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_latMeta);
+    }
+    if (data.containsKey('lng')) {
+      context.handle(
+        _lngMeta,
+        lng.isAcceptableOrUnknown(data['lng']!, _lngMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lngMeta);
+    }
+    if (data.containsKey('accuracy_m')) {
+      context.handle(
+        _accuracyMMeta,
+        accuracyM.isAcceptableOrUnknown(data['accuracy_m']!, _accuracyMMeta),
+      );
+    }
+    if (data.containsKey('altitude_m')) {
+      context.handle(
+        _altitudeMMeta,
+        altitudeM.isAcceptableOrUnknown(data['altitude_m']!, _altitudeMMeta),
+      );
+    }
+    if (data.containsKey('speed_mps')) {
+      context.handle(
+        _speedMpsMeta,
+        speedMps.isAcceptableOrUnknown(data['speed_mps']!, _speedMpsMeta),
+      );
+    }
+    if (data.containsKey('segment_start')) {
+      context.handle(
+        _segmentStartMeta,
+        segmentStart.isAcceptableOrUnknown(
+          data['segment_start']!,
+          _segmentStartMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {runId, seq},
+  ];
+  @override
+  RunPoint map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RunPoint(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      runId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}run_id'],
+      )!,
+      seq: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}seq'],
+      )!,
+      tMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}t_ms'],
+      )!,
+      lat: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}lat'],
+      )!,
+      lng: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}lng'],
+      )!,
+      accuracyM: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}accuracy_m'],
+      ),
+      altitudeM: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}altitude_m'],
+      ),
+      speedMps: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}speed_mps'],
+      ),
+      segmentStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}segment_start'],
+      )!,
+    );
+  }
+
+  @override
+  $RunPointsTable createAlias(String alias) {
+    return $RunPointsTable(attachedDatabase, alias);
+  }
+}
+
+class RunPoint extends DataClass implements Insertable<RunPoint> {
+  final int id;
+  final int runId;
+  final int seq;
+  final int tMs;
+  final double lat;
+  final double lng;
+  final double? accuracyM;
+  final double? altitudeM;
+  final double? speedMps;
+
+  /// True on the first fix after a pause or an app restart: the trail is
+  /// drawn broken here and no distance is counted across the gap.
+  final bool segmentStart;
+  const RunPoint({
+    required this.id,
+    required this.runId,
+    required this.seq,
+    required this.tMs,
+    required this.lat,
+    required this.lng,
+    this.accuracyM,
+    this.altitudeM,
+    this.speedMps,
+    required this.segmentStart,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['run_id'] = Variable<int>(runId);
+    map['seq'] = Variable<int>(seq);
+    map['t_ms'] = Variable<int>(tMs);
+    map['lat'] = Variable<double>(lat);
+    map['lng'] = Variable<double>(lng);
+    if (!nullToAbsent || accuracyM != null) {
+      map['accuracy_m'] = Variable<double>(accuracyM);
+    }
+    if (!nullToAbsent || altitudeM != null) {
+      map['altitude_m'] = Variable<double>(altitudeM);
+    }
+    if (!nullToAbsent || speedMps != null) {
+      map['speed_mps'] = Variable<double>(speedMps);
+    }
+    map['segment_start'] = Variable<bool>(segmentStart);
+    return map;
+  }
+
+  RunPointsCompanion toCompanion(bool nullToAbsent) {
+    return RunPointsCompanion(
+      id: Value(id),
+      runId: Value(runId),
+      seq: Value(seq),
+      tMs: Value(tMs),
+      lat: Value(lat),
+      lng: Value(lng),
+      accuracyM: accuracyM == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accuracyM),
+      altitudeM: altitudeM == null && nullToAbsent
+          ? const Value.absent()
+          : Value(altitudeM),
+      speedMps: speedMps == null && nullToAbsent
+          ? const Value.absent()
+          : Value(speedMps),
+      segmentStart: Value(segmentStart),
+    );
+  }
+
+  factory RunPoint.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RunPoint(
+      id: serializer.fromJson<int>(json['id']),
+      runId: serializer.fromJson<int>(json['runId']),
+      seq: serializer.fromJson<int>(json['seq']),
+      tMs: serializer.fromJson<int>(json['tMs']),
+      lat: serializer.fromJson<double>(json['lat']),
+      lng: serializer.fromJson<double>(json['lng']),
+      accuracyM: serializer.fromJson<double?>(json['accuracyM']),
+      altitudeM: serializer.fromJson<double?>(json['altitudeM']),
+      speedMps: serializer.fromJson<double?>(json['speedMps']),
+      segmentStart: serializer.fromJson<bool>(json['segmentStart']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'runId': serializer.toJson<int>(runId),
+      'seq': serializer.toJson<int>(seq),
+      'tMs': serializer.toJson<int>(tMs),
+      'lat': serializer.toJson<double>(lat),
+      'lng': serializer.toJson<double>(lng),
+      'accuracyM': serializer.toJson<double?>(accuracyM),
+      'altitudeM': serializer.toJson<double?>(altitudeM),
+      'speedMps': serializer.toJson<double?>(speedMps),
+      'segmentStart': serializer.toJson<bool>(segmentStart),
+    };
+  }
+
+  RunPoint copyWith({
+    int? id,
+    int? runId,
+    int? seq,
+    int? tMs,
+    double? lat,
+    double? lng,
+    Value<double?> accuracyM = const Value.absent(),
+    Value<double?> altitudeM = const Value.absent(),
+    Value<double?> speedMps = const Value.absent(),
+    bool? segmentStart,
+  }) => RunPoint(
+    id: id ?? this.id,
+    runId: runId ?? this.runId,
+    seq: seq ?? this.seq,
+    tMs: tMs ?? this.tMs,
+    lat: lat ?? this.lat,
+    lng: lng ?? this.lng,
+    accuracyM: accuracyM.present ? accuracyM.value : this.accuracyM,
+    altitudeM: altitudeM.present ? altitudeM.value : this.altitudeM,
+    speedMps: speedMps.present ? speedMps.value : this.speedMps,
+    segmentStart: segmentStart ?? this.segmentStart,
+  );
+  RunPoint copyWithCompanion(RunPointsCompanion data) {
+    return RunPoint(
+      id: data.id.present ? data.id.value : this.id,
+      runId: data.runId.present ? data.runId.value : this.runId,
+      seq: data.seq.present ? data.seq.value : this.seq,
+      tMs: data.tMs.present ? data.tMs.value : this.tMs,
+      lat: data.lat.present ? data.lat.value : this.lat,
+      lng: data.lng.present ? data.lng.value : this.lng,
+      accuracyM: data.accuracyM.present ? data.accuracyM.value : this.accuracyM,
+      altitudeM: data.altitudeM.present ? data.altitudeM.value : this.altitudeM,
+      speedMps: data.speedMps.present ? data.speedMps.value : this.speedMps,
+      segmentStart: data.segmentStart.present
+          ? data.segmentStart.value
+          : this.segmentStart,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RunPoint(')
+          ..write('id: $id, ')
+          ..write('runId: $runId, ')
+          ..write('seq: $seq, ')
+          ..write('tMs: $tMs, ')
+          ..write('lat: $lat, ')
+          ..write('lng: $lng, ')
+          ..write('accuracyM: $accuracyM, ')
+          ..write('altitudeM: $altitudeM, ')
+          ..write('speedMps: $speedMps, ')
+          ..write('segmentStart: $segmentStart')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    runId,
+    seq,
+    tMs,
+    lat,
+    lng,
+    accuracyM,
+    altitudeM,
+    speedMps,
+    segmentStart,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RunPoint &&
+          other.id == this.id &&
+          other.runId == this.runId &&
+          other.seq == this.seq &&
+          other.tMs == this.tMs &&
+          other.lat == this.lat &&
+          other.lng == this.lng &&
+          other.accuracyM == this.accuracyM &&
+          other.altitudeM == this.altitudeM &&
+          other.speedMps == this.speedMps &&
+          other.segmentStart == this.segmentStart);
+}
+
+class RunPointsCompanion extends UpdateCompanion<RunPoint> {
+  final Value<int> id;
+  final Value<int> runId;
+  final Value<int> seq;
+  final Value<int> tMs;
+  final Value<double> lat;
+  final Value<double> lng;
+  final Value<double?> accuracyM;
+  final Value<double?> altitudeM;
+  final Value<double?> speedMps;
+  final Value<bool> segmentStart;
+  const RunPointsCompanion({
+    this.id = const Value.absent(),
+    this.runId = const Value.absent(),
+    this.seq = const Value.absent(),
+    this.tMs = const Value.absent(),
+    this.lat = const Value.absent(),
+    this.lng = const Value.absent(),
+    this.accuracyM = const Value.absent(),
+    this.altitudeM = const Value.absent(),
+    this.speedMps = const Value.absent(),
+    this.segmentStart = const Value.absent(),
+  });
+  RunPointsCompanion.insert({
+    this.id = const Value.absent(),
+    required int runId,
+    required int seq,
+    required int tMs,
+    required double lat,
+    required double lng,
+    this.accuracyM = const Value.absent(),
+    this.altitudeM = const Value.absent(),
+    this.speedMps = const Value.absent(),
+    this.segmentStart = const Value.absent(),
+  }) : runId = Value(runId),
+       seq = Value(seq),
+       tMs = Value(tMs),
+       lat = Value(lat),
+       lng = Value(lng);
+  static Insertable<RunPoint> custom({
+    Expression<int>? id,
+    Expression<int>? runId,
+    Expression<int>? seq,
+    Expression<int>? tMs,
+    Expression<double>? lat,
+    Expression<double>? lng,
+    Expression<double>? accuracyM,
+    Expression<double>? altitudeM,
+    Expression<double>? speedMps,
+    Expression<bool>? segmentStart,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (runId != null) 'run_id': runId,
+      if (seq != null) 'seq': seq,
+      if (tMs != null) 't_ms': tMs,
+      if (lat != null) 'lat': lat,
+      if (lng != null) 'lng': lng,
+      if (accuracyM != null) 'accuracy_m': accuracyM,
+      if (altitudeM != null) 'altitude_m': altitudeM,
+      if (speedMps != null) 'speed_mps': speedMps,
+      if (segmentStart != null) 'segment_start': segmentStart,
+    });
+  }
+
+  RunPointsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? runId,
+    Value<int>? seq,
+    Value<int>? tMs,
+    Value<double>? lat,
+    Value<double>? lng,
+    Value<double?>? accuracyM,
+    Value<double?>? altitudeM,
+    Value<double?>? speedMps,
+    Value<bool>? segmentStart,
+  }) {
+    return RunPointsCompanion(
+      id: id ?? this.id,
+      runId: runId ?? this.runId,
+      seq: seq ?? this.seq,
+      tMs: tMs ?? this.tMs,
+      lat: lat ?? this.lat,
+      lng: lng ?? this.lng,
+      accuracyM: accuracyM ?? this.accuracyM,
+      altitudeM: altitudeM ?? this.altitudeM,
+      speedMps: speedMps ?? this.speedMps,
+      segmentStart: segmentStart ?? this.segmentStart,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (runId.present) {
+      map['run_id'] = Variable<int>(runId.value);
+    }
+    if (seq.present) {
+      map['seq'] = Variable<int>(seq.value);
+    }
+    if (tMs.present) {
+      map['t_ms'] = Variable<int>(tMs.value);
+    }
+    if (lat.present) {
+      map['lat'] = Variable<double>(lat.value);
+    }
+    if (lng.present) {
+      map['lng'] = Variable<double>(lng.value);
+    }
+    if (accuracyM.present) {
+      map['accuracy_m'] = Variable<double>(accuracyM.value);
+    }
+    if (altitudeM.present) {
+      map['altitude_m'] = Variable<double>(altitudeM.value);
+    }
+    if (speedMps.present) {
+      map['speed_mps'] = Variable<double>(speedMps.value);
+    }
+    if (segmentStart.present) {
+      map['segment_start'] = Variable<bool>(segmentStart.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RunPointsCompanion(')
+          ..write('id: $id, ')
+          ..write('runId: $runId, ')
+          ..write('seq: $seq, ')
+          ..write('tMs: $tMs, ')
+          ..write('lat: $lat, ')
+          ..write('lng: $lng, ')
+          ..write('accuracyM: $accuracyM, ')
+          ..write('altitudeM: $altitudeM, ')
+          ..write('speedMps: $speedMps, ')
+          ..write('segmentStart: $segmentStart')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MealLogsTable extends MealLogs with TableInfo<$MealLogsTable, MealLog> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MealLogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _loggedOnMeta = const VerificationMeta(
+    'loggedOn',
+  );
+  @override
+  late final GeneratedColumn<DateTime> loggedOn = GeneratedColumn<DateTime>(
+    'logged_on',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _slotIdMeta = const VerificationMeta('slotId');
+  @override
+  late final GeneratedColumn<String> slotId = GeneratedColumn<String>(
+    'slot_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _templateIdMeta = const VerificationMeta(
+    'templateId',
+  );
+  @override
+  late final GeneratedColumn<String> templateId = GeneratedColumn<String>(
+    'template_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<MealStatus, String> status =
+      GeneratedColumn<String>(
+        'status',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<MealStatus>($MealLogsTable.$converterstatus);
+  static const VerificationMeta _portionMeta = const VerificationMeta(
+    'portion',
+  );
+  @override
+  late final GeneratedColumn<double> portion = GeneratedColumn<double>(
+    'portion',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1.0),
+  );
+  static const VerificationMeta _kcalMeta = const VerificationMeta('kcal');
+  @override
+  late final GeneratedColumn<int> kcal = GeneratedColumn<int>(
+    'kcal',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _proteinGMeta = const VerificationMeta(
+    'proteinG',
+  );
+  @override
+  late final GeneratedColumn<double> proteinG = GeneratedColumn<double>(
+    'protein_g',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _fatGMeta = const VerificationMeta('fatG');
+  @override
+  late final GeneratedColumn<double> fatG = GeneratedColumn<double>(
+    'fat_g',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _carbsGMeta = const VerificationMeta('carbsG');
+  @override
+  late final GeneratedColumn<double> carbsG = GeneratedColumn<double>(
+    'carbs_g',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _loggedAtMsMeta = const VerificationMeta(
+    'loggedAtMs',
+  );
+  @override
+  late final GeneratedColumn<int> loggedAtMs = GeneratedColumn<int>(
+    'logged_at_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    loggedOn,
+    slotId,
+    templateId,
+    status,
+    portion,
+    kcal,
+    proteinG,
+    fatG,
+    carbsG,
+    loggedAtMs,
+    note,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'meal_logs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MealLog> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('logged_on')) {
+      context.handle(
+        _loggedOnMeta,
+        loggedOn.isAcceptableOrUnknown(data['logged_on']!, _loggedOnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_loggedOnMeta);
+    }
+    if (data.containsKey('slot_id')) {
+      context.handle(
+        _slotIdMeta,
+        slotId.isAcceptableOrUnknown(data['slot_id']!, _slotIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_slotIdMeta);
+    }
+    if (data.containsKey('template_id')) {
+      context.handle(
+        _templateIdMeta,
+        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_templateIdMeta);
+    }
+    if (data.containsKey('portion')) {
+      context.handle(
+        _portionMeta,
+        portion.isAcceptableOrUnknown(data['portion']!, _portionMeta),
+      );
+    }
+    if (data.containsKey('kcal')) {
+      context.handle(
+        _kcalMeta,
+        kcal.isAcceptableOrUnknown(data['kcal']!, _kcalMeta),
+      );
+    }
+    if (data.containsKey('protein_g')) {
+      context.handle(
+        _proteinGMeta,
+        proteinG.isAcceptableOrUnknown(data['protein_g']!, _proteinGMeta),
+      );
+    }
+    if (data.containsKey('fat_g')) {
+      context.handle(
+        _fatGMeta,
+        fatG.isAcceptableOrUnknown(data['fat_g']!, _fatGMeta),
+      );
+    }
+    if (data.containsKey('carbs_g')) {
+      context.handle(
+        _carbsGMeta,
+        carbsG.isAcceptableOrUnknown(data['carbs_g']!, _carbsGMeta),
+      );
+    }
+    if (data.containsKey('logged_at_ms')) {
+      context.handle(
+        _loggedAtMsMeta,
+        loggedAtMs.isAcceptableOrUnknown(
+          data['logged_at_ms']!,
+          _loggedAtMsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {loggedOn, slotId};
+  @override
+  MealLog map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MealLog(
+      loggedOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}logged_on'],
+      )!,
+      slotId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}slot_id'],
+      )!,
+      templateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_id'],
+      )!,
+      status: $MealLogsTable.$converterstatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}status'],
+        )!,
+      ),
+      portion: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}portion'],
+      )!,
+      kcal: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}kcal'],
+      )!,
+      proteinG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}protein_g'],
+      )!,
+      fatG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}fat_g'],
+      )!,
+      carbsG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}carbs_g'],
+      )!,
+      loggedAtMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}logged_at_ms'],
+      ),
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+    );
+  }
+
+  @override
+  $MealLogsTable createAlias(String alias) {
+    return $MealLogsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<MealStatus, String, String> $converterstatus =
+      const EnumNameConverter<MealStatus>(MealStatus.values);
+}
+
+class MealLog extends DataClass implements Insertable<MealLog> {
+  final DateTime loggedOn;
+  final String slotId;
+  final String templateId;
+  final MealStatus status;
+
+  /// 1.0 eaten, 0.5 half, 0 skipped. What the totals multiply by.
+  final double portion;
+  final int kcal;
+  final double proteinG;
+  final double fatG;
+  final double carbsG;
+  final int? loggedAtMs;
+  final String? note;
+  const MealLog({
+    required this.loggedOn,
+    required this.slotId,
+    required this.templateId,
+    required this.status,
+    required this.portion,
+    required this.kcal,
+    required this.proteinG,
+    required this.fatG,
+    required this.carbsG,
+    this.loggedAtMs,
+    this.note,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['logged_on'] = Variable<DateTime>(loggedOn);
+    map['slot_id'] = Variable<String>(slotId);
+    map['template_id'] = Variable<String>(templateId);
+    {
+      map['status'] = Variable<String>(
+        $MealLogsTable.$converterstatus.toSql(status),
+      );
+    }
+    map['portion'] = Variable<double>(portion);
+    map['kcal'] = Variable<int>(kcal);
+    map['protein_g'] = Variable<double>(proteinG);
+    map['fat_g'] = Variable<double>(fatG);
+    map['carbs_g'] = Variable<double>(carbsG);
+    if (!nullToAbsent || loggedAtMs != null) {
+      map['logged_at_ms'] = Variable<int>(loggedAtMs);
+    }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    return map;
+  }
+
+  MealLogsCompanion toCompanion(bool nullToAbsent) {
+    return MealLogsCompanion(
+      loggedOn: Value(loggedOn),
+      slotId: Value(slotId),
+      templateId: Value(templateId),
+      status: Value(status),
+      portion: Value(portion),
+      kcal: Value(kcal),
+      proteinG: Value(proteinG),
+      fatG: Value(fatG),
+      carbsG: Value(carbsG),
+      loggedAtMs: loggedAtMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(loggedAtMs),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+    );
+  }
+
+  factory MealLog.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MealLog(
+      loggedOn: serializer.fromJson<DateTime>(json['loggedOn']),
+      slotId: serializer.fromJson<String>(json['slotId']),
+      templateId: serializer.fromJson<String>(json['templateId']),
+      status: $MealLogsTable.$converterstatus.fromJson(
+        serializer.fromJson<String>(json['status']),
+      ),
+      portion: serializer.fromJson<double>(json['portion']),
+      kcal: serializer.fromJson<int>(json['kcal']),
+      proteinG: serializer.fromJson<double>(json['proteinG']),
+      fatG: serializer.fromJson<double>(json['fatG']),
+      carbsG: serializer.fromJson<double>(json['carbsG']),
+      loggedAtMs: serializer.fromJson<int?>(json['loggedAtMs']),
+      note: serializer.fromJson<String?>(json['note']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'loggedOn': serializer.toJson<DateTime>(loggedOn),
+      'slotId': serializer.toJson<String>(slotId),
+      'templateId': serializer.toJson<String>(templateId),
+      'status': serializer.toJson<String>(
+        $MealLogsTable.$converterstatus.toJson(status),
+      ),
+      'portion': serializer.toJson<double>(portion),
+      'kcal': serializer.toJson<int>(kcal),
+      'proteinG': serializer.toJson<double>(proteinG),
+      'fatG': serializer.toJson<double>(fatG),
+      'carbsG': serializer.toJson<double>(carbsG),
+      'loggedAtMs': serializer.toJson<int?>(loggedAtMs),
+      'note': serializer.toJson<String?>(note),
+    };
+  }
+
+  MealLog copyWith({
+    DateTime? loggedOn,
+    String? slotId,
+    String? templateId,
+    MealStatus? status,
+    double? portion,
+    int? kcal,
+    double? proteinG,
+    double? fatG,
+    double? carbsG,
+    Value<int?> loggedAtMs = const Value.absent(),
+    Value<String?> note = const Value.absent(),
+  }) => MealLog(
+    loggedOn: loggedOn ?? this.loggedOn,
+    slotId: slotId ?? this.slotId,
+    templateId: templateId ?? this.templateId,
+    status: status ?? this.status,
+    portion: portion ?? this.portion,
+    kcal: kcal ?? this.kcal,
+    proteinG: proteinG ?? this.proteinG,
+    fatG: fatG ?? this.fatG,
+    carbsG: carbsG ?? this.carbsG,
+    loggedAtMs: loggedAtMs.present ? loggedAtMs.value : this.loggedAtMs,
+    note: note.present ? note.value : this.note,
+  );
+  MealLog copyWithCompanion(MealLogsCompanion data) {
+    return MealLog(
+      loggedOn: data.loggedOn.present ? data.loggedOn.value : this.loggedOn,
+      slotId: data.slotId.present ? data.slotId.value : this.slotId,
+      templateId: data.templateId.present
+          ? data.templateId.value
+          : this.templateId,
+      status: data.status.present ? data.status.value : this.status,
+      portion: data.portion.present ? data.portion.value : this.portion,
+      kcal: data.kcal.present ? data.kcal.value : this.kcal,
+      proteinG: data.proteinG.present ? data.proteinG.value : this.proteinG,
+      fatG: data.fatG.present ? data.fatG.value : this.fatG,
+      carbsG: data.carbsG.present ? data.carbsG.value : this.carbsG,
+      loggedAtMs: data.loggedAtMs.present
+          ? data.loggedAtMs.value
+          : this.loggedAtMs,
+      note: data.note.present ? data.note.value : this.note,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MealLog(')
+          ..write('loggedOn: $loggedOn, ')
+          ..write('slotId: $slotId, ')
+          ..write('templateId: $templateId, ')
+          ..write('status: $status, ')
+          ..write('portion: $portion, ')
+          ..write('kcal: $kcal, ')
+          ..write('proteinG: $proteinG, ')
+          ..write('fatG: $fatG, ')
+          ..write('carbsG: $carbsG, ')
+          ..write('loggedAtMs: $loggedAtMs, ')
+          ..write('note: $note')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    loggedOn,
+    slotId,
+    templateId,
+    status,
+    portion,
+    kcal,
+    proteinG,
+    fatG,
+    carbsG,
+    loggedAtMs,
+    note,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MealLog &&
+          other.loggedOn == this.loggedOn &&
+          other.slotId == this.slotId &&
+          other.templateId == this.templateId &&
+          other.status == this.status &&
+          other.portion == this.portion &&
+          other.kcal == this.kcal &&
+          other.proteinG == this.proteinG &&
+          other.fatG == this.fatG &&
+          other.carbsG == this.carbsG &&
+          other.loggedAtMs == this.loggedAtMs &&
+          other.note == this.note);
+}
+
+class MealLogsCompanion extends UpdateCompanion<MealLog> {
+  final Value<DateTime> loggedOn;
+  final Value<String> slotId;
+  final Value<String> templateId;
+  final Value<MealStatus> status;
+  final Value<double> portion;
+  final Value<int> kcal;
+  final Value<double> proteinG;
+  final Value<double> fatG;
+  final Value<double> carbsG;
+  final Value<int?> loggedAtMs;
+  final Value<String?> note;
+  final Value<int> rowid;
+  const MealLogsCompanion({
+    this.loggedOn = const Value.absent(),
+    this.slotId = const Value.absent(),
+    this.templateId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.portion = const Value.absent(),
+    this.kcal = const Value.absent(),
+    this.proteinG = const Value.absent(),
+    this.fatG = const Value.absent(),
+    this.carbsG = const Value.absent(),
+    this.loggedAtMs = const Value.absent(),
+    this.note = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MealLogsCompanion.insert({
+    required DateTime loggedOn,
+    required String slotId,
+    required String templateId,
+    required MealStatus status,
+    this.portion = const Value.absent(),
+    this.kcal = const Value.absent(),
+    this.proteinG = const Value.absent(),
+    this.fatG = const Value.absent(),
+    this.carbsG = const Value.absent(),
+    this.loggedAtMs = const Value.absent(),
+    this.note = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : loggedOn = Value(loggedOn),
+       slotId = Value(slotId),
+       templateId = Value(templateId),
+       status = Value(status);
+  static Insertable<MealLog> custom({
+    Expression<DateTime>? loggedOn,
+    Expression<String>? slotId,
+    Expression<String>? templateId,
+    Expression<String>? status,
+    Expression<double>? portion,
+    Expression<int>? kcal,
+    Expression<double>? proteinG,
+    Expression<double>? fatG,
+    Expression<double>? carbsG,
+    Expression<int>? loggedAtMs,
+    Expression<String>? note,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (loggedOn != null) 'logged_on': loggedOn,
+      if (slotId != null) 'slot_id': slotId,
+      if (templateId != null) 'template_id': templateId,
+      if (status != null) 'status': status,
+      if (portion != null) 'portion': portion,
+      if (kcal != null) 'kcal': kcal,
+      if (proteinG != null) 'protein_g': proteinG,
+      if (fatG != null) 'fat_g': fatG,
+      if (carbsG != null) 'carbs_g': carbsG,
+      if (loggedAtMs != null) 'logged_at_ms': loggedAtMs,
+      if (note != null) 'note': note,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MealLogsCompanion copyWith({
+    Value<DateTime>? loggedOn,
+    Value<String>? slotId,
+    Value<String>? templateId,
+    Value<MealStatus>? status,
+    Value<double>? portion,
+    Value<int>? kcal,
+    Value<double>? proteinG,
+    Value<double>? fatG,
+    Value<double>? carbsG,
+    Value<int?>? loggedAtMs,
+    Value<String?>? note,
+    Value<int>? rowid,
+  }) {
+    return MealLogsCompanion(
+      loggedOn: loggedOn ?? this.loggedOn,
+      slotId: slotId ?? this.slotId,
+      templateId: templateId ?? this.templateId,
+      status: status ?? this.status,
+      portion: portion ?? this.portion,
+      kcal: kcal ?? this.kcal,
+      proteinG: proteinG ?? this.proteinG,
+      fatG: fatG ?? this.fatG,
+      carbsG: carbsG ?? this.carbsG,
+      loggedAtMs: loggedAtMs ?? this.loggedAtMs,
+      note: note ?? this.note,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (loggedOn.present) {
+      map['logged_on'] = Variable<DateTime>(loggedOn.value);
+    }
+    if (slotId.present) {
+      map['slot_id'] = Variable<String>(slotId.value);
+    }
+    if (templateId.present) {
+      map['template_id'] = Variable<String>(templateId.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(
+        $MealLogsTable.$converterstatus.toSql(status.value),
+      );
+    }
+    if (portion.present) {
+      map['portion'] = Variable<double>(portion.value);
+    }
+    if (kcal.present) {
+      map['kcal'] = Variable<int>(kcal.value);
+    }
+    if (proteinG.present) {
+      map['protein_g'] = Variable<double>(proteinG.value);
+    }
+    if (fatG.present) {
+      map['fat_g'] = Variable<double>(fatG.value);
+    }
+    if (carbsG.present) {
+      map['carbs_g'] = Variable<double>(carbsG.value);
+    }
+    if (loggedAtMs.present) {
+      map['logged_at_ms'] = Variable<int>(loggedAtMs.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MealLogsCompanion(')
+          ..write('loggedOn: $loggedOn, ')
+          ..write('slotId: $slotId, ')
+          ..write('templateId: $templateId, ')
+          ..write('status: $status, ')
+          ..write('portion: $portion, ')
+          ..write('kcal: $kcal, ')
+          ..write('proteinG: $proteinG, ')
+          ..write('fatG: $fatG, ')
+          ..write('carbsG: $carbsG, ')
+          ..write('loggedAtMs: $loggedAtMs, ')
+          ..write('note: $note, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WaterLogsTable extends WaterLogs
+    with TableInfo<$WaterLogsTable, WaterLog> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WaterLogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _loggedOnMeta = const VerificationMeta(
+    'loggedOn',
+  );
+  @override
+  late final GeneratedColumn<DateTime> loggedOn = GeneratedColumn<DateTime>(
+    'logged_on',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mlMeta = const VerificationMeta('ml');
+  @override
+  late final GeneratedColumn<int> ml = GeneratedColumn<int>(
+    'ml',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [loggedOn, ml];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'water_logs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WaterLog> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('logged_on')) {
+      context.handle(
+        _loggedOnMeta,
+        loggedOn.isAcceptableOrUnknown(data['logged_on']!, _loggedOnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_loggedOnMeta);
+    }
+    if (data.containsKey('ml')) {
+      context.handle(_mlMeta, ml.isAcceptableOrUnknown(data['ml']!, _mlMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {loggedOn};
+  @override
+  WaterLog map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WaterLog(
+      loggedOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}logged_on'],
+      )!,
+      ml: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ml'],
+      )!,
+    );
+  }
+
+  @override
+  $WaterLogsTable createAlias(String alias) {
+    return $WaterLogsTable(attachedDatabase, alias);
+  }
+}
+
+class WaterLog extends DataClass implements Insertable<WaterLog> {
+  final DateTime loggedOn;
+  final int ml;
+  const WaterLog({required this.loggedOn, required this.ml});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['logged_on'] = Variable<DateTime>(loggedOn);
+    map['ml'] = Variable<int>(ml);
+    return map;
+  }
+
+  WaterLogsCompanion toCompanion(bool nullToAbsent) {
+    return WaterLogsCompanion(loggedOn: Value(loggedOn), ml: Value(ml));
+  }
+
+  factory WaterLog.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WaterLog(
+      loggedOn: serializer.fromJson<DateTime>(json['loggedOn']),
+      ml: serializer.fromJson<int>(json['ml']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'loggedOn': serializer.toJson<DateTime>(loggedOn),
+      'ml': serializer.toJson<int>(ml),
+    };
+  }
+
+  WaterLog copyWith({DateTime? loggedOn, int? ml}) =>
+      WaterLog(loggedOn: loggedOn ?? this.loggedOn, ml: ml ?? this.ml);
+  WaterLog copyWithCompanion(WaterLogsCompanion data) {
+    return WaterLog(
+      loggedOn: data.loggedOn.present ? data.loggedOn.value : this.loggedOn,
+      ml: data.ml.present ? data.ml.value : this.ml,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WaterLog(')
+          ..write('loggedOn: $loggedOn, ')
+          ..write('ml: $ml')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(loggedOn, ml);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WaterLog &&
+          other.loggedOn == this.loggedOn &&
+          other.ml == this.ml);
+}
+
+class WaterLogsCompanion extends UpdateCompanion<WaterLog> {
+  final Value<DateTime> loggedOn;
+  final Value<int> ml;
+  final Value<int> rowid;
+  const WaterLogsCompanion({
+    this.loggedOn = const Value.absent(),
+    this.ml = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WaterLogsCompanion.insert({
+    required DateTime loggedOn,
+    this.ml = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : loggedOn = Value(loggedOn);
+  static Insertable<WaterLog> custom({
+    Expression<DateTime>? loggedOn,
+    Expression<int>? ml,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (loggedOn != null) 'logged_on': loggedOn,
+      if (ml != null) 'ml': ml,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WaterLogsCompanion copyWith({
+    Value<DateTime>? loggedOn,
+    Value<int>? ml,
+    Value<int>? rowid,
+  }) {
+    return WaterLogsCompanion(
+      loggedOn: loggedOn ?? this.loggedOn,
+      ml: ml ?? this.ml,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (loggedOn.present) {
+      map['logged_on'] = Variable<DateTime>(loggedOn.value);
+    }
+    if (ml.present) {
+      map['ml'] = Variable<int>(ml.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WaterLogsCompanion(')
+          ..write('loggedOn: $loggedOn, ')
+          ..write('ml: $ml, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $SupplementLogsTable extends SupplementLogs
+    with TableInfo<$SupplementLogsTable, SupplementLog> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SupplementLogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _loggedOnMeta = const VerificationMeta(
+    'loggedOn',
+  );
+  @override
+  late final GeneratedColumn<DateTime> loggedOn = GeneratedColumn<DateTime>(
+    'logged_on',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _supplementIdMeta = const VerificationMeta(
+    'supplementId',
+  );
+  @override
+  late final GeneratedColumn<String> supplementId = GeneratedColumn<String>(
+    'supplement_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _takenAtMsMeta = const VerificationMeta(
+    'takenAtMs',
+  );
+  @override
+  late final GeneratedColumn<int> takenAtMs = GeneratedColumn<int>(
+    'taken_at_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [loggedOn, supplementId, takenAtMs];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'supplement_logs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SupplementLog> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('logged_on')) {
+      context.handle(
+        _loggedOnMeta,
+        loggedOn.isAcceptableOrUnknown(data['logged_on']!, _loggedOnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_loggedOnMeta);
+    }
+    if (data.containsKey('supplement_id')) {
+      context.handle(
+        _supplementIdMeta,
+        supplementId.isAcceptableOrUnknown(
+          data['supplement_id']!,
+          _supplementIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_supplementIdMeta);
+    }
+    if (data.containsKey('taken_at_ms')) {
+      context.handle(
+        _takenAtMsMeta,
+        takenAtMs.isAcceptableOrUnknown(data['taken_at_ms']!, _takenAtMsMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {loggedOn, supplementId};
+  @override
+  SupplementLog map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SupplementLog(
+      loggedOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}logged_on'],
+      )!,
+      supplementId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}supplement_id'],
+      )!,
+      takenAtMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}taken_at_ms'],
+      ),
+    );
+  }
+
+  @override
+  $SupplementLogsTable createAlias(String alias) {
+    return $SupplementLogsTable(attachedDatabase, alias);
+  }
+}
+
+class SupplementLog extends DataClass implements Insertable<SupplementLog> {
+  final DateTime loggedOn;
+  final String supplementId;
+  final int? takenAtMs;
+  const SupplementLog({
+    required this.loggedOn,
+    required this.supplementId,
+    this.takenAtMs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['logged_on'] = Variable<DateTime>(loggedOn);
+    map['supplement_id'] = Variable<String>(supplementId);
+    if (!nullToAbsent || takenAtMs != null) {
+      map['taken_at_ms'] = Variable<int>(takenAtMs);
+    }
+    return map;
+  }
+
+  SupplementLogsCompanion toCompanion(bool nullToAbsent) {
+    return SupplementLogsCompanion(
+      loggedOn: Value(loggedOn),
+      supplementId: Value(supplementId),
+      takenAtMs: takenAtMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(takenAtMs),
+    );
+  }
+
+  factory SupplementLog.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SupplementLog(
+      loggedOn: serializer.fromJson<DateTime>(json['loggedOn']),
+      supplementId: serializer.fromJson<String>(json['supplementId']),
+      takenAtMs: serializer.fromJson<int?>(json['takenAtMs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'loggedOn': serializer.toJson<DateTime>(loggedOn),
+      'supplementId': serializer.toJson<String>(supplementId),
+      'takenAtMs': serializer.toJson<int?>(takenAtMs),
+    };
+  }
+
+  SupplementLog copyWith({
+    DateTime? loggedOn,
+    String? supplementId,
+    Value<int?> takenAtMs = const Value.absent(),
+  }) => SupplementLog(
+    loggedOn: loggedOn ?? this.loggedOn,
+    supplementId: supplementId ?? this.supplementId,
+    takenAtMs: takenAtMs.present ? takenAtMs.value : this.takenAtMs,
+  );
+  SupplementLog copyWithCompanion(SupplementLogsCompanion data) {
+    return SupplementLog(
+      loggedOn: data.loggedOn.present ? data.loggedOn.value : this.loggedOn,
+      supplementId: data.supplementId.present
+          ? data.supplementId.value
+          : this.supplementId,
+      takenAtMs: data.takenAtMs.present ? data.takenAtMs.value : this.takenAtMs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SupplementLog(')
+          ..write('loggedOn: $loggedOn, ')
+          ..write('supplementId: $supplementId, ')
+          ..write('takenAtMs: $takenAtMs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(loggedOn, supplementId, takenAtMs);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SupplementLog &&
+          other.loggedOn == this.loggedOn &&
+          other.supplementId == this.supplementId &&
+          other.takenAtMs == this.takenAtMs);
+}
+
+class SupplementLogsCompanion extends UpdateCompanion<SupplementLog> {
+  final Value<DateTime> loggedOn;
+  final Value<String> supplementId;
+  final Value<int?> takenAtMs;
+  final Value<int> rowid;
+  const SupplementLogsCompanion({
+    this.loggedOn = const Value.absent(),
+    this.supplementId = const Value.absent(),
+    this.takenAtMs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SupplementLogsCompanion.insert({
+    required DateTime loggedOn,
+    required String supplementId,
+    this.takenAtMs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : loggedOn = Value(loggedOn),
+       supplementId = Value(supplementId);
+  static Insertable<SupplementLog> custom({
+    Expression<DateTime>? loggedOn,
+    Expression<String>? supplementId,
+    Expression<int>? takenAtMs,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (loggedOn != null) 'logged_on': loggedOn,
+      if (supplementId != null) 'supplement_id': supplementId,
+      if (takenAtMs != null) 'taken_at_ms': takenAtMs,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SupplementLogsCompanion copyWith({
+    Value<DateTime>? loggedOn,
+    Value<String>? supplementId,
+    Value<int?>? takenAtMs,
+    Value<int>? rowid,
+  }) {
+    return SupplementLogsCompanion(
+      loggedOn: loggedOn ?? this.loggedOn,
+      supplementId: supplementId ?? this.supplementId,
+      takenAtMs: takenAtMs ?? this.takenAtMs,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (loggedOn.present) {
+      map['logged_on'] = Variable<DateTime>(loggedOn.value);
+    }
+    if (supplementId.present) {
+      map['supplement_id'] = Variable<String>(supplementId.value);
+    }
+    if (takenAtMs.present) {
+      map['taken_at_ms'] = Variable<int>(takenAtMs.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SupplementLogsCompanion(')
+          ..write('loggedOn: $loggedOn, ')
+          ..write('supplementId: $supplementId, ')
+          ..write('takenAtMs: $takenAtMs, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $NutritionAdjustmentsTable extends NutritionAdjustments
+    with TableInfo<$NutritionAdjustmentsTable, NutritionAdjustment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NutritionAdjustmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _appliedOnMeta = const VerificationMeta(
+    'appliedOn',
+  );
+  @override
+  late final GeneratedColumn<DateTime> appliedOn = GeneratedColumn<DateTime>(
+    'applied_on',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _moduleIdMeta = const VerificationMeta(
+    'moduleId',
+  );
+  @override
+  late final GeneratedColumn<String> moduleId = GeneratedColumn<String>(
+    'module_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _kcalDeltaMeta = const VerificationMeta(
+    'kcalDelta',
+  );
+  @override
+  late final GeneratedColumn<int> kcalDelta = GeneratedColumn<int>(
+    'kcal_delta',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
+  @override
+  late final GeneratedColumn<String> reason = GeneratedColumn<String>(
+    'reason',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _revertedOnMeta = const VerificationMeta(
+    'revertedOn',
+  );
+  @override
+  late final GeneratedColumn<DateTime> revertedOn = GeneratedColumn<DateTime>(
+    'reverted_on',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    appliedOn,
+    moduleId,
+    kcalDelta,
+    reason,
+    revertedOn,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'nutrition_adjustments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NutritionAdjustment> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('applied_on')) {
+      context.handle(
+        _appliedOnMeta,
+        appliedOn.isAcceptableOrUnknown(data['applied_on']!, _appliedOnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_appliedOnMeta);
+    }
+    if (data.containsKey('module_id')) {
+      context.handle(
+        _moduleIdMeta,
+        moduleId.isAcceptableOrUnknown(data['module_id']!, _moduleIdMeta),
+      );
+    }
+    if (data.containsKey('kcal_delta')) {
+      context.handle(
+        _kcalDeltaMeta,
+        kcalDelta.isAcceptableOrUnknown(data['kcal_delta']!, _kcalDeltaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kcalDeltaMeta);
+    }
+    if (data.containsKey('reason')) {
+      context.handle(
+        _reasonMeta,
+        reason.isAcceptableOrUnknown(data['reason']!, _reasonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reasonMeta);
+    }
+    if (data.containsKey('reverted_on')) {
+      context.handle(
+        _revertedOnMeta,
+        revertedOn.isAcceptableOrUnknown(data['reverted_on']!, _revertedOnMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NutritionAdjustment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NutritionAdjustment(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      appliedOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}applied_on'],
+      )!,
+      moduleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}module_id'],
+      ),
+      kcalDelta: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}kcal_delta'],
+      )!,
+      reason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason'],
+      )!,
+      revertedOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}reverted_on'],
+      ),
+    );
+  }
+
+  @override
+  $NutritionAdjustmentsTable createAlias(String alias) {
+    return $NutritionAdjustmentsTable(attachedDatabase, alias);
+  }
+}
+
+class NutritionAdjustment extends DataClass
+    implements Insertable<NutritionAdjustment> {
+  final int id;
+  final DateTime appliedOn;
+
+  /// The booster or module from the Fuel plan, when one was chosen.
+  final String? moduleId;
+  final int kcalDelta;
+  final String reason;
+  final DateTime? revertedOn;
+  const NutritionAdjustment({
+    required this.id,
+    required this.appliedOn,
+    this.moduleId,
+    required this.kcalDelta,
+    required this.reason,
+    this.revertedOn,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['applied_on'] = Variable<DateTime>(appliedOn);
+    if (!nullToAbsent || moduleId != null) {
+      map['module_id'] = Variable<String>(moduleId);
+    }
+    map['kcal_delta'] = Variable<int>(kcalDelta);
+    map['reason'] = Variable<String>(reason);
+    if (!nullToAbsent || revertedOn != null) {
+      map['reverted_on'] = Variable<DateTime>(revertedOn);
+    }
+    return map;
+  }
+
+  NutritionAdjustmentsCompanion toCompanion(bool nullToAbsent) {
+    return NutritionAdjustmentsCompanion(
+      id: Value(id),
+      appliedOn: Value(appliedOn),
+      moduleId: moduleId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(moduleId),
+      kcalDelta: Value(kcalDelta),
+      reason: Value(reason),
+      revertedOn: revertedOn == null && nullToAbsent
+          ? const Value.absent()
+          : Value(revertedOn),
+    );
+  }
+
+  factory NutritionAdjustment.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NutritionAdjustment(
+      id: serializer.fromJson<int>(json['id']),
+      appliedOn: serializer.fromJson<DateTime>(json['appliedOn']),
+      moduleId: serializer.fromJson<String?>(json['moduleId']),
+      kcalDelta: serializer.fromJson<int>(json['kcalDelta']),
+      reason: serializer.fromJson<String>(json['reason']),
+      revertedOn: serializer.fromJson<DateTime?>(json['revertedOn']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'appliedOn': serializer.toJson<DateTime>(appliedOn),
+      'moduleId': serializer.toJson<String?>(moduleId),
+      'kcalDelta': serializer.toJson<int>(kcalDelta),
+      'reason': serializer.toJson<String>(reason),
+      'revertedOn': serializer.toJson<DateTime?>(revertedOn),
+    };
+  }
+
+  NutritionAdjustment copyWith({
+    int? id,
+    DateTime? appliedOn,
+    Value<String?> moduleId = const Value.absent(),
+    int? kcalDelta,
+    String? reason,
+    Value<DateTime?> revertedOn = const Value.absent(),
+  }) => NutritionAdjustment(
+    id: id ?? this.id,
+    appliedOn: appliedOn ?? this.appliedOn,
+    moduleId: moduleId.present ? moduleId.value : this.moduleId,
+    kcalDelta: kcalDelta ?? this.kcalDelta,
+    reason: reason ?? this.reason,
+    revertedOn: revertedOn.present ? revertedOn.value : this.revertedOn,
+  );
+  NutritionAdjustment copyWithCompanion(NutritionAdjustmentsCompanion data) {
+    return NutritionAdjustment(
+      id: data.id.present ? data.id.value : this.id,
+      appliedOn: data.appliedOn.present ? data.appliedOn.value : this.appliedOn,
+      moduleId: data.moduleId.present ? data.moduleId.value : this.moduleId,
+      kcalDelta: data.kcalDelta.present ? data.kcalDelta.value : this.kcalDelta,
+      reason: data.reason.present ? data.reason.value : this.reason,
+      revertedOn: data.revertedOn.present
+          ? data.revertedOn.value
+          : this.revertedOn,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NutritionAdjustment(')
+          ..write('id: $id, ')
+          ..write('appliedOn: $appliedOn, ')
+          ..write('moduleId: $moduleId, ')
+          ..write('kcalDelta: $kcalDelta, ')
+          ..write('reason: $reason, ')
+          ..write('revertedOn: $revertedOn')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, appliedOn, moduleId, kcalDelta, reason, revertedOn);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NutritionAdjustment &&
+          other.id == this.id &&
+          other.appliedOn == this.appliedOn &&
+          other.moduleId == this.moduleId &&
+          other.kcalDelta == this.kcalDelta &&
+          other.reason == this.reason &&
+          other.revertedOn == this.revertedOn);
+}
+
+class NutritionAdjustmentsCompanion
+    extends UpdateCompanion<NutritionAdjustment> {
+  final Value<int> id;
+  final Value<DateTime> appliedOn;
+  final Value<String?> moduleId;
+  final Value<int> kcalDelta;
+  final Value<String> reason;
+  final Value<DateTime?> revertedOn;
+  const NutritionAdjustmentsCompanion({
+    this.id = const Value.absent(),
+    this.appliedOn = const Value.absent(),
+    this.moduleId = const Value.absent(),
+    this.kcalDelta = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.revertedOn = const Value.absent(),
+  });
+  NutritionAdjustmentsCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime appliedOn,
+    this.moduleId = const Value.absent(),
+    required int kcalDelta,
+    required String reason,
+    this.revertedOn = const Value.absent(),
+  }) : appliedOn = Value(appliedOn),
+       kcalDelta = Value(kcalDelta),
+       reason = Value(reason);
+  static Insertable<NutritionAdjustment> custom({
+    Expression<int>? id,
+    Expression<DateTime>? appliedOn,
+    Expression<String>? moduleId,
+    Expression<int>? kcalDelta,
+    Expression<String>? reason,
+    Expression<DateTime>? revertedOn,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (appliedOn != null) 'applied_on': appliedOn,
+      if (moduleId != null) 'module_id': moduleId,
+      if (kcalDelta != null) 'kcal_delta': kcalDelta,
+      if (reason != null) 'reason': reason,
+      if (revertedOn != null) 'reverted_on': revertedOn,
+    });
+  }
+
+  NutritionAdjustmentsCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? appliedOn,
+    Value<String?>? moduleId,
+    Value<int>? kcalDelta,
+    Value<String>? reason,
+    Value<DateTime?>? revertedOn,
+  }) {
+    return NutritionAdjustmentsCompanion(
+      id: id ?? this.id,
+      appliedOn: appliedOn ?? this.appliedOn,
+      moduleId: moduleId ?? this.moduleId,
+      kcalDelta: kcalDelta ?? this.kcalDelta,
+      reason: reason ?? this.reason,
+      revertedOn: revertedOn ?? this.revertedOn,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (appliedOn.present) {
+      map['applied_on'] = Variable<DateTime>(appliedOn.value);
+    }
+    if (moduleId.present) {
+      map['module_id'] = Variable<String>(moduleId.value);
+    }
+    if (kcalDelta.present) {
+      map['kcal_delta'] = Variable<int>(kcalDelta.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(reason.value);
+    }
+    if (revertedOn.present) {
+      map['reverted_on'] = Variable<DateTime>(revertedOn.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NutritionAdjustmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('appliedOn: $appliedOn, ')
+          ..write('moduleId: $moduleId, ')
+          ..write('kcalDelta: $kcalDelta, ')
+          ..write('reason: $reason, ')
+          ..write('revertedOn: $revertedOn')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5942,6 +9244,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PhotoPosesTable photoPoses = $PhotoPosesTable(this);
   late final $MeasurementsTable measurements = $MeasurementsTable(this);
   late final $FormClipsTable formClips = $FormClipsTable(this);
+  late final $RunsTable runs = $RunsTable(this);
+  late final $RunPointsTable runPoints = $RunPointsTable(this);
+  late final $MealLogsTable mealLogs = $MealLogsTable(this);
+  late final $WaterLogsTable waterLogs = $WaterLogsTable(this);
+  late final $SupplementLogsTable supplementLogs = $SupplementLogsTable(this);
+  late final $NutritionAdjustmentsTable nutritionAdjustments =
+      $NutritionAdjustmentsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5959,6 +9268,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     photoPoses,
     measurements,
     formClips,
+    runs,
+    runPoints,
+    mealLogs,
+    waterLogs,
+    supplementLogs,
+    nutritionAdjustments,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -5975,6 +9290,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('progress_photos', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'sessions',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('runs', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'runs',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('run_points', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -6032,6 +9361,25 @@ final class $$SessionsTableReferences
     ).filter((f) => f.sessionId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_setLogsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$RunsTable, List<Run>> _runsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.runs,
+    aliasName: $_aliasNameGenerator(db.sessions.id, db.runs.sessionId),
+  );
+
+  $$RunsTableProcessedTableManager get runsRefs {
+    final manager = $$RunsTableTableManager(
+      $_db,
+      $_db.runs,
+    ).filter((f) => f.sessionId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_runsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -6139,6 +9487,31 @@ class $$SessionsTableFilterComposer
           }) => $$SetLogsTableFilterComposer(
             $db: $db,
             $table: $db.setLogs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> runsRefs(
+    Expression<bool> Function($$RunsTableFilterComposer f) f,
+  ) {
+    final $$RunsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.runs,
+      getReferencedColumn: (t) => t.sessionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunsTableFilterComposer(
+            $db: $db,
+            $table: $db.runs,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -6328,6 +9701,31 @@ class $$SessionsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> runsRefs<T extends Object>(
+    Expression<T> Function($$RunsTableAnnotationComposer a) f,
+  ) {
+    final $$RunsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.runs,
+      getReferencedColumn: (t) => t.sessionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.runs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$SessionsTableTableManager
@@ -6343,7 +9741,7 @@ class $$SessionsTableTableManager
           $$SessionsTableUpdateCompanionBuilder,
           (Session, $$SessionsTableReferences),
           Session,
-          PrefetchHooks Function({bool setLogsRefs})
+          PrefetchHooks Function({bool setLogsRefs, bool runsRefs})
         > {
   $$SessionsTableTableManager(_$AppDatabase db, $SessionsTable table)
     : super(
@@ -6432,10 +9830,13 @@ class $$SessionsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({setLogsRefs = false}) {
+          prefetchHooksCallback: ({setLogsRefs = false, runsRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (setLogsRefs) db.setLogs],
+              explicitlyWatchedTables: [
+                if (setLogsRefs) db.setLogs,
+                if (runsRefs) db.runs,
+              ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
@@ -6446,6 +9847,18 @@ class $$SessionsTableTableManager
                           ._setLogsRefsTable(db),
                       managerFromTypedResult: (p0) =>
                           $$SessionsTableReferences(db, table, p0).setLogsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.sessionId == item.id),
+                      typedResults: items,
+                    ),
+                  if (runsRefs)
+                    await $_getPrefetchedData<Session, $SessionsTable, Run>(
+                      currentTable: table,
+                      referencedTable: $$SessionsTableReferences._runsRefsTable(
+                        db,
+                      ),
+                      managerFromTypedResult: (p0) =>
+                          $$SessionsTableReferences(db, table, p0).runsRefs,
                       referencedItemsForCurrentItem: (item, referencedItems) =>
                           referencedItems.where((e) => e.sessionId == item.id),
                       typedResults: items,
@@ -6470,7 +9883,7 @@ typedef $$SessionsTableProcessedTableManager =
       $$SessionsTableUpdateCompanionBuilder,
       (Session, $$SessionsTableReferences),
       Session,
-      PrefetchHooks Function({bool setLogsRefs})
+      PrefetchHooks Function({bool setLogsRefs, bool runsRefs})
     >;
 typedef $$SetLogsTableCreateCompanionBuilder = SetLogsCompanion Function({
   Value<int> id,
@@ -9402,6 +12815,1946 @@ typedef $$FormClipsTableProcessedTableManager =
       FormClip,
       PrefetchHooks Function()
     >;
+typedef $$RunsTableCreateCompanionBuilder = RunsCompanion Function({
+  Value<int> id,
+  Value<int?> sessionId,
+  Value<int?> weekNo,
+  Value<String?> dayId,
+  Value<String?> prescriptionId,
+  Value<String?> exerciseId,
+  Value<int?> setLogId,
+  required DateTime runOn,
+  required int startedAtMs,
+  Value<int?> endedAtMs,
+  Value<int> movingMs,
+  Value<double> distanceM,
+  Value<double?> maxSpeedMps,
+  Value<double?> elevGainM,
+  Value<double?> startLat,
+  Value<double?> startLng,
+  Value<double?> endLat,
+  Value<double?> endLng,
+  Value<int?> effort,
+  Value<RunStatus> status,
+  Value<String?> note,
+});
+typedef $$RunsTableUpdateCompanionBuilder = RunsCompanion Function({
+  Value<int> id,
+  Value<int?> sessionId,
+  Value<int?> weekNo,
+  Value<String?> dayId,
+  Value<String?> prescriptionId,
+  Value<String?> exerciseId,
+  Value<int?> setLogId,
+  Value<DateTime> runOn,
+  Value<int> startedAtMs,
+  Value<int?> endedAtMs,
+  Value<int> movingMs,
+  Value<double> distanceM,
+  Value<double?> maxSpeedMps,
+  Value<double?> elevGainM,
+  Value<double?> startLat,
+  Value<double?> startLng,
+  Value<double?> endLat,
+  Value<double?> endLng,
+  Value<int?> effort,
+  Value<RunStatus> status,
+  Value<String?> note,
+});
+
+final class $$RunsTableReferences
+    extends BaseReferences<_$AppDatabase, $RunsTable, Run> {
+  $$RunsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $SessionsTable _sessionIdTable(_$AppDatabase db) => db.sessions
+      .createAlias($_aliasNameGenerator(db.runs.sessionId, db.sessions.id));
+
+  $$SessionsTableProcessedTableManager? get sessionId {
+    final $_column = $_itemColumn<int>('session_id');
+    if ($_column == null) return null;
+    final manager = $$SessionsTableTableManager(
+      $_db,
+      $_db.sessions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_sessionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$RunPointsTable, List<RunPoint>>
+  _runPointsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.runPoints,
+    aliasName: $_aliasNameGenerator(db.runs.id, db.runPoints.runId),
+  );
+
+  $$RunPointsTableProcessedTableManager get runPointsRefs {
+    final manager = $$RunPointsTableTableManager(
+      $_db,
+      $_db.runPoints,
+    ).filter((f) => f.runId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_runPointsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$RunsTableFilterComposer extends Composer<_$AppDatabase, $RunsTable> {
+  $$RunsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get weekNo => $composableBuilder(
+    column: $table.weekNo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dayId => $composableBuilder(
+    column: $table.dayId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get prescriptionId => $composableBuilder(
+    column: $table.prescriptionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get exerciseId => $composableBuilder(
+    column: $table.exerciseId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get setLogId => $composableBuilder(
+    column: $table.setLogId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get runOn => $composableBuilder(
+    column: $table.runOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startedAtMs => $composableBuilder(
+    column: $table.startedAtMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endedAtMs => $composableBuilder(
+    column: $table.endedAtMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get movingMs => $composableBuilder(
+    column: $table.movingMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get distanceM => $composableBuilder(
+    column: $table.distanceM,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get maxSpeedMps => $composableBuilder(
+    column: $table.maxSpeedMps,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get elevGainM => $composableBuilder(
+    column: $table.elevGainM,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get startLat => $composableBuilder(
+    column: $table.startLat,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get startLng => $composableBuilder(
+    column: $table.startLng,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get endLat => $composableBuilder(
+    column: $table.endLat,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get endLng => $composableBuilder(
+    column: $table.endLng,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get effort => $composableBuilder(
+    column: $table.effort,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<RunStatus, RunStatus, String> get status =>
+      $composableBuilder(
+        column: $table.status,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$SessionsTableFilterComposer get sessionId {
+    final $$SessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> runPointsRefs(
+    Expression<bool> Function($$RunPointsTableFilterComposer f) f,
+  ) {
+    final $$RunPointsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.runPoints,
+      getReferencedColumn: (t) => t.runId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunPointsTableFilterComposer(
+            $db: $db,
+            $table: $db.runPoints,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$RunsTableOrderingComposer extends Composer<_$AppDatabase, $RunsTable> {
+  $$RunsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get weekNo => $composableBuilder(
+    column: $table.weekNo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dayId => $composableBuilder(
+    column: $table.dayId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get prescriptionId => $composableBuilder(
+    column: $table.prescriptionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get exerciseId => $composableBuilder(
+    column: $table.exerciseId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get setLogId => $composableBuilder(
+    column: $table.setLogId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get runOn => $composableBuilder(
+    column: $table.runOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startedAtMs => $composableBuilder(
+    column: $table.startedAtMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endedAtMs => $composableBuilder(
+    column: $table.endedAtMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get movingMs => $composableBuilder(
+    column: $table.movingMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get distanceM => $composableBuilder(
+    column: $table.distanceM,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get maxSpeedMps => $composableBuilder(
+    column: $table.maxSpeedMps,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get elevGainM => $composableBuilder(
+    column: $table.elevGainM,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get startLat => $composableBuilder(
+    column: $table.startLat,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get startLng => $composableBuilder(
+    column: $table.startLng,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get endLat => $composableBuilder(
+    column: $table.endLat,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get endLng => $composableBuilder(
+    column: $table.endLng,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get effort => $composableBuilder(
+    column: $table.effort,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$SessionsTableOrderingComposer get sessionId {
+    final $$SessionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RunsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RunsTable> {
+  $$RunsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get weekNo =>
+      $composableBuilder(column: $table.weekNo, builder: (column) => column);
+
+  GeneratedColumn<String> get dayId =>
+      $composableBuilder(column: $table.dayId, builder: (column) => column);
+
+  GeneratedColumn<String> get prescriptionId => $composableBuilder(
+    column: $table.prescriptionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get exerciseId => $composableBuilder(
+    column: $table.exerciseId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get setLogId =>
+      $composableBuilder(column: $table.setLogId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get runOn =>
+      $composableBuilder(column: $table.runOn, builder: (column) => column);
+
+  GeneratedColumn<int> get startedAtMs => $composableBuilder(
+    column: $table.startedAtMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get endedAtMs =>
+      $composableBuilder(column: $table.endedAtMs, builder: (column) => column);
+
+  GeneratedColumn<int> get movingMs =>
+      $composableBuilder(column: $table.movingMs, builder: (column) => column);
+
+  GeneratedColumn<double> get distanceM =>
+      $composableBuilder(column: $table.distanceM, builder: (column) => column);
+
+  GeneratedColumn<double> get maxSpeedMps => $composableBuilder(
+    column: $table.maxSpeedMps,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get elevGainM =>
+      $composableBuilder(column: $table.elevGainM, builder: (column) => column);
+
+  GeneratedColumn<double> get startLat =>
+      $composableBuilder(column: $table.startLat, builder: (column) => column);
+
+  GeneratedColumn<double> get startLng =>
+      $composableBuilder(column: $table.startLng, builder: (column) => column);
+
+  GeneratedColumn<double> get endLat =>
+      $composableBuilder(column: $table.endLat, builder: (column) => column);
+
+  GeneratedColumn<double> get endLng =>
+      $composableBuilder(column: $table.endLng, builder: (column) => column);
+
+  GeneratedColumn<int> get effort =>
+      $composableBuilder(column: $table.effort, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<RunStatus, String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  $$SessionsTableAnnotationComposer get sessionId {
+    final $$SessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> runPointsRefs<T extends Object>(
+    Expression<T> Function($$RunPointsTableAnnotationComposer a) f,
+  ) {
+    final $$RunPointsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.runPoints,
+      getReferencedColumn: (t) => t.runId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunPointsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.runPoints,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$RunsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RunsTable,
+          Run,
+          $$RunsTableFilterComposer,
+          $$RunsTableOrderingComposer,
+          $$RunsTableAnnotationComposer,
+          $$RunsTableCreateCompanionBuilder,
+          $$RunsTableUpdateCompanionBuilder,
+          (Run, $$RunsTableReferences),
+          Run,
+          PrefetchHooks Function({bool sessionId, bool runPointsRefs})
+        > {
+  $$RunsTableTableManager(_$AppDatabase db, $RunsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RunsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RunsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RunsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> sessionId = const Value.absent(),
+                Value<int?> weekNo = const Value.absent(),
+                Value<String?> dayId = const Value.absent(),
+                Value<String?> prescriptionId = const Value.absent(),
+                Value<String?> exerciseId = const Value.absent(),
+                Value<int?> setLogId = const Value.absent(),
+                Value<DateTime> runOn = const Value.absent(),
+                Value<int> startedAtMs = const Value.absent(),
+                Value<int?> endedAtMs = const Value.absent(),
+                Value<int> movingMs = const Value.absent(),
+                Value<double> distanceM = const Value.absent(),
+                Value<double?> maxSpeedMps = const Value.absent(),
+                Value<double?> elevGainM = const Value.absent(),
+                Value<double?> startLat = const Value.absent(),
+                Value<double?> startLng = const Value.absent(),
+                Value<double?> endLat = const Value.absent(),
+                Value<double?> endLng = const Value.absent(),
+                Value<int?> effort = const Value.absent(),
+                Value<RunStatus> status = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+              }) => RunsCompanion(
+                id: id,
+                sessionId: sessionId,
+                weekNo: weekNo,
+                dayId: dayId,
+                prescriptionId: prescriptionId,
+                exerciseId: exerciseId,
+                setLogId: setLogId,
+                runOn: runOn,
+                startedAtMs: startedAtMs,
+                endedAtMs: endedAtMs,
+                movingMs: movingMs,
+                distanceM: distanceM,
+                maxSpeedMps: maxSpeedMps,
+                elevGainM: elevGainM,
+                startLat: startLat,
+                startLng: startLng,
+                endLat: endLat,
+                endLng: endLng,
+                effort: effort,
+                status: status,
+                note: note,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> sessionId = const Value.absent(),
+                Value<int?> weekNo = const Value.absent(),
+                Value<String?> dayId = const Value.absent(),
+                Value<String?> prescriptionId = const Value.absent(),
+                Value<String?> exerciseId = const Value.absent(),
+                Value<int?> setLogId = const Value.absent(),
+                required DateTime runOn,
+                required int startedAtMs,
+                Value<int?> endedAtMs = const Value.absent(),
+                Value<int> movingMs = const Value.absent(),
+                Value<double> distanceM = const Value.absent(),
+                Value<double?> maxSpeedMps = const Value.absent(),
+                Value<double?> elevGainM = const Value.absent(),
+                Value<double?> startLat = const Value.absent(),
+                Value<double?> startLng = const Value.absent(),
+                Value<double?> endLat = const Value.absent(),
+                Value<double?> endLng = const Value.absent(),
+                Value<int?> effort = const Value.absent(),
+                Value<RunStatus> status = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+              }) => RunsCompanion.insert(
+                id: id,
+                sessionId: sessionId,
+                weekNo: weekNo,
+                dayId: dayId,
+                prescriptionId: prescriptionId,
+                exerciseId: exerciseId,
+                setLogId: setLogId,
+                runOn: runOn,
+                startedAtMs: startedAtMs,
+                endedAtMs: endedAtMs,
+                movingMs: movingMs,
+                distanceM: distanceM,
+                maxSpeedMps: maxSpeedMps,
+                elevGainM: elevGainM,
+                startLat: startLat,
+                startLng: startLng,
+                endLat: endLat,
+                endLng: endLng,
+                effort: effort,
+                status: status,
+                note: note,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) =>
+                    (e.readTable(table), $$RunsTableReferences(db, table, e)),
+              )
+              .toList(),
+          prefetchHooksCallback: ({sessionId = false, runPointsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (runPointsRefs) db.runPoints],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (sessionId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.sessionId,
+                        referencedTable: $$RunsTableReferences._sessionIdTable(
+                          db,
+                        ),
+                        referencedColumn: $$RunsTableReferences
+                            ._sessionIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (runPointsRefs)
+                    await $_getPrefetchedData<Run, $RunsTable, RunPoint>(
+                      currentTable: table,
+                      referencedTable: $$RunsTableReferences
+                          ._runPointsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$RunsTableReferences(db, table, p0).runPointsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.runId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$RunsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RunsTable,
+      Run,
+      $$RunsTableFilterComposer,
+      $$RunsTableOrderingComposer,
+      $$RunsTableAnnotationComposer,
+      $$RunsTableCreateCompanionBuilder,
+      $$RunsTableUpdateCompanionBuilder,
+      (Run, $$RunsTableReferences),
+      Run,
+      PrefetchHooks Function({bool sessionId, bool runPointsRefs})
+    >;
+typedef $$RunPointsTableCreateCompanionBuilder = RunPointsCompanion Function({
+  Value<int> id,
+  required int runId,
+  required int seq,
+  required int tMs,
+  required double lat,
+  required double lng,
+  Value<double?> accuracyM,
+  Value<double?> altitudeM,
+  Value<double?> speedMps,
+  Value<bool> segmentStart,
+});
+typedef $$RunPointsTableUpdateCompanionBuilder = RunPointsCompanion Function({
+  Value<int> id,
+  Value<int> runId,
+  Value<int> seq,
+  Value<int> tMs,
+  Value<double> lat,
+  Value<double> lng,
+  Value<double?> accuracyM,
+  Value<double?> altitudeM,
+  Value<double?> speedMps,
+  Value<bool> segmentStart,
+});
+
+final class $$RunPointsTableReferences
+    extends BaseReferences<_$AppDatabase, $RunPointsTable, RunPoint> {
+  $$RunPointsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $RunsTable _runIdTable(_$AppDatabase db) =>
+      db.runs.createAlias($_aliasNameGenerator(db.runPoints.runId, db.runs.id));
+
+  $$RunsTableProcessedTableManager get runId {
+    final $_column = $_itemColumn<int>('run_id')!;
+
+    final manager = $$RunsTableTableManager(
+      $_db,
+      $_db.runs,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_runIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$RunPointsTableFilterComposer
+    extends Composer<_$AppDatabase, $RunPointsTable> {
+  $$RunPointsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get seq => $composableBuilder(
+    column: $table.seq,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get tMs => $composableBuilder(
+    column: $table.tMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get lat => $composableBuilder(
+    column: $table.lat,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get lng => $composableBuilder(
+    column: $table.lng,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get accuracyM => $composableBuilder(
+    column: $table.accuracyM,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get altitudeM => $composableBuilder(
+    column: $table.altitudeM,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get speedMps => $composableBuilder(
+    column: $table.speedMps,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get segmentStart => $composableBuilder(
+    column: $table.segmentStart,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$RunsTableFilterComposer get runId {
+    final $$RunsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.runId,
+      referencedTable: $db.runs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunsTableFilterComposer(
+            $db: $db,
+            $table: $db.runs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RunPointsTableOrderingComposer
+    extends Composer<_$AppDatabase, $RunPointsTable> {
+  $$RunPointsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get seq => $composableBuilder(
+    column: $table.seq,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get tMs => $composableBuilder(
+    column: $table.tMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get lat => $composableBuilder(
+    column: $table.lat,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get lng => $composableBuilder(
+    column: $table.lng,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get accuracyM => $composableBuilder(
+    column: $table.accuracyM,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get altitudeM => $composableBuilder(
+    column: $table.altitudeM,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get speedMps => $composableBuilder(
+    column: $table.speedMps,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get segmentStart => $composableBuilder(
+    column: $table.segmentStart,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$RunsTableOrderingComposer get runId {
+    final $$RunsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.runId,
+      referencedTable: $db.runs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunsTableOrderingComposer(
+            $db: $db,
+            $table: $db.runs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RunPointsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RunPointsTable> {
+  $$RunPointsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get seq =>
+      $composableBuilder(column: $table.seq, builder: (column) => column);
+
+  GeneratedColumn<int> get tMs =>
+      $composableBuilder(column: $table.tMs, builder: (column) => column);
+
+  GeneratedColumn<double> get lat =>
+      $composableBuilder(column: $table.lat, builder: (column) => column);
+
+  GeneratedColumn<double> get lng =>
+      $composableBuilder(column: $table.lng, builder: (column) => column);
+
+  GeneratedColumn<double> get accuracyM =>
+      $composableBuilder(column: $table.accuracyM, builder: (column) => column);
+
+  GeneratedColumn<double> get altitudeM =>
+      $composableBuilder(column: $table.altitudeM, builder: (column) => column);
+
+  GeneratedColumn<double> get speedMps =>
+      $composableBuilder(column: $table.speedMps, builder: (column) => column);
+
+  GeneratedColumn<bool> get segmentStart => $composableBuilder(
+    column: $table.segmentStart,
+    builder: (column) => column,
+  );
+
+  $$RunsTableAnnotationComposer get runId {
+    final $$RunsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.runId,
+      referencedTable: $db.runs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RunsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.runs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RunPointsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RunPointsTable,
+          RunPoint,
+          $$RunPointsTableFilterComposer,
+          $$RunPointsTableOrderingComposer,
+          $$RunPointsTableAnnotationComposer,
+          $$RunPointsTableCreateCompanionBuilder,
+          $$RunPointsTableUpdateCompanionBuilder,
+          (RunPoint, $$RunPointsTableReferences),
+          RunPoint,
+          PrefetchHooks Function({bool runId})
+        > {
+  $$RunPointsTableTableManager(_$AppDatabase db, $RunPointsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RunPointsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RunPointsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RunPointsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> runId = const Value.absent(),
+                Value<int> seq = const Value.absent(),
+                Value<int> tMs = const Value.absent(),
+                Value<double> lat = const Value.absent(),
+                Value<double> lng = const Value.absent(),
+                Value<double?> accuracyM = const Value.absent(),
+                Value<double?> altitudeM = const Value.absent(),
+                Value<double?> speedMps = const Value.absent(),
+                Value<bool> segmentStart = const Value.absent(),
+              }) => RunPointsCompanion(
+                id: id,
+                runId: runId,
+                seq: seq,
+                tMs: tMs,
+                lat: lat,
+                lng: lng,
+                accuracyM: accuracyM,
+                altitudeM: altitudeM,
+                speedMps: speedMps,
+                segmentStart: segmentStart,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int runId,
+                required int seq,
+                required int tMs,
+                required double lat,
+                required double lng,
+                Value<double?> accuracyM = const Value.absent(),
+                Value<double?> altitudeM = const Value.absent(),
+                Value<double?> speedMps = const Value.absent(),
+                Value<bool> segmentStart = const Value.absent(),
+              }) => RunPointsCompanion.insert(
+                id: id,
+                runId: runId,
+                seq: seq,
+                tMs: tMs,
+                lat: lat,
+                lng: lng,
+                accuracyM: accuracyM,
+                altitudeM: altitudeM,
+                speedMps: speedMps,
+                segmentStart: segmentStart,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$RunPointsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({runId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (runId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.runId,
+                        referencedTable: $$RunPointsTableReferences._runIdTable(
+                          db,
+                        ),
+                        referencedColumn: $$RunPointsTableReferences
+                            ._runIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$RunPointsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RunPointsTable,
+      RunPoint,
+      $$RunPointsTableFilterComposer,
+      $$RunPointsTableOrderingComposer,
+      $$RunPointsTableAnnotationComposer,
+      $$RunPointsTableCreateCompanionBuilder,
+      $$RunPointsTableUpdateCompanionBuilder,
+      (RunPoint, $$RunPointsTableReferences),
+      RunPoint,
+      PrefetchHooks Function({bool runId})
+    >;
+typedef $$MealLogsTableCreateCompanionBuilder = MealLogsCompanion Function({
+  required DateTime loggedOn,
+  required String slotId,
+  required String templateId,
+  required MealStatus status,
+  Value<double> portion,
+  Value<int> kcal,
+  Value<double> proteinG,
+  Value<double> fatG,
+  Value<double> carbsG,
+  Value<int?> loggedAtMs,
+  Value<String?> note,
+  Value<int> rowid,
+});
+typedef $$MealLogsTableUpdateCompanionBuilder = MealLogsCompanion Function({
+  Value<DateTime> loggedOn,
+  Value<String> slotId,
+  Value<String> templateId,
+  Value<MealStatus> status,
+  Value<double> portion,
+  Value<int> kcal,
+  Value<double> proteinG,
+  Value<double> fatG,
+  Value<double> carbsG,
+  Value<int?> loggedAtMs,
+  Value<String?> note,
+  Value<int> rowid,
+});
+
+class $$MealLogsTableFilterComposer
+    extends Composer<_$AppDatabase, $MealLogsTable> {
+  $$MealLogsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get loggedOn => $composableBuilder(
+    column: $table.loggedOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get slotId => $composableBuilder(
+    column: $table.slotId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<MealStatus, MealStatus, String> get status =>
+      $composableBuilder(
+        column: $table.status,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<double> get portion => $composableBuilder(
+    column: $table.portion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get kcal => $composableBuilder(
+    column: $table.kcal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get proteinG => $composableBuilder(
+    column: $table.proteinG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get fatG => $composableBuilder(
+    column: $table.fatG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get carbsG => $composableBuilder(
+    column: $table.carbsG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get loggedAtMs => $composableBuilder(
+    column: $table.loggedAtMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MealLogsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MealLogsTable> {
+  $$MealLogsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get loggedOn => $composableBuilder(
+    column: $table.loggedOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get slotId => $composableBuilder(
+    column: $table.slotId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get portion => $composableBuilder(
+    column: $table.portion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get kcal => $composableBuilder(
+    column: $table.kcal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get proteinG => $composableBuilder(
+    column: $table.proteinG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get fatG => $composableBuilder(
+    column: $table.fatG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get carbsG => $composableBuilder(
+    column: $table.carbsG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get loggedAtMs => $composableBuilder(
+    column: $table.loggedAtMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MealLogsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MealLogsTable> {
+  $$MealLogsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get loggedOn =>
+      $composableBuilder(column: $table.loggedOn, builder: (column) => column);
+
+  GeneratedColumn<String> get slotId =>
+      $composableBuilder(column: $table.slotId, builder: (column) => column);
+
+  GeneratedColumn<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<MealStatus, String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<double> get portion =>
+      $composableBuilder(column: $table.portion, builder: (column) => column);
+
+  GeneratedColumn<int> get kcal =>
+      $composableBuilder(column: $table.kcal, builder: (column) => column);
+
+  GeneratedColumn<double> get proteinG =>
+      $composableBuilder(column: $table.proteinG, builder: (column) => column);
+
+  GeneratedColumn<double> get fatG =>
+      $composableBuilder(column: $table.fatG, builder: (column) => column);
+
+  GeneratedColumn<double> get carbsG =>
+      $composableBuilder(column: $table.carbsG, builder: (column) => column);
+
+  GeneratedColumn<int> get loggedAtMs => $composableBuilder(
+    column: $table.loggedAtMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+}
+
+class $$MealLogsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MealLogsTable,
+          MealLog,
+          $$MealLogsTableFilterComposer,
+          $$MealLogsTableOrderingComposer,
+          $$MealLogsTableAnnotationComposer,
+          $$MealLogsTableCreateCompanionBuilder,
+          $$MealLogsTableUpdateCompanionBuilder,
+          (MealLog, BaseReferences<_$AppDatabase, $MealLogsTable, MealLog>),
+          MealLog,
+          PrefetchHooks Function()
+        > {
+  $$MealLogsTableTableManager(_$AppDatabase db, $MealLogsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MealLogsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MealLogsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MealLogsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> loggedOn = const Value.absent(),
+                Value<String> slotId = const Value.absent(),
+                Value<String> templateId = const Value.absent(),
+                Value<MealStatus> status = const Value.absent(),
+                Value<double> portion = const Value.absent(),
+                Value<int> kcal = const Value.absent(),
+                Value<double> proteinG = const Value.absent(),
+                Value<double> fatG = const Value.absent(),
+                Value<double> carbsG = const Value.absent(),
+                Value<int?> loggedAtMs = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MealLogsCompanion(
+                loggedOn: loggedOn,
+                slotId: slotId,
+                templateId: templateId,
+                status: status,
+                portion: portion,
+                kcal: kcal,
+                proteinG: proteinG,
+                fatG: fatG,
+                carbsG: carbsG,
+                loggedAtMs: loggedAtMs,
+                note: note,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required DateTime loggedOn,
+                required String slotId,
+                required String templateId,
+                required MealStatus status,
+                Value<double> portion = const Value.absent(),
+                Value<int> kcal = const Value.absent(),
+                Value<double> proteinG = const Value.absent(),
+                Value<double> fatG = const Value.absent(),
+                Value<double> carbsG = const Value.absent(),
+                Value<int?> loggedAtMs = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MealLogsCompanion.insert(
+                loggedOn: loggedOn,
+                slotId: slotId,
+                templateId: templateId,
+                status: status,
+                portion: portion,
+                kcal: kcal,
+                proteinG: proteinG,
+                fatG: fatG,
+                carbsG: carbsG,
+                loggedAtMs: loggedAtMs,
+                note: note,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MealLogsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MealLogsTable,
+      MealLog,
+      $$MealLogsTableFilterComposer,
+      $$MealLogsTableOrderingComposer,
+      $$MealLogsTableAnnotationComposer,
+      $$MealLogsTableCreateCompanionBuilder,
+      $$MealLogsTableUpdateCompanionBuilder,
+      (MealLog, BaseReferences<_$AppDatabase, $MealLogsTable, MealLog>),
+      MealLog,
+      PrefetchHooks Function()
+    >;
+typedef $$WaterLogsTableCreateCompanionBuilder = WaterLogsCompanion Function({
+  required DateTime loggedOn,
+  Value<int> ml,
+  Value<int> rowid,
+});
+typedef $$WaterLogsTableUpdateCompanionBuilder = WaterLogsCompanion Function({
+  Value<DateTime> loggedOn,
+  Value<int> ml,
+  Value<int> rowid,
+});
+
+class $$WaterLogsTableFilterComposer
+    extends Composer<_$AppDatabase, $WaterLogsTable> {
+  $$WaterLogsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get loggedOn => $composableBuilder(
+    column: $table.loggedOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ml => $composableBuilder(
+    column: $table.ml,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WaterLogsTableOrderingComposer
+    extends Composer<_$AppDatabase, $WaterLogsTable> {
+  $$WaterLogsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get loggedOn => $composableBuilder(
+    column: $table.loggedOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ml => $composableBuilder(
+    column: $table.ml,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WaterLogsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WaterLogsTable> {
+  $$WaterLogsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get loggedOn =>
+      $composableBuilder(column: $table.loggedOn, builder: (column) => column);
+
+  GeneratedColumn<int> get ml =>
+      $composableBuilder(column: $table.ml, builder: (column) => column);
+}
+
+class $$WaterLogsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $WaterLogsTable,
+          WaterLog,
+          $$WaterLogsTableFilterComposer,
+          $$WaterLogsTableOrderingComposer,
+          $$WaterLogsTableAnnotationComposer,
+          $$WaterLogsTableCreateCompanionBuilder,
+          $$WaterLogsTableUpdateCompanionBuilder,
+          (WaterLog, BaseReferences<_$AppDatabase, $WaterLogsTable, WaterLog>),
+          WaterLog,
+          PrefetchHooks Function()
+        > {
+  $$WaterLogsTableTableManager(_$AppDatabase db, $WaterLogsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WaterLogsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WaterLogsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WaterLogsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<DateTime> loggedOn = const Value.absent(),
+            Value<int> ml = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) => WaterLogsCompanion(loggedOn: loggedOn, ml: ml, rowid: rowid),
+          createCompanionCallback:
+              ({
+                required DateTime loggedOn,
+                Value<int> ml = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WaterLogsCompanion.insert(
+                loggedOn: loggedOn,
+                ml: ml,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WaterLogsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $WaterLogsTable,
+      WaterLog,
+      $$WaterLogsTableFilterComposer,
+      $$WaterLogsTableOrderingComposer,
+      $$WaterLogsTableAnnotationComposer,
+      $$WaterLogsTableCreateCompanionBuilder,
+      $$WaterLogsTableUpdateCompanionBuilder,
+      (WaterLog, BaseReferences<_$AppDatabase, $WaterLogsTable, WaterLog>),
+      WaterLog,
+      PrefetchHooks Function()
+    >;
+typedef $$SupplementLogsTableCreateCompanionBuilder =
+    SupplementLogsCompanion Function({
+      required DateTime loggedOn,
+      required String supplementId,
+      Value<int?> takenAtMs,
+      Value<int> rowid,
+    });
+typedef $$SupplementLogsTableUpdateCompanionBuilder =
+    SupplementLogsCompanion Function({
+      Value<DateTime> loggedOn,
+      Value<String> supplementId,
+      Value<int?> takenAtMs,
+      Value<int> rowid,
+    });
+
+class $$SupplementLogsTableFilterComposer
+    extends Composer<_$AppDatabase, $SupplementLogsTable> {
+  $$SupplementLogsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get loggedOn => $composableBuilder(
+    column: $table.loggedOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get supplementId => $composableBuilder(
+    column: $table.supplementId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get takenAtMs => $composableBuilder(
+    column: $table.takenAtMs,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SupplementLogsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SupplementLogsTable> {
+  $$SupplementLogsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get loggedOn => $composableBuilder(
+    column: $table.loggedOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get supplementId => $composableBuilder(
+    column: $table.supplementId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get takenAtMs => $composableBuilder(
+    column: $table.takenAtMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SupplementLogsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SupplementLogsTable> {
+  $$SupplementLogsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get loggedOn =>
+      $composableBuilder(column: $table.loggedOn, builder: (column) => column);
+
+  GeneratedColumn<String> get supplementId => $composableBuilder(
+    column: $table.supplementId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get takenAtMs =>
+      $composableBuilder(column: $table.takenAtMs, builder: (column) => column);
+}
+
+class $$SupplementLogsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SupplementLogsTable,
+          SupplementLog,
+          $$SupplementLogsTableFilterComposer,
+          $$SupplementLogsTableOrderingComposer,
+          $$SupplementLogsTableAnnotationComposer,
+          $$SupplementLogsTableCreateCompanionBuilder,
+          $$SupplementLogsTableUpdateCompanionBuilder,
+          (
+            SupplementLog,
+            BaseReferences<_$AppDatabase, $SupplementLogsTable, SupplementLog>,
+          ),
+          SupplementLog,
+          PrefetchHooks Function()
+        > {
+  $$SupplementLogsTableTableManager(
+    _$AppDatabase db,
+    $SupplementLogsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SupplementLogsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SupplementLogsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SupplementLogsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> loggedOn = const Value.absent(),
+                Value<String> supplementId = const Value.absent(),
+                Value<int?> takenAtMs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SupplementLogsCompanion(
+                loggedOn: loggedOn,
+                supplementId: supplementId,
+                takenAtMs: takenAtMs,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required DateTime loggedOn,
+                required String supplementId,
+                Value<int?> takenAtMs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SupplementLogsCompanion.insert(
+                loggedOn: loggedOn,
+                supplementId: supplementId,
+                takenAtMs: takenAtMs,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SupplementLogsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SupplementLogsTable,
+      SupplementLog,
+      $$SupplementLogsTableFilterComposer,
+      $$SupplementLogsTableOrderingComposer,
+      $$SupplementLogsTableAnnotationComposer,
+      $$SupplementLogsTableCreateCompanionBuilder,
+      $$SupplementLogsTableUpdateCompanionBuilder,
+      (
+        SupplementLog,
+        BaseReferences<_$AppDatabase, $SupplementLogsTable, SupplementLog>,
+      ),
+      SupplementLog,
+      PrefetchHooks Function()
+    >;
+typedef $$NutritionAdjustmentsTableCreateCompanionBuilder =
+    NutritionAdjustmentsCompanion Function({
+      Value<int> id,
+      required DateTime appliedOn,
+      Value<String?> moduleId,
+      required int kcalDelta,
+      required String reason,
+      Value<DateTime?> revertedOn,
+    });
+typedef $$NutritionAdjustmentsTableUpdateCompanionBuilder =
+    NutritionAdjustmentsCompanion Function({
+      Value<int> id,
+      Value<DateTime> appliedOn,
+      Value<String?> moduleId,
+      Value<int> kcalDelta,
+      Value<String> reason,
+      Value<DateTime?> revertedOn,
+    });
+
+class $$NutritionAdjustmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $NutritionAdjustmentsTable> {
+  $$NutritionAdjustmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get appliedOn => $composableBuilder(
+    column: $table.appliedOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get moduleId => $composableBuilder(
+    column: $table.moduleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get kcalDelta => $composableBuilder(
+    column: $table.kcalDelta,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get revertedOn => $composableBuilder(
+    column: $table.revertedOn,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NutritionAdjustmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $NutritionAdjustmentsTable> {
+  $$NutritionAdjustmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get appliedOn => $composableBuilder(
+    column: $table.appliedOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get moduleId => $composableBuilder(
+    column: $table.moduleId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get kcalDelta => $composableBuilder(
+    column: $table.kcalDelta,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get revertedOn => $composableBuilder(
+    column: $table.revertedOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NutritionAdjustmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NutritionAdjustmentsTable> {
+  $$NutritionAdjustmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get appliedOn =>
+      $composableBuilder(column: $table.appliedOn, builder: (column) => column);
+
+  GeneratedColumn<String> get moduleId =>
+      $composableBuilder(column: $table.moduleId, builder: (column) => column);
+
+  GeneratedColumn<int> get kcalDelta =>
+      $composableBuilder(column: $table.kcalDelta, builder: (column) => column);
+
+  GeneratedColumn<String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get revertedOn => $composableBuilder(
+    column: $table.revertedOn,
+    builder: (column) => column,
+  );
+}
+
+class $$NutritionAdjustmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $NutritionAdjustmentsTable,
+          NutritionAdjustment,
+          $$NutritionAdjustmentsTableFilterComposer,
+          $$NutritionAdjustmentsTableOrderingComposer,
+          $$NutritionAdjustmentsTableAnnotationComposer,
+          $$NutritionAdjustmentsTableCreateCompanionBuilder,
+          $$NutritionAdjustmentsTableUpdateCompanionBuilder,
+          (
+            NutritionAdjustment,
+            BaseReferences<
+              _$AppDatabase,
+              $NutritionAdjustmentsTable,
+              NutritionAdjustment
+            >,
+          ),
+          NutritionAdjustment,
+          PrefetchHooks Function()
+        > {
+  $$NutritionAdjustmentsTableTableManager(
+    _$AppDatabase db,
+    $NutritionAdjustmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NutritionAdjustmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NutritionAdjustmentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$NutritionAdjustmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> appliedOn = const Value.absent(),
+                Value<String?> moduleId = const Value.absent(),
+                Value<int> kcalDelta = const Value.absent(),
+                Value<String> reason = const Value.absent(),
+                Value<DateTime?> revertedOn = const Value.absent(),
+              }) => NutritionAdjustmentsCompanion(
+                id: id,
+                appliedOn: appliedOn,
+                moduleId: moduleId,
+                kcalDelta: kcalDelta,
+                reason: reason,
+                revertedOn: revertedOn,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required DateTime appliedOn,
+                Value<String?> moduleId = const Value.absent(),
+                required int kcalDelta,
+                required String reason,
+                Value<DateTime?> revertedOn = const Value.absent(),
+              }) => NutritionAdjustmentsCompanion.insert(
+                id: id,
+                appliedOn: appliedOn,
+                moduleId: moduleId,
+                kcalDelta: kcalDelta,
+                reason: reason,
+                revertedOn: revertedOn,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NutritionAdjustmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $NutritionAdjustmentsTable,
+      NutritionAdjustment,
+      $$NutritionAdjustmentsTableFilterComposer,
+      $$NutritionAdjustmentsTableOrderingComposer,
+      $$NutritionAdjustmentsTableAnnotationComposer,
+      $$NutritionAdjustmentsTableCreateCompanionBuilder,
+      $$NutritionAdjustmentsTableUpdateCompanionBuilder,
+      (
+        NutritionAdjustment,
+        BaseReferences<
+          _$AppDatabase,
+          $NutritionAdjustmentsTable,
+          NutritionAdjustment
+        >,
+      ),
+      NutritionAdjustment,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -9430,4 +14783,15 @@ class $AppDatabaseManager {
       $$MeasurementsTableTableManager(_db, _db.measurements);
   $$FormClipsTableTableManager get formClips =>
       $$FormClipsTableTableManager(_db, _db.formClips);
+  $$RunsTableTableManager get runs => $$RunsTableTableManager(_db, _db.runs);
+  $$RunPointsTableTableManager get runPoints =>
+      $$RunPointsTableTableManager(_db, _db.runPoints);
+  $$MealLogsTableTableManager get mealLogs =>
+      $$MealLogsTableTableManager(_db, _db.mealLogs);
+  $$WaterLogsTableTableManager get waterLogs =>
+      $$WaterLogsTableTableManager(_db, _db.waterLogs);
+  $$SupplementLogsTableTableManager get supplementLogs =>
+      $$SupplementLogsTableTableManager(_db, _db.supplementLogs);
+  $$NutritionAdjustmentsTableTableManager get nutritionAdjustments =>
+      $$NutritionAdjustmentsTableTableManager(_db, _db.nutritionAdjustments);
 }

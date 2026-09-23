@@ -120,7 +120,7 @@ class _DayBody extends StatelessWidget {
         if (day.isTrainingDay) ...[
           Gap.l,
           FilledButton.icon(
-            onPressed: () => context.go('/run/$weekNo/${day.id}'),
+            onPressed: () => context.push('/run/$weekNo/${day.id}'),
             icon: const Icon(Icons.play_arrow_rounded),
             label: const Text('Start session'),
           ),

@@ -138,7 +138,7 @@ class _DaySheet extends ConsumerWidget {
                     primary: true,
                     onTap: () {
                       Navigator.pop(context);
-                      context.go('/run/$week/${day.id}');
+                      context.push('/run/$week/${day.id}');
                     },
                   )
                 else if (record?.status == RecordStatus.inProgress)
@@ -148,7 +148,7 @@ class _DaySheet extends ConsumerWidget {
                     primary: true,
                     onTap: () {
                       Navigator.pop(context);
-                      context.go('/run/$week/${day.id}');
+                      context.push('/run/$week/${day.id}');
                     },
                   )
                 else if (isPast && record == null) ...[
@@ -158,7 +158,7 @@ class _DaySheet extends ConsumerWidget {
                     primary: true,
                     onTap: () {
                       Navigator.pop(context);
-                      context.go(
+                      context.push(
                         '/run/$week/${day.id}'
                         '?date=${_iso(entry.date)}',
                       );
@@ -188,7 +188,7 @@ class _DaySheet extends ConsumerWidget {
                     label: 'Correct it',
                     onTap: () {
                       Navigator.pop(context);
-                      context.go(
+                      context.push(
                         '/run/$week/${day.id}?date=${_iso(entry.date)}',
                       );
                     },
@@ -200,7 +200,7 @@ class _DaySheet extends ConsumerWidget {
                     label: 'Preview the session',
                     onTap: () {
                       Navigator.pop(context);
-                      context.go('/week/$week/day/${day.id}');
+                      context.push('/week/$week/day/${day.id}');
                     },
                   ),
                 ],

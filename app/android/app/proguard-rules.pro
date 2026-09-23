@@ -73,6 +73,15 @@
 -keep class androidx.biometric.** { *; }
 -dontwarn androidx.biometric.**
 
+# ---------------------------------------------------------------- GPS runs
+#
+# geolocator starts its foreground location service by class name from the
+# merged manifest. If R8 renames it, tracking dies the moment the screen goes
+# off — the one moment it exists for.
+-keep class com.baseflow.geolocator.** { *; }
+-dontwarn com.baseflow.geolocator.**
+-dontwarn com.google.android.gms.**
+
 # ---------------------------------------------------------------- Play Core
 #
 # Flutter's engine references the deferred-components API even when no

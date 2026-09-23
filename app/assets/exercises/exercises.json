@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "revision": 2,
-  "notes": "Exercise library for The Keller Twelve. 72 definitions carried from v1 plus four added for v2 (the wall cable and the step platform). media.still and media.youtubeUrl ship as null on purpose -- Phase 7 fills them. stillSearchTerm is a matching hint for free-exercise-db, NOT a verified slug.",
+  "notes": "Exercise library for The Keller Twelve. 72 definitions carried from v1 plus four added for v2 (the wall cable and the step platform). media.still and media.stillLicence are written by tools/match_stills.py and carried over by every regeneration; media.youtubeUrl is added by hand, never guessed. stillSearchTerm is a matching hint for free-exercise-db, NOT a verified slug.",
   "exercises": [
     {
       "id": "ab-wheel-knees",

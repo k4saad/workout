@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../../app/calendar_providers.dart';
 import '../../app/providers.dart';
 import '../../app/session_providers.dart';
 import '../../core/theme/app_theme.dart';
@@ -52,8 +53,9 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
   void initState() {
     super.initState();
     unawaited(_boot());
-    // The phone must not sleep between sets.
-    unawaited(WakelockPlus.enable());
+    // The phone must not sleep between sets. A phone that refuses is an
+    // inconvenience, never a reason for the session to fall over.
+    unawaited(WakelockPlus.enable().catchError((Object _) {}));
     _budgetTicker = Timer.periodic(
       const Duration(seconds: 30),
       (_) => _checkBudget(),
@@ -63,7 +65,7 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
   @override
   void dispose() {
     _budgetTicker?.cancel();
-    unawaited(WakelockPlus.disable());
+    unawaited(WakelockPlus.disable().catchError((Object _) {}));
     super.dispose();
   }
 
@@ -221,7 +223,14 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
     await ref.read(notificationServiceProvider).cancelRest();
     ref.invalidate(historyProvider);
     ref.invalidate(resumableSessionProvider);
-    if (mounted) context.go('/');
+    // The screen underneath (calendar, week, Today) is still alive and must
+    // not show the day as untrained — tapping it would offer to restart, and
+    // restarting un-finishes the session.
+    ref.invalidate(allRecordsProvider);
+    ref.invalidate(completedSessionCountProvider);
+    // Back to wherever the session was started from: Today, the week,
+    // the calendar. That tab's stack is intact underneath.
+    if (mounted) context.canPop() ? context.pop() : context.go('/');
   }
 
   Future<void> _logNiggle(String? exerciseId) async {
@@ -229,24 +238,28 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
     if (s == null) return;
     final site = await showModalBottomSheet<NiggleSite>(
       context: context,
-      backgroundColor: AppTheme.surface,
+      // Eight sites plus a title do not fit the default 9/16 cap on a small
+      // phone at large text; the list scrolls instead of cutting off.
+      isScrollControlled: true,
       builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'What hurts?',
-                style: Theme.of(context).textTheme.titleLarge,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'What hurts?',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
               ),
-            ),
-            for (final n in NiggleSite.values)
-              ListTile(
-                title: Text(_niggleLabel(n)),
-                onTap: () => Navigator.pop(context, n),
-              ),
-          ],
+              for (final n in NiggleSite.values)
+                ListTile(
+                  title: Text(_niggleLabel(n)),
+                  onTap: () => Navigator.pop(context, n),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -299,6 +312,50 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
     final library = bundle?.library;
     final item = s.focus;
 
+    // Back mid-set asks first. Leaving loses nothing — every set is already
+    // saved and Today offers to resume — but a stray swipe between heavy
+    // sets should not dump you out of the session.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final leave = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Leave the session?'),
+            content: const Text(
+              'Everything you have logged is saved. Today will offer to '
+              'resume exactly where you left off.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Keep going'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Leave'),
+              ),
+            ],
+          ),
+        );
+        if (leave == true && context.mounted) {
+          ref.invalidate(resumableSessionProvider);
+          ref.invalidate(allRecordsProvider);
+          context.canPop() ? context.pop() : context.go('/');
+        }
+      },
+      child: _body(context, s, bundle, library, item),
+    );
+  }
+
+  Widget _body(
+    BuildContext context,
+    RunnerState s,
+    ProgrammeBundle? bundle,
+    ExerciseLibrary? library,
+    RunnerItem? item,
+  ) {
     return Scaffold(
       appBar: AppBar(
         title: Text(s.day.title),

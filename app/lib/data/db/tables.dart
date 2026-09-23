@@ -233,3 +233,149 @@ class FormClips extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+// =========================================================== v3: GPS runs
+//
+// Location history is the most sensitive thing this app now holds — a trail
+// that starts at the front door is a home address. It lives here, in the
+// app-private database, and leaves the phone only inside a backup Saad makes
+// himself. Nothing uploads it; test/privacy_audit_test.dart keeps it that way.
+
+/// Where a GPS run is in its life.
+enum RunStatus { recording, paused, finished, discarded }
+
+/// One GPS-tracked run.
+///
+/// The link columns mirror `set_logs`: a run started from a programme day
+/// stores the day, week and prescription it belonged to, DENORMALISED, so the
+/// history survives the programme being edited. A free run leaves them null
+/// and still appears on the calendar through [runOn].
+///
+/// Times are epoch MILLISECONDS in plain integers. Drift stores a DateTime as
+/// whole seconds, which is too coarse for a pace.
+class Runs extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get sessionId => integer().nullable().references(
+    Sessions,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  IntColumn get weekNo => integer().nullable()();
+  TextColumn get dayId => text().nullable()();
+  TextColumn get prescriptionId => text().nullable()();
+  TextColumn get exerciseId => text().nullable()();
+
+  /// The set this run was logged as, when it came from the session runner.
+  IntColumn get setLogId => integer().nullable()();
+
+  /// Local midnight of the start: the calendar key.
+  DateTimeColumn get runOn => dateTime()();
+  IntColumn get startedAtMs => integer()();
+  IntColumn get endedAtMs => integer().nullable()();
+
+  /// Time actually moving: elapsed minus pauses.
+  IntColumn get movingMs => integer().withDefault(const Constant(0))();
+  RealColumn get distanceM => real().withDefault(const Constant(0))();
+  RealColumn get maxSpeedMps => real().nullable()();
+  RealColumn get elevGainM => real().nullable()();
+  RealColumn get startLat => real().nullable()();
+  RealColumn get startLng => real().nullable()();
+  RealColumn get endLat => real().nullable()();
+  RealColumn get endLng => real().nullable()();
+
+  /// 1-10 RPE, asked at the end.
+  IntColumn get effort => integer().nullable()();
+  TextColumn get status =>
+      textEnum<RunStatus>().withDefault(const Constant('recording'))();
+  TextColumn get note => text().nullable()();
+}
+
+/// One accepted GPS fix. A row per point, not a blob: the backup writes rows
+/// as JSON, and a Uint8List does not survive that round trip.
+class RunPoints extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get runId =>
+      integer().references(Runs, #id, onDelete: KeyAction.cascade)();
+  IntColumn get seq => integer()();
+  IntColumn get tMs => integer()();
+  RealColumn get lat => real()();
+  RealColumn get lng => real()();
+  RealColumn get accuracyM => real().nullable()();
+  RealColumn get altitudeM => real().nullable()();
+  RealColumn get speedMps => real().nullable()();
+
+  /// True on the first fix after a pause or an app restart: the trail is
+  /// drawn broken here and no distance is counted across the gap.
+  BoolColumn get segmentStart => boolean().withDefault(const Constant(false))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {runId, seq},
+  ];
+}
+
+// =========================================================== v3: Fuel
+//
+// Every row stores its own numbers, like `set_logs` stores its exercise id:
+// the meal plan will be retuned, and last month's log must still say what was
+// actually eaten.
+
+/// What happened to a planned meal.
+enum MealStatus { planned, eaten, partial, skipped }
+
+/// One meal slot on one date: which option was chosen and whether it was
+/// eaten. `planned` records a swap made before eating.
+class MealLogs extends Table {
+  DateTimeColumn get loggedOn => dateTime()();
+  TextColumn get slotId => text()();
+  TextColumn get templateId => text()();
+  TextColumn get status => textEnum<MealStatus>()();
+
+  /// 1.0 eaten, 0.5 half, 0 skipped. What the totals multiply by.
+  RealColumn get portion => real().withDefault(const Constant(1.0))();
+  IntColumn get kcal => integer().withDefault(const Constant(0))();
+  RealColumn get proteinG => real().withDefault(const Constant(0))();
+  RealColumn get fatG => real().withDefault(const Constant(0))();
+  RealColumn get carbsG => real().withDefault(const Constant(0))();
+  IntColumn get loggedAtMs => integer().nullable()();
+  TextColumn get note => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {loggedOn, slotId};
+}
+
+/// Water for one date, in ml.
+class WaterLogs extends Table {
+  DateTimeColumn get loggedOn => dateTime()();
+  IntColumn get ml => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column> get primaryKey => {loggedOn};
+}
+
+/// A supplement ticked off on one date.
+class SupplementLogs extends Table {
+  DateTimeColumn get loggedOn => dateTime()();
+  TextColumn get supplementId => text()();
+  IntColumn get takenAtMs => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {loggedOn, supplementId};
+}
+
+/// A calorie adjustment Saad APPLIED — the +250 when the scale stalls, the
+/// cut when the waist runs ahead.
+///
+/// v2 recomputed the bump on every read and stored nothing, so the moment it
+/// worked (weight rising again) the target silently fell back. An applied
+/// adjustment stays applied until it is reverted.
+class NutritionAdjustments extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get appliedOn => dateTime()();
+
+  /// The booster or module from the Fuel plan, when one was chosen.
+  TextColumn get moduleId => text().nullable()();
+  IntColumn get kcalDelta => integer()();
+  TextColumn get reason => text()();
+  DateTimeColumn get revertedOn => dateTime().nullable()();
+}

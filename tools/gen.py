@@ -8,8 +8,18 @@ This is the file that stops v1's 19-unloadable-weights bug from recurring.
 """
 import json, math, itertools, os, io
 
-OUT = r"C:\Users\Saad\OneDrive\Desktop\workout\data"
+# Relative to this file, never absolute: an absolute path here once wrote a
+# git worktree's regenerated data straight into the MAIN checkout.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(ROOT, "data")
 V1 = os.path.join(OUT, "v1-reference")
+# The app bundles byte-identical copies. Writing both here is what keeps them
+# identical; a hand copy is how they drift.
+ASSETS = {
+    "keller-twelve.json": os.path.join(ROOT, "app", "assets", "programmes"),
+    "inventory.json": os.path.join(ROOT, "app", "assets", "programmes"),
+    "exercises.json": os.path.join(ROOT, "app", "assets", "exercises"),
+}
 
 # ----------------------------------------------------------------------------
 # Inventory — PLACEHOLDER. Weigh yours (docs/04-calibration.md) and regenerate.
@@ -945,6 +955,29 @@ NEW = [
 byid = {e["id"]: e for e in exdoc["exercises"]}
 for e in NEW:
     byid[e["id"]] = e
+# Media is NOT generated. tools/match_stills.py writes media.still and
+# media.stillLicence after this script runs, and demo links are added by hand,
+# so a regeneration must carry them over from the current file. Before this, every
+# run of gen.py silently nulled all 26 licensed stills.
+#
+# Falls back to the bundled copy, and refuses to run with neither: regenerating
+# from nothing would drop every still with every gate green. V14 in
+# validate.py catches it if it ever happens anyway.
+_current = os.path.join(OUT, "exercises.json")
+if not os.path.exists(_current):
+    _current = os.path.join(ASSETS["exercises.json"], "exercises.json")
+if not os.path.exists(_current):
+    raise SystemExit(
+        "gen.py: neither data/exercises.json nor the app asset copy exists. "
+        "Restore one from git before regenerating; the media fields live there.")
+with io.open(_current, encoding="utf-8") as fh:
+    _kept = {e["id"]: e.get("media", {}) for e in json.load(fh)["exercises"]}
+for eid, media in _kept.items():
+    if eid in byid:
+        for k in ("still", "stillLicence", "youtubeUrl", "youtubeStartSec"):
+            if media.get(k) is not None:
+                byid[eid]["media"][k] = media[k]
+
 # normalise: make sure every exercise carries the optional v2 fields
 for e in byid.values():
     e.setdefault("equipmentNote", None)
@@ -955,7 +988,8 @@ EXERCISES = {
     "schemaVersion": 2, "revision": 2,
     "notes": ("Exercise library for The Keller Twelve. 72 definitions carried from v1 plus four "
               "added for v2 (the wall cable and the step platform). media.still and "
-              "media.youtubeUrl ship as null on purpose -- Phase 7 fills them. stillSearchTerm is "
+              "media.stillLicence are written by tools/match_stills.py and carried over by every "
+              "regeneration; media.youtubeUrl is added by hand, never guessed. stillSearchTerm is "
               "a matching hint for free-exercise-db, NOT a verified slug."),
     "exercises": sorted(byid.values(), key=lambda e: e["id"]),
 }
@@ -965,9 +999,11 @@ EXERCISES = {
 # ============================================================================
 def dump(obj, name):
     path = os.path.join(OUT, name)
-    with io.open(path, "w", encoding="utf-8", newline="\n") as fh:
-        json.dump(obj, fh, indent=2, ensure_ascii=False)
-        fh.write("\n")
+    for target in [OUT] + ([ASSETS[name]] if name in ASSETS else []):
+        with io.open(os.path.join(target, name), "w", encoding="utf-8",
+                     newline="\n") as fh:
+            json.dump(obj, fh, indent=2, ensure_ascii=False)
+            fh.write("\n")
     return path, os.path.getsize(path)
 
 
@@ -976,6 +1012,27 @@ for obj, name in [(PROGRAMME, "keller-twelve.json"),
                   (INVENTORY, "inventory.json")]:
     p, n = dump(obj, name)
     print(f"wrote {name:24s} {n:>8,} bytes")
+
+# Content authored in data/ and bundled by the app as-is. gen.py does not
+# build these; it only mirrors them, so the bundled copy can never drift from
+# the reviewed one. test/data/asset_mirror_test.dart fails if it does.
+MIRRORED = {
+    "schema.json": os.path.join(ROOT, "app", "assets", "programmes"),
+    "quotes.json": os.path.join(ROOT, "app", "assets", "content"),
+    "fuel.json": os.path.join(ROOT, "app", "assets", "nutrition"),
+    "motions.json": os.path.join(ROOT, "app", "assets", "exercises"),
+}
+for name, target in MIRRORED.items():
+    src = os.path.join(OUT, name)
+    if not os.path.exists(src):
+        continue
+    with io.open(src, encoding="utf-8") as fh:
+        raw = fh.read()
+    json.loads(raw)  # a malformed file fails HERE, not on the phone
+    with io.open(os.path.join(target, name), "w", encoding="utf-8",
+                 newline="\n") as fh:
+        fh.write(raw)
+    print(f"mirrored {name:21s} {len(raw.encode('utf-8')):>8,} bytes")
 
 print("\nlattice steps:")
 for m in DIV:

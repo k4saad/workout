@@ -133,6 +133,71 @@ void main() {
     expect(weights.single.kg, 51.4);
   });
 
+  test('a GPS trail and a meal log survive export, wipe and restore', () async {
+    await seed();
+    final runId = await db
+        .into(db.runs)
+        .insert(
+          RunsCompanion.insert(
+            runOn: DateTime(2026, 11, 8),
+            startedAtMs: 1793950000123,
+            endedAtMs: const Value(1793951800456),
+            movingMs: const Value(1740000),
+            distanceM: const Value(4215.7),
+            status: const Value(RunStatus.finished),
+          ),
+        );
+    for (var i = 0; i < 3; i++) {
+      await db
+          .into(db.runPoints)
+          .insert(
+            RunPointsCompanion.insert(
+              runId: runId,
+              seq: i,
+              tMs: 1793950000123 + i * 1000,
+              lat: 51.9607123 + i * 0.0001,
+              lng: 7.6261456,
+              segmentStart: Value(i == 0),
+            ),
+          );
+    }
+    await db
+        .into(db.mealLogs)
+        .insert(
+          MealLogsCompanion.insert(
+            loggedOn: DateTime(2026, 11, 8),
+            slotId: 'post',
+            templateId: 'n1',
+            status: MealStatus.partial,
+            portion: const Value(0.5),
+            kcal: const Value(213),
+            proteinG: const Value(8.8),
+          ),
+        );
+
+    final zip = File(p.join(docs.path, 'backup.zip'));
+    await backup.export(zip);
+    await db.wipe();
+    expect(await db.select(db.runPoints).get(), isEmpty);
+    await backup.restore(zip);
+
+    final run = (await db.select(db.runs).get()).single;
+    expect(run.startedAtMs, 1793950000123);
+    expect(run.distanceM, closeTo(4215.7, 1e-9));
+    expect(run.status, RunStatus.finished);
+    final pts = await (db.select(
+      db.runPoints,
+    )..orderBy([(t) => OrderingTerm.asc(t.seq)])).get();
+    expect(pts, hasLength(3));
+    expect(pts.first.lat, closeTo(51.9607123, 1e-9));
+    expect(pts.first.segmentStart, isTrue);
+    expect(pts.last.tMs, 1793950002123);
+    final meal = (await db.select(db.mealLogs).get()).single;
+    expect(meal.status, MealStatus.partial);
+    expect(meal.portion, 0.5);
+    expect(meal.proteinG, closeTo(8.8, 1e-9));
+  });
+
   test('restore puts the programme file and the photos back', () async {
     await seed();
     final zip = File(p.join(docs.path, 'backup.zip'));

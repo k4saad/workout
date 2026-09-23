@@ -168,7 +168,9 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
         });
         await _loadGhost();
       } else {
-        if (mounted) context.go('/body/progress');
+        if (mounted) {
+          context.canPop() ? context.pop() : context.go('/progress/photos');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -207,9 +209,11 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                'You can still shoot with the normal camera app and import '
-                'later — but the ghost overlay is what keeps the angles '
-                'consistent, so it is worth sorting out.',
+                'Check that the app is allowed to use the camera '
+                '(Android Settings → Apps → Keller Twelve → Permissions), '
+                'then come back. Do not use the phone\'s camera app instead: '
+                'those photos land in the gallery, and from there in Google '
+                'Photos.',
                 textAlign: TextAlign.center,
                 style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
               ),
@@ -226,6 +230,50 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
 
     final pose = _poses[_poseIndex];
 
+    // Back mid-shoot asks first: a stray swipe while the phone is propped on
+    // the bench would otherwise abandon a half-finished shoot. The poses
+    // already taken are kept either way.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final leave = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Stop the shoot?'),
+            content: Text(
+              _poseIndex == 0
+                  ? 'No photos taken yet.'
+                  : '$_poseIndex of ${_poses.length} poses are saved and '
+                        'stay saved.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Keep shooting'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Stop'),
+              ),
+            ],
+          ),
+        );
+        if (leave == true && context.mounted) {
+          _timer?.cancel();
+          context.canPop() ? context.pop() : context.go('/progress/photos');
+        }
+      },
+      child: _viewfinder(context, t, camera, pose),
+    );
+  }
+
+  Widget _viewfinder(
+    BuildContext context,
+    TextTheme t,
+    CameraController camera,
+    PhotoPose pose,
+  ) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(

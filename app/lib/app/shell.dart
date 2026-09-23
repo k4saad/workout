@@ -27,20 +27,24 @@ class AppShell extends StatelessWidget {
         (label: 'Today', icon: Icons.today_outlined, active: Icons.today),
         (
           label: 'Week',
-          icon: Icons.view_week_outlined,
-          active: Icons.view_week,
+          icon: Icons.calendar_view_week_outlined,
+          active: Icons.calendar_view_week,
         ),
         (
-          label: 'Numbers',
+          label: 'Fuel',
+          icon: Icons.restaurant_outlined,
+          active: Icons.restaurant,
+        ),
+        (
+          label: 'Progress',
           icon: Icons.insights_outlined,
           active: Icons.insights,
         ),
         (
-          label: 'Body',
-          icon: Icons.accessibility_new_outlined,
-          active: Icons.accessibility_new,
+          label: 'More',
+          icon: Icons.grid_view_outlined,
+          active: Icons.grid_view,
         ),
-        (label: 'More', icon: Icons.menu, active: Icons.menu_open),
       ];
 
   @override
@@ -64,14 +68,16 @@ class AppShell extends StatelessWidget {
         body: shell,
         bottomNavigationBar: DecoratedBox(
           decoration: const BoxDecoration(
-            border: Border(top: BorderSide(color: AppTheme.outline)),
+            border: Border(top: BorderSide(color: AppTheme.outlineSoft)),
           ),
           child: NavigationBar(
             selectedIndex: shell.currentIndex,
             // Tapping the tab you are already on pops that tab back to its
             // root — the standard "take me back to the top" gesture.
-            onDestinationSelected: (i) =>
-                shell.goBranch(i, initialLocation: i == shell.currentIndex),
+            onDestinationSelected: (i) {
+              HapticFeedback.selectionClick();
+              shell.goBranch(i, initialLocation: i == shell.currentIndex);
+            },
             destinations: [
               for (final d in destinations)
                 NavigationDestination(
@@ -91,7 +97,6 @@ class AppShell extends StatelessWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surface,
         title: const Text('Close the app?'),
         content: const Text(
           'Nothing is lost — every set is saved the moment you log it.',
@@ -110,4 +115,75 @@ class AppShell extends StatelessWidget {
     );
     return ok ?? false;
   }
+}
+
+/// Holds every tab's navigator alive and fades the incoming one in.
+///
+/// The structure around each child NEVER changes with the index — only the
+/// values fed to it — so switching tabs cannot rebuild a tab's navigator and
+/// lose its place. Inactive tabs are Offstage (and their tickers paused), so
+/// they cost nothing and finders in tests do not see them.
+class FadeBranchContainer extends StatefulWidget {
+  const FadeBranchContainer({
+    super.key,
+    required this.currentIndex,
+    required this.children,
+  });
+
+  final int currentIndex;
+  final List<Widget> children;
+
+  @override
+  State<FadeBranchContainer> createState() => _FadeBranchContainerState();
+}
+
+class _FadeBranchContainerState extends State<FadeBranchContainer>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: AppMotion.medium,
+    value: 1,
+  );
+  late final Animation<double> _fade = CurvedAnimation(
+    parent: _c,
+    curve: AppMotion.curve,
+  );
+
+  @override
+  void didUpdateWidget(FadeBranchContainer old) {
+    super.didUpdateWidget(old);
+    if (old.currentIndex != widget.currentIndex) {
+      if (AppMotion.reduced(context)) {
+        _c.value = 1;
+      } else {
+        _c.forward(from: 0);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Stack(
+    fit: StackFit.expand,
+    children: [
+      for (var i = 0; i < widget.children.length; i++)
+        Offstage(
+          offstage: i != widget.currentIndex,
+          child: TickerMode(
+            enabled: i == widget.currentIndex,
+            child: FadeTransition(
+              opacity: i == widget.currentIndex
+                  ? _fade
+                  : kAlwaysCompleteAnimation,
+              child: widget.children[i],
+            ),
+          ),
+        ),
+    ],
+  );
 }

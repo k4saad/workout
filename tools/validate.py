@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Validation gates V1-V13 from docs/02-data-model.md, section 1.6.
+"""Validation gates V1-V13 from docs/02-data-model.md, section 1.6, plus V14+
+added in v3 (docs/06-v3-plan.md).
 
 These are the same assertions Phase 1 ports to `flutter test`. Run this after any
 edit to data/*.json, and after any change to tools/gen.py.
@@ -209,6 +210,26 @@ for b in OWN:
         fail("V13", f"{b['id']}: declares defaultRir={b['defaultRir']} but every prescription "
                     f"overrides it — the field is dead, and the deload will not soften anything")
 
+# ============================== V14 every licensed still is wired in =========
+# gen.py once reset all 26 stills to null on every run, with every gate green.
+# The images shipped with nothing pointing at them. Now losing one fails here.
+IMG = os.path.join(ROOT, "app", "assets", "exercises", "img")
+_files = {f for f in os.listdir(IMG)} if os.path.isdir(IMG) else set()
+_referenced = collections.Counter()
+for e in exdoc["exercises"]:
+    still = e.get("media", {}).get("still")
+    if still is None:
+        continue
+    name = still.rsplit("/", 1)[-1]
+    _referenced[name] += 1
+    if name not in _files:
+        fail("V14", f"{e['id']}: media.still {still} does not exist")
+    if not e["media"].get("stillLicence"):
+        fail("V14", f"{e['id']}: has a still but no stillLicence")
+for f in sorted(_files - set(_referenced)):
+    fail("V14", f"img/{f} ships in the APK but no exercise points at it "
+                "(did a regeneration drop media.still?)")
+
 # ====================================================== V7 rep ranges ========
 for b in OWN:
     for d, s, p in all_prescriptions(b.get("days", [])):
@@ -397,5 +418,5 @@ if failures:
     for f in failures:
         print(f"  X {f}")
     sys.exit(1)
-print("ALL GATES PASSED (V1-V13)")
+print("ALL GATES PASSED (V1-V14)")
 sys.exit(0)

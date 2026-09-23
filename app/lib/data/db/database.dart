@@ -28,17 +28,33 @@ part 'database.g.dart';
     PhotoPoses,
     Measurements,
     FormClips,
+    // v3
+    Runs,
+    RunPoints,
+    MealLogs,
+    WaterLogs,
+    SupplementLogs,
+    NutritionAdjustments,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   /// In-memory instance for tests. No device, no files.
-  AppDatabase.memory() : super(NativeDatabase.memory());
+  ///
+  /// Streams close synchronously so a `.watch()` provider does not leave a
+  /// pending timer behind when a widget test ends.
+  AppDatabase.memory()
+    : super(
+        DatabaseConnection(
+          NativeDatabase.memory(),
+          closeStreamsSynchronously: true,
+        ),
+      );
 
   /// Bump this and add an `onUpgrade` branch. Never drop a column that holds
   /// logged sets.
-  static const currentSchema = 2;
+  static const currentSchema = 3;
 
   @override
   int get schemaVersion => currentSchema;
@@ -58,6 +74,20 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(photoPoses);
         await m.createTable(measurements);
         await m.createTable(formClips);
+      }
+      // v3: GPS runs and the Fuel plan. New TABLES only — createTable is
+      // CREATE TABLE IF NOT EXISTS, and ADD COLUMN has no such guard, so a
+      // v1 -> v3 upgrade would otherwise fail on a duplicate column.
+      //
+      // Until v3 ships, later work in the same release extends THIS branch
+      // rather than bumping again: one migration per release.
+      if (from < 3) {
+        await m.createTable(runs);
+        await m.createTable(runPoints);
+        await m.createTable(mealLogs);
+        await m.createTable(waterLogs);
+        await m.createTable(supplementLogs);
+        await m.createTable(nutritionAdjustments);
       }
     },
     beforeOpen: (details) async {

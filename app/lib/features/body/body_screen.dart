@@ -34,7 +34,7 @@ class BodyScreen extends ConsumerWidget {
           IconButton(
             tooltip: 'Progress photos',
             icon: const Icon(Icons.photo_library_outlined),
-            onPressed: () => context.go('/body/progress'),
+            onPressed: () => context.push('/progress/photos'),
           ),
         ],
       ),

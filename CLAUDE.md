@@ -1,9 +1,11 @@
 # CLAUDE.md — Keller Twelve
 
-Single-user offline Android training app. Flutter + Riverpod + Drift.
-One user, one programme, no backend, no accounts, no network.
+Single-user offline-first Android training app. Flutter + Riverpod + Drift.
+One user, one programme, no backend, no accounts, no network except
+OpenStreetMap tiles for the run map.
 
-**Plan:** `docs/03-build-plan.md`. Follow its phases; do not skip ahead.
+**Plan:** `docs/03-build-plan.md` (v1/v2, done) and `docs/06-v3-plan.md` (v3, current).
+Follow the phases in order; do not skip ahead.
 **Programme:** `docs/01-programme.md`. **Specs:** `docs/02-data-model.md`.
 **Why things are the way they are:** `docs/00-audit.md`.
 
@@ -25,11 +27,23 @@ One user, one programme, no backend, no accounts, no network.
   Change `tools/gen.py`, then run `python tools/gen.py && python tools/validate.py` and
   confirm all gates pass. Typing loads by hand is how v1 ended up with 19 unloadable
   starting weights.
+- **`data/` is the source; `app/assets/` is a copy.** gen.py writes both: the generated
+  programme files, plus a byte-for-byte mirror of the authored files
+  (`schema.json`, `quotes.json`, `fuel.json`, `motions.json`). `test/data/asset_mirror_test.dart` fails
+  if they drift. Never edit an asset copy by hand.
 - **A superset must not force a re-plate.** Members of the same `groupId` either share a
   load or pair a loaded movement with a bodyweight / cable / banded one. Otherwise the
   superset saves no time and the 60-minute ceiling breaks.
-- **No network calls** except `url_launcher` opening a YouTube link. No analytics, no
-  crash reporting, no cloud, no auth, ever.
+- **The network is for map tiles only.** INTERNET exists (approved by Saad, 2026-09-23)
+  so the run map can draw OpenStreetMap tiles from `tile.openstreetmap.org`. Apart from
+  that, the only outbound action is `url_launcher` opening a YouTube link. No analytics,
+  no crash reporting, no cloud, no auth, no uploads of anything, ever.
+  `test/privacy_audit_test.dart` allow-lists the hosts.
+- **Location is foreground-only.** FINE/COARSE plus FOREGROUND_SERVICE_LOCATION so a run
+  records with the screen off, started from a tap. Never ACCESS_BACKGROUND_LOCATION.
+  Only `lib/features/runs/`, `lib/data/run*` and `lib/app/run*` may import geolocator or
+  flutter_map. A GPS trail is a home address: it never leaves the phone except inside a
+  backup Saad makes himself.
 - **`set_logs` store their own `exercise_id`.** Never resolve history through the live
   programme JSON — exercises get swapped and history must survive.
 - **Never scrape or bundle copyrighted exercise images or GIFs.** Unlicense/CC sources
@@ -43,6 +57,8 @@ One user, one programme, no backend, no accounts, no network.
   a path the phone's gallery or Google Photos can see.
 - `android:allowBackup="false"` **and** `backup_rules.xml` excluding the photo directory.
 - No code path may upload, share or sync a photo. Export is manual and user-initiated.
+- Photo and media code (`lib/features/progress/`, `media_repository.dart`) never imports
+  a network or location package. With INTERNET granted, this is the guard that matters.
 - Deleting a photo or shoot deletes the **files**, not just the DB rows.
 - Never commit anything under `photos/` or `clips/`.
 
@@ -67,21 +83,34 @@ One user, one programme, no backend, no accounts, no network.
 
 ## Navigation and chrome
 
-- **Five tabs in a bottom `NavigationBar`**: Today · Week · Numbers · Body ·
+- **Five tabs in a bottom `NavigationBar`**: Today · Week · Fuel · Progress ·
   More. The top of a phone is the furthest point from the thumb of the hand
   holding it; anything reached between sets belongs at the bottom.
+  (v3: Fuel got a tab because meals are logged six times a day; the old Numbers
+  and Body tabs became one Progress hub: body, photos, lifts, runs.)
 - **Every tab owns its navigator** (`StatefulShellRoute.indexedStack`).
   Drill-downs navigate to a NESTED route so the stack builds and back walks up
   it. `context.go` to a sibling top-level route REPLACES the stack — that is
   what made back quit the app, and it must not come back.
-- The session runner and the photo capture screen are **outside the shell**,
-  full screen. Mid-set, a tab bar is four ways to lose your place.
+- The session runner, the photo capture screen and the live run tracker are
+  **outside the shell**, full screen. Mid-set, a tab bar is four ways to lose
+  your place. Enter them with `context.push`, leave with `pop`, and give each
+  a confirming `PopScope`. `context.go` to a root route replaces the shell and
+  makes back quit the app — that was a real v2 bug.
 - **No "home" arrow in an app bar.** The bottom bar is the way home.
 - **Palette: black, grey, crimson.** One accent, used sparingly, so crimson
   always means "this is the thing". Amber and green appear only as semantic
   states and always carry a glyph too.
 - The launch screen and the app icon background are both `AppTheme.bg`, so
   opening the app does not flash.
+- **Build screens from `lib/core/ui/`** (`AppCard`, `ToneBanner`, `StatTile`,
+  `RingProgress`, `Pressable`, `FadeSlideIn`, `Skeleton`, `EmptyState`,
+  `NavTile`, `showAppSheet`). Numbers use `AppTheme.numeric`. Every animation
+  respects `AppMotion.reduced(context)`. No bare `CircularProgressIndicator`
+  for a page load — use `SkeletonPage`.
+- **Look at it.** `flutter test --dart-define=SCREENSHOTS=true test/screens/`
+  renders every main screen to `app/build/screens/*.png` with real fonts. A UI
+  change is not done until its screenshot has been looked at.
 
 ## Device reality
 
@@ -95,6 +124,7 @@ carrier of meaning** — pair it with a glyph.
 - Anything that changes the training programme's meaning (sets, reps, progression rules,
   exercise selection)
 - Any new dependency
-- Anything that would add a permission to the manifest
+- Anything that would add a permission to the manifest (v3 added INTERNET, location and
+  foreground-service location with his approval; nothing else)
 
 **Do not ask me about:** naming, file layout, widget structure, test structure. Decide.

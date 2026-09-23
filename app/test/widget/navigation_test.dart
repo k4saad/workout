@@ -104,8 +104,8 @@ void main() {
 
     for (final (label, heading) in const [
       ('Week', 'Week'),
-      ('Numbers', 'Numbers'),
-      ('Body', 'Body'),
+      ('Fuel', 'Fuel'),
+      ('Progress', 'Progress'),
       ('More', 'More'),
     ]) {
       await tapTab(tester, label);
@@ -141,8 +141,8 @@ void main() {
 
   testWidgets('back from a tab root returns to Today', (tester) async {
     await pumpApp(tester);
-    await tapTab(tester, 'Numbers');
-    expect(find.widgetWithText(AppBar, 'Numbers'), findsOneWidget);
+    await tapTab(tester, 'Progress');
+    expect(find.widgetWithText(AppBar, 'Progress'), findsOneWidget);
 
     await pressBack(tester);
 
@@ -195,5 +195,58 @@ void main() {
 
     await tapTab(tester, 'More');
     expect(find.widgetWithText(AppBar, 'More'), findsOneWidget);
+  });
+
+  testWidgets('the Progress hub drills into Body, and back returns to it', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await tapTab(tester, 'Progress');
+    await tester.tap(find.text('BODY'));
+    await settle(tester);
+    expect(find.widgetWithText(AppBar, 'Body'), findsOneWidget);
+
+    await pressBack(tester);
+    expect(find.widgetWithText(AppBar, 'Progress'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsOneWidget);
+  });
+
+  testWidgets('back in the session runner asks, then returns to the tab', (
+    tester,
+  ) async {
+    // v2 entered the runner with context.go, which REPLACED the shell: back
+    // mid-session closed the app. It is pushed now, and asks first.
+    await pumpApp(tester);
+    router.push('/run/1/f-mon');
+    await settle(tester);
+    // Let the page transition finish before looking: mid-fade, the shell
+    // underneath is still on stage.
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.byType(NavigationBar), findsNothing);
+
+    await pressBack(tester);
+    expect(find.text('Leave the session?'), findsOneWidget);
+    await tester.tap(find.text('Leave'));
+    await settle(tester);
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'The Keller Twelve'), findsOneWidget);
+  });
+
+  testWidgets('photos opened from Body come back to Body', (tester) async {
+    await pumpApp(tester);
+    await tapTab(tester, 'Progress');
+    await tester.tap(find.text('BODY'));
+    await settle(tester);
+    await tester.pump(const Duration(seconds: 1));
+    await tester.tap(find.byTooltip('Progress photos'));
+    await settle(tester);
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.byType(NavigationBar), findsOneWidget);
+
+    await pressBack(tester);
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.widgetWithText(AppBar, 'Body'), findsOneWidget);
   });
 }

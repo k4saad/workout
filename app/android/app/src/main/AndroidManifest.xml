@@ -23,12 +23,32 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
     <!--
-      NO INTERNET PERMISSION. Not a mistake.
-      This app holds a year of training data and a gallery of shirtless photos.
-      It makes exactly one outbound call — url_launcher opening a YouTube demo
-      — and that hands off to the browser, which needs no permission here.
-      Adding android.permission.INTERNET is a decision to discuss, not a fix.
+      NETWORK: map tiles only (v3, approved by Saad on 2026-09-23).
+      The run tracker draws its trail over OpenStreetMap, and tiles come from
+      tile.openstreetmap.org. That is the ONLY host the app talks to. Nothing
+      is ever uploaded: not a set, not a weigh-in, not a photo, not a GPS
+      point. Requesting a tile does tell the tile server roughly which area is
+      on screen — that is the price of a street map, and it was accepted.
+      test/privacy_audit_test.dart enforces the "tiles only" part.
     -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!--
+      GPS run tracking. FINE for a usable trail (COARSE must be declared
+      alongside it on Android 12+). FOREGROUND_SERVICE_LOCATION lets the
+      tracker keep recording with the phone in a pocket and the screen off —
+      it runs as a visible "Run in progress" notification, started from a tap
+      in the app.
+
+      Deliberately NOT declared: ACCESS_BACKGROUND_LOCATION. A foreground
+      service started while the app is visible does not need it, and without
+      it the app cannot see location at any other time.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
 
     <application
         android:label="Keller Twelve"
@@ -36,7 +56,8 @@
         android:icon="@mipmap/ic_launcher"
         android:fullBackupContent="@xml/backup_rules"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:allowBackup="false">
+        android:allowBackup="false"
+        android:enableOnBackInvokedCallback="true">
         <!--
           allowBackup="false" is a HARD requirement, not a preference.
           Left at the default, Android silently uploads app-private storage —

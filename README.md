@@ -18,9 +18,9 @@ Five tabs along the bottom, where your thumb is:
 |---|---|
 | **Today** | What you are doing now, the resume banner, week progress, bodyweight trend. History sits behind the top-right icon. |
 | **Week** | The seven day cards, and the month calendar behind the top-right icon. |
-| **Numbers** | Sets per muscle, session length, plate gaps, niggles, every lift. |
-| **Body** | Weigh-ins, the trend, measurements. Progress photos behind the top-right icon. |
-| **More** | Exercise library, cardio timer, and Settings (bars and plates, the programme editor, backups, next cycle). |
+| **Fuel** | Today's meals, timed around the session, and what is left to eat. |
+| **Progress** | Body (weigh-ins, trend, measurements), progress photos, and every lift's numbers. |
+| **More** | Exercise library, cardio timer, and Settings (equipment, the programme editor, backups, next cycle). |
 
 Back walks up the tab you are in, then to Today, then asks before closing.
 Tapping the tab you are already on jumps back to the top of it.
@@ -32,7 +32,7 @@ Tapping the tab you are already on jumps back to the top of it.
 | Flutter | 3.47.5 · stable · Dart 3.13.4 |
 | JDK running Gradle | Temurin 17.0.20.1, via `flutter config --jdk-dir` (system default java is 25) |
 | minSdk / target | 24 / Flutter default |
-| App version | 0.11.0+11 |
+| App version | 0.12.0+12 |
 
 Known deviations from the build plan are listed at the end of
 [docs/03-build-plan.md](docs/03-build-plan.md).
@@ -46,6 +46,7 @@ Known deviations from the build plan are listed at the end of
 | 2 | [docs/02-data-model.md](docs/02-data-model.md) | Schema v2, the five algorithms, and the specs that must be test-first. |
 | 3 | [docs/03-build-plan.md](docs/03-build-plan.md) | 11 phases, sub-phases, tasks, acceptance criteria, paste-ready prompts. |
 | 4 | [docs/04-calibration.md](docs/04-calibration.md) | The week-1 measurements the whole app depends on. **Do this before Phase 1.** |
+| 6 | [docs/06-v3-plan.md](docs/06-v3-plan.md) | v3, phase by phase: Fuel, GPS runs, animated demos, calendar, photos, the coach's fixes. |
 | — | [CLAUDE.md](CLAUDE.md) | Standing rules for Claude Code. Loaded automatically. |
 
 ## The data
@@ -94,8 +95,9 @@ balance        both upper days 10 push / 10 pull
 
 1. **The programme is data.** Sets, reps, loads, day structure and cues live in JSON.
    Hardcoding `4 × 6–8 bench press` in a widget is a bug even if it renders correctly.
-2. **Nothing leaves the device.** No accounts, no sync, no analytics. One outbound call:
-   `url_launcher` opening a YouTube demo, and even that is optional.
+2. **Nothing leaves the device.** No accounts, no sync, no analytics, no uploads. The
+   run map fetches OpenStreetMap tiles (the only host the app talks to), and
+   `url_launcher` can open a YouTube demo. Your data never goes anywhere.
 3. **A phase is done when the APK is on the phone**, not when the code compiles.
 
 ## Status
@@ -248,12 +250,17 @@ behind it.
 ## Your data, and where it lives
 
 **Everything is on the phone.** There is no account, no server and no sync.
-The app has no `INTERNET` permission at all — `test/privacy_audit_test.dart`
-fails the build if one appears.
+Since v3 the app holds `INTERNET` for one reason: the run map draws
+OpenStreetMap tiles from `tile.openstreetmap.org`. Nothing is ever sent —
+`test/privacy_audit_test.dart` allow-lists that host, forbids background
+location, and stops the photo code from even importing a network package.
+Requesting tiles does tell the tile server roughly which area the map is
+showing; that is the price of a street map.
 
 | What | Where | Leaves the device when |
 |---|---|---|
-| Sessions, sets, weigh-ins, measurements | app-private SQLite | you export a backup |
+| Sessions, sets, weigh-ins, measurements, meals | app-private SQLite | you export a backup |
+| GPS runs (the trail, point by point) | app-private SQLite | you export a backup |
 | Progress photos and form clips | app-private files, excluded from Android's cloud backup | you export a backup and choose where it goes |
 | The programme | `programme.json` in app-private storage | you export it |
 

@@ -85,4 +85,59 @@ void main() {
       expect(reloaded.backupIsStale(now), isFalse);
     });
   });
+
+  group('who the app is talking to', () {
+    test('it greets Saad out of the box', () {
+      expect(const Preferences().athleteName, 'Saad');
+      expect(const Preferences().launchQuote, isTrue);
+      expect(const Preferences().recentQuoteIds, isEmpty);
+    });
+
+    test(
+      'a v2 preferences file with none of the new keys still loads',
+      () async {
+        File('${tmp.path}/${PreferencesService.fileName}').writeAsStringSync(
+          '{"eveningReminder": true, "reminderHour": 19, "reminderMinute": 0}',
+        );
+        final p = await PreferencesService(documentsDir: tmp).load();
+        expect(p.eveningReminder, isTrue);
+        expect(p.reminderHour, 19);
+        expect(p.athleteName, 'Saad');
+        expect(p.launchQuote, isTrue);
+        expect(p.recentQuoteIds, isEmpty);
+      },
+    );
+
+    test('a blank name falls back rather than greeting nobody', () {
+      final p = Preferences.fromJson({'athleteName': '   '});
+      expect(p.athleteName, 'Saad');
+    });
+
+    test('name, switch and quote history round-trip', () async {
+      await PreferencesService(documentsDir: tmp).save(
+        const Preferences(
+          athleteName: 'Saad K.',
+          launchQuote: false,
+          recentQuoteIds: ['q2', 'q1'],
+        ),
+      );
+      final p = await PreferencesService(documentsDir: tmp).load();
+      expect(p.athleteName, 'Saad K.');
+      expect(p.launchQuote, isFalse);
+      expect(p.recentQuoteIds, ['q2', 'q1']);
+    });
+
+    test('a shown quote goes to the front, once, and history is capped', () {
+      var p = const Preferences(recentQuoteIds: ['a', 'b', 'c']);
+      p = p.withQuoteShown('b');
+      expect(p.recentQuoteIds, ['b', 'a', 'c']);
+
+      var full = const Preferences();
+      for (var i = 0; i < Preferences.quoteMemory + 10; i++) {
+        full = full.withQuoteShown('q$i');
+      }
+      expect(full.recentQuoteIds, hasLength(Preferences.quoteMemory));
+      expect(full.recentQuoteIds.first, 'q${Preferences.quoteMemory + 9}');
+    });
+  });
 }

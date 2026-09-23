@@ -3,7 +3,7 @@ description: "Single-user offline training app for the Keller Twelve programme."
 publish_to: 'none'
 
 # versionName+versionCode. Bump both on every install-over-the-top.
-version: 0.11.0+11
+version: 0.12.0+12
 
 environment:
   sdk: ^3.13.0
@@ -55,6 +55,15 @@ dependencies:
   image: ^4.5.4
   local_auth: ^2.3.0
 
+  # GPS run tracking (v3, approved by Saad 2026-09-23). geolocator owns the
+  # foreground location service that keeps recording with the screen off;
+  # flutter_map + latlong2 draw the trail over OpenStreetMap tiles. Those
+  # tiles are the ONLY network traffic the app makes. Location never leaves
+  # the phone.
+  geolocator: ^14.0.2
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
+
   # ids
   uuid: ^4.5.1
 
@@ -88,3 +97,17 @@ flutter:
     - assets/programmes/
     - assets/exercises/
     - assets/exercises/img/
+    # v3 content. Each file here is mirrored from data/ by tools/gen.py and
+    # a test fails if a copy drifts.
+    - assets/content/
+    - assets/nutrition/
+
+  # Display face for numbers and headings. Copied from the Flutter SDK's own
+  # material_fonts cache (Apache-2.0, licence alongside). Body text stays on
+  # the system Roboto; quotes use the system serif.
+  fonts:
+    - family: RobotoCondensed
+      fonts:
+        - asset: assets/fonts/RobotoCondensed-Regular.ttf
+        - asset: assets/fonts/RobotoCondensed-Bold.ttf
+          weight: 700

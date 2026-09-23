@@ -40,7 +40,7 @@ class ProgressScreen extends ConsumerWidget {
           ),
         ),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => context.go('/capture?week=$week'),
+          onPressed: () => context.push('/capture?week=$week'),
           icon: const Icon(Icons.photo_camera),
           label: const Text('New shoot'),
         ),

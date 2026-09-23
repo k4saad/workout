@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- shrinkResources strips any drawable referenced only by NAME from Dart.
+     The run notification names ic_stat_run as a string, so keep it. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_run" />

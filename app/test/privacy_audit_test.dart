@@ -56,20 +56,34 @@ void main() {
       );
     });
 
-    test('the app cannot reach the network', () {
+    test('the network is there for map tiles, and nothing else', () {
+      // v3 added INTERNET for the run map's OpenStreetMap tiles — approved
+      // by Saad on 2026-09-23. What keeps that honest is the "no code path
+      // uploads anything" group below: tile.openstreetmap.org is the only
+      // host lib/ may name.
+      expect(manifest, contains('android.permission.INTERNET'));
       expect(
-        manifest.contains('android.permission.INTERNET'),
+        manifest.contains('ACCESS_NETWORK_STATE'),
         isFalse,
-        reason:
-            'This app holds a year of training data and a gallery of private '
-            'photos. Adding INTERNET is a decision to discuss, not a fix.',
+        reason: 'nothing here decides what to send based on connectivity',
       );
-      expect(manifest.contains('ACCESS_NETWORK_STATE'), isFalse);
     });
 
-    test('no location permission — this is not a running app', () {
-      expect(manifest.contains('ACCESS_FINE_LOCATION'), isFalse);
-      expect(manifest.contains('ACCESS_COARSE_LOCATION'), isFalse);
+    test('location is foreground-only: never in the background', () {
+      expect(manifest, contains('android.permission.ACCESS_FINE_LOCATION'));
+      expect(manifest, contains('android.permission.ACCESS_COARSE_LOCATION'));
+      // Screen-off tracking runs as a visible foreground service started
+      // from a tap. It does not need background location, and without it the
+      // app cannot see where you are at any other time.
+      expect(
+        manifest,
+        contains('android.permission.FOREGROUND_SERVICE_LOCATION'),
+      );
+      expect(
+        manifest.contains('ACCESS_BACKGROUND_LOCATION'),
+        isFalse,
+        reason: 'the tracker never needs location while the app is closed',
+      );
     });
 
     test('no external storage permission', () {
@@ -178,7 +192,80 @@ void main() {
       }
     });
 
-    test('the only outbound call is url_launcher', () {
+    test('the only hosts named anywhere in lib/ are the allowed ones', () {
+      // Every URL literal in the app. Tiles and the OSM copyright page for
+      // the map, YouTube for demo links. Anything else is a new outbound
+      // call, and that is a decision to discuss, not a fix.
+      const allowed = {
+        'tile.openstreetmap.org',
+        'www.openstreetmap.org',
+        'www.youtube.com',
+        'youtube.com',
+        'youtu.be',
+        'm.youtube.com',
+      };
+      final url = RegExp(r"https?://([a-zA-Z0-9.\-{}]+)");
+      for (final f in dartFiles) {
+        for (final m in url.allMatches(f.source)) {
+          final host = m.group(1)!;
+          expect(
+            allowed.contains(host),
+            isTrue,
+            reason: '${f.path} names $host',
+          );
+        }
+      }
+    });
+
+    test('photo and media code never touches a network package', () {
+      // With INTERNET granted, THIS is the guard that matters most: the
+      // files that hold progress photos cannot even import the map, the
+      // location plugin or the link launcher.
+      for (final f in dartFiles) {
+        final media =
+            f.path.contains('/features/progress/') ||
+            f.path.endsWith('/data/media_repository.dart') ||
+            f.path.endsWith('/data/backup_service.dart');
+        if (!media) continue;
+        for (final banned in [
+          'package:flutter_map/',
+          'package:geolocator/',
+          'package:url_launcher/',
+          'package:share_plus/',
+        ]) {
+          if (banned == 'package:share_plus/' &&
+              f.path.endsWith('/data/backup_service.dart')) {
+            // Export is manual and user-initiated: the share sheet IS the
+            // export. It is the one sanctioned way photos leave the phone.
+            continue;
+          }
+          expect(
+            f.source.contains(banned),
+            isFalse,
+            reason: '${f.path} imports $banned',
+          );
+        }
+      }
+    });
+
+    test('only the run feature may use location or draw the map', () {
+      for (final f in dartFiles) {
+        final runs =
+            f.path.contains('/features/runs/') ||
+            f.path.contains('/data/run') ||
+            f.path.contains('/app/run');
+        if (runs) continue;
+        for (final banned in ['package:geolocator/', 'package:flutter_map/']) {
+          expect(
+            f.source.contains(banned),
+            isFalse,
+            reason: '${f.path} reaches for $banned outside the run feature',
+          );
+        }
+      }
+    });
+
+    test('url_launcher stays the way demo links open', () {
       final pubspec = read('pubspec.yaml');
       expect(pubspec, contains('url_launcher'));
     });

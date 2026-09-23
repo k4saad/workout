@@ -32,9 +32,10 @@ img.ColorRgba8 rgba(int argb) => img.ColorRgba8(
 /// from 48 px to 432 px without a second set of numbers to keep in sync.
 img.Image drawMark(int size, {bool transparentBackground = false}) {
   final im = img.Image(width: size, height: size, numChannels: 4);
-  img.fill(im, color: transparentBackground
-      ? img.ColorRgba8(0, 0, 0, 0)
-      : rgba(bg));
+  img.fill(
+    im,
+    color: transparentBackground ? img.ColorRgba8(0, 0, 0, 0) : rgba(bg),
+  );
 
   final c = size / 2;
   final bar = rgba(crimson);
@@ -55,7 +56,12 @@ img.Image drawMark(int size, {bool transparentBackground = false}) {
 
   // Two plates each side: inner tall, outer shorter. Sleeve order reads as
   // depth without any shading.
-  void plate(double offset, double halfWidth, double halfHeight, img.Color col) {
+  void plate(
+    double offset,
+    double halfWidth,
+    double halfHeight,
+    img.Color col,
+  ) {
     for (final dir in [-1, 1]) {
       final x = c + dir * offset;
       img.fillRect(

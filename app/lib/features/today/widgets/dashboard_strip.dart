@@ -68,7 +68,7 @@ class DashboardStrip extends ConsumerWidget {
               children: [
                 Expanded(
                   child: InkWell(
-                    onTap: () => context.go('/body'),
+                    onTap: () => context.go('/progress/body'),
                     borderRadius: BorderRadius.circular(8),
                     child: SizedBox(
                       height: 46,
@@ -95,7 +95,7 @@ class DashboardStrip extends ConsumerWidget {
                 IconButton(
                   tooltip: 'Numbers',
                   icon: const Icon(Icons.insights_outlined),
-                  onPressed: () => context.go('/stats'),
+                  onPressed: () => context.go('/progress/lifts'),
                 ),
               ],
             ),
