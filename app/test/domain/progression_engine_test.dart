@@ -366,7 +366,11 @@ void main() {
     });
 
     test('timeOnly adds seconds', () {
-      final p = squat(type: ProgressionType.timeOnly).copyWith(
+      // creep: null on purpose. The squat fixture's default is a 12-REP
+      // creep ceiling, and on a hold measured in seconds that would read as
+      // a 12-second ceiling on a 30-second plank. tools/validate.py gate V14
+      // rejects that shape in authored data.
+      final p = squat(type: ProgressionType.timeOnly, creep: null).copyWith(
         loadMode: LoadMode.timed,
         unit: RepUnit.sec,
         startLoadKg: null,
@@ -594,6 +598,252 @@ void main() {
       expect(s.repTargetMin, p.repsMin);
       expect(s.repTargetMax, p.repsMax);
       expect(s.reason, contains('35 min'));
+    });
+  });
+
+  group('the history window judges a whole session, by the calendar', () {
+    // Week 6 Monday at 18:40, and week 9 Monday opened at 19:00: exactly 21
+    // days apart, but 21 days and 20 minutes by the clock. Per set and by
+    // the hour, those sets fell out of the window and week 9 went back to
+    // the programme start (Phase 1 review).
+    final week9 = DateTime(2026, 11, 2, 19);
+
+    test('a session 21 calendar days ago is in a 21-day window', () {
+      final s = fineEngine.suggest(
+        prescription: squat(),
+        history: sets([8, 8, 8, 8], load: 40, daysAgo: 21),
+        now: week9,
+      );
+      expect(s.suggestedKg, greaterThan(40), reason: s.reason);
+    });
+
+    test('22 days is outside it', () {
+      final s = fineEngine.suggest(
+        prescription: squat(),
+        history: sets([8, 8, 8, 8], load: 40, daysAgo: 22),
+        now: week9,
+      );
+      expect(s.suggestedKg, 30);
+      expect(s.reason.toLowerCase(), contains('programme start'));
+    });
+
+    test('training in between (the deload) keeps older history live', () {
+      // Week 7 missed, week 8 trained (the deload: not history, but he was
+      // under the bar a week ago), week 9: the week-6 sets are what to
+      // progress from, even 25 days on.
+      final s = fineEngine.suggest(
+        prescription: squat(),
+        history: sets([8, 8, 8, 8], load: 40, daysAgo: 25),
+        lastTrainedAt: DateTime(2026, 10, 26, 18),
+        now: week9,
+      );
+      expect(s.suggestedKg, 42.5, reason: s.reason);
+    });
+
+    test('a session straddling the cutoff is judged on all of its sets', () {
+      // The first two sets land before midnight 21 days back, the last two
+      // after it. Judged on its later sets only, 8, 8 at the top would earn
+      // a jump the whole session did not.
+      final history = [
+        for (final (i, reps) in [5, 5, 8, 8].indexed)
+          LoggedSet(
+            reps: reps,
+            loadKg: 40,
+            rir: 2,
+            targetRepsMin: 6,
+            targetRepsMax: 8,
+            completedAt: DateTime(2026, 10, 11, 23, 50 + i * 5),
+          ),
+      ];
+      final s = fineEngine.suggest(
+        prescription: squat(),
+        history: history,
+        now: week9,
+      );
+      expect(s.isStalled, isTrue, reason: s.reason);
+      expect(s.suggestedKg, 40);
+    });
+  });
+
+  group('rule 3a never takes less than one loadable step', () {
+    // The shipped kit before its 1.0 and 0.5 kg plates are bought: the
+    // barbell moves in 2.5 kg steps.
+    final unbought = Inventory(
+      bars: Fixtures.inventory.bars,
+      plates: Fixtures.inventory.plates
+          .where((p) => p.weightKg >= 1.25)
+          .toList(),
+      fixedDumbbells: Fixtures.inventory.fixedDumbbells,
+      kettlebells: Fixtures.inventory.kettlebells,
+    );
+    final engine = ProgressionEngine(PlateSolver(unbought));
+
+    Prescription bench({
+      required int repsMin,
+      required int repsMax,
+      int? creep,
+      required double increment,
+      required double maxJumpPct,
+    }) => squat(repsMin: repsMin, repsMax: repsMax, creep: creep).copyWith(
+      id: 'b-tue-1',
+      exerciseId: 'barbell-bench-press',
+      progression: Progression(
+        type: ProgressionType.doubleProgression,
+        incrementKg: increment,
+        deloadPct: 0.10,
+        stallLimit: 2,
+        historyWindowDays: 21,
+        maxJumpPct: maxJumpPct,
+      ),
+    );
+
+    test('at the rep-creep ceiling the load moves (no deadlock)', () {
+      // 1 kg wanted, 2.5 kg is the smallest step and exactly 10%: v2 took
+      // 1 kg, snapped back to 25, and at the creep ceiling returned
+      // 25 x 6 "Earned the jump." forever.
+      final s = engine.suggest(
+        prescription: bench(
+          repsMin: 6,
+          repsMax: 6,
+          creep: 10,
+          increment: 1.0,
+          maxJumpPct: 0.10,
+        ),
+        history: sets([10, 10, 10, 10], load: 25, targetMin: 6, targetMax: 10),
+        now: now,
+      );
+      expect(s.suggestedKg, 27.5, reason: s.reason);
+      expect(s.repTargetMax, 6);
+      expect(s.isRepCreep, isFalse);
+    });
+
+    test('without rep creep the load moves too', () {
+      final s = engine.suggest(
+        prescription: bench(
+          repsMin: 8,
+          repsMax: 8,
+          increment: 2.0,
+          maxJumpPct: 0.25,
+        ),
+        history: sets([8, 8, 8], load: 10, targetMin: 8, targetMax: 8),
+        now: now,
+      );
+      expect(s.suggestedKg, 12.5, reason: s.reason);
+    });
+  });
+
+  group('timed holds have a ceiling', () {
+    Prescription hold({int? ceiling = 40}) =>
+        squat(type: ProgressionType.timeOnly).copyWith(
+          loadMode: LoadMode.timed,
+          unit: RepUnit.sec,
+          startLoadKg: null,
+          repsMin: 30,
+          repsMax: 30,
+          repsCreepMax: ceiling,
+          progression: const Progression(
+            type: ProgressionType.timeOnly,
+            incrementSec: 5,
+          ),
+        );
+
+    List<LoggedSet> held(int sec) => [
+      for (var i = 0; i < 3; i++)
+        LoggedSet(
+          durationSec: sec,
+          targetRepsMin: sec,
+          targetRepsMax: sec,
+          completedAt: DateTime(2026, 10, 26, 18, i),
+        ),
+    ];
+
+    test('a hold at its ceiling stays there', () {
+      final s = fineEngine.suggest(
+        prescription: hold(),
+        history: held(40),
+        now: now,
+      );
+      expect(s.repTargetMin, 40);
+      expect(s.repTargetMax, 40);
+      expect(s.reason.toLowerCase(), contains('ceiling'));
+    });
+
+    test('growth stops at the ceiling, not past it', () {
+      final s = fineEngine.suggest(
+        prescription: hold(),
+        history: held(38),
+        now: now,
+      );
+      expect(s.repTargetMax, 40);
+    });
+
+    test('below the ceiling it still adds the increment', () {
+      final s = fineEngine.suggest(
+        prescription: hold(),
+        history: held(30),
+        now: now,
+      );
+      expect(s.repTargetMax, 35);
+      expect(s.reason, contains('add 5 seconds'));
+    });
+  });
+
+  group('a deload never asks for more reps', () {
+    final programme = Fixtures.programme;
+    final resolver = BlockResolver(programme);
+    final shipped = ProgressionEngine(PlateSolver(Fixtures.inventory));
+
+    Prescription deload(String id) => resolver
+        .resolveDays(programme.blockById('deload')!, 8)
+        .expand((d) => d.allPrescriptions)
+        .firstWhere((p) => p.id == id);
+
+    List<LoggedSet> week7(int sets, int reps, double kg, int min, int max) => [
+      for (var i = 0; i < sets; i++)
+        LoggedSet(
+          reps: reps,
+          loadKg: kg,
+          rir: 1,
+          targetRepsMin: min,
+          targetRepsMax: max,
+          completedAt: DateTime(2026, 10, 30, 18, i),
+        ),
+    ];
+
+    test('the overhead press is 70% of the earned load at 6 reps', () {
+      // Earned 17; 70% is 11.9 -> 11, the same plates as 70% of 16. That
+      // used to trip rule 8 and creep the DELOAD to 6-8.
+      final p = deload('b-fri-1');
+      final s = shipped.suggest(
+        prescription: p,
+        history: week7(4, 6, 16, 6, 6),
+        blockLoadMultiplier: 0.7,
+        now: now,
+      );
+      expect(s.suggestedKg, 11, reason: s.reason);
+      expect(s.repTargetMin, p.repsMin);
+      expect(s.repTargetMax, 6);
+      expect(s.isRepCreep, isFalse);
+      expect(s.reason, contains('Deload'));
+      expect(s.reason, isNot(contains('not loadable')));
+      expect(s.reason, contains('17 kg'));
+    });
+
+    test('a light lateral raise holds its range in the deload', () {
+      // At 4 kg the step is 0.5 kg, 12.5%: in a normal week that is rep
+      // creep to 12-17. In the deload it is 70% of 4 kg at 12-15.
+      final p = deload('b-tue-4b');
+      final s = shipped.suggest(
+        prescription: p,
+        history: week7(3, 15, 4, 12, 15),
+        blockLoadMultiplier: 0.7,
+        now: now,
+      );
+      expect(s.repTargetMax, 15, reason: s.reason);
+      expect(s.suggestedKg, 2);
+      expect(s.isRepCreep, isFalse);
+      expect(s.reason, contains('Deload'));
+      expect(s.reason.toLowerCase(), isNot(contains('coarse')));
     });
   });
 

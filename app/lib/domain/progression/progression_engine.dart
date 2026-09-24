@@ -91,6 +91,18 @@ class ProgressionEngine {
     required Prescription prescription,
     required List<LoggedSet> history,
     DateTime? now,
+
+    /// When ANY session was last trained, not just this exercise.
+    ///
+    /// The history window exists to stop a load from six months ago driving
+    /// today's suggestion. It is not meant to punish a missed week: miss
+    /// Thursday, train the following Monday, and on the Thursday after that
+    /// the squat history is 22 days old and the engine would cold-start you
+    /// back at the programme's opening load — a rollback of the whole block.
+    ///
+    /// So the window is measured from the last time you were under a bar at
+    /// all. Stop training for a month and it expires as intended.
+    DateTime? lastTrainedAt,
     int stallCount = 0,
     double blockLoadMultiplier = 1.0,
   }) {
@@ -127,23 +139,39 @@ class ProgressionEngine {
         );
 
       case ProgressionType.timeOnly:
-        final fresh = _inWindow(history, p, today);
+        final fresh = _inWindow(history, p, today, lastTrainedAt);
         final lastTarget = _lastTargetMax(fresh) ?? p.repsMax;
         final hitIt =
             fresh.isNotEmpty && fresh.every((s) => s.achieved >= lastTarget);
+
+        // A hold needs a ceiling. Five seconds a week compounds: a 30-second
+        // plank in week 1 is a ten-minute plank by the end of the year, which
+        // is a test of patience rather than of anything trainable. Past the
+        // ceiling the progression belongs on the load or on a harder variant.
+        //
+        // Only when one is AUTHORED, though. For a timed hold `repsMax` is a
+        // duration, so deriving a fallback from it is arithmetic on a number
+        // that means something else. Gate V-hold checks every hold has one.
+        final ceiling = p.repsCreepMax;
+        final atCeiling = ceiling != null && lastTarget >= ceiling;
+        final grown = lastTarget + p.progression.incrementSec;
         final next = hitIt
-            ? lastTarget + (p.progression.incrementSec)
+            ? (ceiling == null ? grown : (grown < ceiling ? grown : ceiling))
             : lastTarget;
+
         return LoadSuggestion(
           repTargetMin: next,
           repTargetMax: next,
-          reason: hitIt
+          reason: atCeiling
+              ? 'At the $ceiling-second ceiling — hold it there and make '
+                    'the movement harder instead.'
+              : hitIt
               ? 'Held it — add ${p.progression.incrementSec} seconds.'
               : 'Hold for $next seconds.',
         );
 
       case ProgressionType.repsOnly:
-        final fresh = _inWindow(history, p, today);
+        final fresh = _inWindow(history, p, today, lastTrainedAt);
         final lastTarget = _lastTargetMax(fresh) ?? p.repsMax;
         final hitIt =
             fresh.isNotEmpty && fresh.every((s) => s.achieved >= lastTarget);
@@ -167,7 +195,7 @@ class ProgressionEngine {
     // [prescription] is the RESOLVED one: the block resolver has already
     // multiplied its startLoadKg by the block's loadMultiplier (step 2b).
     // Scaling it again made a deload cold start 0.7 x 0.7 = 49%.
-    final fresh = _inWindow(history, p, today);
+    final fresh = _inWindow(history, p, today, lastTrainedAt);
     if (fresh.isEmpty) {
       return _withPlates(
         p,
@@ -267,24 +295,32 @@ class ProgressionEngine {
     final maxJump = lastLoad * p.progression.maxJumpPct;
     final canCreep = p.repsCreepMax != null && targetMax < p.repsCreepMax!;
 
-    // Rule 3b: one step is too big a jump.
+    // Rule 3b: one step is too big a jump, so the load stays put.
+    //
+    // In a deload the load-holding half still applies — a jump the plates
+    // cannot make was never earned in kilograms, so the deload comes off what
+    // was actually lifted. The rep-creep half does NOT: the whole point of
+    // the week is less stress, and "70% of the load but two more reps per
+    // set" is more work, not less.
     if (step != null && step > maxJump && canCreep) {
-      final crept = (targetMax + repCreepStep).clamp(
-        p.repsMin,
-        p.repsCreepMax!,
-      );
+      final crept = isDeload
+          ? targetMax
+          : (targetMax + repCreepStep).clamp(p.repsMin, p.repsCreepMax!);
       return _withPlates(
         p,
         _scale(lastLoad, blockLoadMultiplier),
         repMin: targetMin,
         repMax: crept,
-        reason:
-            'Earned it, but the smallest jump here is '
-            '${_fmt(step)} kg — ${(step / lastLoad * 100).round()}% of '
-            'the load. Plates are too coarse: add reps instead.',
-        isRepCreep: true,
+        reason: isDeload
+            ? 'Deload: ${(blockLoadMultiplier * 100).round()}% of the '
+                  '${_fmt(solver.solve(lastLoad, p.loadMode).achievableKg)} kg '
+                  'you earned.'
+            : 'Earned it, but the smallest jump here is '
+                  '${_fmt(step)} kg — ${(step / lastLoad * 100).round()}% of '
+                  'the load. Plates are too coarse: add reps instead.',
+        isRepCreep: !isDeload,
         stallCount: 0,
-        deloaded: blockLoadMultiplier != 1.0,
+        deloaded: blockLoadMultiplier != 1.0 && !isDeload,
       );
     }
 
@@ -294,7 +330,13 @@ class ProgressionEngine {
         ? p.progression.incrementKg
         : (step ?? 0);
     final cap = step == null ? maxJump : (maxJump > step ? maxJump : step);
-    final jump = desired < cap ? desired : cap;
+
+    // A jump smaller than the smallest loadable step snaps straight back to
+    // where it started, and the athlete is told "earned the jump" while the
+    // bar never changes. Wanting 1 kg on a kit whose finest step is 2.5 kg
+    // means taking 2.5 or taking nothing, and nothing is the deadlock.
+    final atLeastOneStep = (step != null && desired < step) ? step : desired;
+    final jump = atLeastOneStep < cap ? atLeastOneStep : cap;
 
     var suggested = _scale(lastLoad + jump, blockLoadMultiplier);
     var reason = 'Earned the jump.';
@@ -324,7 +366,12 @@ class ProgressionEngine {
         (snapped.achievableKg - solver.solve(held, p.loadMode).achievableKg)
             .abs() <
         1e-6;
-    if (sameLoad && p.repsCreepMax != null && targetMax < p.repsCreepMax!) {
+    // Same exemption as rule 3b: a deload is allowed to produce "nothing
+    // moved", because the load coming down IS the change.
+    if (!isDeload &&
+        sameLoad &&
+        p.repsCreepMax != null &&
+        targetMax < p.repsCreepMax!) {
       repMin = targetMin;
       repMax = (targetMax + repCreepStep).clamp(p.repsMin, p.repsCreepMax!);
       creeping = true;
@@ -349,16 +396,73 @@ class ProgressionEngine {
 
   // ---------------------------------------------------------------- helpers
 
+  /// Sets close enough together in time to be one session.
+  ///
+  /// `LoggedSet` carries no session id — the engine is deliberately ignorant
+  /// of the database — so sessions are inferred from the gaps. Six hours is
+  /// far longer than any session in a sixty-minute programme and far shorter
+  /// than the gap to the next one.
+  static const _sessionGap = Duration(hours: 6);
+
+  /// Midnight on the calendar day [d] falls in.
+  static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  /// [n] days before [d], by the calendar.
+  ///
+  /// `subtract(Duration(days:))` is wrong across a DST boundary, and Germany
+  /// crosses one in the middle of the programme.
+  static DateTime _daysBefore(DateTime d, int n) =>
+      DateTime(d.year, d.month, d.day - n);
+
   List<LoggedSet> _inWindow(
     List<LoggedSet> history,
     Prescription p,
     DateTime now,
+    DateTime? lastTrainedAt,
   ) {
     if (history.isEmpty) return const [];
-    final cutoff = now.subtract(
-      Duration(days: p.progression.historyWindowDays),
-    );
-    return history.where((s) => s.completedAt.isAfter(cutoff)).toList();
+    final days = p.progression.historyWindowDays;
+
+    // Measured back from the last session of ANY kind, so a missed week does
+    // not throw away the block. Never forward of now, and never further back
+    // than one extra window — a month off is still a reason to start again.
+    var anchor = now;
+    if (lastTrainedAt != null && lastTrainedAt.isBefore(now)) {
+      final floor = _daysBefore(now, days);
+      anchor = lastTrainedAt.isAfter(floor) ? lastTrainedAt : floor;
+    }
+
+    // By the CALENDAR, not the clock. Week 6's Monday at 18:40 and week 9's
+    // Monday opened at 19:00 are twenty-one days apart on any calendar, and
+    // twenty-one days and twenty minutes by the hour. Judged by the hour,
+    // that session dropped out of a 21-day window and the block rolled back
+    // to its opening loads.
+    final cutoff = _daysBefore(_dateOnly(anchor), days);
+
+    final sorted = [...history]
+      ..sort((a, b) => a.completedAt.compareTo(b.completedAt));
+
+    // A session is in or out as a unit. One that ran past midnight must not
+    // be judged on the half of it that landed after the cutoff: two sets at
+    // the top of the range would earn a jump the whole session did not.
+    final out = <LoggedSet>[];
+    var run = <LoggedSet>[sorted.first];
+    void flush() {
+      if (run.any((s) => !_dateOnly(s.completedAt).isBefore(cutoff))) {
+        out.addAll(run);
+      }
+    }
+
+    for (final s in sorted.skip(1)) {
+      if (s.completedAt.difference(run.last.completedAt) <= _sessionGap) {
+        run.add(s);
+      } else {
+        flush();
+        run = [s];
+      }
+    }
+    flush();
+    return out;
   }
 
   double? _lastLoad(List<LoggedSet> sets) {

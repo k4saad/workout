@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validation gates V1-V13 from docs/02-data-model.md, section 1.6, plus V14-V16
+"""Validation gates V1-V13 from docs/02-data-model.md, section 1.6, plus V14-V17
 added in v3 (docs/06-v3-plan.md).
 
 These are the same assertions Phase 1 ports to `flutter test`. Run this after any
@@ -469,6 +469,48 @@ for ph in prog["nutritionPhases"]:
     print(f"  weeks {ph['weeks'][0]}-{ph['weeks'][-1]}: stated {ph['kcal']}  "
           f"macros {s}  {ok}")
 
+# ============ V17 a timed hold's ceiling is in the same unit as the hold ======
+#
+# `repsCreepMax` means "how far the rep range may grow" for rep work and "how
+# long the hold may grow to" for timed work. Giving a 30-second plank a
+# ceiling of 12 reads as a 12-SECOND ceiling and freezes it below where it
+# already is. The engine now only applies a ceiling that was authored, so a
+# malformed one has to be caught here.
+for b in prog["blocks"]:
+    for d in b.get("days", []):
+        for sec in d.get("sections", []):
+            for p_ in sec.get("prescriptions", []):
+                ceiling = p_.get("repsCreepMax")
+                if ceiling is None:
+                    continue
+                if p_.get("unit") != "sec":
+                    continue
+                if ceiling <= p_["repsMax"]:
+                    fail(f"V17 {p_['id']} ({d['id']}): held for {p_['repsMax']}s "
+                         f"but its ceiling is {ceiling} — a ceiling below the "
+                         f"hold freezes it. Give it seconds, or leave it null.")
+                elif p_["progression"].get("type") == "timeOnly" and                         p_["progression"].get("incrementSec", 0) > 0 and                         ceiling > p_["repsMax"] * 4:
+                    warn(f"V17 {p_['id']} ({d['id']}): a {p_['repsMax']}s hold "
+                         f"with a {ceiling}s ceiling grows for "
+                         f"{(ceiling - p_['repsMax']) // p_['progression']['incrementSec']} "
+                         f"weeks before it stops. That is a long time to hold "
+                         f"a plank.")
+
+# ---------- every timed hold that grows SHOULD have a ceiling ----------------
+for b in prog["blocks"]:
+    for d in b.get("days", []):
+        for sec in d.get("sections", []):
+            for p_ in sec.get("prescriptions", []):
+                prog_ = p_.get("progression", {})
+                if prog_.get("type") != "timeOnly":
+                    continue
+                if prog_.get("incrementSec", 0) <= 0:
+                    continue
+                if p_.get("repsCreepMax") is None:
+                    warn(f"V17 {p_['id']} ({d['id']}): grows by "
+                         f"{prog_['incrementSec']}s a week with no ceiling. "
+                         f"Five seconds a week compounds.")
+
 # --------------------------------------------------------------- verdict ----
 print()
 print("=" * 74)
@@ -482,5 +524,5 @@ if failures:
     for f in failures:
         print(f"  X {f}")
     sys.exit(1)
-print("ALL GATES PASSED (V1-V16)")
+print("ALL GATES PASSED (V1-V17)")
 sys.exit(0)

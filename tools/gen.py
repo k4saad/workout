@@ -430,7 +430,7 @@ f_mon = D("f-mon", "mon", "Full Body A", "lift", [
         # it shares a plate with anything else, and the plank rides along so
         # the day stays at ~45 minutes rather than 48.
         P("f-mon-4", "plank", 5, 3, 30, 30, 0, "timed", None, unit="sec",
-          prog=TIME(5), subs=["dead-bug", "hollow-hold"], group="f-mon-ss2",
+          prog=TIME(5), subs=["dead-bug", "hollow-hold"], group="f-mon-ss2", creep=60,
           note="The second your lower back sags, the set is over. Reset rather than holding a bad shape."),
         P("f-mon-5a", "ez-bar-curl", 6, 3, 10, 12, 0, "ezBar", BAR["ezBar"], rir=3,
           prog=DP(1.0), subs=["dumbbell-curl", "hammer-curl"], group="f-mon-ss2", creep=15,
@@ -452,6 +452,7 @@ f_mon = D("f-mon", "mon", "Full Body A", "lift", [
 f_tue = D("f-tue", "tue", "Skip, Run & Core", "cardio", [
     S("cardio", "Session", prescriptions=[
         P("f-tue-1", "rope-skipping", 1, 6, 60, 60, 60, "timed", None, unit="sec", prog=TIME(15),
+          creep=180,
           note="Skipping wrecks untrained calves and Achilles tendons, so we ramp it over four weeks."),
         P("f-tue-2", "easy-run", 2, 1, *TABLE, 0, "timed", None, unit="sec", prog=CARD("second"),
           subs=["run-intervals"],
@@ -460,9 +461,9 @@ f_tue = D("f-tue", "tue", "Skip, Run & Core", "cardio", [
           group="f-tue-core", uni=True, per_side=True,
           note="Three-round circuit with the side plank and hollow hold."),
         P("f-tue-3b", "side-plank", 4, 3, 20, 20, 0, "timed", None, unit="sec", prog=TIME(5),
-          group="f-tue-core", uni=True, per_side=True),
+          group="f-tue-core", uni=True, per_side=True, creep=45),
         P("f-tue-3c", "hollow-hold", 5, 3, 20, 20, 45, "timed", None, unit="sec", prog=TIME(5),
-          group="f-tue-core"),
+          group="f-tue-core", creep=45),
     ]),
 ], note="Easy means easy. This session exists for your heart and your calves, not to burn "
         "calories — you need those.")
@@ -579,8 +580,9 @@ f_sun = D("f-sun", "sun", "Easy Run & Mobility", "cardio", [
     S("cardio", "Session", prescriptions=[
         P("f-sun-1", "easy-run", 1, 1, *TABLE, 0, "timed", None, unit="sec", prog=CARD("long"),
           subs=["run-intervals"], note="The longer of your two runs. Same conversational pace."),
-        P("f-sun-2", "rope-skipping", 2, 3, 60, 60, 60, "timed", None, unit="sec", prog=TIME(15)),
-        P("f-sun-3", "dead-hang", 3, 3, 20, 20, 45, "timed", None, unit="sec", prog=TIME(5),
+        P("f-sun-2", "rope-skipping", 2, 3, 60, 60, 60, "timed", None, unit="sec", prog=TIME(15),
+          creep=180),
+        P("f-sun-3", "dead-hang", 3, 3, 20, 20, 45, "timed", None, unit="sec", prog=TIME(5), creep=60,
           note="From the rings or the wall bar. Relax into it — this decompresses everything the "
                "squats and rows compressed all week."),
     ]),
@@ -852,12 +854,12 @@ b_sun = D("b-sun", "sun", "Run, Bag & Core", "cardio", [
         P("b-sun-4a", "ab-wheel-knees", 4, 3, 8, 8, 0, "bodyweight", None, rir=1, prog=REPS,
           subs=["plank"], group="b-sun-core", creep=14),
         P("b-sun-4b", "hollow-hold", 5, 3, 30, 30, 0, "timed", None, unit="sec", prog=TIME(5),
-          subs=["dead-bug"], group="b-sun-core"),
+          subs=["dead-bug"], group="b-sun-core", creep=60),
         # suitcase-carry and farmers-walk stay reachable (V10) as anti-lean
         # alternatives to the side plank now that Thursday's carry is gone.
         P("b-sun-4c", "side-plank", 6, 3, 30, 30, 45, "timed", None, unit="sec", prog=TIME(5),
           subs=["plank", "suitcase-carry", "farmers-walk"], group="b-sun-core",
-          uni=True, per_side=True),
+          uni=True, per_side=True, creep=60),
     ]),
     S("cooldown", "Stretch", drills=[
         drill("couch-stretch", 1, "45 s / side"),
