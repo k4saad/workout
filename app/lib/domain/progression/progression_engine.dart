@@ -45,6 +45,19 @@ class LoadSuggestion {
   String get repLabel => repTargetMin == repTargetMax
       ? '$repTargetMin'
       : '$repTargetMin–$repTargetMax';
+
+  LoadSuggestion copyWith({int? newStallCount}) => LoadSuggestion(
+    suggestedKg: suggestedKg,
+    repTargetMin: repTargetMin,
+    repTargetMax: repTargetMax,
+    reason: reason,
+    plates: plates,
+    isStalled: isStalled,
+    isRepCreep: isRepCreep,
+    newStallCount: newStallCount ?? this.newStallCount,
+    smallestStepKg: smallestStepKg,
+    warning: warning,
+  );
 }
 
 /// Decides what to put on the bar next.
@@ -70,6 +83,10 @@ class ProgressionEngine {
   /// How much the rep range extends on each creep.
   static const repCreepStep = 2;
 
+  /// [prescription] must be the block-RESOLVED prescription for the week.
+  /// [history] must not contain deload or test sessions, nor the session
+  /// being run (`SuggestionService` filters them). [blockLoadMultiplier]
+  /// scales loads read from history; below 1.0 it also marks a deload week.
   LoadSuggestion suggest({
     required Prescription prescription,
     required List<LoggedSet> history,
@@ -90,10 +107,12 @@ class ProgressionEngine {
         );
 
       case ProgressionType.cardioTable:
+        // The block resolver has already put this week's row from the
+        // cardio table into repsMin/repsMax (resolver step 5).
         return LoadSuggestion(
           repTargetMin: p.repsMin,
           repTargetMax: p.repsMax,
-          reason: 'Follow the cardio table for this week.',
+          reason: 'This week on the cardio table: ${_runLength(p)}, easy.',
         );
 
       case ProgressionType.bandProgression:
@@ -145,11 +164,14 @@ class ProgressionEngine {
     }
 
     // ---- Rule 1: cold start ----------------------------------------------
+    // [prescription] is the RESOLVED one: the block resolver has already
+    // multiplied its startLoadKg by the block's loadMultiplier (step 2b).
+    // Scaling it again made a deload cold start 0.7 x 0.7 = 49%.
     final fresh = _inWindow(history, p, today);
     if (fresh.isEmpty) {
       return _withPlates(
         p,
-        _scale(p.startLoadKg, blockLoadMultiplier),
+        p.startLoadKg,
         repMin: p.repsMin,
         repMax: p.repsMax,
         reason: history.isEmpty
@@ -160,7 +182,24 @@ class ProgressionEngine {
       );
     }
 
-    final lastLoad = _lastLoad(fresh) ?? p.startLoadKg ?? 0;
+    // Rule 1b: history, but none of it loaded — the exercise fallback found
+    // a bodyweight variant (Foundation's split squat, before Build loads
+    // it). Reps without a load earn no jump from a load never lifted.
+    final loggedLoad = _lastLoad(fresh);
+    final start = p.startLoadKg;
+    if (loggedLoad == null && start != null && start > 0) {
+      return _withPlates(
+        p,
+        start,
+        repMin: p.repsMin,
+        repMax: p.repsMax,
+        reason: 'First time with load — start at the programme load.',
+        stallCount: stallCount,
+        deloaded: blockLoadMultiplier != 1.0,
+      );
+    }
+
+    final lastLoad = loggedLoad ?? start ?? 0;
     final targetMin = _lastTargetMin(fresh) ?? p.repsMin;
     final targetMax = _lastTargetMax(fresh) ?? p.repsMax;
 
@@ -197,8 +236,14 @@ class ProgressionEngine {
     }
 
     // ---- Rules 3 and 4: was the jump earned? ------------------------------
+    // A deload's RIR target is softer on purpose (its block default is 4),
+    // and last week's sets were logged against a harder one. The deload must
+    // not re-judge them: the week earned what it earned, and the deload
+    // takes 70% of that.
+    final isDeload = blockLoadMultiplier < 1.0;
     final allAtTop = fresh.every((s) => s.achieved >= targetMax);
     final rirMet =
+        isDeload ||
         p.targetRir == null ||
         fresh.every((s) => s.rir == null || s.rir! >= p.targetRir!);
 
@@ -257,9 +302,18 @@ class ProgressionEngine {
     var repMax = p.repsMax;
     var creeping = false;
 
+    var earned = lastLoad + jump;
     if (step != null && step > maxJump && !canCreep) {
       reason = 'Rep ceiling reached — taking the big jump.';
-      suggested = _scale(lastLoad + step, blockLoadMultiplier);
+      earned = lastLoad + step;
+      suggested = _scale(earned, blockLoadMultiplier);
+    }
+    if (isDeload) {
+      // Nothing is being jumped this week: say what the number is.
+      reason =
+          'Deload: ${(blockLoadMultiplier * 100).round()}% of the '
+          '${_fmt(solver.solve(earned, p.loadMode).achievableKg)} kg '
+          'you earned.';
     }
 
     // ---- Rule 8: the final guard -----------------------------------------
@@ -288,7 +342,8 @@ class ProgressionEngine {
       reason: reason,
       isRepCreep: creeping,
       stallCount: 0,
-      deloaded: blockLoadMultiplier != 1.0,
+      // The deload reason above already says so.
+      deloaded: blockLoadMultiplier != 1.0 && (!isDeload || creeping),
     );
   }
 
@@ -383,4 +438,15 @@ class ProgressionEngine {
   static String _fmt(double v) => v == v.roundToDouble()
       ? v.toStringAsFixed(0)
       : v.toStringAsFixed(2).replaceFirst(RegExp(r'0+$'), '');
+
+  /// "35 min", "24–26 min", "5000 m".
+  static String _runLength(Prescription p) {
+    String range(int a, int b) => a == b ? '$a' : '$a–$b';
+    return switch (p.unit) {
+      RepUnit.sec =>
+        '${range((p.repsMin / 60).round(), (p.repsMax / 60).round())} min',
+      RepUnit.m => '${range(p.repsMin, p.repsMax)} m',
+      RepUnit.reps => range(p.repsMin, p.repsMax),
+    };
+  }
 }

@@ -152,44 +152,67 @@ class AppDatabase extends _$AppDatabase {
   /// keeps its id when you trade Bulgarian split squats for reverse lunges;
   /// without this clause the lunge would be suggested at the split squat's
   /// load, which is how someone training alone gets hurt.
+  ///
+  /// [excludeBlockIds] skips sessions logged in those blocks: the progression
+  /// engine passes the deload and test blocks, because a 70% week and a 5RM
+  /// say nothing about whether the next working session earned a jump —
+  /// v2 progressed week 9 from the deload (coach review §0 item 3).
+  /// [excludeSessionId] skips the session being run, so a suggestion does
+  /// not change mid-session because its own first sets are now "last time".
   Future<List<SetLog>> lastSetsForPrescription(
     String prescriptionId,
-    String exerciseId,
-  ) async {
-    final last =
-        await (select(setLogs)
-              ..where(
-                (l) =>
-                    l.prescriptionId.equals(prescriptionId) &
-                    l.exerciseId.equals(exerciseId) &
-                    l.isWarmup.equals(false),
-              )
-              ..orderBy([(l) => OrderingTerm.desc(l.completedAt)])
-              ..limit(1))
-            .getSingleOrNull();
-    if (last == null) return const [];
-    return _setsFromSameSession(
-      last,
-      (l) =>
-          l.prescriptionId.equals(prescriptionId) &
-          l.exerciseId.equals(exerciseId),
-    );
-  }
+    String exerciseId, {
+    Set<String> excludeBlockIds = const {},
+    int? excludeSessionId,
+  }) => _lastSessionSets(
+    (l) =>
+        l.prescriptionId.equals(prescriptionId) &
+        l.exerciseId.equals(exerciseId),
+    excludeBlockIds: excludeBlockIds,
+    excludeSessionId: excludeSessionId,
+  );
 
   /// Fallback history lookup, by exercise. Used when a prescription is new —
-  /// after a swap, or when the programme was edited.
-  Future<List<SetLog>> lastSetsForExercise(String exerciseId) async {
-    final last =
-        await (select(setLogs)
-              ..where(
-                (l) =>
-                    l.exerciseId.equals(exerciseId) & l.isWarmup.equals(false),
-              )
-              ..orderBy([(l) => OrderingTerm.desc(l.completedAt)])
-              ..limit(1))
-            .getSingleOrNull();
+  /// after a swap, or when the programme was edited. Same exclusions.
+  Future<List<SetLog>> lastSetsForExercise(
+    String exerciseId, {
+    Set<String> excludeBlockIds = const {},
+    int? excludeSessionId,
+  }) => _lastSessionSets(
+    (l) => l.exerciseId.equals(exerciseId),
+    excludeBlockIds: excludeBlockIds,
+    excludeSessionId: excludeSessionId,
+  );
+
+  /// The working sets matching [match] from the most recent session that
+  /// logged any, outside the excluded blocks and session.
+  Future<List<SetLog>> _lastSessionSets(
+    Expression<bool> Function($SetLogsTable) match, {
+    required Set<String> excludeBlockIds,
+    required int? excludeSessionId,
+  }) async {
+    Expression<bool> where = match(setLogs) & setLogs.isWarmup.equals(false);
+    if (excludeSessionId != null) {
+      where = where & setLogs.sessionId.equals(excludeSessionId).not();
+    }
+    if (excludeBlockIds.isNotEmpty) {
+      where = where & sessions.blockId.isNotIn(excludeBlockIds);
+    }
+    final query =
+        select(setLogs).join([
+            innerJoin(sessions, sessions.id.equalsExp(setLogs.sessionId)),
+          ])
+          ..where(where)
+          // Drift stores whole seconds; the id breaks a tie in favour of the
+          // set logged last.
+          ..orderBy([
+            OrderingTerm.desc(setLogs.completedAt),
+            OrderingTerm.desc(setLogs.id),
+          ])
+          ..limit(1);
+    final last = (await query.getSingleOrNull())?.readTable(setLogs);
     if (last == null) return const [];
-    return _setsFromSameSession(last, (l) => l.exerciseId.equals(exerciseId));
+    return _setsFromSameSession(last, match);
   }
 
   Future<List<SetLog>> _setsFromSameSession(

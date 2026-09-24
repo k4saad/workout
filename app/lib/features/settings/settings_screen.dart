@@ -59,9 +59,11 @@ class SettingsScreen extends ConsumerWidget {
           Text('The gym', style: t.titleLarge),
           Gap.s,
           _Link(
-            icon: Icons.straighten,
-            title: 'Bars, plates and the lattice',
-            body: 'Every suggested load is computed from these numbers.',
+            icon: Icons.fitness_center,
+            title: 'Your equipment',
+            body:
+                'The bars and plates every load is built from, and your '
+                'week-12 targets in plates.',
             onTap: () => context.go('/more/settings/gym'),
           ),
           _Link(

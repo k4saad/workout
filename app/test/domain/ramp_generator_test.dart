@@ -11,8 +11,11 @@ import '../support/fixtures.dart';
 /// with a 9 kg bar, 50% is 10 kg — half a kilo per side, which does not
 /// exist. Percentages break whenever the bar is a large fraction of the load,
 /// which is every lift in this gym for the first two months.
+///
+/// The worked examples below are on the pinned v2 inventory (9 kg bar, 0.5 kg
+/// lattice step) they were written for. The shipped kit is checked at the end.
 void main() {
-  final solver = PlateSolver(Fixtures.inventory);
+  final solver = PlateSolver(Fixtures.legacyInventory);
   final ramp = RampGenerator(solver);
 
   group('a light working set needs no ramp', () {
@@ -23,10 +26,15 @@ void main() {
       expect(sets.single.reps, 8);
     });
 
-    test('the empty bar itself ramps with itself', () {
-      final sets = ramp.forWorkingSet(9, LoadMode.barbell);
-      expect(sets, hasLength(1));
-      expect(sets.single.loadKg, 9);
+    test('working on the empty bar there is no ramp at all', () {
+      // The coach: a warm-up set at the working weight is just another work
+      // set. The first work set on the bare bar IS the warm-up.
+      expect(ramp.forWorkingSet(9, LoadMode.barbell), isEmpty);
+    });
+
+    test('nor one smallest step above it', () {
+      // 9.5 kg is the bar plus one 0.25 kg plate a side.
+      expect(ramp.forWorkingSet(9.5, LoadMode.barbell), isEmpty);
     });
   });
 
@@ -82,7 +90,7 @@ void main() {
 
     test('a percentage ramp would NOT be — the v1 bug', () {
       // 50% of a 20 kg bench is 10 kg: 0.5 kg per side.
-      final coarse = PlateSolver(Fixtures.inventory);
+      final coarse = PlateSolver(Fixtures.legacyInventory);
       expect(
         coarse.isValid(10, LoadMode.barbell),
         isTrue,
@@ -90,8 +98,8 @@ void main() {
       );
       // ...but the point stands for the real coarse case:
       final noMicro = PlateSolver(
-        Fixtures.inventory.copyWith(
-          plates: Fixtures.inventory.plates
+        Fixtures.legacyInventory.copyWith(
+          plates: Fixtures.legacyInventory.plates
               .where((p) => p.weightKg >= 1.25)
               .toList(),
         ),
@@ -164,5 +172,59 @@ void main() {
       expect(seconds, greaterThan(0));
       expect(seconds, lessThan(400), reason: 'a ramp is not a workout');
     });
+  });
+
+  group('on the shipped kit', () {
+    final shipped = PlateSolver(Fixtures.inventory);
+    final shippedRamp = RampGenerator(shipped);
+
+    test('every ramp weight is buildable, bar to a 70 kg working set', () {
+      for (var w = 10.0; w <= 70.0; w += 1.0) {
+        for (final s in shippedRamp.forWorkingSet(w, LoadMode.barbell)) {
+          expect(
+            shipped.isValid(s.loadKg, LoadMode.barbell),
+            isTrue,
+            reason: 'ramp weight ${s.loadKg} for a $w kg working set',
+          );
+          expect(s.loadKg, lessThanOrEqualTo(w));
+        }
+      }
+    });
+
+    test('the ramp starts on the 10 kg bar', () {
+      final sets = shippedRamp.forWorkingSet(30, LoadMode.barbell);
+      expect(sets.first.loadKg, 10);
+    });
+
+    test('week 1 ramps nothing: every Foundation lift starts on the bar', () {
+      // Foundation ramps its main lifts from week 1 (coach review N2), and
+      // in week 1 they are all the empty 10 kg bar.
+      final foundation = Fixtures.programme.blockById('foundation')!;
+      final ramped = [
+        for (final d in foundation.days)
+          for (final p in d.allPrescriptions)
+            if (p.warmupRamp) p,
+      ];
+      expect(ramped, isNotEmpty);
+      for (final p in ramped) {
+        if (p.startLoadKg != shipped.inventory.baseWeightFor(p.loadMode)) {
+          continue;
+        }
+        expect(
+          shippedRamp.forWorkingSet(p.startLoadKg!, p.loadMode),
+          isEmpty,
+          reason: '${p.id} works on the bare bar',
+        );
+      }
+    });
+
+    test(
+      '11 kg is one step off the bar: still no ramp; 12 kg gets the bar',
+      () {
+        expect(shippedRamp.forWorkingSet(11, LoadMode.barbell), isEmpty);
+        final twelve = shippedRamp.forWorkingSet(12, LoadMode.barbell);
+        expect(twelve.map((s) => s.loadKg), [10.0]);
+      },
+    );
   });
 }

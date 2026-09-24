@@ -9,8 +9,12 @@ import '../support/fixtures.dart';
 ///
 /// Written before the implementation. The plate solver is the thing that
 /// stops the app suggesting a weight this gym cannot build.
+///
+/// B-1 .. B-12 test the ALGORITHM, on the pinned v2 inventory the worked
+/// examples were written for (9 kg bar, 0.25 kg microplates). What the app
+/// actually ships is tested at the bottom, against [Fixtures.inventory].
 void main() {
-  final inventory = Fixtures.inventory;
+  final inventory = Fixtures.legacyInventory;
   final solver = PlateSolver(inventory);
 
   /// The coarse inventory v1 assumed: 1.25 kg smallest, so a 2.5 kg step.
@@ -242,6 +246,8 @@ void main() {
   });
 
   group('every load in the shipped programme is buildable', () {
+    final shipped = PlateSolver(Fixtures.inventory);
+
     test('and the breakdown reads like something you can follow', () {
       final programme = Fixtures.programme;
       var checked = 0;
@@ -250,7 +256,7 @@ void main() {
           for (final p in d.allPrescriptions) {
             if (p.startLoadKg == null || !p.loadMode.isPlateLoaded) continue;
             checked++;
-            final s = solver.solve(p.startLoadKg!, p.loadMode);
+            final s = shipped.solve(p.startLoadKg!, p.loadMode);
             expect(
               s.isExact,
               isTrue,
@@ -263,4 +269,168 @@ void main() {
       expect(checked, greaterThan(20));
     });
   });
+
+  group('the shipped kit', () {
+    // v3: barbell 10, EZ 7, handles 2 (collars included); 20x2, 10x4, 5x8,
+    // 2.5x8, 1.25x8, 1.0x4, 0.5x8. That every whole kilogram loads is gate
+    // V16 in programme_data_test; this is about what the solver SAYS.
+    final kit = Fixtures.inventory;
+    final shipped = PlateSolver(kit);
+    const ranges = {
+      LoadMode.barbell: 100,
+      LoadMode.ezBar: 30,
+      LoadMode.dumbbellPair: 22,
+      LoadMode.dumbbellSingle: 30,
+    };
+
+    test('the week-12 targets load as the programme doc says', () {
+      // docs/01 section 4: squat 34 = 10 + 1 + 1 per side, and so on.
+      const expected = {34: 12.0, 60: 25.0, 24: 7.0, 20: 5.0, 30: 10.0};
+      expected.forEach((kg, perSide) {
+        final s = shipped.solve(kg.toDouble(), LoadMode.barbell);
+        expect(s.isExact, isTrue, reason: '$kg kg');
+        expect(s.breakdown, contains('bar 10'), reason: '$kg kg');
+        final sum = s.perSide.fold<double>(0, (a, p) => a + p.kg * p.count);
+        expect(sum, closeTo(perSide, 1e-9), reason: '$kg kg: ${s.breakdown}');
+      });
+    });
+
+    test('every breakdown adds up to the weight it claims', () {
+      // With 1.25 kg AND 1.0 kg plates in the set, a largest-first greedy
+      // fill takes a 1.25 for a 2 kg side and is left 0.25 kg short: the app
+      // would say "14 kg" and list 13.5 kg of iron.
+      ranges.forEach((mode, top) {
+        final base = kit.baseWeightFor(mode);
+        for (final kg in shipped.lattice.values(mode).where((v) => v <= top)) {
+          final s = shipped.solve(kg, mode);
+          final perSide = s.perSide.fold<double>(
+            0,
+            (a, p) => a + p.kg * p.count,
+          );
+          expect(
+            base + 2 * perSide,
+            closeTo(s.achievableKg, 1e-6),
+            reason: '${mode.name} $kg kg shows ${s.breakdown}',
+          );
+        }
+      });
+    });
+
+    test('lists the same plates as tools/gen.py breakdown()', () {
+      // Copied from `breakdown()` in tools/gen.py (fewest plates, then the
+      // most of the biggest). The app and the programme doc must agree on
+      // what goes on the bar.
+      final barbell = <double, List<(double, int)>>{
+        11: [(0.5, 1)],
+        12: [(1, 1)],
+        13: [(1, 1), (0.5, 1)],
+        14: [(1, 2)],
+        18: [(2.5, 1), (1, 1), (0.5, 1)],
+        18.5: [(2.5, 1), (1.25, 1), (0.5, 1)],
+        19: [(2.5, 1), (1, 2)],
+        23: [(5, 1), (1, 1), (0.5, 1)],
+        24: [(5, 1), (1, 2)],
+        28: [(5, 1), (2.5, 1), (1, 1), (0.5, 1)],
+        29: [(5, 1), (2.5, 1), (1, 2)],
+        31.5: [(5, 1), (2.5, 1), (1.25, 1), (1, 2)],
+        34: [(10, 1), (1, 2)],
+        60: [(20, 1), (5, 1)],
+      };
+      final pair = <double, List<(double, int)>>{
+        5: [(1, 1), (0.5, 1)],
+        6: [(1, 1), (0.5, 2)],
+        11: [(2.5, 1), (1, 1), (0.5, 2)],
+      };
+      void check(LoadMode mode, Map<double, List<(double, int)>> table) {
+        table.forEach((kg, plates) {
+          final s = shipped.solve(kg, mode);
+          expect(
+            [for (final p in s.perSide) (p.kg, p.count)],
+            plates,
+            reason: '${mode.name} $kg kg shows ${s.breakdown}',
+          );
+        });
+      }
+
+      check(LoadMode.barbell, barbell);
+      check(LoadMode.dumbbellPair, pair);
+      expect(
+        shipped.solve(13, LoadMode.barbell).breakdown,
+        '13 kg = bar 10 + (1 + 0.5) per side',
+      );
+    });
+
+    test(
+      'every weight on every implement: exact, owned, and fewest plates',
+      () {
+        // A property, not examples: for EVERY lattice value, the listed plates
+        // sum to the weight, never use more of a size than one side owns, and
+        // use as few plates as any exact combination can.
+        for (final mode in ranges.keys) {
+          final base = kit.baseWeightFor(mode);
+          final budget = {for (final b in kit.budgetFor(mode)) b.kg: b.count};
+          final fewest = _fewestPlatesPerSide(budget);
+          for (final kg in shipped.lattice.values(mode)) {
+            final s = shipped.solve(kg, mode);
+            final why = '${mode.name} $kg kg shows ${s.breakdown}';
+            expect(s.isExact, isTrue, reason: why);
+            var sum = 0.0;
+            var plates = 0;
+            final seen = <double>{};
+            for (final p in s.perSide) {
+              expect(seen.add(p.kg), isTrue, reason: '$why: size listed twice');
+              expect(p.count, greaterThan(0), reason: why);
+              expect(
+                p.count,
+                lessThanOrEqualTo(budget[p.kg] ?? 0),
+                reason: '$why: more ${p.kg} kg plates than one side owns',
+              );
+              sum += p.kg * p.count;
+              plates += p.count;
+            }
+            expect(base + 2 * sum, closeTo(kg, 1e-6), reason: why);
+            final perSideUnits = ((kg - base) / 2 * 1000).round();
+            expect(
+              plates,
+              fewest[perSideUnits],
+              reason: '$why: not the fewest',
+            );
+          }
+        }
+      },
+    );
+
+    test('contention counts the plates actually listed', () {
+      // 14 kg on the bar is 1 + 1 per side: all four 1 kg plates. A pair of
+      // 4 kg dumbbells wants four more. A largest-first fill listed the bar
+      // as 1.25 + 0.5 a side and hid the clash.
+      final report = shipped.contention([
+        (kg: 14.0, mode: LoadMode.barbell),
+        (kg: 4.0, mode: LoadMode.dumbbellPair),
+      ]);
+      expect(report.isContended, isTrue);
+      expect(report.shortfall[1.0], 4);
+    });
+  });
+}
+
+/// The fewest plates that make each per-side total (in grams), by bounded
+/// knapsack over [budget] (plate kg -> count on one side). Independent of the
+/// solver's own search, so the property test is not the solver checking
+/// itself.
+Map<int, int> _fewestPlatesPerSide(Map<double, int> budget) {
+  var best = <int, int>{0: 0};
+  budget.forEach((kg, count) {
+    final grams = (kg * 1000).round();
+    final next = <int, int>{};
+    best.forEach((sum, plates) {
+      for (var n = 0; n <= count; n++) {
+        final s = sum + n * grams;
+        final p = plates + n;
+        if (p < (next[s] ?? 1 << 30)) next[s] = p;
+      }
+    });
+    best = next;
+  });
+  return best;
 }

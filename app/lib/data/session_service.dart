@@ -35,6 +35,11 @@ class SetEntry {
   final int? rir;
   final String? side;
   final bool isWarmup;
+
+  /// What the SUGGESTION asked for — a crept rep target, this week's run
+  /// length — not the prescription's base range. The engine reads these
+  /// back as the target to beat; logging the base range instead reset every
+  /// creep and deadlocked light dumbbell work (coach review §0 item 4).
   final int? targetRepsMin;
   final int? targetRepsMax;
   final double? targetLoadKg;
@@ -128,7 +133,9 @@ class SessionService {
           targetRepsMax: Value(e.targetRepsMax),
           targetLoadKg: Value(e.targetLoadKg),
           note: Value(e.note),
-          completedAt: DateTime.now(),
+          // The injected clock, like everything else here: history is
+          // ordered by this, and a replayed or retro-logged week needs it.
+          completedAt: _clock(),
         ),
       );
 

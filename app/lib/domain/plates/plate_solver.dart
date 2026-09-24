@@ -133,7 +133,9 @@ class PlateSolver {
         mode: mode,
         perSide: const [],
         breakdown: 'bar only — no plates configured',
-        warning: 'No plates in the inventory. Run the calibration in Settings.',
+        warning:
+            'No plates in the inventory. Add the plates you own under '
+            'Settings → Your equipment.',
       );
     }
 
@@ -158,7 +160,7 @@ class PlateSolver {
       achievable = lattice.snapDown(target, mode);
     }
 
-    final perSide = _greedyPerSide((achievable - base) / 2, mode);
+    final perSide = _perSide((achievable - base) / 2, mode);
     final step = lattice.smallestStepAt(achievable, mode);
     // Derived from the step rather than snapUp: snapUp is inclusive, so
     // snapping up from a value already on the lattice returns that value.
@@ -219,23 +221,75 @@ class PlateSolver {
     );
   }
 
-  /// Greedy from the heaviest plate down, respecting the per-side budget.
+  final Map<LoadMode, Map<int, List<PlateCount>>> _perSideCache = {};
+
+  /// The plates for one side: an EXACT search over what one side owns.
   ///
-  /// Greedy is optimal here because every plate size divides the next one up
-  /// in a standard collection. The lattice has already guaranteed the total
-  /// is reachable.
-  List<PlateCount> _greedyPerSide(double perSideKg, LoadMode mode) {
-    var remaining = perSideKg;
-    final out = <PlateCount>[];
-    for (final stock in inventory.budgetFor(mode)) {
-      if (remaining < stock.kg - _eps) continue;
-      final n = ((remaining + _eps) / stock.kg).floor().clamp(0, stock.count);
-      if (n > 0) {
-        out.add(PlateCount(stock.kg, n));
-        remaining = double.parse((remaining - stock.kg * n).toStringAsFixed(3));
-      }
+  /// Fewest plates first; among equally few, the most of the biggest size,
+  /// then the next — the same rule as `breakdown()` in tools/gen.py, so the
+  /// app and the programme doc list the same iron.
+  ///
+  /// Not greedy. Largest-first only works when every size divides the next
+  /// one up, and 1.25 kg next to 1.0 kg does not: greedy loads a 2 kg side
+  /// as 1.25 + 0.5 and is a quarter-kilo short, so the app said "14 kg" and
+  /// listed 13.5 kg of plates.
+  List<PlateCount> _perSide(double perSideKg, LoadMode mode) {
+    final target = (perSideKg * 1000).round();
+    if (target <= 0) return const [];
+    return (_perSideCache[mode] ??= {}).putIfAbsent(
+      target,
+      () => _search(target, inventory.budgetFor(mode)),
+    );
+  }
+
+  static List<PlateCount> _search(
+    int target,
+    List<({double kg, int count})> budget,
+  ) {
+    final grams = [for (final b in budget) (b.kg * 1000).round()];
+    // What the sizes from i onwards can add at most: prunes dead branches.
+    final reach = List<int>.filled(budget.length + 1, 0);
+    for (var i = budget.length - 1; i >= 0; i--) {
+      reach[i] = reach[i + 1] + grams[i] * budget[i].count;
     }
-    return out;
+
+    List<int>? best;
+    var bestPlates = 1 << 30;
+    final counts = List<int>.filled(budget.length, 0);
+
+    // Depth-first, largest size first, most plates of it first: the counts
+    // come out in descending lexicographic order, so the first exact answer
+    // found at a given plate count is the one that prefers bigger plates.
+    void walk(int i, int remaining, int plates) {
+      if (remaining == 0) {
+        if (plates < bestPlates) {
+          bestPlates = plates;
+          best = [...counts];
+        }
+        return;
+      }
+      if (i == budget.length || plates >= bestPlates) return;
+      if (remaining > reach[i]) return;
+      final most = remaining ~/ grams[i];
+      for (
+        var n = most < budget[i].count ? most : budget[i].count;
+        n >= 0;
+        n--
+      ) {
+        counts[i] = n;
+        walk(i + 1, remaining - n * grams[i], plates + n);
+      }
+      counts[i] = 0;
+    }
+
+    walk(0, target, 0);
+
+    final found = best;
+    if (found == null) return const []; // off the lattice: nothing exact
+    return List.unmodifiable([
+      for (var i = 0; i < budget.length; i++)
+        if (found[i] > 0) PlateCount(budget[i].kg, found[i]),
+    ]);
   }
 
   String _breakdown(
@@ -284,7 +338,10 @@ class PlateSolver {
     for (final item in simultaneous) {
       if (!item.mode.isPlateLoaded) continue;
       final base = inventory.baseWeightFor(item.mode);
-      final perSide = _greedyPerSide((item.kg - base) / 2, item.mode);
+      // What that load actually takes, not a nearby weight's plates: snap
+      // first, so an off-lattice request still counts real iron.
+      final kg = lattice.snapDown(item.kg, item.mode);
+      final perSide = _perSide((kg - base) / 2, item.mode);
       final multiplier = inventory.platesConsumedPer(item.mode);
       for (final p in perSide) {
         needed[p.kg] = (needed[p.kg] ?? 0) + p.count * multiplier;

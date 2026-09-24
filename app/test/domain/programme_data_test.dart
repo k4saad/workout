@@ -6,7 +6,9 @@ import 'package:keller_twelve/domain/plates/lattice.dart';
 
 import '../support/fixtures.dart';
 
-/// Validation gates V1-V13 from docs/02-data-model.md section 1.6.
+/// Validation gates V1-V13 from docs/02-data-model.md section 1.6, plus the
+/// v3 gates V15 (cardio-table runs name their column) and V16 (the kit makes
+/// every whole kilogram). V14 (licensed stills) lives in tools/validate.py.
 ///
 /// These mirror `tools/validate.py`. They fail the build, not a report — a
 /// programme that ships an unloadable weight or a 70-minute session is broken
@@ -359,9 +361,11 @@ void main() {
   group('V11 — the sixty-minute ceiling', () {
     const ceiling = 60;
 
-    test('no authored lift day exceeds 60 minutes', () {
+    test('no authored session exceeds 60 minutes, cardio days included', () {
+      // gen.py costs a cardio day at the longest week its cardio table can
+      // ask of it, so the week-11 35-minute run is inside Sunday's number.
       for (final b in owned) {
-        for (final d in b.days.where((d) => d.kind == DayKind.lift)) {
+        for (final d in b.days.where((d) => d.kind != DayKind.rest)) {
           expect(
             d.estMinutes,
             lessThanOrEqualTo(ceiling),
@@ -454,6 +458,95 @@ void main() {
         }
       },
     );
+  });
+
+  group('V15 — every cardio-table run names its column', () {
+    test('progression.table is long or second, with a row every week', () {
+      // Before v3 nothing said which column drove a run, so the table was
+      // never applied. Read from the raw JSON: this is a data contract.
+      const column = {'long': 'longRunMin', 'second': 'secondRunMin'};
+      final raw = Fixtures.programmeJson;
+      final rows = <int, Map<String, dynamic>>{
+        for (final r in (raw['cardioProgression'] as List).cast<Map>())
+          for (final w in (r['weeks'] as List).cast<int>())
+            w: r.cast<String, dynamic>(),
+      };
+      var runs = 0;
+      for (final b in (raw['blocks'] as List).cast<Map>()) {
+        for (final d in (b['days'] as List).cast<Map>()) {
+          for (final s in (d['sections'] as List).cast<Map>()) {
+            for (final p in (s['prescriptions'] as List).cast<Map>()) {
+              final prog = (p['progression'] as Map).cast<String, dynamic>();
+              if (prog['type'] != 'cardioTable') continue;
+              runs++;
+              final table = prog['table'];
+              expect(column.keys, contains(table), reason: '${p['id']}');
+              for (final w in (b['weeks'] as List).cast<int>()) {
+                expect(
+                  rows[w]?[column[table]],
+                  isNotNull,
+                  reason: '${p['id']}: no ${column[table]} in week $w',
+                );
+              }
+            }
+          }
+        }
+      }
+      expect(runs, greaterThanOrEqualTo(4));
+    });
+
+    test(
+      'Sunday runs read the long column, Tuesday and Wednesday the second',
+      () {
+        final raw = Fixtures.programmeJson;
+        for (final b in (raw['blocks'] as List).cast<Map>()) {
+          for (final d in (b['days'] as List).cast<Map>()) {
+            for (final s in (d['sections'] as List).cast<Map>()) {
+              for (final p in (s['prescriptions'] as List).cast<Map>()) {
+                final prog = p['progression'] as Map;
+                if (prog['type'] != 'cardioTable') continue;
+                expect(
+                  prog['table'],
+                  d['weekday'] == 'sun' ? 'long' : 'second',
+                  reason: '${p['id']} on ${d['weekday']}',
+                );
+              }
+            }
+          }
+        }
+      },
+    );
+  });
+
+  group('V16 — the kit makes every whole kilogram', () {
+    test('on the barbell, the EZ bar and the dumbbells', () {
+      // The v3 promise (docs/01 section 4), over the range the programme and
+      // cycle 2 can use. Losing the 1.0 kg plates would break it.
+      const ranges = {
+        LoadMode.barbell: 100,
+        LoadMode.ezBar: 30,
+        LoadMode.dumbbellPair: 22,
+        LoadMode.dumbbellSingle: 30,
+      };
+      ranges.forEach((mode, top) {
+        for (var kg = inventory.baseWeightFor(mode).ceil(); kg <= top; kg++) {
+          expect(
+            lattice.isValid(kg.toDouble(), mode),
+            isTrue,
+            reason: '$kg kg as ${mode.name}',
+          );
+        }
+      });
+    });
+
+    test('the bars are the definitive kit, collars included', () {
+      expect(inventory.barWeight('barbell'), 10.0);
+      expect(inventory.barWeight('ezBar'), 7.0);
+      expect(inventory.barWeight('dbHandle'), 2.0);
+      expect(inventory.collarWeightKg, 0.0);
+      expect(inventory.bars.every((b) => b.measured), isTrue);
+      expect(Fixtures.inventoryJson['revision'], 2);
+    });
   });
 
   group('data sanity beyond the gates', () {

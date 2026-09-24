@@ -41,6 +41,19 @@ class SessionRunnerScreen extends ConsumerStatefulWidget {
       _SessionRunnerScreenState();
 }
 
+/// What the steppers show and an untouched stepper logs: anything the athlete
+/// changed, else the suggestion (see [RunnerItem.prefill]).
+PendingSet _withPrefill(RunnerItem item, PendingSet p) {
+  final pre = item.prefill;
+  return PendingSet(
+    reps: p.reps ?? pre.reps,
+    loadKg: p.loadKg ?? pre.loadKg,
+    durationSec: p.durationSec ?? pre.durationSec,
+    distanceM: p.distanceM ?? pre.distanceM,
+    rir: p.rir,
+  );
+}
+
 class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
   RunnerState? _state;
   PendingSet _pending = const PendingSet();
@@ -92,8 +105,15 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
         retroactive: widget.retroDate != null,
       );
 
+      // What to load today, worked out once from the history BEFORE this
+      // session: the stepper pre-fills it and every set logs it as target.
+      final suggestions = await ref.read(suggestionServiceProvider.future);
       final controller = ref.read(runnerControllerProvider);
-      final loaded = await controller.load(session, day);
+      final loaded = await controller.load(
+        session,
+        day,
+        suggestions: await suggestions.forSession(session, day),
+      );
       if (!mounted) return;
       setState(() => _state = loaded);
 
@@ -123,8 +143,8 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
         content: Text(
           'You are ${s.elapsedMinutes(DateTime.now())} minutes in, with '
           '${s.visibleItems.where((i) => !i.isComplete).length} movements '
-          'left.\n\nSixty minutes means sixty minutes. Drop the optional '
-          'work and finish the main lifts properly.',
+          'left.\n\nSixty minutes means sixty minutes. Cut the last '
+          'superset and finish the main lifts properly.',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         actions: [
@@ -134,7 +154,7 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Cut the extras'),
+            child: const Text('Cut the last superset'),
           ),
         ],
       ),
@@ -156,16 +176,18 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
     if (s == null || next == null) return;
 
     final controller = ref.read(runnerControllerProvider);
+    // Exactly what the steppers show, so an untouched stepper logs its value.
+    final shown = _withPrefill(item, _pending);
     final updated = await controller.logSet(
       s,
       prescription: item.prescription,
       setIndex: next.setIndex,
       side: next.side,
-      reps: _pending.reps ?? item.prescription.repsMin,
-      loadKg: _pending.loadKg ?? item.suggestedLoadKg,
-      durationSec: _pending.durationSec,
-      distanceM: _pending.distanceM,
-      rir: _pending.rir,
+      reps: shown.reps,
+      loadKg: shown.loadKg,
+      durationSec: shown.durationSec,
+      distanceM: shown.distanceM,
+      rir: shown.rir,
       isWarmup: isWarmup,
       exerciseName: exercise.name,
     );
@@ -698,10 +720,14 @@ class _FocusCard extends ConsumerWidget {
             .asData
             ?.value ??
         [];
-    final suggestion = ref
-        .watch(suggestionProvider((p: p, mult: blockMultiplier)))
-        .asData
-        ?.value;
+    // The suggestion the session opened with — the one the stepper holds and
+    // the log records. The provider is only a fallback.
+    final suggestion =
+        item.suggestion ??
+        ref
+            .watch(suggestionProvider((p: p, mult: blockMultiplier)))
+            .asData
+            ?.value;
 
     return Card(
       child: Padding(
@@ -819,7 +845,7 @@ class _FocusCard extends ConsumerWidget {
               Gap.m,
               SetInput(
                 prescription: p,
-                value: pending,
+                value: _withPrefill(item, pending),
                 latticeStep: latticeStep,
                 onChanged: onPendingChanged,
               ),

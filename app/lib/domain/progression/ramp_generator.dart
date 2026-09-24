@@ -40,7 +40,8 @@ class RampGenerator {
 
   final PlateSolver solver;
 
-  /// Below this gap there is nothing worth ramping — just pull the bar out.
+  /// Below this gap the empty bar is the whole ramp: one set of 8 on it.
+  /// Within one plate step of the bar there is no ramp at all.
   static const minGapKg = 4.0;
 
   /// Above this gap, two intermediates instead of one.
@@ -60,9 +61,12 @@ class RampGenerator {
     final gap = workingKg - base;
     final rest = _restFor(exerciseId);
 
-    if (gap <= 0) {
-      return [RampSet(loadKg: base, reps: 8, restSec: rest)];
-    }
+    // Working on the bare bar, or one plate step off it: no ramp at all. A
+    // "warm-up" at the working weight is just an extra work set, and
+    // Foundation now ramps from week 1, when every main lift is the empty
+    // bar (coach review §7).
+    final step = solver.smallestStepAt(base, mode) ?? 0;
+    if (gap <= step + 1e-6) return const [];
 
     if (gap < minGapKg) {
       // The bar itself IS the warm-up at these loads.

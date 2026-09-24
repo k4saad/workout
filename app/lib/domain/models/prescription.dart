@@ -2,6 +2,21 @@ import 'package:collection/collection.dart';
 
 import 'enums.dart';
 
+/// Which `cardioProgression` column drives a `cardioTable` run.
+enum CardioColumn {
+  /// `longRunMin`: the Sunday run.
+  long,
+
+  /// `secondRunMin`: the midweek run.
+  second;
+
+  /// Lenient, like every enum here: an unknown column reads as none.
+  static CardioColumn? fromJson(String? v) =>
+      CardioColumn.values.where((e) => e.name == v).firstOrNull;
+
+  String toJson() => name;
+}
+
 /// The progression rule attached to a prescription.
 class Progression {
   const Progression({
@@ -12,6 +27,7 @@ class Progression {
     this.stallLimit = 2,
     this.historyWindowDays = 21,
     this.maxJumpPct = 0.10,
+    this.table,
   });
 
   final ProgressionType type;
@@ -32,6 +48,11 @@ class Progression {
   /// one lattice step — that is what deadlocked v1 (audit A1).
   final double maxJumpPct;
 
+  /// `cardioTable` only: which `cardioProgression` column sets this run's
+  /// length each week. The block resolver applies it (audit C4); a week
+  /// whose column is empty has no such run.
+  final CardioColumn? table;
+
   static const Progression none = Progression(type: ProgressionType.none);
 
   factory Progression.fromJson(Map<String, dynamic> j) => Progression(
@@ -42,6 +63,7 @@ class Progression {
     stallLimit: (j['stallLimit'] as num?)?.toInt() ?? 2,
     historyWindowDays: (j['historyWindowDays'] as num?)?.toInt() ?? 21,
     maxJumpPct: (j['maxJumpPct'] as num?)?.toDouble() ?? 0.10,
+    table: CardioColumn.fromJson(j['table'] as String?),
   );
 
   Map<String, dynamic> toJson() => {
@@ -52,6 +74,9 @@ class Progression {
     'stallLimit': stallLimit,
     'historyWindowDays': historyWindowDays,
     'maxJumpPct': maxJumpPct,
+    // Without this an in-app edit saved every run without its column, and
+    // the schema requires one for cardioTable.
+    if (table != null) 'table': table!.toJson(),
   };
 
   Progression copyWith({
@@ -62,6 +87,7 @@ class Progression {
     int? stallLimit,
     int? historyWindowDays,
     double? maxJumpPct,
+    CardioColumn? table,
   }) => Progression(
     type: type ?? this.type,
     incrementKg: incrementKg ?? this.incrementKg,
@@ -70,6 +96,7 @@ class Progression {
     stallLimit: stallLimit ?? this.stallLimit,
     historyWindowDays: historyWindowDays ?? this.historyWindowDays,
     maxJumpPct: maxJumpPct ?? this.maxJumpPct,
+    table: table ?? this.table,
   );
 
   @override
@@ -81,7 +108,8 @@ class Progression {
       other.deloadPct == deloadPct &&
       other.stallLimit == stallLimit &&
       other.historyWindowDays == historyWindowDays &&
-      other.maxJumpPct == maxJumpPct;
+      other.maxJumpPct == maxJumpPct &&
+      other.table == table;
 
   @override
   int get hashCode => Object.hash(
@@ -92,6 +120,7 @@ class Progression {
     stallLimit,
     historyWindowDays,
     maxJumpPct,
+    table,
   );
 }
 

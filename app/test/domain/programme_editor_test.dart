@@ -193,8 +193,15 @@ void main() {
       final day = next.blocks
           .expand((b) => b.days)
           .firstWhere((d) => d.id == 'b-mon');
+      final before = programme.blocks
+          .expand((b) => b.days)
+          .firstWhere((d) => d.id == 'b-mon');
       expect(day.weekday, Weekday.tue);
-      expect(day.allPrescriptions, hasLength(6));
+      expect(before.allPrescriptions, isNotEmpty);
+      expect(
+        day.allPrescriptions.map((p) => p.id),
+        before.allPrescriptions.map((p) => p.id),
+      );
     });
 
     test('removing a day removes only that day', () {

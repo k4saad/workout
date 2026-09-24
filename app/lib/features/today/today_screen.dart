@@ -12,6 +12,7 @@ import '../../domain/models/programme.dart';
 import '../common/widgets.dart';
 import 'widgets/backup_nag.dart';
 import 'widgets/dashboard_strip.dart';
+import 'widgets/upgrade_notice.dart';
 
 /// The home screen: what am I doing today, and is the rest of it on track.
 class TodayScreen extends ConsumerWidget {
@@ -61,6 +62,7 @@ class TodayScreen extends ConsumerWidget {
                         0) >
                     0,
               ),
+              const UpgradeNotice(),
               if (planned.status == ProgrammeStatus.active &&
                   planned.weekNo != null) ...[
                 Gap.m,
@@ -81,10 +83,6 @@ class TodayScreen extends ConsumerWidget {
                   ref: ref,
                 ),
               },
-              if (!b.inventory.isCalibrated) ...[
-                Gap.l,
-                const _CalibrationNag(),
-              ],
             ],
           );
         },
@@ -427,6 +425,7 @@ class _BeforeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
+    final firstWeek = programme.checkpointForWeek(1)?.items ?? const [];
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -445,12 +444,34 @@ class _BeforeCard extends StatelessWidget {
               DateFormat('EEEE d MMMM').format(programme.startDate),
               style: t.headlineSmall,
             ),
-            Gap.m,
-            Text(
-              'Before then: weigh both bars, count the plates, and take the '
-              'four baseline photos — you cannot shoot week 1 later.',
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-            ),
+            // What to do before then is the programme's own week-1
+            // checkpoint, not copy typed here.
+            if (firstWeek.isNotEmpty) ...[
+              Gap.m,
+              Text(
+                'Before then',
+                style: t.titleSmall?.copyWith(color: AppTheme.textDim),
+              ),
+              Gap.xs,
+              for (final item in firstWeek)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 3),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 2, right: 8),
+                        child: Icon(
+                          Icons.check_box_outline_blank,
+                          size: 18,
+                          color: AppTheme.textDim,
+                        ),
+                      ),
+                      Expanded(child: Text(item, style: t.bodyMedium)),
+                    ],
+                  ),
+                ),
+            ],
           ],
         ),
       ),
@@ -489,56 +510,6 @@ class _CompleteCard extends StatelessWidget {
                 label: const Text('Build the next cycle'),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Until the bars have been on a scale, every suggested load is a guess.
-/// Say so rather than pretending.
-class _CalibrationNag extends StatelessWidget {
-  const _CalibrationNag();
-
-  @override
-  Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
-    return InkWell(
-      onTap: () => context.go('/more/settings/gym'),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.warn.withValues(alpha: 0.10),
-          border: Border.all(color: AppTheme.warn.withValues(alpha: 0.45)),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(Icons.straighten, color: AppTheme.warn, size: 22),
-            Gap.m,
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Bar weights are still estimates',
-                    style: t.titleMedium?.copyWith(color: AppTheme.warn),
-                  ),
-                  Gap.xs,
-                  Text(
-                    'Every load below is computed from a guessed bar weight. '
-                    'Put both bars on the bathroom scale and correct them — '
-                    'it takes five minutes and it makes every number in this '
-                    'app real. Tap to do it now.',
-                    style: t.bodyMedium,
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right, color: AppTheme.warn),
           ],
         ),
       ),

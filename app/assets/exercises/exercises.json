@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "revision": 2,
-  "notes": "Exercise library for The Keller Twelve. 72 definitions carried from v1 plus four added for v2 (the wall cable and the step platform). media.still and media.stillLicence are written by tools/match_stills.py and carried over by every regeneration; media.youtubeUrl is added by hand, never guessed. stillSearchTerm is a matching hint for free-exercise-db, NOT a verified slug.",
+  "revision": 3,
+  "notes": "Exercise library for The Keller Twelve. 72 definitions carried from v1, four added for v2 (the wall cable and the step platform) and two for v3 (the ring hamstring curl and strides). media.still and media.stillLicence are written by tools/match_stills.py and carried over by every regeneration; media.youtubeUrl is added by hand, never guessed. stillSearchTerm is a matching hint for free-exercise-db, NOT a verified slug.",
   "exercises": [
     {
       "id": "ab-wheel-knees",
@@ -2154,7 +2154,7 @@
       ],
       "defaultLoadMode": "bodyweight",
       "cues": [
-        "Kneel on the mat and anchor your heels under a heavy loaded barbell.",
+        "Kneel on the mat and anchor your heels under a loaded barbell lying on the floor, padded with the folded mat. Never the squat stand — it can tip.",
         "Lower your torso as slowly as you can control, then catch yourself with your hands.",
         "Push back up with the hands and reset. Only the lowering counts."
       ],
@@ -2597,6 +2597,56 @@
       "progressionNote": null
     },
     {
+      "id": "ring-hamstring-curl",
+      "name": "Ring hamstring curl",
+      "aliases": [
+        "suspension hamstring curl",
+        "ring leg curl"
+      ],
+      "pattern": "hinge",
+      "primaryMuscles": [
+        "hamstrings"
+      ],
+      "secondaryMuscles": [
+        "glutes"
+      ],
+      "equipment": [
+        "rings",
+        "mat"
+      ],
+      "defaultLoadMode": "bodyweight",
+      "cues": [
+        "Rings low, about 20 cm off the floor. Lie on your back on the mat and put your heels in the rings, arms flat by your sides.",
+        "Squeeze the glutes and lift the hips until knees, hips and shoulders are one line.",
+        "Keep the hips up and curl your heels towards your backside.",
+        "Straighten the legs slowly, over three seconds, without letting the hips drop.",
+        "Too hard: let the hips come down between reps. Too easy: one leg at a time."
+      ],
+      "commonErrors": [
+        "Hips sagging as the legs straighten — the lower back takes over from the hamstrings.",
+        "Rushing the way out. The slow straightening is most of the rep.",
+        "Heels drifting apart, so the rings swing."
+      ],
+      "soloSafety": "Rings low, about 20 cm off the floor: a slipped heel drops you a hand's width onto the mat. Nothing to fail under.",
+      "media": {
+        "still": null,
+        "stillLicence": null,
+        "stillSearchTerm": "suspension hamstring curl",
+        "youtubeUrl": null,
+        "youtubeStartSec": 0
+      },
+      "substitutes": [
+        "slider-hamstring-curl",
+        "nordic-curl-negative"
+      ],
+      "tags": [
+        "accessory",
+        "soloSafe"
+      ],
+      "equipmentNote": "Uses the gymnastic rings, set at their lowest.",
+      "progressionNote": "Reps first, up to 15. Then slower on the way out, then one leg."
+    },
+    {
       "id": "ring-row",
       "name": "Ring row",
       "aliases": [
@@ -2727,6 +2777,48 @@
       ],
       "equipmentNote": null,
       "progressionNote": null
+    },
+    {
+      "id": "running-strides",
+      "name": "Strides",
+      "aliases": [
+        "relaxed strides",
+        "stride-outs"
+      ],
+      "pattern": "conditioning",
+      "primaryMuscles": [
+        "legs"
+      ],
+      "secondaryMuscles": [
+        "calves"
+      ],
+      "equipment": [],
+      "defaultLoadMode": "timed",
+      "cues": [
+        "Straight after the easy run, on flat ground.",
+        "Build smoothly over 15 seconds to about 80% of a sprint — quick and tall, relaxed shoulders and hands.",
+        "Walk back to the start. Begin the next one when your breathing has settled.",
+        "Four of them. They teach you to run fast without straining, and they cost two or three minutes."
+      ],
+      "commonErrors": [
+        "Sprinting them. A stride should feel fast and easy at the same time.",
+        "Doing them cold. They belong after the run, never before."
+      ],
+      "soloSafety": "Skip them if the calves or Achilles are sore — that is the injury this programme ramps skipping and running to avoid.",
+      "media": {
+        "still": null,
+        "stillLicence": null,
+        "stillSearchTerm": null,
+        "youtubeUrl": null,
+        "youtubeStartSec": 0
+      },
+      "substitutes": [],
+      "tags": [
+        "conditioning",
+        "timed"
+      ],
+      "equipmentNote": null,
+      "progressionNote": "None. Four relaxed strides every Sunday of Build and Push."
     },
     {
       "id": "seated-dumbbell-press",
@@ -2908,7 +3000,8 @@
       ],
       "defaultLoadMode": "bodyweight",
       "cues": [
-        "Lie on your back, heels on a towel or sliders, hips lifted. Slide the feet out and drag them back in with the hamstrings."
+        "Lie on your back with your heels on a towel on bare floor, not on the foam mats — the mats grip, and the towel will not slide.",
+        "Lift the hips, slide the feet out and drag them back in with the hamstrings."
       ],
       "commonErrors": [
         "Letting the hips drop as the legs extend."
@@ -2927,7 +3020,7 @@
       "tags": [
         "beginnerFriendly"
       ],
-      "equipmentNote": null,
+      "equipmentNote": "A towel and a stretch of bare floor. Sliders do the same job.",
       "progressionNote": null
     },
     {
@@ -3063,7 +3156,7 @@
       ],
       "equipment": [
         "stepPlatform",
-        "dumbbell"
+        "dumbbells"
       ],
       "defaultLoadMode": "dumbbellPair",
       "cues": [

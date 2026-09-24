@@ -3,6 +3,7 @@ import 'package:keller_twelve/domain/models/enums.dart';
 import 'package:keller_twelve/domain/models/inventory.dart';
 import 'package:keller_twelve/domain/models/prescription.dart';
 import 'package:keller_twelve/domain/plates/plate_solver.dart';
+import 'package:keller_twelve/domain/programme/block_resolver.dart';
 import 'package:keller_twelve/domain/progression/logged_set.dart';
 import 'package:keller_twelve/domain/progression/progression_engine.dart';
 
@@ -15,7 +16,9 @@ import '../support/fixtures.dart';
 /// lattice, v1 would earn a jump, clamp it to 10%, round that down to zero,
 /// and report "earned the jump" while suggesting the same weight forever.
 void main() {
-  final fine = Fixtures.inventory; // 0.25 kg microplates -> 0.5 kg step
+  // The pinned v2 inventory these cases were written for: a 9 kg bar and
+  // 0.25 kg microplates -> a 0.5 kg step. Engine behaviour, not shipped data.
+  final fine = Fixtures.legacyInventory;
   final coarse = Inventory(
     bars: fine.bars,
     plates: fine.plates.where((p) => p.weightKg >= 1.25).toList(),
@@ -478,6 +481,119 @@ void main() {
       );
       expect(s.isStalled, isTrue);
       expect(s.repTargetMax, 10, reason: 'the crept target is kept');
+    });
+  });
+
+  group('v3: the shipped kit and programme (coach review §0)', () {
+    final programme = Fixtures.programme;
+    final resolver = BlockResolver(programme);
+    final shipped = ProgressionEngine(PlateSolver(Fixtures.inventory));
+
+    Prescription resolved(String blockId, int week, String id) => resolver
+        .resolveDays(programme.blockById(blockId)!, week)
+        .expand((d) => d.allPrescriptions)
+        .firstWhere((p) => p.id == id);
+
+    List<LoggedSet> topOfRange(Prescription p, double load) => [
+      for (var i = 0; i < p.sets; i++)
+        LoggedSet(
+          reps: p.repsMax,
+          loadKg: load,
+          rir: p.targetRir,
+          targetRepsMin: p.repsMin,
+          targetRepsMax: p.repsMax,
+          completedAt: DateTime(2026, 10, 26, 18, i),
+        ),
+    ];
+
+    test('an empty bar takes the whole Foundation increment', () {
+      // At 10 kg a 10% cap is 1 kg; the data widens maxJumpPct in
+      // Foundation so the empty-bar lifts can actually climb (item 1).
+      for (final id in [
+        'f-mon-1',
+        'f-wed-1',
+        'f-wed-2',
+        'f-fri-1',
+        'f-fri-2',
+      ]) {
+        final p = resolved('foundation', 1, id);
+        expect(p.startLoadKg, 10, reason: id);
+        final s = shipped.suggest(
+          prescription: p,
+          history: topOfRange(p, 10),
+          now: now,
+        );
+        expect(
+          s.suggestedKg,
+          10 + p.progression.incrementKg,
+          reason: '$id: ${s.reason}',
+        );
+        expect(s.isRepCreep, isFalse, reason: id);
+      }
+    });
+
+    test('logging RIR 3 in Foundation earns the jump (item 6)', () {
+      final p = resolved('foundation', 2, 'f-mon-1');
+      expect(p.targetRir, 3);
+      final s = shipped.suggest(
+        prescription: p,
+        history: topOfRange(p, 13),
+        now: now,
+      );
+      expect(s.suggestedKg, 16);
+    });
+
+    test('a deload cold start is scaled once, not 0.7 x 0.7 (minor)', () {
+      // The resolver has already put the 70% into startLoadKg.
+      final p = resolved('deload', 8, 'b-mon-1');
+      final build = resolved('build', 5, 'b-mon-1');
+      expect(p.startLoadKg, closeTo(build.startLoadKg! * 0.7, 1e-9));
+      final s = shipped.suggest(
+        prescription: p,
+        history: const [],
+        blockLoadMultiplier: 0.7,
+        now: now,
+      );
+      expect(
+        s.suggestedKg,
+        shipped.solver.solve(p.startLoadKg!, p.loadMode).achievableKg,
+      );
+      expect(s.reason.toLowerCase(), contains('deload'));
+    });
+
+    test('an unloaded history cannot earn a loaded jump', () {
+      // Foundation's split squat is bodyweight; Build's is loaded from 6 kg.
+      // Twelve bodyweight reps say nothing about 6 kg dumbbells, so week 5
+      // starts at the programme's 6, not one jump past a weight never lifted.
+      final p = resolved('build', 5, 'b-mon-3a');
+      expect(p.loadMode, LoadMode.dumbbellPair);
+      final s = shipped.suggest(
+        prescription: p,
+        history: [
+          for (var i = 0; i < 6; i++)
+            LoggedSet(
+              reps: 12,
+              rir: 3,
+              targetRepsMin: 8,
+              targetRepsMax: 12,
+              side: i.isEven ? 'L' : 'R',
+              completedAt: DateTime(2026, 10, 30, 18, i),
+            ),
+        ],
+        now: now,
+      );
+      expect(s.suggestedKg, p.startLoadKg);
+      expect(s.repTargetMin, p.repsMin);
+      expect(s.repTargetMax, p.repsMax);
+    });
+
+    test('a cardio table run targets its resolved week, in seconds', () {
+      final p = resolved('push', 11, 'b-sun-1');
+      final s = shipped.suggest(prescription: p, history: const [], now: now);
+      expect(s.suggestedKg, isNull);
+      expect(s.repTargetMin, p.repsMin);
+      expect(s.repTargetMax, p.repsMax);
+      expect(s.reason, contains('35 min'));
     });
   });
 

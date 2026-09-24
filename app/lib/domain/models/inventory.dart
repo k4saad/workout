@@ -13,8 +13,10 @@ class Bar {
   final String name;
   final double weightKg;
 
-  /// False until it has actually been on a bathroom scale. The plate solver is
-  /// garbage-in until this is true for every bar (docs/04-calibration.md).
+  /// True when [weightKg] is the bar's real weight, collars included — the
+  /// definitive kit ships this way, and a weight the athlete sets himself is
+  /// real too. False only in pre-v3 inventories, whose bars were placeholder
+  /// guesses; the shipped-revision upgrade replaces those.
   final bool measured;
 
   factory Bar.fromJson(Map<String, dynamic> j) => Bar(
@@ -124,6 +126,7 @@ class RoomDimensions {
 /// wrong plate counts make the solver propose weights that cannot be built.
 class Inventory {
   const Inventory({
+    this.revision = 1,
     this.bars = const [],
     this.plates = const [],
     this.fixedDumbbells = const [],
@@ -132,6 +135,11 @@ class Inventory {
     this.room = const RoomDimensions(),
   });
 
+  /// Which shipped kit this descends from. Saving keeps it, so the file
+  /// itself says which release it came from; pre-v3 files have none and read
+  /// as 1. The shipped-revision upgrade compares it with the asset's.
+  final int revision;
+
   final List<Bar> bars;
   final List<PlateStock> plates;
   final List<FixedDumbbell> fixedDumbbells;
@@ -139,8 +147,7 @@ class Inventory {
   final double collarWeightKg;
   final RoomDimensions room;
 
-  /// True once every bar has actually been weighed. Until then the app should
-  /// say so loudly rather than pretending its numbers are real.
+  /// True when every bar's weight is known rather than guessed.
   bool get isCalibrated => bars.isNotEmpty && bars.every((b) => b.measured);
 
   Bar? bar(String id) {
@@ -192,6 +199,7 @@ class Inventory {
   }
 
   factory Inventory.fromJson(Map<String, dynamic> j) => Inventory(
+    revision: (j['revision'] as num?)?.toInt() ?? 1,
     bars: (j['bars'] as List? ?? const [])
         .map((e) => Bar.fromJson(e as Map<String, dynamic>))
         .toList(),
@@ -211,6 +219,7 @@ class Inventory {
   );
 
   Map<String, dynamic> toJson() => {
+    'revision': revision,
     'bars': bars.map((e) => e.toJson()).toList(),
     'plates': plates.map((e) => e.toJson()).toList(),
     'fixedDumbbells': fixedDumbbells.map((e) => e.toJson()).toList(),
@@ -220,6 +229,7 @@ class Inventory {
   };
 
   Inventory copyWith({
+    int? revision,
     List<Bar>? bars,
     List<PlateStock>? plates,
     List<FixedDumbbell>? fixedDumbbells,
@@ -227,6 +237,7 @@ class Inventory {
     double? collarWeightKg,
     RoomDimensions? room,
   }) => Inventory(
+    revision: revision ?? this.revision,
     bars: bars ?? this.bars,
     plates: plates ?? this.plates,
     fixedDumbbells: fixedDumbbells ?? this.fixedDumbbells,

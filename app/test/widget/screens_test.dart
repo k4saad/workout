@@ -91,14 +91,24 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Today warns that the bars are still guesses', (tester) async {
-    // Tall viewport: ListView builds lazily, and the nag sits below the fold,
-    // now under the dashboard strip as well.
+  testWidgets('Today no longer nags about bar weights', (tester) async {
+    // v3 ships the definitive kit (measured: true, collars included), so the
+    // "bars are still estimates" nag and the "weigh both bars" copy are gone
+    // — on day one and before it. Tall viewport: ListView builds lazily.
+    expect(bundle.inventory.bars.every((b) => b.measured), isTrue);
     phoneSized(tester, const Size(400, 2600));
-    await draw(tester, const TodayScreen());
-    // inventory.json ships with measured:false. Until the bars are weighed,
-    // every load in the app is fiction and it must say so.
-    expect(find.textContaining('still estimates'), findsOneWidget);
+    final before = ProgrammeCalendar.addDays(bundle.programme.startDate, -3);
+    for (final today in [bundle.programme.startDate, before]) {
+      await draw(tester, const TodayScreen(), today: today);
+      expect(find.textContaining('still estimates'), findsNothing);
+      expect(find.textContaining('bathroom'), findsNothing);
+      expect(find.textContaining(RegExp('weigh both bars')), findsNothing);
+    }
+
+    // What to do before week 1 is the programme's own week-1 checkpoint.
+    for (final item in bundle.programme.checkpointForWeek(1)!.items) {
+      expect(find.text(item), findsOneWidget, reason: item);
+    }
   });
 
   testWidgets('Week renders seven day cards', (tester) async {

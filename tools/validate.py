@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validation gates V1-V13 from docs/02-data-model.md, section 1.6, plus V14+
+"""Validation gates V1-V13 from docs/02-data-model.md, section 1.6, plus V14-V16
 added in v3 (docs/06-v3-plan.md).
 
 These are the same assertions Phase 1 ports to `flutter test`. Run this after any
@@ -288,33 +288,90 @@ if orphans:
     fail("V10", f"{len(orphans)} library exercises are unreachable: {', '.join(orphans)}")
 
 # =========================================== V11 sixty-minute ceiling ========
+# Every session, not only lift days: gen.py costs a cardio day at the longest
+# week its cardio table can ask of it, so a 35-minute week-11 run is inside
+# the number. (Before v3 cardio days were not gated, and b-sun's estimate used
+# the 26-minute week-5 run.)
 CEIL = 60
 for b in OWN:
     for d in b.get("days", []):
-        if d["kind"] == "lift" and d["estMinutes"] > CEIL:
+        if d["kind"] != "rest" and d["estMinutes"] > CEIL:
             fail("V11", f"{d['id']} '{d['title']}': {d['estMinutes']} min exceeds the "
                         f"{CEIL} min ceiling")
 # the deload and push blocks inherit, so check the resolved set counts too
+RESOLVED = {}   # (block, day) -> (estimate, arithmetic), for the report
+
+
+def inherited_estimate(b, d):
+    mult = b.get("setMultiplier", 1.0)
+    # push adds sets via overrides; approximate by scaling the source estimate
+    extra, why = 0.0, []
+    ov = (b.get("dayOverrides") or {}).get(d["id"], {})
+    for pid, po in (ov.get("prescriptionOverrides") or {}).items():
+        if "sets" in po:
+            base = next((p["sets"] for s in d["sections"]
+                         for p in s.get("prescriptions", []) if p["id"] == pid), 0)
+            add = max(0, po["sets"] - base)
+            if add:
+                extra += add * 3.2   # ~190 s per heavy set
+                why.append(f"{add} x 3.2 ({pid})")
+        if po.get("optional") is False:
+            extra += 4.5
+            why.append(f"4.5 ({pid} switched on)")
+    est = d["estMinutes"] * mult + extra
+    head = f"{d['estMinutes']}" + (f" x {mult:g}" if mult != 1.0 else "")
+    return est, " + ".join([head] + why)
+
+
 for b in prog["blocks"]:
     if not b.get("inheritsDaysFrom"):
         continue
-    mult = b.get("setMultiplier", 1.0)
     for d in source_days(b):
         if d["kind"] != "lift":
             continue
-        # push adds sets via overrides; approximate by scaling the source estimate
-        extra = 0
-        ov = (b.get("dayOverrides") or {}).get(d["id"], {})
-        for pid, po in (ov.get("prescriptionOverrides") or {}).items():
-            if "sets" in po:
-                base = next((p["sets"] for s in d["sections"]
-                             for p in s.get("prescriptions", []) if p["id"] == pid), 0)
-                extra += max(0, po["sets"] - base) * 3.2   # ~190 s per heavy set
-            if po.get("optional") is False:
-                extra += 4.5
-        est = d["estMinutes"] * mult + extra
+        est, why = inherited_estimate(b, d)
+        RESOLVED[(b["id"], d["id"])] = (est, why)
         if est > CEIL:
             fail("V11", f"{b['id']}/{d['id']} resolves to ~{est:.0f} min, over the {CEIL} ceiling")
+
+# ================================= V15 every cardio-table run names its column =
+# Before v3 no prescription said which column of cardioProgression drove it, so
+# the table was never applied and every run showed its static week-5 value.
+COLUMN = {"long": "longRunMin", "second": "secondRunMin"}
+ROW_FOR = {w: r for r in prog.get("cardioProgression", []) for w in r["weeks"]}
+for b in OWN:
+    weeks = list(b["weeks"]) + [w for i in prog["blocks"]
+                                if i.get("inheritsDaysFrom") == b["id"] for w in i["weeks"]]
+    for d, s, p in all_prescriptions(b.get("days", [])):
+        if p["progression"]["type"] != "cardioTable":
+            continue
+        table = p["progression"].get("table")
+        if table not in COLUMN:
+            fail("V15", f"{p['id']}: cardioTable run without a valid progression.table "
+                        f"(got {table!r}; expected one of {sorted(COLUMN)})")
+            continue
+        for w in weeks:
+            row = ROW_FOR.get(w)
+            if row is None:
+                fail("V15", f"{p['id']}: no cardioProgression row for week {w}")
+            elif row.get(COLUMN[table]) is None:
+                if w in b["weeks"]:
+                    fail("V15", f"{p['id']}: {COLUMN[table]} is null in week {w}, a week its "
+                                f"own block runs it")
+                else:
+                    warn(f"V15 {p['id']} ({d['id']}): no {table} run in week {w} "
+                         f"({COLUMN[table]} is null). The engine must show that run as not "
+                         f"prescribed that week, not fall back to the static reps.")
+
+# ======================================= V16 the kit makes every whole kilogram =
+# The v3 promise (docs/01 section 4): with the definitive kit, every whole kg is
+# loadable on every implement across the range the programme and cycle 2 use.
+KIT_RANGE = {"barbell": 100, "ezBar": 30, "dumbbellPair": 22, "dumbbellSingle": 30}
+for mode, top in KIT_RANGE.items():
+    have = {round(a, 3) for a in LAT[mode]}
+    gaps = [kg for kg in range(int(BASE[mode] + 0.999), top + 1) if float(kg) not in have]
+    if gaps:
+        fail("V16", f"{mode}: the kit cannot make {gaps} kg")
 
 # ---------------------------------------------------- informational report ---
 print("=" * 74)
@@ -328,18 +385,22 @@ print(f"loads checked  {checked} startLoadKg values against the lattice")
 print(f"lattice step   barbell {LAT['barbell'][1]-LAT['barbell'][0]:.2f} kg  |  "
       f"dumbbell {LAT['dumbbellPair'][1]-LAT['dumbbellPair'][0]:.2f} kg per DB")
 
-print("\nSESSION LENGTHS")
+print("\nSESSION LENGTHS  (cardio days at their longest cardio-table week)")
 for b in OWN:
     for d in b.get("days", []):
         if d["kind"] == "rest":
             continue
         n = sum(p["sets"] for _, _, p in all_prescriptions([d]))
-        flag = "  <-- OVER" if (d["kind"] == "lift" and d["estMinutes"] > CEIL) else ""
+        flag = "  <-- OVER" if d["estMinutes"] > CEIL else ""
         opt = " (optional)" if d.get("optional") else ""
         print(f"  {b['id']:11s} {d['weekday']}  {d['title'][:26]:28s} "
               f"{d['estMinutes']:3d} min  {n:2d} sets{opt}{flag}")
+for (bid, did), (est, why) in RESOLVED.items():
+    flag = "  <-- OVER" if est > CEIL else ""
+    print(f"  {bid:11s} {did:6s} resolves to {est:5.1f} min  = {why}{flag}")
 
-print("\nWEEKLY SETS PER PRIMARY MUSCLE")
+print("\nWEEKLY HARD SETS PER MUSCLE  (primary 1, secondary 0.5; runs, skipping and bag "
+      "excluded)")
 for bid in ("foundation", "build"):
     vol = collections.Counter()
     for d in BLOCKS[bid]["days"]:
@@ -348,13 +409,16 @@ for bid in ("foundation", "build"):
             if s["type"] not in ("main", "finisher", "cardio"):
                 continue
             for p in s["prescriptions"]:
-                if p.get("optional"):
+                ex = LIB[p["exerciseId"]]
+                if p.get("optional") or ex.get("pattern") == "conditioning":
                     continue
-                for m in LIB[p["exerciseId"]].get("primaryMuscles", []):
+                for m in ex.get("primaryMuscles", []):
                     vol[m] += p["sets"]
+                for m in ex.get("secondaryMuscles", []):
+                    vol[m] += p["sets"] * 0.5
     lo = [m for m, n in vol.items() if n < 6]
     hi = [m for m, n in vol.items() if n > 18]
-    print(f"  {bid}: " + "  ".join(f"{m} {n}" for m, n in vol.most_common()))
+    print(f"  {bid}: " + "  ".join(f"{m} {n:g}" for m, n in vol.most_common()))
     if lo:
         print(f"    low (<6):  {', '.join(lo)}")
     if hi:
@@ -418,5 +482,5 @@ if failures:
     for f in failures:
         print(f"  X {f}")
     sys.exit(1)
-print("ALL GATES PASSED (V1-V14)")
+print("ALL GATES PASSED (V1-V16)")
 sys.exit(0)

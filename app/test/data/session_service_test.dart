@@ -112,6 +112,32 @@ void main() {
       expect(rows.single.targetLoadKg, 21);
     });
 
+    test('a set is stamped by the service clock, not the wall clock', () async {
+      // Replaying a week of training in a test, or logging a session from
+      // memory, needs the timestamps the service is told.
+      final at = DateTime(2026, 11, 2, 18, 42, 7);
+      final clocked = SessionService(db, clock: () => at);
+      final s = await clocked.start(
+        programmeId: programme.id,
+        blockId: 'build',
+        day: monday(),
+        weekNo: 5,
+        date: DateTime(2026, 11, 2),
+      );
+      await clocked.logSet(
+        s.id,
+        const SetEntry(
+          prescriptionId: 'b-mon-1',
+          exerciseId: 'barbell-back-squat',
+          setIndex: 1,
+          reps: 5,
+          loadKg: 21,
+        ),
+      );
+      final row = (await db.setsForSession(s.id)).single;
+      expect(row.completedAt, at);
+    });
+
     test('a killed session is resumable', () async {
       final s = await startMonday();
       await svc.logSet(
@@ -251,8 +277,8 @@ void main() {
       final before = await svc.progress(s.id, day);
       expect(before.done, 0);
       // 4 squat + 3 RDL + 6 BSS (per side) + 6 calf (per side) + 3 knee raise
-      // + 3 negatives = 25
-      expect(before.planned, 25);
+      // + 3 negatives + 3 lateral raises = 28
+      expect(before.planned, 28);
 
       await svc.logSet(
         s.id,

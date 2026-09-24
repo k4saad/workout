@@ -52,6 +52,9 @@ final suggestionServiceProvider = FutureProvider<SuggestionService>((
   return SuggestionService(
     db: ref.watch(databaseProvider),
     inventory: bundle.inventory,
+    // Which blocks are deloads and tests (never history), and each
+    // session's load multiplier.
+    programme: bundle.programme,
   );
 });
 

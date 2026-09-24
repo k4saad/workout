@@ -299,8 +299,14 @@
         "maxJumpPct": {
           "description": "Above this fraction of current load, a single lattice step is too big a jump and rep creep engages instead. The clamp must never reduce a jump below one lattice step.",
           "type": "number", "minimum": 0, "maximum": 1
+        },
+        "table": {
+          "description": "cardioTable only: which cardioProgression column drives this run. 'long' reads longRunMin, 'second' reads secondRunMin. A null column in a week means no such run that week, not a fallback to the prescription's own reps. Required when type is cardioTable (v3).",
+          "enum": ["long", "second"]
         }
-      }
+      },
+      "if": { "properties": { "type": { "const": "cardioTable" } } },
+      "then": { "required": ["type", "table"] }
     }
   }
 }

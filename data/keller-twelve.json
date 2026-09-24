@@ -2,7 +2,7 @@
   "id": "keller-twelve",
   "name": "The Keller Twelve",
   "schemaVersion": 2,
-  "revision": 1,
+  "revision": 2,
   "startDate": "2026-09-28",
   "totalWeeks": 12,
   "notes": "Beginner hypertrophy block for a 167 cm / 50 kg lifter training alone five evenings a week in a basement gym, on a 60-minute session ceiling. Every load in this file is snapped to the plate lattice described in inventory.json -- change the inventory and regenerate with tools/gen.py rather than editing loads by hand. Cardio is deliberately capped so it does not eat the caloric surplus.",
@@ -75,7 +75,7 @@
   },
   "rules": [
     "Eat in surplus every single day. A missed meal is a missed session.",
-    "Leave 2 reps in the tank -- 3 to 4 during weeks 1 to 4.",
+    "Leave 2 reps in the tank -- 3 during weeks 1 to 4.",
     "Collars on. Check them mid-set. Spinlock collars work loose under load.",
     "Never fail alone under a bar. Set the catch pins, or press dumbbells.",
     "Add weight only when you earn it: top of the rep range on every set.",
@@ -97,7 +97,7 @@
         12,
         15
       ],
-      "skipping": "Warm-up 6 x 45 s",
+      "skipping": "Tue 6 x 60 s · Sun 3 x 60 s",
       "bag": null,
       "note": "Calves and Achilles need four weeks to adapt. Don't rush this."
     },
@@ -114,9 +114,9 @@
         15,
         18
       ],
-      "skipping": "Warm-up 6 x 60 s",
-      "bag": "Sun 2 x 2 min",
-      "note": "The bag appears. Wraps or gloves, always."
+      "skipping": "Tue 6 x 60 s · Sun 3 x 60 s",
+      "bag": null,
+      "note": "A little longer, same easy pace. The bag arrives with Build in week 5."
     },
     {
       "weeks": [
@@ -131,9 +131,9 @@
         20,
         20
       ],
-      "skipping": "Warm-up 3 min - Sun 8 x 30 s fast",
+      "skipping": "Warm-up 3 min on lift days",
       "bag": "Sun 3 x 2 min",
-      "note": "Second run becomes the optional Wednesday. Skip it if you are behind on food."
+      "note": "Second run becomes the optional Wednesday -- skip it if you are behind on food. Strides after the Sunday run from now on. The bag appears: wraps or gloves."
     },
     {
       "weeks": [
@@ -147,7 +147,7 @@
         20,
         20
       ],
-      "skipping": "Warm-up 3 min - Sun 8 x 30 s fast",
+      "skipping": "Warm-up 3 min on lift days",
       "bag": "Sun 3 x 2 min",
       "note": "Highest cardio week before the deload."
     },
@@ -160,9 +160,9 @@
         15
       ],
       "secondRunMin": null,
-      "skipping": "5 x 60 s",
-      "bag": null,
-      "note": "Deload. Everything comes down, including this."
+      "skipping": "Warm-up 3 min on lift days",
+      "bag": "Sun 2 x 2 min",
+      "note": "Deload. Everything comes down, including this. No Wednesday run, no strides."
     },
     {
       "weeks": [
@@ -177,7 +177,7 @@
         20,
         25
       ],
-      "skipping": "Warm-up 3 min - Sun 10 x 30 s fast",
+      "skipping": "Warm-up 3 min on lift days",
       "bag": "Sun 3 x 2 min",
       "note": "Runs get longer, never faster."
     },
@@ -193,9 +193,9 @@
         25,
         25
       ],
-      "skipping": "Warm-up 3 min - Sun 10 x 30 s fast",
-      "bag": "Sun 3 x 3 min",
-      "note": "Last easy long run."
+      "skipping": "Warm-up 3 min on lift days",
+      "bag": "Sun 3 x 2 min",
+      "note": "Last easy long run -- the longest Sunday of the cycle, and it still fits the hour."
     },
     {
       "weeks": [
@@ -203,7 +203,7 @@
       ],
       "longRunMin": null,
       "secondRunMin": null,
-      "skipping": "5 x 60 s",
+      "skipping": "Warm-up 3 min on lift days",
       "bag": null,
       "note": "5K time trial replaces the Sunday run. Target 28-32 min."
     }
@@ -216,10 +216,9 @@
         50.5
       ],
       "items": [
-        "Baseline photos -- all four poses, normal camera app",
+        "Baseline photos -- all four poses, in the app's capture screen. It keeps them private; the phone's camera app would put them in the gallery",
         "All five measurements: waist, chest, upper arm, thigh, neck",
-        "WEIGH both bars and both dumbbell handles, then update inventory.json",
-        "Count every plate and weigh one of each size",
+        "Confirm the kit: barbell 10 kg, EZ bar 7 kg, handles 2 kg (collars included); plates as listed in Settings → Your equipment",
         "Measure ceiling clearance for overhead press and for skipping",
         "First bodyweight entry"
       ]
@@ -271,86 +270,86 @@
     {
       "exerciseId": "barbell-back-squat",
       "week4Kg": [
-        18,
-        18
+        19.0,
+        19.0
       ],
       "week12Kg": [
-        36,
-        36
+        34.0,
+        34.0
       ],
       "reps": 5,
       "isFloor": true,
-      "note": "e1RM ~42 kg, 0.76x bodyweight. A FLOOR, not a goal."
+      "note": "e1RM ~40 kg, 0.72x a 55 kg bodyweight. A FLOOR, not a goal."
     },
     {
       "exerciseId": "barbell-deadlift",
       "week4Kg": [
-        39,
-        39
+        25.0,
+        25.0
       ],
       "week12Kg": [
-        69,
-        69
+        60.0,
+        60.0
       ],
       "reps": 5,
       "isFloor": true,
-      "note": "e1RM ~80 kg, 1.46x bodyweight."
+      "note": "e1RM ~70 kg, 1.27x a 55 kg bodyweight."
     },
     {
       "exerciseId": "barbell-bench-press",
       "week4Kg": [
-        15,
-        15
+        16.0,
+        16.0
       ],
       "week12Kg": [
-        26,
-        26
+        24.0,
+        24.0
       ],
       "reps": 5,
       "isFloor": true,
-      "note": "e1RM ~31 kg."
+      "note": "e1RM ~28 kg, 0.51x a 55 kg bodyweight."
     },
     {
       "exerciseId": "barbell-overhead-press",
       "week4Kg": [
-        13,
-        13
+        13.0,
+        13.0
       ],
       "week12Kg": [
-        19,
-        19
+        20.0,
+        20.0
       ],
       "reps": 5,
       "isFloor": true,
-      "note": "e1RM ~23 kg. The slowest-moving lift you own -- that is normal."
+      "note": "e1RM ~23 kg, 0.42x a 55 kg bodyweight. The slowest-moving lift you own -- that is normal."
     },
     {
       "exerciseId": "barbell-bent-over-row",
       "week4Kg": [
-        18,
-        18
+        16.0,
+        16.0
       ],
       "week12Kg": [
-        31,
-        31
+        30.0,
+        30.0
       ],
       "reps": 5,
       "isFloor": true,
-      "note": "e1RM ~39 kg."
+      "note": "e1RM ~35 kg, 0.64x a 55 kg bodyweight."
     },
     {
       "exerciseId": "barbell-romanian-deadlift",
       "week4Kg": [
-        27,
-        27
+        25.0,
+        25.0
       ],
       "week12Kg": [
-        42,
-        42
+        37.0,
+        37.0
       ],
       "reps": 8,
       "isFloor": true,
-      "note": null
+      "note": "e1RM ~47 kg, 0.85x a 55 kg bodyweight."
     },
     {
       "exerciseId": "pull-up",
@@ -372,13 +371,13 @@
         4
       ],
       "blockKind": "intro",
-      "defaultRir": 4,
+      "defaultRir": 3,
       "loadMultiplier": 1.0,
       "setMultiplier": 1.0,
       "setRounding": "up",
       "includeSupersets": true,
       "includeFinishers": true,
-      "summary": "Full body three times a week. Light loads, perfect reps, every barbell lift introduced with the empty bar. Build the eating habit here.",
+      "summary": "Full body three times a week. Light loads, perfect reps, every barbell lift introduced with the empty 10 kg bar, and a short arms-and-delts superset to finish. Build the eating habit here.",
       "inheritsDaysFrom": null,
       "dayOverrides": {},
       "days": [
@@ -388,7 +387,7 @@
           "title": "Full Body A",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 36,
+          "estMinutes": 45,
           "note": "Squat-led. Every load is deliberately light — you are rehearsing patterns, not testing yourself. The four weeks you spend here are the four you don't lose to a tweaked back in week six.",
           "warnings": [
             {
@@ -448,7 +447,7 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 29,
+              "estMinutes": 39,
               "drills": [],
               "prescriptions": [
                 {
@@ -464,24 +463,24 @@
                   "restSec": 120,
                   "targetRir": null,
                   "loadMode": "barbell",
-                  "startLoadKg": 9.0,
+                  "startLoadKg": 10.0,
                   "perSide": false,
                   "unilateral": false,
-                  "warmupRamp": false,
+                  "warmupRamp": true,
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 2.5,
+                    "incrementKg": 3.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.35
                   },
                   "substitutes": [
                     "goblet-squat",
                     "dumbbell-squat"
                   ],
-                  "coachNote": "EMPTY BAR in week 1. No exceptions. Brace as if someone is about to punch your stomach, then sit down and stand up.",
+                  "coachNote": "EMPTY BAR (10 kg) in week 1. No exceptions. Brace as if someone is about to punch your stomach, then sit down and stand up.",
                   "tempo": null
                 },
                 {
@@ -497,18 +496,18 @@
                   "restSec": 90,
                   "targetRir": null,
                   "loadMode": "barbell",
-                  "startLoadKg": 15.0,
+                  "startLoadKg": 16.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 2.5,
+                    "incrementKg": 3.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.3
                   },
                   "substitutes": [
                     "dumbbell-romanian-deadlift",
@@ -585,13 +584,13 @@
                   "id": "f-mon-4",
                   "exerciseId": "plank",
                   "order": 5,
-                  "groupId": null,
+                  "groupId": "f-mon-ss2",
                   "unit": "sec",
                   "sets": 3,
                   "repsMin": 30,
                   "repsMax": 30,
                   "repsCreepMax": null,
-                  "restSec": 45,
+                  "restSec": 0,
                   "targetRir": null,
                   "loadMode": "timed",
                   "startLoadKg": null,
@@ -610,6 +609,69 @@
                     "hollow-hold"
                   ],
                   "coachNote": "The second your lower back sags, the set is over. Reset rather than holding a bad shape.",
+                  "tempo": null
+                },
+                {
+                  "id": "f-mon-5a",
+                  "exerciseId": "ez-bar-curl",
+                  "order": 6,
+                  "groupId": "f-mon-ss2",
+                  "unit": "reps",
+                  "sets": 3,
+                  "repsMin": 10,
+                  "repsMax": 12,
+                  "repsCreepMax": 15,
+                  "restSec": 0,
+                  "targetRir": 3,
+                  "loadMode": "ezBar",
+                  "startLoadKg": 7.0,
+                  "perSide": false,
+                  "unilateral": false,
+                  "warmupRamp": false,
+                  "optional": false,
+                  "progression": {
+                    "type": "doubleProgression",
+                    "incrementKg": 1.0,
+                    "deloadPct": 0.1,
+                    "stallLimit": 2,
+                    "historyWindowDays": 21,
+                    "maxJumpPct": 0.1
+                  },
+                  "substitutes": [
+                    "dumbbell-curl",
+                    "hammer-curl"
+                  ],
+                  "coachNote": "The bare 7 kg EZ bar. Elbows pinned to the ribs, lower it over a slow count. Easy on purpose: this is the habit, not the stimulus, for four weeks.",
+                  "tempo": null
+                },
+                {
+                  "id": "f-mon-5b",
+                  "exerciseId": "cable-face-pull",
+                  "order": 7,
+                  "groupId": "f-mon-ss2",
+                  "unit": "reps",
+                  "sets": 3,
+                  "repsMin": 15,
+                  "repsMax": 15,
+                  "repsCreepMax": null,
+                  "restSec": 60,
+                  "targetRir": null,
+                  "loadMode": "cable",
+                  "startLoadKg": null,
+                  "perSide": false,
+                  "unilateral": false,
+                  "warmupRamp": false,
+                  "optional": false,
+                  "progression": {
+                    "type": "bandProgression",
+                    "stallLimit": 3,
+                    "historyWindowDays": 21
+                  },
+                  "substitutes": [
+                    "band-face-pull",
+                    "band-pull-apart"
+                  ],
+                  "coachNote": "Wall cable, light. Elbows high and wide, hands rotating back at the end.",
                   "tempo": null
                 }
               ]
@@ -693,8 +755,8 @@
                   "groupId": null,
                   "unit": "sec",
                   "sets": 1,
-                  "repsMin": 900,
-                  "repsMax": 1080,
+                  "repsMin": 720,
+                  "repsMax": 900,
                   "repsCreepMax": null,
                   "restSec": 0,
                   "targetRir": null,
@@ -706,6 +768,7 @@
                   "optional": false,
                   "progression": {
                     "type": "cardioTable",
+                    "table": "second",
                     "stallLimit": 99,
                     "historyWindowDays": 21
                   },
@@ -808,12 +871,12 @@
           "title": "Full Body B",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 35,
+          "estMinutes": 43,
           "note": "Hinge-led, and the day that teaches you the deadlift and the overhead press — the two lifts a beginner is most often thrown into cold.",
           "warnings": [
             {
               "title": "Bar height — read before your first pull",
-              "body": "Your plates are small-diameter, so a lightly loaded bar sits too low and forces your back to round at the start. Stack the two 20 kg tri-grips flat and rest each end of the bar on them until your working weight has enough plates to raise it naturally — around 50 kg with the 20s on."
+              "body": "Your plates are small-diameter, so a lightly loaded bar sits too low and forces your back to round at the start. Stack the two 20 kg tri-grips flat and rest each end of the bar on them for every pull, warm-ups included, until the 20s themselves go on the bar: 50 kg and up (the 10 kg bar plus a 20 on each side)."
             },
             {
               "title": "Check the ceiling",
@@ -866,7 +929,7 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 29,
+              "estMinutes": 37,
               "drills": [],
               "prescriptions": [
                 {
@@ -882,10 +945,10 @@
                   "restSec": 150,
                   "targetRir": null,
                   "loadMode": "barbell",
-                  "startLoadKg": 9.0,
+                  "startLoadKg": 10.0,
                   "perSide": false,
                   "unilateral": false,
-                  "warmupRamp": false,
+                  "warmupRamp": true,
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
@@ -893,13 +956,13 @@
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.5
                   },
                   "substitutes": [
                     "dumbbell-deadlift",
                     "barbell-romanian-deadlift"
                   ],
-                  "coachNote": "EMPTY BAR from the blocks in week 1. Take the slack out of the bar before you pull — you should hear it click. Set it down and reset every rep.",
+                  "coachNote": "EMPTY BAR (10 kg) from the blocks in week 1. Take the slack out of the bar before you pull — you should hear it click. Set it down and reset every rep.",
                   "tempo": null
                 },
                 {
@@ -915,7 +978,7 @@
                   "restSec": 105,
                   "targetRir": null,
                   "loadMode": "barbell",
-                  "startLoadKg": 9.0,
+                  "startLoadKg": 10.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
@@ -926,13 +989,13 @@
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.15
                   },
                   "substitutes": [
                     "dumbbell-overhead-press",
                     "seated-dumbbell-press"
                   ],
-                  "coachNote": "Empty bar in week 1. Ribs down, glutes and abs locked. Leaning back to move the weight means it is too heavy.",
+                  "coachNote": "Empty 10 kg bar in week 1. Ribs down, glutes and abs locked. Leaning back to move the weight means it is too heavy.",
                   "tempo": null
                 },
                 {
@@ -974,7 +1037,7 @@
                   "sets": 3,
                   "repsMin": 10,
                   "repsMax": 10,
-                  "repsCreepMax": null,
+                  "repsCreepMax": 15,
                   "restSec": 75,
                   "targetRir": null,
                   "loadMode": "kettlebell",
@@ -984,42 +1047,77 @@
                   "warmupRamp": false,
                   "optional": false,
                   "progression": {
-                    "type": "none"
-                  },
-                  "substitutes": [
-                    "dumbbell-squat",
-                    "barbell-back-squat"
-                  ],
-                  "coachNote": "Depth is whatever you can hold without the lower back rounding. That point is your depth for now.",
-                  "tempo": null
-                },
-                {
-                  "id": "f-wed-4",
-                  "exerciseId": "dead-bug",
-                  "order": 5,
-                  "groupId": null,
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 10,
-                  "repsMax": 10,
-                  "repsCreepMax": null,
-                  "restSec": 30,
-                  "targetRir": null,
-                  "loadMode": "bodyweight",
-                  "startLoadKg": null,
-                  "perSide": true,
-                  "unilateral": true,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
                     "type": "repsOnly",
                     "stallLimit": 3,
                     "historyWindowDays": 21
                   },
                   "substitutes": [
-                    "plank"
+                    "dumbbell-squat",
+                    "barbell-back-squat"
                   ],
-                  "coachNote": "Lower back pressed flat into the mat the entire time.",
+                  "coachNote": "One bell, so it progresses by reps: 10 up to 15, three seconds down every rep. Depth is whatever you can hold without the lower back rounding.",
+                  "tempo": "3s eccentric"
+                },
+                {
+                  "id": "f-wed-5a",
+                  "exerciseId": "lateral-raise",
+                  "order": 5,
+                  "groupId": "f-wed-ss2",
+                  "unit": "reps",
+                  "sets": 3,
+                  "repsMin": 12,
+                  "repsMax": 15,
+                  "repsCreepMax": 20,
+                  "restSec": 0,
+                  "targetRir": 3,
+                  "loadMode": "dumbbellPair",
+                  "startLoadKg": 2.0,
+                  "perSide": false,
+                  "unilateral": false,
+                  "warmupRamp": false,
+                  "optional": false,
+                  "progression": {
+                    "type": "doubleProgression",
+                    "incrementKg": 1.0,
+                    "deloadPct": 0.1,
+                    "stallLimit": 2,
+                    "historyWindowDays": 21,
+                    "maxJumpPct": 0.1
+                  },
+                  "substitutes": [
+                    "band-lateral-raise"
+                  ],
+                  "coachNote": "The bare 2 kg handles. Lead with the elbows, stop at shoulder height. The reps climb to 20 before the weight moves.",
+                  "tempo": "3s eccentric"
+                },
+                {
+                  "id": "f-wed-5b",
+                  "exerciseId": "cable-triceps-pushdown",
+                  "order": 6,
+                  "groupId": "f-wed-ss2",
+                  "unit": "reps",
+                  "sets": 3,
+                  "repsMin": 12,
+                  "repsMax": 15,
+                  "repsCreepMax": null,
+                  "restSec": 60,
+                  "targetRir": null,
+                  "loadMode": "cable",
+                  "startLoadKg": null,
+                  "perSide": false,
+                  "unilateral": false,
+                  "warmupRamp": false,
+                  "optional": false,
+                  "progression": {
+                    "type": "bandProgression",
+                    "stallLimit": 3,
+                    "historyWindowDays": 21
+                  },
+                  "substitutes": [
+                    "ez-bar-skullcrusher",
+                    "overhead-dumbbell-extension"
+                  ],
+                  "coachNote": "Wall cable, light. Elbows pinned to the ribs, squeeze at the bottom.",
                   "tempo": null
                 }
               ]
@@ -1069,7 +1167,7 @@
           "title": "Full Body C",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 30,
+          "estMinutes": 43,
           "note": "Press-led, plus the first work towards a pull-up. You will not get a pull-up by trying pull-ups — you get it by lowering yourself slowly, over and over.",
           "warnings": [
             {
@@ -1123,7 +1221,7 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 25,
+              "estMinutes": 37,
               "drills": [],
               "prescriptions": [
                 {
@@ -1139,24 +1237,24 @@
                   "restSec": 120,
                   "targetRir": null,
                   "loadMode": "barbell",
-                  "startLoadKg": 9.0,
+                  "startLoadKg": 10.0,
                   "perSide": false,
                   "unilateral": false,
-                  "warmupRamp": false,
+                  "warmupRamp": true,
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 1.0,
+                    "incrementKg": 2.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.25
                   },
                   "substitutes": [
                     "dumbbell-floor-press",
                     "dumbbell-bench-press"
                   ],
-                  "coachNote": "Empty bar in week 1. Feet flat, shoulder blades pinched back and down, bar to the lower chest, elbows at 45-60 degrees.",
+                  "coachNote": "Empty 10 kg bar in week 1. Feet flat, shoulder blades pinched back and down, bar to the lower chest, elbows at 45-60 degrees.",
                   "tempo": null
                 },
                 {
@@ -1172,18 +1270,18 @@
                   "restSec": 105,
                   "targetRir": null,
                   "loadMode": "barbell",
-                  "startLoadKg": 9.0,
+                  "startLoadKg": 10.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 2.5,
+                    "incrementKg": 2.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.25
                   },
                   "substitutes": [
                     "one-arm-dumbbell-row",
@@ -1281,6 +1379,68 @@
                   ],
                   "coachNote": "Partial range. If your back arches at all, swap for a 3 x 40 s plank until week 3.",
                   "tempo": null
+                },
+                {
+                  "id": "f-fri-5a",
+                  "exerciseId": "lateral-raise",
+                  "order": 6,
+                  "groupId": "f-fri-ss2",
+                  "unit": "reps",
+                  "sets": 3,
+                  "repsMin": 12,
+                  "repsMax": 15,
+                  "repsCreepMax": 20,
+                  "restSec": 0,
+                  "targetRir": 3,
+                  "loadMode": "dumbbellPair",
+                  "startLoadKg": 2.0,
+                  "perSide": false,
+                  "unilateral": false,
+                  "warmupRamp": false,
+                  "optional": false,
+                  "progression": {
+                    "type": "doubleProgression",
+                    "incrementKg": 1.0,
+                    "deloadPct": 0.1,
+                    "stallLimit": 2,
+                    "historyWindowDays": 21,
+                    "maxJumpPct": 0.1
+                  },
+                  "substitutes": [
+                    "band-lateral-raise"
+                  ],
+                  "coachNote": "The bare 2 kg handles again. Side delts are what make shoulders look wider on a light frame, and pressing barely touches them. Only direct work grows them.",
+                  "tempo": "3s eccentric"
+                },
+                {
+                  "id": "f-fri-5b",
+                  "exerciseId": "cable-triceps-pushdown",
+                  "order": 7,
+                  "groupId": "f-fri-ss2",
+                  "unit": "reps",
+                  "sets": 3,
+                  "repsMin": 12,
+                  "repsMax": 15,
+                  "repsCreepMax": null,
+                  "restSec": 60,
+                  "targetRir": null,
+                  "loadMode": "cable",
+                  "startLoadKg": null,
+                  "perSide": false,
+                  "unilateral": false,
+                  "warmupRamp": false,
+                  "optional": false,
+                  "progression": {
+                    "type": "bandProgression",
+                    "stallLimit": 3,
+                    "historyWindowDays": 21
+                  },
+                  "substitutes": [
+                    "ez-bar-skullcrusher",
+                    "overhead-dumbbell-extension"
+                  ],
+                  "coachNote": "Wall cable — no plate change inside the superset. Elbows pinned to the ribs.",
+                  "tempo": null
                 }
               ]
             },
@@ -1340,8 +1500,8 @@
                   "groupId": null,
                   "unit": "sec",
                   "sets": 1,
-                  "repsMin": 1200,
-                  "repsMax": 1320,
+                  "repsMin": 900,
+                  "repsMax": 1080,
                   "repsCreepMax": null,
                   "restSec": 0,
                   "targetRir": null,
@@ -1353,6 +1513,7 @@
                   "optional": false,
                   "progression": {
                     "type": "cardioTable",
+                    "table": "long",
                     "stallLimit": 99,
                     "historyWindowDays": 21
                   },
@@ -1487,7 +1648,7 @@
           "title": "Lower A · Squat",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 47,
+          "estMinutes": 51,
           "note": "Quads, glutes and the whole brace. If you only ever do one thing properly, make it this squat.",
           "warnings": [
             {
@@ -1535,7 +1696,7 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 43,
+              "estMinutes": 46,
               "drills": [],
               "prescriptions": [
                 {
@@ -1558,11 +1719,11 @@
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 2.5,
+                    "incrementKg": 2.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.15
                   },
                   "substitutes": [
                     "barbell-front-squat",
@@ -1591,18 +1752,18 @@
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 2.5,
+                    "incrementKg": 2.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.15
                   },
                   "substitutes": [
                     "dumbbell-romanian-deadlift",
                     "barbell-good-morning",
                     "single-leg-rdl"
                   ],
-                  "coachNote": "Same bar, strip to the RDL weight once. Squeeze the glutes to stand up rather than pulling with the lower back.",
+                  "coachNote": "Same bar: one plate change up to the RDL weight. Squeeze the glutes to stand up rather than pulling with the lower back.",
                   "tempo": null
                 },
                 {
@@ -1709,7 +1870,7 @@
                   "repsMin": 3,
                   "repsMax": 3,
                   "repsCreepMax": 6,
-                  "restSec": 60,
+                  "restSec": 0,
                   "targetRir": null,
                   "loadMode": "bodyweight",
                   "startLoadKg": null,
@@ -1728,6 +1889,38 @@
                   ],
                   "coachNote": "You are already hanging on the bar, so this costs you almost nothing. A second vertical-pull exposure in the week is what buys you your first strict pull-up.",
                   "tempo": "5s eccentric"
+                },
+                {
+                  "id": "b-mon-4c",
+                  "exerciseId": "lateral-raise",
+                  "order": 7,
+                  "groupId": "b-mon-ss2",
+                  "unit": "reps",
+                  "sets": 3,
+                  "repsMin": 12,
+                  "repsMax": 15,
+                  "repsCreepMax": 20,
+                  "restSec": 60,
+                  "targetRir": 1,
+                  "loadMode": "dumbbellPair",
+                  "startLoadKg": 2.0,
+                  "perSide": false,
+                  "unilateral": false,
+                  "warmupRamp": false,
+                  "optional": false,
+                  "progression": {
+                    "type": "doubleProgression",
+                    "incrementKg": 1.0,
+                    "deloadPct": 0.1,
+                    "stallLimit": 2,
+                    "historyWindowDays": 21,
+                    "maxJumpPct": 0.1
+                  },
+                  "substitutes": [
+                    "band-lateral-raise"
+                  ],
+                  "coachNote": "Bare 2 kg handles to start: strip the split-squat dumbbells once, before this superset, never inside it. Lead with the elbows, stop at shoulder height.",
+                  "tempo": "3s eccentric"
                 }
               ]
             },
@@ -1759,8 +1952,8 @@
           "title": "Upper A · Bench-led",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 48,
-          "note": "10 pressing sets and 10 pulling sets. Every upper day in this programme is balanced — that is the whole point of the rewrite.",
+          "estMinutes": 50,
+          "note": "Seven pressing sets and seven pulling sets on the compounds, then arms and side delts. Every upper day in this programme pulls as much as it presses.",
           "warnings": [
             {
               "title": "Bench pins at chest height",
@@ -1807,7 +2000,7 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 43,
+              "estMinutes": 46,
               "drills": [],
               "prescriptions": [
                 {
@@ -1856,18 +2049,18 @@
                   "restSec": 120,
                   "targetRir": null,
                   "loadMode": "barbell",
-                  "startLoadKg": 19.0,
+                  "startLoadKg": 18.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 2.5,
+                    "incrementKg": 2.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.15
                   },
                   "substitutes": [
                     "one-arm-dumbbell-row",
@@ -1981,7 +2174,7 @@
                   "repsMin": 12,
                   "repsMax": 15,
                   "repsCreepMax": 20,
-                  "restSec": 45,
+                  "restSec": 0,
                   "targetRir": 1,
                   "loadMode": "dumbbellPair",
                   "startLoadKg": 2.0,
@@ -1991,7 +2184,7 @@
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 0.5,
+                    "incrementKg": 1.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
@@ -2000,8 +2193,38 @@
                   "substitutes": [
                     "band-lateral-raise"
                   ],
-                  "coachNote": "Bare handles, or the fixed vinyl dumbbells. Lead with the elbows. There is no such thing as a heavy lateral raise.",
+                  "coachNote": "Starts on the bare 2 kg handles; the reps climb to 20 before the weight moves. Lead with the elbows. There is no such thing as a heavy lateral raise.",
                   "tempo": "3s eccentric"
+                },
+                {
+                  "id": "b-tue-4c",
+                  "exerciseId": "cable-triceps-pushdown",
+                  "order": 7,
+                  "groupId": "b-tue-ss2",
+                  "unit": "reps",
+                  "sets": 3,
+                  "repsMin": 12,
+                  "repsMax": 15,
+                  "repsCreepMax": null,
+                  "restSec": 45,
+                  "targetRir": 1,
+                  "loadMode": "cable",
+                  "startLoadKg": null,
+                  "perSide": false,
+                  "unilateral": false,
+                  "warmupRamp": false,
+                  "optional": false,
+                  "progression": {
+                    "type": "bandProgression",
+                    "stallLimit": 3,
+                    "historyWindowDays": 21
+                  },
+                  "substitutes": [
+                    "ez-bar-skullcrusher",
+                    "overhead-dumbbell-extension"
+                  ],
+                  "coachNote": "Wall cable — no plate change inside the superset. Elbows pinned to the ribs; the second triceps exposure of the week.",
+                  "tempo": null
                 }
               ]
             },
@@ -2051,7 +2274,7 @@
                   "unit": "sec",
                   "sets": 1,
                   "repsMin": 1200,
-                  "repsMax": 1500,
+                  "repsMax": 1200,
                   "repsCreepMax": null,
                   "restSec": 0,
                   "targetRir": null,
@@ -2063,6 +2286,7 @@
                   "optional": false,
                   "progression": {
                     "type": "cardioTable",
+                    "table": "second",
                     "stallLimit": 99,
                     "historyWindowDays": 21
                   },
@@ -2106,12 +2330,12 @@
           "title": "Lower B · Deadlift",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 52,
+          "estMinutes": 45,
           "note": "Deadlift day. The heaviest thing you lift all week and the lift with the least margin for sloppy technique. Five reps, never more, never to failure.",
           "warnings": [
             {
               "title": "Bar height — read before your first pull",
-              "body": "Your plates are small-diameter, so a lightly loaded bar sits too low and forces your back to round at the start. Stack the two 20 kg tri-grips flat and rest each end of the bar on them until your working weight has enough plates to raise it naturally — around 50 kg with the 20s on."
+              "body": "Your plates are small-diameter, so a lightly loaded bar sits too low and forces your back to round at the start. Stack the two 20 kg tri-grips flat and rest each end of the bar on them for every pull, warm-ups included, until the 20s themselves go on the bar: 50 kg and up (the 10 kg bar plus a 20 on each side)."
             },
             {
               "title": "Pad the hip thrust bar",
@@ -2158,7 +2382,7 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 48,
+              "estMinutes": 41,
               "drills": [],
               "prescriptions": [
                 {
@@ -2174,18 +2398,18 @@
                   "restSec": 180,
                   "targetRir": null,
                   "loadMode": "barbell",
-                  "startLoadKg": 39.0,
+                  "startLoadKg": 30.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": true,
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 2.5,
+                    "incrementKg": 5.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.2
                   },
                   "substitutes": [
                     "barbell-romanian-deadlift",
@@ -2214,17 +2438,17 @@
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 1.0,
+                    "incrementKg": 2.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.15
                   },
                   "substitutes": [
                     "goblet-squat",
                     "barbell-back-squat"
                   ],
-                  "coachNote": "Your second squat exposure of the week, and the one v1 was missing. Elbows high, torso vertical. Swap to a goblet squat if the wrists complain.",
+                  "coachNote": "Your second squat exposure of the week. Elbows high, torso vertical. On a thin 30 mm bar a cross-arm grip is kinder to the wrists; swap to a goblet squat if they still complain.",
                   "tempo": null
                 },
                 {
@@ -2247,17 +2471,17 @@
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 2.5,
+                    "incrementKg": 2.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
+                    "maxJumpPct": 0.15
                   },
                   "substitutes": [
                     "dumbbell-hip-thrust",
                     "glute-bridge"
                   ],
-                  "coachNote": "Squeeze hard at the top for a full second. Ribs stay down — don't arch the lower back to get higher.",
+                  "coachNote": "Brace the bench against a wall first. Small plates sit the bar low, so lift it over your thighs rather than rolling it. Squeeze hard at the top for a full second; ribs stay down.",
                   "tempo": "1s pause top"
                 },
                 {
@@ -2291,54 +2515,22 @@
                 },
                 {
                   "id": "b-thu-4",
-                  "exerciseId": "suitcase-carry",
+                  "exerciseId": "ring-hamstring-curl",
                   "order": 5,
-                  "groupId": null,
-                  "unit": "sec",
-                  "sets": 3,
-                  "repsMin": 30,
-                  "repsMax": 30,
-                  "repsCreepMax": null,
-                  "restSec": 60,
-                  "targetRir": null,
-                  "loadMode": "dumbbellSingle",
-                  "startLoadKg": 14.0,
-                  "perSide": true,
-                  "unilateral": true,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 2.5,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
-                  },
-                  "substitutes": [
-                    "farmers-walk"
-                  ],
-                  "coachNote": "Walk the length of the basement without leaning away from it. Check the collars before you pick it up.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-thu-5",
-                  "exerciseId": "nordic-curl-negative",
-                  "order": 6,
                   "groupId": null,
                   "unit": "reps",
                   "sets": 3,
-                  "repsMin": 5,
-                  "repsMax": 5,
-                  "repsCreepMax": 8,
-                  "restSec": 90,
+                  "repsMin": 8,
+                  "repsMax": 12,
+                  "repsCreepMax": 15,
+                  "restSec": 75,
                   "targetRir": null,
                   "loadMode": "bodyweight",
                   "startLoadKg": null,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
-                  "optional": true,
+                  "optional": false,
                   "progression": {
                     "type": "repsOnly",
                     "stallLimit": 3,
@@ -2346,10 +2538,10 @@
                   },
                   "substitutes": [
                     "slider-hamstring-curl",
-                    "dumbbell-romanian-deadlift"
+                    "nordic-curl-negative"
                   ],
-                  "coachNote": "FROM WEEK 9 ONLY — skip this in weeks 5-8. Hook your feet under the squat stand. Lower as slowly as you can control; expect to fall fast at first.",
-                  "tempo": "max eccentric"
+                  "coachNote": "Rings low, about 20 cm off the floor. Hips up and stay up; curl the heels in, straighten slowly. No rings? The slider curl, heels on a towel on bare floor, not the mats.",
+                  "tempo": "3s eccentric"
                 }
               ]
             },
@@ -2445,7 +2637,7 @@
                   "restSec": 150,
                   "targetRir": null,
                   "loadMode": "barbell",
-                  "startLoadKg": 13.0,
+                  "startLoadKg": 14.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": true,
@@ -2662,17 +2854,17 @@
         {
           "id": "b-sun",
           "weekday": "sun",
-          "title": "Run, Skip & Core",
+          "title": "Run, Bag & Core",
           "kind": "cardio",
           "optional": false,
-          "estMinutes": 54,
+          "estMinutes": 58,
           "note": null,
           "warnings": [],
           "sections": [
             {
               "type": "cardio",
-              "title": "Session",
-              "estMinutes": 51,
+              "title": "Run",
+              "estMinutes": 35,
               "drills": [],
               "prescriptions": [
                 {
@@ -2695,43 +2887,31 @@
                   "optional": false,
                   "progression": {
                     "type": "cardioTable",
+                    "table": "long",
                     "stallLimit": 99,
                     "historyWindowDays": 21
                   },
                   "substitutes": [
                     "run-intervals"
                   ],
-                  "coachNote": "Your one dedicated cardio session, 48 hours clear of Thursday's deadlifts and a full day before Monday's squat. Follow the cardio table.",
+                  "coachNote": "Your long run, 48 hours clear of Thursday's deadlifts and a full day before Monday's squat. Easy pace, by time not distance. Straight after it, while you are warm: four relaxed 15-second strides, walking back between them.",
                   "tempo": null
-                },
+                }
+              ]
+            },
+            {
+              "type": "cardio",
+              "title": "Strides, bag & core",
+              "estMinutes": 20,
+              "drills": [
                 {
-                  "id": "b-sun-2",
-                  "exerciseId": "rope-skipping",
-                  "order": 2,
-                  "groupId": null,
-                  "unit": "sec",
-                  "sets": 8,
-                  "repsMin": 30,
-                  "repsMax": 30,
-                  "repsCreepMax": null,
-                  "restSec": 30,
-                  "targetRir": null,
-                  "loadMode": "timed",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "timeOnly",
-                    "incrementSec": 0,
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [],
-                  "coachNote": "Fast intervals. Balls of the feet, elbows in, wrists doing the work.",
-                  "tempo": null
-                },
+                  "exerciseId": "running-strides",
+                  "order": 1,
+                  "text": "4 x 15 s, walk back",
+                  "note": "Quick and tall, about 80% effort, never a sprint. Skip them in the deload week."
+                }
+              ],
+              "prescriptions": [
                 {
                   "id": "b-sun-3",
                   "exerciseId": "heavy-bag-rounds",
@@ -2843,7 +3023,9 @@
                     "historyWindowDays": 21
                   },
                   "substitutes": [
-                    "plank"
+                    "plank",
+                    "suitcase-carry",
+                    "farmers-walk"
                   ],
                   "coachNote": null,
                   "tempo": null
@@ -2919,7 +3101,7 @@
       "setRounding": "up",
       "includeSupersets": true,
       "includeFinishers": true,
-      "summary": "Same split, one set added to the lead lift of each day, 1 rep in reserve on those sets. Nordic curl negatives become non-optional on Thursday.",
+      "summary": "Same split, one set added to the lead lift of each day, 1 rep in reserve on those sets. Nordic curl negatives replace the ring hamstring curl on Thursday.",
       "inheritsDaysFrom": "build",
       "dayOverrides": {
         "b-mon": {
@@ -2944,8 +3126,14 @@
               "sets": 4,
               "targetRir": 1
             },
-            "b-thu-5": {
-              "optional": false
+            "b-thu-4": {
+              "exerciseId": "nordic-curl-negative",
+              "repsMin": 3,
+              "repsMax": 5,
+              "repsCreepMax": 8,
+              "restSec": 90,
+              "tempo": "max eccentric",
+              "coachNote": "Weeks 9-11: nordic negatives replace the ring curl. Kneel on the mat with your heels under a loaded barbell on the floor, padded with the folded mat -- never the squat stand, it can tip. Lower as slowly as you can; expect to fall fast at first."
             }
           }
         },
@@ -2973,7 +3161,7 @@
       "setRounding": "up",
       "includeSupersets": true,
       "includeFinishers": false,
-      "summary": "Five-rep tests on the four barbell lifts, max strict pull-ups, and the 5K. These five numbers seed cycle 2.",
+      "summary": "Five-rep tests on the five barbell lifts, max strict pull-ups, and the 5K. These numbers seed cycle 2.",
       "inheritsDaysFrom": null,
       "dayOverrides": {},
       "days": [
@@ -3047,7 +3235,7 @@
                   "restSec": 300,
                   "targetRir": 0,
                   "loadMode": "barbell",
-                  "startLoadKg": 36.0,
+                  "startLoadKg": 34.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": true,
@@ -3186,7 +3374,7 @@
                   "restSec": 300,
                   "targetRir": 0,
                   "loadMode": "barbell",
-                  "startLoadKg": 26.0,
+                  "startLoadKg": 24.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": true,
@@ -3211,7 +3399,7 @@
                   "restSec": 240,
                   "targetRir": 0,
                   "loadMode": "barbell",
-                  "startLoadKg": 31.0,
+                  "startLoadKg": 30.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
@@ -3299,7 +3487,7 @@
           "warnings": [
             {
               "title": "Bar height — read before your first pull",
-              "body": "Your plates are small-diameter, so a lightly loaded bar sits too low and forces your back to round at the start. Stack the two 20 kg tri-grips flat and rest each end of the bar on them until your working weight has enough plates to raise it naturally — around 50 kg with the 20s on."
+              "body": "Your plates are small-diameter, so a lightly loaded bar sits too low and forces your back to round at the start. Stack the two 20 kg tri-grips flat and rest each end of the bar on them for every pull, warm-ups included, until the 20s themselves go on the bar: 50 kg and up (the 10 kg bar plus a 20 on each side)."
             },
             {
               "title": "Collars on, checked mid-set",
@@ -3358,7 +3546,7 @@
                   "restSec": 300,
                   "targetRir": 0,
                   "loadMode": "barbell",
-                  "startLoadKg": 69.0,
+                  "startLoadKg": 60.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": true,
@@ -3464,7 +3652,7 @@
                   "restSec": 300,
                   "targetRir": 0,
                   "loadMode": "barbell",
-                  "startLoadKg": 19.0,
+                  "startLoadKg": 20.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": true,

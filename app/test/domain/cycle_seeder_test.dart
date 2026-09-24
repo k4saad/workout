@@ -195,10 +195,9 @@ void main() {
 
     test('no test result and no history keeps what was there', () {
       final seed = seeder.seed(programme: programme, results: results());
-      final before = allOf(programme)
-          .firstWhere((p) => p.exerciseId == 'ez-bar-curl');
-      final after = allOf(seed.programme)
-          .firstWhere((p) => p.exerciseId == 'ez-bar-curl');
+      // By id: Foundation has its own EZ curl, and it is not seeded.
+      final before = allOf(programme).firstWhere((p) => p.id == 'b-tue-4a');
+      final after = allOf(seed.programme).firstWhere((p) => p.id == 'b-tue-4a');
       expect(after.startLoadKg, before.startLoadKg);
       expect(after.exerciseId, before.exerciseId);
     });

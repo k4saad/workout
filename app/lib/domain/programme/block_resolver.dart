@@ -19,9 +19,16 @@ import '../models/programme.dart';
 /// 2e. if !includeSupersets -> clear every groupId                    (new)
 /// 3.  apply dayOverrides[dayId].prescriptionOverrides[presId]
 /// 4.  apply dayOverrides[dayId].weekSpecific[weekNo].prescriptionOverrides
+/// 5.  cardioTable runs take this week's cardioProgression row      (audit C4)
 /// ```
 ///
 /// Steps 3 and 4 are shallow merges, and 4 wins over 3.
+///
+/// Step 5: a run's length is the week's `longRunMin` or `secondRunMin`
+/// (per `progression.table`), in the prescription's own unit. A column the
+/// row leaves empty means NO such run that week — it is removed, and the day
+/// says why; a day left with nothing to log becomes a rest day. A week with
+/// no row at all keeps the run as authored.
 class BlockResolver {
   const BlockResolver(this.programme);
 
@@ -29,10 +36,13 @@ class BlockResolver {
 
   /// The days of [block] as they should be performed in [week].
   ///
+  /// [applyCardioTable] is false only for [detach]: a block's structure must
+  /// not lose a run because the week it was detached in had none.
+  ///
   /// Throws [StateError] if the block inherits from a block that does not
   /// exist, or from one that itself inherits (one level only, deliberately —
   /// a chain would make "detach and duplicate" ambiguous).
-  List<Day> resolveDays(Block block, int week) {
+  List<Day> resolveDays(Block block, int week, {bool applyCardioTable = true}) {
     final source = _sourceBlock(block);
 
     var days = source.days;
@@ -58,8 +68,78 @@ class BlockResolver {
     // 3 and 4 — overrides, week-specific last.
     days = days.map((d) => _applyOverrides(d, block, week)).toList();
 
+    // 5 — the cardio table.
+    if (applyCardioTable) {
+      days = days.map((d) => _applyCardioTable(d, week)).toList();
+    }
+
     return days;
   }
+
+  Day _applyCardioTable(Day day, int week) {
+    final row = programme.cardioForWeek(week);
+    if (row == null) return day;
+
+    final omitted = <CardioColumn>{};
+    var touched = false;
+    final sections = <Section>[];
+    for (final s in day.sections) {
+      final kept = <Prescription>[];
+      for (final p in s.prescriptions) {
+        final column = p.progression.type == ProgressionType.cardioTable
+            ? p.progression.table
+            : null;
+        if (column == null) {
+          kept.add(p);
+          continue;
+        }
+        touched = true;
+        final minutes = switch (column) {
+          CardioColumn.long => row.longRunMin,
+          CardioColumn.second => row.secondRunMin,
+        };
+        if (minutes == null || minutes.isEmpty) {
+          omitted.add(column);
+          continue;
+        }
+        // Minutes in the table; seconds (or minutes) on the prescription.
+        final perUnit = switch (p.unit) {
+          RepUnit.sec => 60,
+          _ => null,
+        };
+        kept.add(
+          perUnit == null
+              ? p
+              : p.copyWith(
+                  repsMin: minutes.first * perUnit,
+                  repsMax: minutes.last * perUnit,
+                ),
+        );
+      }
+      sections.add(s.copyWith(prescriptions: kept));
+    }
+    if (!touched) return day;
+    if (omitted.isEmpty) return day.copyWith(sections: sections);
+
+    final which = omitted.map(_columnLabel).join(' or ');
+    final nothingLeft = day
+        .copyWith(sections: sections)
+        .loggedPrescriptions
+        .isEmpty;
+    final why = [
+      'No $which run this week.',
+      if (row.note != null) row.note!,
+      // The day's own note is about the run it no longer has.
+      if (!nothingLeft && day.note != null) day.note!,
+    ].join(' ');
+    final out = day.copyWith(sections: sections, note: why);
+    return nothingLeft ? out.copyWith(kind: DayKind.rest, estMinutes: 0) : out;
+  }
+
+  static String _columnLabel(CardioColumn c) => switch (c) {
+    CardioColumn.long => 'long',
+    CardioColumn.second => 'second',
+  };
 
   /// The day of [block] falling on [weekday] in [week], or null if the block
   /// defines no day for that weekday.
@@ -151,7 +231,7 @@ class BlockResolver {
     if (!block.inherits) return block;
     final week = forWeek ?? block.firstWeek;
     return block.copyWith(
-      days: resolveDays(block, week),
+      days: resolveDays(block, week, applyCardioTable: false),
       clearInherits: true,
       dayOverrides: const {},
       loadMultiplier: 1.0,

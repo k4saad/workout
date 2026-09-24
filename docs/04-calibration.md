@@ -1,7 +1,21 @@
 # 04 — Week-1 calibration
 
-**Do this before Phase 1.** It takes about forty minutes and everything downstream
-depends on it.
+> **Replaced in v3. There is nothing to weigh.** The programme now ships a definitive
+> kit — barbell 10 kg, EZ bar 7 kg, dumbbell handles 2 kg (all including collars),
+> plates 20 ×2, 10 ×4, 5 ×8, 2.5 ×8, 1.25 ×8, 1.0 ×4, 0.5 ×8 — and you arrange your
+> equipment to match it. The app shows it under **Settings → Your equipment**, and
+> [doc 01 §4](01-programme.md#4-equipment-and-the-loading-lattice) explains the lattice
+> it makes (every whole kilogram on every implement). Week 1's checkpoint is "confirm
+> the kit", not "weigh the bars".
+>
+> What follows is kept as **optional reference**: how to check a bar or a plate if one
+> ever looks wrong, and the room, body, movement and running baselines, which still
+> matter. The room measurements (§3) are safety checks — ceiling clearance for the
+> press and the rope — not load calibration. Two things below are superseded outright:
+> the microplate advice in §2 (the kit already has 1.0 kg and 0.5 kg plates; 0.25 kg
+> plates are not needed), and the "normal camera" in §5 (use the app's capture screen).
+
+**Originally:** do this before Phase 1. It takes about forty minutes.
 
 The plate solver, the progression engine, the ramp generator and every load in the
 programme are computed from these numbers. Guessed inputs produce a plausible-looking
@@ -69,7 +83,7 @@ separately. A 20 kg plate you cannot load is a 20 kg plate the solver must not c
 | Ceiling height, lifting area | ______ cm | Standing overhead press needs your height + ~55 cm with arms locked out. Under that, the programme switches to seated or landmine pressing. |
 | Ceiling height, skipping area | ______ cm | Skipping needs roughly 2.4 m clear. Pipes count. |
 | Clearance above the pull-up bar | ______ cm | Your chin has to clear the bar without your head hitting the ceiling. |
-| Usable floor length for carries | ______ m | Suitcase carries are prescribed as 30 s per side; if the run is short you will be turning a lot. |
+| Usable floor length for carries | ______ m | Only matters if you swap a suitcase carry in for the Sunday side plank; if the run is short you will be turning a lot. |
 | Squat stand catch-pin lowest setting | ______ cm | Must be below your squat bottom position. |
 
 ## 4. Baseline body
@@ -83,7 +97,11 @@ separately. A 20 kg plate you cannot load is a 20 kg plate the solver must not c
 | Thigh, mid-thigh, relaxed | ______ cm |
 | Neck | ______ cm |
 
-## 5. Baseline photos — do this week, with your normal camera
+## 5. Baseline photos — do this week, in the app
+
+Use the app's capture screen, **not the phone's camera app**: the capture screen keeps
+photos in app-private storage, while the camera app puts them in the gallery and from
+there into every cloud backup the phone runs.
 
 Four poses: **front relaxed · front flexed · side right · back**.
 
@@ -92,9 +110,8 @@ Four poses: **front relaxed · front flexed · side right · back**.
 - Shorts only, no shirt, feet in the same place
 - Do not suck in, do not flex on the relaxed shots
 
-**You cannot shoot week 1 retroactively.** The ghost-overlay feature in Phase 5 also
-needs a first frame to align against. Take them this week and import them when Phase 5
-lands.
+**You cannot shoot week 1 retroactively.** The ghost overlay also needs a first frame
+to align every later shoot against.
 
 ## 6. Movement screen — do this before your first loaded set
 

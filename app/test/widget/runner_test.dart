@@ -125,7 +125,8 @@ void main() {
   ) async {
     await open(tester, 'b-mon');
 
-    expect(find.textContaining('0 / 25 sets'), findsOneWidget);
+    // 4 + 3 + (3 + 3) x 2 sides + 3 + 3 + 3 lateral raises (v3) = 28.
+    expect(find.textContaining('0 / 28 sets'), findsOneWidget);
 
     await tester.tap(find.textContaining('Log set 1'));
     for (var i = 0; i < 10; i++) {
@@ -234,13 +235,15 @@ void main() {
 
     expect(await db.select(db.sessions).get(), hasLength(1));
     expect(find.textContaining('Set 2 of 4'), findsOneWidget);
-    expect(find.textContaining('1 / 25 sets'), findsOneWidget);
+    expect(find.textContaining('1 / 28 sets'), findsOneWidget);
   });
 
   testWidgets('a deload day offers the deloaded weight', (tester) async {
     await open(tester, 'b-mon', week: 8);
-    // 21 * 0.70 = 14.7
-    expect(find.text('14.7'), findsWidgets);
+    // 21 * 0.70 = 14.7, which the plates cannot make. The runner offers the
+    // loadable weight below it: bar 10 + 2.25 per side = 14.5.
+    expect(find.text('14.5'), findsWidgets);
+    expect(find.text('14.7'), findsNothing);
   });
 
   group('the progression engine reaches the screen', () {
@@ -249,8 +252,8 @@ void main() {
     ) async {
       await open(tester, 'b-mon');
       expect(find.textContaining('Programme start'), findsOneWidget);
-      // 21 kg = bar 9 + 6 per side
-      expect(find.textContaining('bar 9'), findsOneWidget);
+      // 21 kg = bar 10 + 5.5 per side, on the shipped kit
+      expect(find.textContaining('bar 10'), findsOneWidget);
       expect(find.textContaining('per side'), findsOneWidget);
     });
 
