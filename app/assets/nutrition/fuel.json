@@ -1,5 +1,1359 @@
 {
-  "_comment": "Placeholder. The Fuel feature fills this from data/fuel.json.",
-  "foods": [],
-  "meals": []
+  "schemaVersion": 1,
+  "generatedBy": "tools/gen_fuel.py",
+  "note": "Generated. Every gram is solved to hit a slot target; do not hand-edit.",
+  "athlete": {
+    "heightCm": 167,
+    "startWeightKg": 50.0,
+    "targetWeightKg": 60.0
+  },
+  "foods": [
+    {
+      "id": "magerquark",
+      "kcal": 67,
+      "proteinG": 12.0,
+      "carbsG": 4.0,
+      "fatG": 0.3,
+      "name": "Magerquark",
+      "category": "dairy",
+      "packG": 500,
+      "note": "The backbone of this plan. 500 g is 60 g of protein for about a euro."
+    },
+    {
+      "id": "skyr",
+      "kcal": 63,
+      "proteinG": 11.0,
+      "carbsG": 4.0,
+      "fatG": 0.2,
+      "name": "Skyr natur",
+      "category": "dairy",
+      "packG": 450
+    },
+    {
+      "id": "huettenkaese",
+      "kcal": 98,
+      "proteinG": 12.5,
+      "carbsG": 3.0,
+      "fatG": 4.2,
+      "name": "Hüttenkäse",
+      "category": "dairy",
+      "packG": 200
+    },
+    {
+      "id": "vollmilch",
+      "kcal": 64,
+      "proteinG": 3.4,
+      "carbsG": 4.8,
+      "fatG": 3.5,
+      "name": "Vollmilch 3,5 %",
+      "category": "dairy",
+      "packG": 1000,
+      "note": "Whole milk, not skimmed. You are trying to gain weight."
+    },
+    {
+      "id": "griech_joghurt",
+      "kcal": 133,
+      "proteinG": 4.0,
+      "carbsG": 4.0,
+      "fatG": 10.0,
+      "name": "Griechischer Joghurt 10 %",
+      "category": "dairy",
+      "packG": 500
+    },
+    {
+      "id": "gouda",
+      "kcal": 356,
+      "proteinG": 25.0,
+      "carbsG": 0.0,
+      "fatG": 28.0,
+      "name": "Gouda jung, am Stück",
+      "category": "dairy",
+      "packG": 400,
+      "note": "Check the label says mikrobielles Lab — animal rennet is not halal."
+    },
+    {
+      "id": "eier",
+      "kcal": 137,
+      "proteinG": 12.6,
+      "carbsG": 0.6,
+      "fatG": 9.5,
+      "name": "Eier Größe M",
+      "category": "dairy",
+      "packG": 580,
+      "note": "One egg is about 58 g. A 10-pack is 580 g."
+    },
+    {
+      "id": "whey",
+      "kcal": 380,
+      "proteinG": 78.0,
+      "carbsG": 6.0,
+      "fatG": 5.0,
+      "name": "Whey Protein neutral",
+      "category": "supplement",
+      "packG": 1000,
+      "note": "Neutral, not flavoured: flavoured tubs often carry undeclared alcohol carriers."
+    },
+    {
+      "id": "haehnchenbrust",
+      "kcal": 106,
+      "proteinG": 23.0,
+      "carbsG": 0.0,
+      "fatG": 1.5,
+      "name": "Hähnchenbrustfilet (halal)",
+      "category": "meat",
+      "packG": 500
+    },
+    {
+      "id": "haehnchenschenkel",
+      "kcal": 172,
+      "proteinG": 18.0,
+      "carbsG": 0.0,
+      "fatG": 11.0,
+      "name": "Hähnchenschenkel (halal)",
+      "category": "meat",
+      "packG": 600,
+      "note": "Cheaper and far more forgiving in a pan than breast."
+    },
+    {
+      "id": "rinderhack",
+      "kcal": 212,
+      "proteinG": 19.0,
+      "carbsG": 0.0,
+      "fatG": 15.0,
+      "name": "Rinderhackfleisch 15 % (halal)",
+      "category": "meat",
+      "packG": 500
+    },
+    {
+      "id": "thunfisch",
+      "kcal": 108,
+      "proteinG": 24.0,
+      "carbsG": 0.0,
+      "fatG": 1.0,
+      "name": "Thunfisch im eigenen Saft",
+      "category": "fish",
+      "packG": 150,
+      "note": "Drained weight. A tin is about 150 g in, 110 g out."
+    },
+    {
+      "id": "lachs",
+      "kcal": 208,
+      "proteinG": 20.0,
+      "carbsG": 0.0,
+      "fatG": 14.0,
+      "name": "Lachsfilet TK",
+      "category": "fish",
+      "packG": 400
+    },
+    {
+      "id": "linsen_rot",
+      "kcal": 347,
+      "proteinG": 24.0,
+      "carbsG": 52.0,
+      "fatG": 1.5,
+      "name": "Rote Linsen, trocken",
+      "category": "legume",
+      "packG": 500
+    },
+    {
+      "id": "kichererbsen",
+      "kcal": 122,
+      "proteinG": 6.5,
+      "carbsG": 16.0,
+      "fatG": 2.6,
+      "name": "Kichererbsen (Dose, abgetropft)",
+      "category": "legume",
+      "packG": 265
+    },
+    {
+      "id": "kidneybohnen",
+      "kcal": 116,
+      "proteinG": 7.0,
+      "carbsG": 15.0,
+      "fatG": 0.6,
+      "name": "Kidneybohnen (Dose, abgetropft)",
+      "category": "legume",
+      "packG": 265
+    },
+    {
+      "id": "tofu",
+      "kcal": 144,
+      "proteinG": 15.0,
+      "carbsG": 1.0,
+      "fatG": 8.5,
+      "name": "Tofu natur",
+      "category": "legume",
+      "packG": 400
+    },
+    {
+      "id": "haferflocken",
+      "kcal": 372,
+      "proteinG": 13.0,
+      "carbsG": 59.0,
+      "fatG": 7.0,
+      "name": "Haferflocken zart",
+      "category": "grain",
+      "packG": 500,
+      "note": "Weigh them dry. Cooked oats are mostly water."
+    },
+    {
+      "id": "reis",
+      "kcal": 350,
+      "proteinG": 7.5,
+      "carbsG": 77.0,
+      "fatG": 0.9,
+      "name": "Basmatireis, roh",
+      "category": "grain",
+      "packG": 1000,
+      "note": "Dry weight. 100 g dry is roughly 260 g cooked."
+    },
+    {
+      "id": "nudeln",
+      "kcal": 340,
+      "proteinG": 13.0,
+      "carbsG": 62.0,
+      "fatG": 2.5,
+      "name": "Vollkornnudeln, roh",
+      "category": "grain",
+      "packG": 500
+    },
+    {
+      "id": "couscous",
+      "kcal": 358,
+      "proteinG": 12.0,
+      "carbsG": 72.0,
+      "fatG": 1.0,
+      "name": "Couscous, roh",
+      "category": "grain",
+      "packG": 500
+    },
+    {
+      "id": "bulgur",
+      "kcal": 342,
+      "proteinG": 12.0,
+      "carbsG": 69.0,
+      "fatG": 1.3,
+      "name": "Bulgur, roh",
+      "category": "grain",
+      "packG": 500
+    },
+    {
+      "id": "kartoffeln",
+      "kcal": 70,
+      "proteinG": 2.0,
+      "carbsG": 15.0,
+      "fatG": 0.1,
+      "name": "Kartoffeln",
+      "category": "veg",
+      "packG": 2500
+    },
+    {
+      "id": "suesskartoffel",
+      "kcal": 86,
+      "proteinG": 1.6,
+      "carbsG": 20.0,
+      "fatG": 0.1,
+      "name": "Süßkartoffel",
+      "category": "veg",
+      "packG": 1000
+    },
+    {
+      "id": "vollkornbrot",
+      "kcal": 210,
+      "proteinG": 7.0,
+      "carbsG": 36.0,
+      "fatG": 1.5,
+      "name": "Vollkornbrot",
+      "category": "grain",
+      "packG": 500,
+      "note": "A slice is about 45 g."
+    },
+    {
+      "id": "banane",
+      "kcal": 89,
+      "proteinG": 1.1,
+      "carbsG": 21.0,
+      "fatG": 0.3,
+      "name": "Banane",
+      "category": "fruit",
+      "packG": 120,
+      "note": "A medium banana is about 120 g peeled."
+    },
+    {
+      "id": "datteln",
+      "kcal": 282,
+      "proteinG": 2.5,
+      "carbsG": 65.0,
+      "fatG": 0.4,
+      "name": "Datteln, getrocknet",
+      "category": "fruit",
+      "packG": 200,
+      "note": "Sunnah, and the densest carbohydrate on the shelf."
+    },
+    {
+      "id": "rosinen",
+      "kcal": 299,
+      "proteinG": 3.1,
+      "carbsG": 71.0,
+      "fatG": 0.5,
+      "name": "Rosinen",
+      "category": "fruit",
+      "packG": 200
+    },
+    {
+      "id": "honig",
+      "kcal": 304,
+      "proteinG": 0.3,
+      "carbsG": 75.0,
+      "fatG": 0.0,
+      "name": "Honig",
+      "category": "fruit",
+      "packG": 500
+    },
+    {
+      "id": "apfel",
+      "kcal": 52,
+      "proteinG": 0.3,
+      "carbsG": 12.0,
+      "fatG": 0.2,
+      "name": "Apfel",
+      "category": "fruit",
+      "packG": 180
+    },
+    {
+      "id": "orange",
+      "kcal": 47,
+      "proteinG": 0.9,
+      "carbsG": 9.4,
+      "fatG": 0.1,
+      "name": "Orange",
+      "category": "fruit",
+      "packG": 200
+    },
+    {
+      "id": "erdnussmus",
+      "kcal": 588,
+      "proteinG": 25.0,
+      "carbsG": 12.0,
+      "fatG": 50.0,
+      "name": "Erdnussmus (100 % Erdnüsse)",
+      "category": "fat",
+      "packG": 350,
+      "note": "Ingredients should read: peanuts. Maybe salt."
+    },
+    {
+      "id": "mandeln",
+      "kcal": 579,
+      "proteinG": 21.0,
+      "carbsG": 9.0,
+      "fatG": 50.0,
+      "name": "Mandeln",
+      "category": "fat",
+      "packG": 200
+    },
+    {
+      "id": "walnuesse",
+      "kcal": 654,
+      "proteinG": 15.0,
+      "carbsG": 7.0,
+      "fatG": 65.0,
+      "name": "Walnüsse",
+      "category": "fat",
+      "packG": 200
+    },
+    {
+      "id": "olivenoel",
+      "kcal": 884,
+      "proteinG": 0.0,
+      "carbsG": 0.0,
+      "fatG": 100.0,
+      "name": "Olivenöl",
+      "category": "fat",
+      "packG": 500
+    },
+    {
+      "id": "rapsoel",
+      "kcal": 884,
+      "proteinG": 0.0,
+      "carbsG": 0.0,
+      "fatG": 100.0,
+      "name": "Rapsöl",
+      "category": "fat",
+      "packG": 1000
+    },
+    {
+      "id": "tahin",
+      "kcal": 595,
+      "proteinG": 17.0,
+      "carbsG": 10.0,
+      "fatG": 54.0,
+      "name": "Sesammus (Tahin)",
+      "category": "fat",
+      "packG": 300
+    },
+    {
+      "id": "avocado",
+      "kcal": 160,
+      "proteinG": 2.0,
+      "carbsG": 2.0,
+      "fatG": 15.0,
+      "name": "Avocado",
+      "category": "fat",
+      "packG": 200
+    },
+    {
+      "id": "spinat_tk",
+      "kcal": 24,
+      "proteinG": 2.9,
+      "carbsG": 1.0,
+      "fatG": 0.4,
+      "name": "Blattspinat TK",
+      "category": "veg",
+      "packG": 450
+    },
+    {
+      "id": "brokkoli",
+      "kcal": 34,
+      "proteinG": 2.8,
+      "carbsG": 4.0,
+      "fatG": 0.4,
+      "name": "Brokkoli",
+      "category": "veg",
+      "packG": 500
+    },
+    {
+      "id": "tomaten",
+      "kcal": 18,
+      "proteinG": 0.9,
+      "carbsG": 3.0,
+      "fatG": 0.2,
+      "name": "Tomaten",
+      "category": "veg",
+      "packG": 500
+    },
+    {
+      "id": "gurke",
+      "kcal": 15,
+      "proteinG": 0.7,
+      "carbsG": 2.0,
+      "fatG": 0.1,
+      "name": "Gurke",
+      "category": "veg",
+      "packG": 400
+    },
+    {
+      "id": "paprika",
+      "kcal": 31,
+      "proteinG": 1.0,
+      "carbsG": 6.0,
+      "fatG": 0.3,
+      "name": "Paprika",
+      "category": "veg",
+      "packG": 400
+    },
+    {
+      "id": "zwiebel",
+      "kcal": 40,
+      "proteinG": 1.1,
+      "carbsG": 7.0,
+      "fatG": 0.1,
+      "name": "Zwiebel",
+      "category": "veg",
+      "packG": 1000
+    },
+    {
+      "id": "karotten",
+      "kcal": 41,
+      "proteinG": 0.9,
+      "carbsG": 8.0,
+      "fatG": 0.2,
+      "name": "Karotten",
+      "category": "veg",
+      "packG": 1000
+    },
+    {
+      "id": "passata",
+      "kcal": 35,
+      "proteinG": 1.5,
+      "carbsG": 6.0,
+      "fatG": 0.2,
+      "name": "Passierte Tomaten",
+      "category": "veg",
+      "packG": 500
+    }
+  ],
+  "slots": [
+    {
+      "id": "breakfast",
+      "name": "Breakfast",
+      "time": "07:30",
+      "days": "both",
+      "kcal": 540,
+      "proteinG": 22
+    },
+    {
+      "id": "mid_morning",
+      "name": "Mid-morning",
+      "time": "10:30",
+      "days": "both",
+      "kcal": 330,
+      "proteinG": 10
+    },
+    {
+      "id": "lunch",
+      "name": "Lunch",
+      "time": "13:00",
+      "days": "both",
+      "kcal": 560,
+      "proteinG": 30
+    },
+    {
+      "id": "pre_training",
+      "name": "Before training",
+      "time": "17:00",
+      "days": "training",
+      "kcal": 250,
+      "proteinG": 3
+    },
+    {
+      "id": "post_training",
+      "name": "Straight after",
+      "time": "19:45",
+      "days": "training",
+      "kcal": 280,
+      "proteinG": 24
+    },
+    {
+      "id": "afternoon",
+      "name": "Afternoon",
+      "time": "17:00",
+      "days": "rest",
+      "kcal": 530,
+      "proteinG": 27
+    },
+    {
+      "id": "dinner",
+      "name": "Dinner",
+      "time": "20:45",
+      "days": "both",
+      "kcal": 520,
+      "proteinG": 32
+    },
+    {
+      "id": "before_bed",
+      "name": "Before bed",
+      "time": "22:30",
+      "days": "both",
+      "kcal": 120,
+      "proteinG": 10
+    }
+  ],
+  "meals": [
+    {
+      "id": "porridge_pb",
+      "slotId": "breakfast",
+      "name": "Porridge with peanut butter",
+      "note": "Cook the oats in the milk, not water. Stir the peanut butter in at the end.",
+      "items": [
+        {
+          "foodId": "erdnussmus",
+          "grams": 20
+        },
+        {
+          "foodId": "banane",
+          "grams": 120
+        },
+        {
+          "foodId": "haferflocken",
+          "grams": 15
+        },
+        {
+          "foodId": "vollmilch",
+          "grams": 400
+        }
+      ],
+      "kcal": 536,
+      "proteinG": 21.9,
+      "carbsG": 55.6,
+      "fatG": 25.4
+    },
+    {
+      "id": "eggs_bread",
+      "slotId": "breakfast",
+      "name": "Eggs on wholemeal bread",
+      "note": "Scrambled in the oil, with a sliced tomato.",
+      "items": [
+        {
+          "foodId": "rapsoel",
+          "grams": 8
+        },
+        {
+          "foodId": "tomaten",
+          "grams": 80
+        },
+        {
+          "foodId": "vollkornbrot",
+          "grams": 165
+        },
+        {
+          "foodId": "eier",
+          "grams": 75
+        }
+      ],
+      "kcal": 534,
+      "proteinG": 21.7,
+      "carbsG": 62.2,
+      "fatG": 17.8
+    },
+    {
+      "id": "quark_oats",
+      "slotId": "breakfast",
+      "name": "Overnight oats with quark",
+      "note": "Made the night before. The one breakfast that survives oversleeping.",
+      "items": [
+        {
+          "foodId": "rosinen",
+          "grams": 25
+        },
+        {
+          "foodId": "honig",
+          "grams": 15
+        },
+        {
+          "foodId": "haferflocken",
+          "grams": 100
+        },
+        {
+          "foodId": "magerquark",
+          "grams": 65
+        }
+      ],
+      "kcal": 536,
+      "proteinG": 21.6,
+      "carbsG": 90.6,
+      "fatG": 7.3
+    },
+    {
+      "id": "dates_nuts",
+      "slotId": "mid_morning",
+      "name": "Dates, almonds and a glass of milk",
+      "note": "Pocket food. The milk is what makes it a meal rather than a snack.",
+      "items": [
+        {
+          "foodId": "vollmilch",
+          "grams": 150
+        },
+        {
+          "foodId": "datteln",
+          "grams": 45
+        },
+        {
+          "foodId": "mandeln",
+          "grams": 20
+        }
+      ],
+      "kcal": 339,
+      "proteinG": 10.4,
+      "carbsG": 38.2,
+      "fatG": 15.4
+    },
+    {
+      "id": "bread_cheese",
+      "slotId": "mid_morning",
+      "name": "Bread, cheese and an apple",
+      "note": "Two slices, sliced Gouda, an apple on the walk.",
+      "items": [
+        {
+          "foodId": "tomaten",
+          "grams": 80
+        },
+        {
+          "foodId": "apfel",
+          "grams": 180
+        },
+        {
+          "foodId": "vollkornbrot",
+          "grams": 90
+        },
+        {
+          "foodId": "gouda",
+          "grams": 10
+        }
+      ],
+      "kcal": 333,
+      "proteinG": 10.1,
+      "carbsG": 56.4,
+      "fatG": 4.7
+    },
+    {
+      "id": "banana_shake",
+      "slotId": "mid_morning",
+      "name": "Banana milk",
+      "note": "Blended, or just shaken in a bottle on the way out. No whey in this one: a 10 g slot has no room for it, and pretending otherwise would have solved to a 3 g scoop.",
+      "items": [
+        {
+          "foodId": "honig",
+          "grams": 10
+        },
+        {
+          "foodId": "banane",
+          "grams": 165
+        },
+        {
+          "foodId": "vollmilch",
+          "grams": 240
+        }
+      ],
+      "kcal": 331,
+      "proteinG": 10.0,
+      "carbsG": 53.7,
+      "fatG": 8.9
+    },
+    {
+      "id": "chicken_rice",
+      "slotId": "lunch",
+      "name": "Chicken, rice and broccoli",
+      "note": "Cook the rice for two days at once.",
+      "items": [
+        {
+          "foodId": "brokkoli",
+          "grams": 150
+        },
+        {
+          "foodId": "rapsoel",
+          "grams": 10
+        },
+        {
+          "foodId": "reis",
+          "grams": 95
+        },
+        {
+          "foodId": "haehnchenbrust",
+          "grams": 80
+        }
+      ],
+      "kcal": 557,
+      "proteinG": 29.7,
+      "carbsG": 79.2,
+      "fatG": 12.7
+    },
+    {
+      "id": "lentil_bulgur",
+      "slotId": "lunch",
+      "name": "Red lentils with bulgur",
+      "note": "Mercimek. Cheap, filling, and it reheats better than it cooks.",
+      "items": [
+        {
+          "foodId": "zwiebel",
+          "grams": 60
+        },
+        {
+          "foodId": "olivenoel",
+          "grams": 8
+        },
+        {
+          "foodId": "passata",
+          "grams": 100
+        },
+        {
+          "foodId": "bulgur",
+          "grams": 15
+        },
+        {
+          "foodId": "linsen_rot",
+          "grams": 110
+        }
+      ],
+      "kcal": 563,
+      "proteinG": 30.4,
+      "carbsG": 77.8,
+      "fatG": 10.1
+    },
+    {
+      "id": "tuna_pasta",
+      "slotId": "lunch",
+      "name": "Tuna pasta",
+      "note": "Tuna, wholemeal pasta, passata. Fifteen minutes.",
+      "items": [
+        {
+          "foodId": "passata",
+          "grams": 150
+        },
+        {
+          "foodId": "olivenoel",
+          "grams": 10
+        },
+        {
+          "foodId": "paprika",
+          "grams": 80
+        },
+        {
+          "foodId": "nudeln",
+          "grams": 95
+        },
+        {
+          "foodId": "thunfisch",
+          "grams": 60
+        }
+      ],
+      "kcal": 554,
+      "proteinG": 29.8,
+      "carbsG": 72.7,
+      "fatG": 13.5
+    },
+    {
+      "id": "mince_potato",
+      "slotId": "lunch",
+      "name": "Mince and potatoes",
+      "note": "Halal beef mince, potatoes, whatever vegetable is in the drawer.",
+      "items": [
+        {
+          "foodId": "karotten",
+          "grams": 100
+        },
+        {
+          "foodId": "zwiebel",
+          "grams": 50
+        },
+        {
+          "foodId": "kartoffeln",
+          "grams": 380
+        },
+        {
+          "foodId": "rinderhack",
+          "grams": 110
+        }
+      ],
+      "kcal": 560,
+      "proteinG": 29.9,
+      "carbsG": 68.5,
+      "fatG": 17.1
+    },
+    {
+      "id": "banana_dates",
+      "slotId": "pre_training",
+      "name": "Banana and dates",
+      "note": "Ninety minutes before you go down. Nothing heavy, nothing fatty.",
+      "items": [
+        {
+          "foodId": "datteln",
+          "grams": 10
+        },
+        {
+          "foodId": "banane",
+          "grams": 250
+        }
+      ],
+      "kcal": 251,
+      "proteinG": 3.0,
+      "carbsG": 59.0,
+      "fatG": 0.8
+    },
+    {
+      "id": "rice_honey",
+      "slotId": "pre_training",
+      "name": "Rice with honey",
+      "note": "If the dates are gone. Fast, boring, works.",
+      "items": [
+        {
+          "foodId": "banane",
+          "grams": 120
+        },
+        {
+          "foodId": "honig",
+          "grams": 20
+        },
+        {
+          "foodId": "reis",
+          "grams": 20
+        }
+      ],
+      "kcal": 238,
+      "proteinG": 2.9,
+      "carbsG": 55.6,
+      "fatG": 0.5
+    },
+    {
+      "id": "oat_shake",
+      "slotId": "pre_training",
+      "name": "Oats and dates, blended",
+      "note": "When the day got away from you and it has to be liquid. No milk this close to training -- fat and protein sit in the stomach.",
+      "items": [
+        {
+          "foodId": "honig",
+          "grams": 10
+        },
+        {
+          "foodId": "datteln",
+          "grams": 65
+        },
+        {
+          "foodId": "haferflocken",
+          "grams": 10
+        }
+      ],
+      "kcal": 251,
+      "proteinG": 3.0,
+      "carbsG": 55.6,
+      "fatG": 1.0
+    },
+    {
+      "id": "whey_banana",
+      "slotId": "post_training",
+      "name": "Whey and banana",
+      "note": "Drink it in the basement, before you shower. This is the easy 24 g.",
+      "items": [
+        {
+          "foodId": "banane",
+          "grams": 120
+        },
+        {
+          "foodId": "vollmilch",
+          "grams": 130
+        },
+        {
+          "foodId": "whey",
+          "grams": 25
+        }
+      ],
+      "kcal": 285,
+      "proteinG": 25.2,
+      "carbsG": 32.9,
+      "fatG": 6.2
+    },
+    {
+      "id": "quark_honey",
+      "slotId": "post_training",
+      "name": "Quark with honey",
+      "note": "If the whey has run out. Slower, just as good.",
+      "items": [
+        {
+          "foodId": "honig",
+          "grams": 20
+        },
+        {
+          "foodId": "rosinen",
+          "grams": 20
+        },
+        {
+          "foodId": "vollmilch",
+          "grams": 65
+        },
+        {
+          "foodId": "magerquark",
+          "grams": 175
+        }
+      ],
+      "kcal": 279,
+      "proteinG": 23.9,
+      "carbsG": 39.3,
+      "fatG": 2.9
+    },
+    {
+      "id": "milk_oats",
+      "slotId": "post_training",
+      "name": "Oats, milk and quark",
+      "note": "The cheapest 24 g of protein in this plan.",
+      "items": [
+        {
+          "foodId": "vollmilch",
+          "grams": 200
+        },
+        {
+          "foodId": "honig",
+          "grams": 15
+        },
+        {
+          "foodId": "haferflocken",
+          "grams": 5
+        },
+        {
+          "foodId": "magerquark",
+          "grams": 140
+        }
+      ],
+      "kcal": 286,
+      "proteinG": 24.3,
+      "carbsG": 29.4,
+      "fatG": 7.8
+    },
+    {
+      "id": "chickpea_couscous",
+      "slotId": "afternoon",
+      "name": "Lentils and couscous",
+      "note": "Rest-day second lunch. No cooking beyond a kettle.",
+      "items": [
+        {
+          "foodId": "olivenoel",
+          "grams": 12
+        },
+        {
+          "foodId": "paprika",
+          "grams": 80
+        },
+        {
+          "foodId": "zwiebel",
+          "grams": 40
+        },
+        {
+          "foodId": "couscous",
+          "grams": 5
+        },
+        {
+          "foodId": "linsen_rot",
+          "grams": 105
+        }
+      ],
+      "kcal": 529,
+      "proteinG": 27.0,
+      "carbsG": 65.8,
+      "fatG": 13.9
+    },
+    {
+      "id": "eggs_bread_big",
+      "slotId": "afternoon",
+      "name": "Eggs, bread and avocado",
+      "note": "A rest day still has to hit the number.",
+      "items": [
+        {
+          "foodId": "avocado",
+          "grams": 70
+        },
+        {
+          "foodId": "tomaten",
+          "grams": 80
+        },
+        {
+          "foodId": "vollkornbrot",
+          "grams": 100
+        },
+        {
+          "foodId": "eier",
+          "grams": 140
+        }
+      ],
+      "kcal": 528,
+      "proteinG": 26.8,
+      "carbsG": 40.6,
+      "fatG": 25.5
+    },
+    {
+      "id": "quark_bowl",
+      "slotId": "afternoon",
+      "name": "Quark bowl",
+      "note": "Quark, oats, fruit, nut butter. Two minutes.",
+      "items": [
+        {
+          "foodId": "erdnussmus",
+          "grams": 20
+        },
+        {
+          "foodId": "banane",
+          "grams": 120
+        },
+        {
+          "foodId": "haferflocken",
+          "grams": 65
+        },
+        {
+          "foodId": "magerquark",
+          "grams": 105
+        }
+      ],
+      "kcal": 537,
+      "proteinG": 27.4,
+      "carbsG": 70.2,
+      "fatG": 15.2
+    },
+    {
+      "id": "salmon_potato",
+      "slotId": "dinner",
+      "name": "Salmon and potatoes",
+      "note": "Frozen fillet, oven, done.",
+      "items": [
+        {
+          "foodId": "brokkoli",
+          "grams": 120
+        },
+        {
+          "foodId": "olivenoel",
+          "grams": 6
+        },
+        {
+          "foodId": "kartoffeln",
+          "grams": 260
+        },
+        {
+          "foodId": "lachs",
+          "grams": 115
+        }
+      ],
+      "kcal": 515,
+      "proteinG": 31.6,
+      "carbsG": 43.8,
+      "fatG": 22.8
+    },
+    {
+      "id": "tofu_stirfry",
+      "slotId": "dinner",
+      "name": "Tofu and vegetables",
+      "note": "Whatever is in the drawer, hot pan, soy sauce.",
+      "items": [
+        {
+          "foodId": "paprika",
+          "grams": 100
+        },
+        {
+          "foodId": "zwiebel",
+          "grams": 50
+        },
+        {
+          "foodId": "rapsoel",
+          "grams": 8
+        },
+        {
+          "foodId": "reis",
+          "grams": 40
+        },
+        {
+          "foodId": "tofu",
+          "grams": 185
+        }
+      ],
+      "kcal": 528,
+      "proteinG": 32.3,
+      "carbsG": 42.1,
+      "fatG": 24.4
+    },
+    {
+      "id": "chicken_salad",
+      "slotId": "dinner",
+      "name": "Chicken, bread and salad",
+      "note": "The one to cook when you got home late and still have to eat properly.",
+      "items": [
+        {
+          "foodId": "gurke",
+          "grams": 100
+        },
+        {
+          "foodId": "tomaten",
+          "grams": 100
+        },
+        {
+          "foodId": "olivenoel",
+          "grams": 8
+        },
+        {
+          "foodId": "vollkornbrot",
+          "grams": 155
+        },
+        {
+          "foodId": "haehnchenbrust",
+          "grams": 85
+        }
+      ],
+      "kcal": 519,
+      "proteinG": 32.0,
+      "carbsG": 60.8,
+      "fatG": 11.9
+    },
+    {
+      "id": "quark_small",
+      "slotId": "before_bed",
+      "name": "Quark",
+      "note": "Slow protein overnight. Non-negotiable on training days.",
+      "items": [
+        {
+          "foodId": "vollmilch",
+          "grams": 145
+        },
+        {
+          "foodId": "magerquark",
+          "grams": 45
+        }
+      ],
+      "kcal": 123,
+      "proteinG": 10.3,
+      "carbsG": 8.8,
+      "fatG": 5.2
+    },
+    {
+      "id": "skyr_small",
+      "slotId": "before_bed",
+      "name": "Skyr",
+      "note": "Same job, different tub.",
+      "items": [
+        {
+          "foodId": "vollmilch",
+          "grams": 140
+        },
+        {
+          "foodId": "skyr",
+          "grams": 45
+        }
+      ],
+      "kcal": 118,
+      "proteinG": 9.7,
+      "carbsG": 8.5,
+      "fatG": 5.0
+    },
+    {
+      "id": "milk_glass",
+      "slotId": "before_bed",
+      "name": "Warm milk and cottage cheese",
+      "note": "When you cannot face another spoonful of quark.",
+      "items": [
+        {
+          "foodId": "honig",
+          "grams": 10
+        },
+        {
+          "foodId": "vollmilch",
+          "grams": 30
+        },
+        {
+          "foodId": "huettenkaese",
+          "grams": 70
+        }
+      ],
+      "kcal": 118,
+      "proteinG": 9.8,
+      "carbsG": 11.0,
+      "fatG": 4.0
+    }
+  ],
+  "modules": [
+    {
+      "id": "phase2",
+      "name": "Weeks 5-8: +150",
+      "kcal": 150,
+      "proteinG": 5,
+      "note": "TDEE rose with your bodyweight. Add this to any meal.",
+      "items": [
+        {
+          "foodId": "erdnussmus",
+          "grams": 25
+        }
+      ]
+    },
+    {
+      "id": "phase3",
+      "name": "Weeks 9-12: +300",
+      "kcal": 300,
+      "proteinG": 10,
+      "note": "Final push. Split it: half in the morning, half after training.",
+      "items": [
+        {
+          "foodId": "erdnussmus",
+          "grams": 25
+        },
+        {
+          "foodId": "haferflocken",
+          "grams": 40
+        }
+      ]
+    },
+    {
+      "id": "boost250",
+      "name": "Stalled: +250",
+      "kcal": 250,
+      "proteinG": 8,
+      "note": "The scale has not moved for two weeks. This is the fix, and it stays applied until the scale moves again.",
+      "items": [
+        {
+          "foodId": "erdnussmus",
+          "grams": 20
+        },
+        {
+          "foodId": "datteln",
+          "grams": 40
+        }
+      ]
+    }
+  ],
+  "phases": [
+    {
+      "weeks": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "kcal": 2600,
+      "proteinG": 110,
+      "moduleId": null
+    },
+    {
+      "weeks": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "kcal": 2750,
+      "proteinG": 115,
+      "moduleId": "phase2"
+    },
+    {
+      "weeks": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "kcal": 2900,
+      "proteinG": 120,
+      "moduleId": "phase3"
+    }
+  ],
+  "supplements": [
+    {
+      "id": "creatine",
+      "name": "Creatine monohydrate",
+      "dose": "5 g",
+      "timing": "any time, daily",
+      "note": "The only supplement here with strong evidence behind it. Unflavoured monohydrate; nothing else is worth the money."
+    },
+    {
+      "id": "vitamin_d",
+      "name": "Vitamin D3",
+      "dose": "1000-2000 IU",
+      "timing": "with a meal containing fat",
+      "note": "Münster, indoors, training in a basement. Between October and March almost everyone at this latitude is short of it."
+    },
+    {
+      "id": "whey_supp",
+      "name": "Whey protein",
+      "dose": "1 scoop",
+      "timing": "straight after training",
+      "note": "Convenience, not magic. It is there so the post-training 25 g happens on a night you cannot face cooking."
+    }
+  ],
+  "hydration": {
+    "dailyMl": 3000,
+    "trainingExtraMl": 700,
+    "note": "Three litres, plus about 700 ml across a session. Dark urine in the morning means yesterday was short."
+  },
+  "buyingGuide": [
+    {
+      "title": "Meat",
+      "body": "The halal butcher, or the supermarket's halal line. Lidl and Rewe both stock halal chicken in most Münster branches; the Turkish grocers on Wolbecker Straße are cheaper and better."
+    },
+    {
+      "title": "Cheese",
+      "body": "Look for mikrobielles Lab or vegetarisches Lab on the label. Animal rennet is the default in a lot of German cheese and it is usually calf."
+    },
+    {
+      "title": "Gelatine",
+      "body": "In yoghurts, gummy sweets, some protein bars and a lot of desserts. If the label says Gelatine without saying Rind, assume pork."
+    },
+    {
+      "title": "Flavourings",
+      "body": "Vanilla extract and some flavoured whey carry alcohol as a carrier. Neutral whey avoids the question entirely."
+    },
+    {
+      "title": "Reading a label",
+      "body": "Nährwerte je 100 g is what this plan is built on. Compare per 100 g, never per portion — the portion on the packet is whatever flatters the number."
+    }
+  ]
 }
