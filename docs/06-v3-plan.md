@@ -26,6 +26,46 @@ supermarket staples.
 
 ---
 
+## Where this stands (2026-09-24)
+
+| Phase | State |
+|---|---|
+| 0 — Foundation | **Done** — `a1888e7` |
+| 1 — The programme a coach would sign off | **Done** — `8282b8d`, finished in `e6cd785` |
+| 2 — Fuel: the diet plan | next |
+| 3 — Animated exercise demos | |
+| 4 — GPS runs on OpenStreetMap | |
+| 5 — Calendar and Week | |
+| 6 — Progress photos and Body | |
+| 7 — Launch quote and premium polish | |
+| 8 — Hardening and release | |
+
+Phase 1's review found 24 issues and its fixer was interrupted partway,
+leaving eight failing engine tests — written for confirmed findings, none
+implemented. Those are done (`e6cd785`) and the branch is merged to `master`:
+**681 tests, analyze clean, gates V1–V17.** The worktree is gone; everything
+is in the main checkout.
+
+### How the remaining phases get built
+
+The plan was never the problem. The last run spent its budget on 31-agent
+review-and-fix swarms that re-derived context they already had, and stopped
+mid-surgery. So:
+
+- **No agent swarms.** The work is done directly, in this session, in order.
+- **One phase per commit**, each ending on the gate below.
+- **Test-first for anything with arithmetic in it** — the meal solver, the
+  run maths, the motion rig — as CLAUDE.md already requires.
+- When something is cut, it is **said out loud** rather than left looking done.
+
+The gate, unchanged and non-negotiable:
+
+1. `flutter analyze` clean.
+2. `flutter test` green.
+3. `python tools/gen.py && python tools/validate.py` — all gates.
+4. Screens the phase touched have been **looked at**, not just asserted on.
+5. `dart format .`, one conventional commit.
+
 ## Phase 0 — Foundation
 
 Everything the later phases stand on, so none of them has to invent it.
