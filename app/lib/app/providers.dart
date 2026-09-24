@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/programme_repository.dart';
 import '../domain/calendar/programme_calendar.dart';
+import '../domain/fuel/fuel_plan.dart';
 import '../domain/models/exercise.dart';
 import '../domain/models/inventory.dart';
 import '../domain/models/programme.dart';
@@ -24,6 +25,11 @@ final exerciseLibraryProvider = FutureProvider<ExerciseLibrary>(
 
 final inventoryProvider = FutureProvider<Inventory>(
   (ref) => ref.watch(programmeRepositoryProvider).loadInventory(),
+);
+
+/// The eating plan, generated and bundled.
+final fuelPlanProvider = FutureProvider<FuelPlan>(
+  (ref) => ref.watch(programmeRepositoryProvider).loadFuel(),
 );
 
 /// Everything the UI needs in one shot, so screens do not juggle three

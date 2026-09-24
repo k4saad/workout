@@ -5,13 +5,14 @@ import 'package:intl/intl.dart';
 
 import '../../app/providers.dart';
 import '../../app/session_providers.dart';
-import '../../core/theme/app_theme.dart';
 import '../../domain/calendar/programme_calendar.dart';
 import '../../domain/models/enums.dart';
 import '../../domain/models/programme.dart';
+import '../../core/ui/ui.dart';
 import '../common/widgets.dart';
 import 'widgets/backup_nag.dart';
 import 'widgets/dashboard_strip.dart';
+import 'widgets/next_meal_card.dart';
 import 'widgets/upgrade_notice.dart';
 
 /// The home screen: what am I doing today, and is the rest of it on track.
@@ -83,6 +84,13 @@ class TodayScreen extends ConsumerWidget {
                   ref: ref,
                 ),
               },
+              if (planned.status == ProgrammeStatus.active) ...[
+                Gap.l,
+                const SectionHeader('Next to eat'),
+                // The plan he has to go and look for is the plan he stops
+                // following in week three.
+                NextMealCard(now: DateTime.now()),
+              ],
             ],
           );
         },

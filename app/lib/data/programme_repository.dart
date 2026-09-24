@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '../domain/models/exercise.dart';
+import '../domain/fuel/fuel_plan.dart';
 import '../domain/models/inventory.dart';
 import '../domain/models/programme.dart';
 
@@ -169,6 +170,7 @@ class ProgrammeRepository {
   static const assetSchema = 'assets/programmes/schema.json';
   static const assetExercises = 'assets/exercises/exercises.json';
   static const assetInventory = 'assets/programmes/inventory.json';
+  static const assetFuel = 'assets/nutrition/fuel.json';
 
   static const _programmeFile = 'programme.json';
   static const _inventoryFile = 'inventory.json';
@@ -186,6 +188,7 @@ class ProgrammeRepository {
   Directory? _cachedDir;
   Programme? _programme;
   ExerciseLibrary? _library;
+  FuelPlan? _fuel;
   Inventory? _inventory;
 
   ProgrammeUpgrade? _lastUpgrade;
@@ -441,6 +444,14 @@ class ProgrammeRepository {
     return _library = ExerciseLibrary.fromJson(
       jsonDecode(raw) as Map<String, dynamic>,
     );
+  }
+
+  /// The eating plan. Always the asset: it is generated reference data, like
+  /// the exercise library, not something edited per-cycle.
+  Future<FuelPlan> loadFuel({bool force = false}) async {
+    if (_fuel != null && !force) return _fuel!;
+    final raw = await _loadAsset(assetFuel);
+    return _fuel = FuelPlan.fromJson(jsonDecode(raw) as Map<String, dynamic>);
   }
 
   /// Bar weights and plate counts: the kit every suggested load is built

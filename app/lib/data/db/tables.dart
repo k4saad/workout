@@ -323,6 +323,26 @@ class RunPoints extends Table {
 /// What happened to a planned meal.
 enum MealStatus { planned, eaten, partial, skipped }
 
+extension MealStatusPortion on MealStatus {
+  /// What the meal's macros are multiplied by.
+  ///
+  /// `planned` is zero: a meal he has chosen but not eaten has not fed him,
+  /// and counting it would make every morning look like a day already won.
+  double get portion => switch (this) {
+    MealStatus.eaten => 1.0,
+    MealStatus.partial => 0.5,
+    MealStatus.skipped => 0.0,
+    MealStatus.planned => 0.0,
+  };
+
+  String get label => switch (this) {
+    MealStatus.eaten => 'Eaten',
+    MealStatus.partial => 'Half',
+    MealStatus.skipped => 'Skipped',
+    MealStatus.planned => 'Planned',
+  };
+}
+
 /// One meal slot on one date: which option was chosen and whether it was
 /// eaten. `planned` records a swap made before eating.
 class MealLogs extends Table {

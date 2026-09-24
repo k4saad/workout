@@ -160,108 +160,118 @@ SLOTS = [
     ("before_bed",    "Before bed",         "22:30", "both",     120, 10),
 ]
 
-# Every template: fixed grams where the amount is the point (one banana, two
-# slices of bread), and two FLEX foods whose grams the generator solves so the
-# meal lands on its slot targets. Rounded to 5 g, because nobody weighs 37 g
-# of oats.
+# Every template: the portions that ARE the meal, written as they are eaten
+# (three eggs, 70 g of oats, a tin of tuna), plus ONE flex food whose grams the
+# generator solves so the meal lands on its slot calories. Rounded to 5 g.
 #
-# (slot, id, name, note, fixed[(food, g)], flex(lighter_food, protein_food))
+# It used to solve TWO flex foods against calories AND protein. That is a
+# tighter fit on paper and it produced "porridge" of 15 g of oats and 400 g of
+# milk, because oats and milk sit close enough together in protein density that
+# the solver could trade one away entirely. Calories are the target that has to
+# be hit exactly; protein is a floor checked across the whole day, so the meal
+# does not need to carry a precise amount of it -- which is what lets every
+# portion here be a portion.
+#
+# (slot, id, name, note, fixed[(food, g)], flex_food)
 TEMPLATES = [
-    # ---- breakfast: 540 kcal, 22 P ----------------------------------------
+    # ---- breakfast: 540 kcal ----------------------------------------------
     ("breakfast", "porridge_pb", "Porridge with peanut butter",
      "Cook the oats in the milk, not water. Stir the peanut butter in at the end.",
-     [("erdnussmus", 20), ("banane", 120)], ("haferflocken", "vollmilch")),
+     [("haferflocken", 55), ("erdnussmus", 15), ("banane", 100),
+      ("magerquark", 100)], "vollmilch"),
     ("breakfast", "eggs_bread", "Eggs on wholemeal bread",
-     "Scrambled in the oil, with a sliced tomato.",
-     [("rapsoel", 8), ("tomaten", 80)], ("vollkornbrot", "eier")),
+     "Three eggs, scrambled in the oil, with a sliced tomato.",
+     [("eier", 116), ("rapsoel", 5), ("tomaten", 80)], "vollkornbrot"),
     ("breakfast", "quark_oats", "Overnight oats with quark",
      "Made the night before. The one breakfast that survives oversleeping.",
-     [("rosinen", 25), ("honig", 15)], ("haferflocken", "magerquark")),
+     [("magerquark", 110), ("rosinen", 25), ("honig", 15)], "haferflocken"),
 
-    # ---- mid-morning: 330 kcal, 10 P --------------------------------------
+    # ---- mid-morning: 330 kcal --------------------------------------------
     ("mid_morning", "dates_nuts", "Dates, almonds and a glass of milk",
      "Pocket food. The milk is what makes it a meal rather than a snack.",
-     [("vollmilch", 150)], ("datteln", "mandeln")),
+     [("datteln", 50), ("mandeln", 15)], "vollmilch"),
     ("mid_morning", "bread_cheese", "Bread, cheese and an apple",
      "Two slices, sliced Gouda, an apple on the walk.",
-     [("tomaten", 80), ("apfel", 180)], ("vollkornbrot", "gouda")),
+     [("vollkornbrot", 70), ("apfel", 150)], "gouda"),
     ("mid_morning", "banana_shake", "Banana milk",
-     "Blended, or just shaken in a bottle on the way out. No whey in this "
-     "one: a 10 g slot has no room for it, and pretending otherwise would "
-     "have solved to a 3 g scoop.",
-     [("honig", 10)], ("banane", "vollmilch")),
+     "Blended, or just shaken in a bottle on the way out.",
+     [("banane", 110), ("honig", 10), ("magerquark", 100)], "vollmilch"),
 
-    # ---- lunch: 560 kcal, 30 P --------------------------------------------
+    # ---- lunch: 560 kcal --------------------------------------------------
     ("lunch", "chicken_rice", "Chicken, rice and broccoli",
      "Cook the rice for two days at once.",
-     [("brokkoli", 150), ("rapsoel", 10)], ("reis", "haehnchenbrust")),
+     [("haehnchenbrust", 115), ("brokkoli", 150), ("rapsoel", 10)], "reis"),
     ("lunch", "lentil_bulgur", "Red lentils with bulgur",
      "Mercimek. Cheap, filling, and it reheats better than it cooks.",
-     [("zwiebel", 60), ("olivenoel", 8), ("passata", 100)], ("bulgur", "linsen_rot")),
+     [("linsen_rot", 75), ("zwiebel", 60), ("olivenoel", 8),
+      ("passata", 100)], "bulgur"),
     ("lunch", "tuna_pasta", "Tuna pasta",
-     "Tuna, wholemeal pasta, passata. Fifteen minutes.",
-     [("passata", 150), ("olivenoel", 10), ("paprika", 80)], ("nudeln", "thunfisch")),
+     "A whole tin, wholemeal pasta, passata. Fifteen minutes.",
+     [("thunfisch", 110), ("passata", 150), ("olivenoel", 10),
+      ("paprika", 80)], "nudeln"),
     ("lunch", "mince_potato", "Mince and potatoes",
      "Halal beef mince, potatoes, whatever vegetable is in the drawer.",
-     [("karotten", 100), ("zwiebel", 50)], ("kartoffeln", "rinderhack")),
+     [("rinderhack", 130), ("karotten", 100), ("zwiebel", 50)], "kartoffeln"),
 
-    # ---- before training: 250 kcal, 3 P -----------------------------------
+    # ---- before training: 250 kcal ----------------------------------------
     ("pre_training", "banana_dates", "Banana and dates",
      "Ninety minutes before you go down. Nothing heavy, nothing fatty.",
-     [], ("datteln", "banane")),
+     [("banane", 120)], "datteln"),
     ("pre_training", "rice_honey", "Rice with honey",
      "If the dates are gone. Fast, boring, works.",
-     [("banane", 120)], ("honig", "reis")),
+     [("honig", 20)], "reis"),
     ("pre_training", "oat_shake", "Oats and dates, blended",
      "When the day got away from you and it has to be liquid. No milk this "
      "close to training -- fat and protein sit in the stomach.",
-     [("honig", 10)], ("datteln", "haferflocken")),
+     [("datteln", 30)], "haferflocken"),
 
-    # ---- straight after: 280 kcal, 24 P -----------------------------------
+    # ---- straight after: 280 kcal -----------------------------------------
     ("post_training", "whey_banana", "Whey and banana",
-     "Drink it in the basement, before you shower. This is the easy 24 g.",
-     [("banane", 120)], ("vollmilch", "whey")),
+     "Drink it in the basement, before you shower. This is the easy 30 g.",
+     [("whey", 25), ("banane", 120)], "vollmilch"),
     ("post_training", "quark_honey", "Quark with honey",
      "If the whey has run out. Slower, just as good.",
-     [("honig", 20), ("rosinen", 20)], ("vollmilch", "magerquark")),
+     [("magerquark", 140), ("honig", 20)], "rosinen"),
     ("post_training", "milk_oats", "Oats, milk and quark",
-     "The cheapest 24 g of protein in this plan.",
-     [("vollmilch", 200), ("honig", 15)], ("haferflocken", "magerquark")),
+     "The cheapest recovery meal in this plan.",
+     [("magerquark", 100), ("haferflocken", 40)], "vollmilch"),
 
-    # ---- rest-day afternoon: 530 kcal, 27 P -------------------------------
+    # ---- rest-day afternoon: 530 kcal -------------------------------------
     ("afternoon", "chickpea_couscous", "Lentils and couscous",
      "Rest-day second lunch. No cooking beyond a kettle.",
-     [("olivenoel", 12), ("paprika", 80), ("zwiebel", 40)],
-     ("couscous", "linsen_rot")),
+     [("linsen_rot", 60), ("olivenoel", 6), ("paprika", 80),
+      ("zwiebel", 40)], "couscous"),
     ("afternoon", "eggs_bread_big", "Eggs, bread and avocado",
-     "A rest day still has to hit the number.",
-     [("avocado", 70), ("tomaten", 80)], ("vollkornbrot", "eier")),
+     "Four eggs. A rest day still has to hit the number.",
+     [("eier", 145), ("avocado", 40), ("tomaten", 80)], "vollkornbrot"),
     ("afternoon", "quark_bowl", "Quark bowl",
      "Quark, oats, fruit, nut butter. Two minutes.",
-     [("erdnussmus", 20), ("banane", 120)], ("haferflocken", "magerquark")),
+     [("magerquark", 130), ("erdnussmus", 12), ("banane", 120)],
+     "haferflocken"),
 
-    # ---- dinner: 520 kcal, 32 P -------------------------------------------
+    # ---- dinner: 520 kcal -------------------------------------------------
     ("dinner", "salmon_potato", "Salmon and potatoes",
      "Frozen fillet, oven, done.",
-     [("brokkoli", 120), ("olivenoel", 6)], ("kartoffeln", "lachs")),
+     [("lachs", 120), ("brokkoli", 120), ("olivenoel", 6)], "kartoffeln"),
     ("dinner", "tofu_stirfry", "Tofu and vegetables",
      "Whatever is in the drawer, hot pan, soy sauce.",
-     [("paprika", 100), ("zwiebel", 50), ("rapsoel", 8)], ("reis", "tofu")),
+     [("tofu", 150), ("paprika", 100), ("zwiebel", 50),
+      ("rapsoel", 8)], "reis"),
     ("dinner", "chicken_salad", "Chicken, bread and salad",
      "The one to cook when you got home late and still have to eat properly.",
-     [("gurke", 100), ("tomaten", 100), ("olivenoel", 8)],
-     ("vollkornbrot", "haehnchenbrust")),
+     [("haehnchenbrust", 110), ("gurke", 100), ("tomaten", 100),
+      ("olivenoel", 10)], "vollkornbrot"),
 
-    # ---- before bed: 120 kcal, 10 P ---------------------------------------
+    # ---- before bed: 120 kcal ---------------------------------------------
     ("before_bed", "quark_small", "Quark",
      "Slow protein overnight. Non-negotiable on training days.",
-     [], ("vollmilch", "magerquark")),
+     [], "magerquark"),
     ("before_bed", "skyr_small", "Skyr",
      "Same job, different tub.",
-     [], ("vollmilch", "skyr")),
-    ("before_bed", "milk_glass", "Warm milk and cottage cheese",
+     [], "skyr"),
+    ("before_bed", "milk_glass", "Warm milk with honey",
      "When you cannot face another spoonful of quark.",
-     [("honig", 10)], ("vollmilch", "huettenkaese")),
+     [("honig", 10)], "vollmilch"),
 ]
 
 # Phase modules. The base day is 2,600 kcal; the later phases ADD to it rather
@@ -328,63 +338,63 @@ def macros(items):
     return t
 
 
-def solve(fixed, flex_a, flex_b, kcal_target, protein_target):
-    """Grams of the two flex foods that land the meal on its targets.
-
-    Two equations, two unknowns:
-        kcal_a/100 * ga + kcal_b/100 * gb = kcal still needed
-        prot_a/100 * ga + prot_b/100 * gb = protein still needed
-
-    Rounded to 5 g afterwards — the rounding error is what the tolerance gate
-    then has to accept, and it is worth it for a number he can actually weigh.
-    """
+def solve(fixed, flex, kcal_target):
+    """Grams of the flex food that land the meal on its calorie target."""
     base = macros(fixed)
-    need_k = kcal_target - base["kcal"]
-    need_p = protein_target - base["proteinG"]
+    need = kcal_target - base["kcal"]
+    per_g = FOODS[flex]["kcal"] / 100.0
+    if per_g <= 0:
+        return None
+    return round((need / per_g) / 5) * 5
 
-    a, b = FOODS[flex_a], FOODS[flex_b]
-    a1, b1 = a["kcal"] / 100.0, b["kcal"] / 100.0
-    a2, b2 = a["proteinG"] / 100.0, b["proteinG"] / 100.0
 
-    det = a1 * b2 - a2 * b1
-    if abs(det) < 1e-9:
-        return None, None  # the two foods are macro-parallel: unsolvable
-    ga = (need_k * b2 - need_p * b1) / det
-    gb = (a1 * need_p - a2 * need_k) / det
-    return round(ga / 5) * 5, round(gb / 5) * 5
-
+# The smallest amount of a food that is still a PORTION. Below these the
+# arithmetic is fine and the meal is a joke: 15 g of oats is a garnish, and a
+# solver with no lower bound will happily write it.
+MIN_G = {
+    "haferflocken": 40, "reis": 50, "nudeln": 60, "couscous": 50, "bulgur": 50,
+    "kartoffeln": 150, "vollkornbrot": 60, "vollmilch": 100, "magerquark": 100,
+    "skyr": 100, "datteln": 20, "banane": 60, "mandeln": 15, "gouda": 20,
+    "erdnussmus": 10, "honig": 10, "rosinen": 15, "whey": 20,
+}
 
 SLOT_BY_ID = {s[0]: s for s in SLOTS}
 built = []
 
-for slot_id, tid, name, note, fixed, (flex_a, flex_b) in TEMPLATES:
+for slot_id, tid, name, note, fixed, flex in TEMPLATES:
     slot = SLOT_BY_ID[slot_id]
-    kcal_t, prot_t = slot[4], slot[5]
-    ga, gb = solve(fixed, flex_a, flex_b, kcal_t, prot_t)
+    kcal_t = slot[4]
+    g = solve(fixed, flex, kcal_t)
 
-    if ga is None:
-        fail(f"{tid}: {flex_a} and {flex_b} cannot solve — same macro ratio")
-        continue
-    if ga < 5 or gb < 5:
-        fail(f"{tid}: solved to {flex_a} {ga} g, {flex_b} {gb} g. A negative or "
-             f"zero portion means the fixed items already overshoot the slot.")
+    if g is None:
+        fail(f"{tid}: {flex} has no calories to solve with")
         continue
 
-    items = list(fixed) + [(flex_a, ga), (flex_b, gb)]
-    # Merge a flex food that is also fixed, so nothing is listed twice.
-    merged = {}
-    order = []
-    for fid, g in items:
+    floor = MIN_G.get(flex, 5)
+    if g < floor:
+        fail(f"{tid}: solved to {flex} {g} g, under the {floor} g that food "
+             f"needs to be a portion. The fixed items already use "
+             f"{macros(fixed)['kcal']:.0f} of the {kcal_t} kcal slot.")
+        continue
+
+    items = list(fixed) + [(flex, g)]
+    merged, order = {}, []
+    for fid, grams in items:
         if fid not in merged:
             order.append(fid)
             merged[fid] = 0
-        merged[fid] += g
+        merged[fid] += grams
     items = [(fid, merged[fid]) for fid in order]
+
+    for fid, grams in items:
+        floor = MIN_G.get(fid)
+        if floor and grams < floor:
+            fail(f"{tid}: {fid} at {grams} g is under its {floor} g minimum")
 
     m = macros(items)
     built.append({
         "id": tid, "slotId": slot_id, "name": name, "note": note,
-        "items": [{"foodId": fid, "grams": g} for fid, g in items],
+        "items": [{"foodId": fid, "grams": grams} for fid, grams in items],
         "kcal": round(m["kcal"]),
         "proteinG": round(m["proteinG"], 1),
         "carbsG": round(m["carbsG"], 1),
@@ -392,11 +402,8 @@ for slot_id, tid, name, note, fixed, (flex_a, flex_b) in TEMPLATES:
     })
 
     dk = m["kcal"] - kcal_t
-    if abs(dk) > kcal_t * 0.06:
+    if abs(dk) > max(12, kcal_t * 0.04):
         fail(f"{tid}: {m['kcal']:.0f} kcal against a {kcal_t} target ({dk:+.0f})")
-    dp = m["proteinG"] - prot_t
-    if abs(dp) > max(3.0, prot_t * 0.12):
-        fail(f"{tid}: {m['proteinG']:.0f} g protein against a {prot_t} target ({dp:+.0f})")
 
 # ------------------------------------------------------- the whole-day gate --
 # Every combination he could pick has to land on the phase. Rather than walking
@@ -419,7 +426,12 @@ for day_kind, slot_ids in [
         add = macros(MODULE_BY_ID[module_id][5]) if module_id else {
             "kcal": 0, "proteinG": 0, "carbsG": 0, "fatG": 0}
 
-        lo = {"kcal": add["kcal"], "proteinG": add["proteinG"], "fatG": add["fatG"]}
+        lo = {
+            "kcal": add["kcal"],
+            "proteinG": add["proteinG"],
+            "fatG": add["fatG"],
+            "carbsG": add["carbsG"],
+        }
         hi = dict(lo)
         for sid in slot_ids:
             opts = [t for t in built if t["slotId"] == sid]
@@ -443,9 +455,19 @@ for day_kind, slot_ids in [
             if p < prot_t:
                 fail(f"{day_kind} {label}, {bound} day: {p:.0f} g protein, "
                      f"under the {prot_t} g floor")
-            if p > prot_t * 1.45:
-                fail(f"{day_kind} {label}, {bound} day: {p:.0f} g protein is "
-                     f"more than 145 % of {prot_t} -- it displaces carbs")
+            # No protein CEILING. The first draft had one, and it was the
+            # wrong gate: it failed days of entirely sensible food and the
+            # only way to satisfy it was to shrink the meat back to the
+            # portions that made this plan absurd in the first place.
+            #
+            # Protein is only a problem insofar as it displaces the
+            # carbohydrate that fuels five sessions a week, so THAT is what
+            # is checked. 250 g is 5 g per kilo at 50 kg, which is enough to
+            # train on; below it the day is worth re-authoring.
+            if tot["carbsG"] < 250:
+                fail(f"{day_kind} {label}, {bound} day: {tot['carbsG']:.0f} g "
+                     f"of carbohydrate, under the 250 g floor -- the protein "
+                     f"is crowding out the fuel")
             if tot["fatG"] < 40:
                 fail(f"{day_kind} {label}, {bound} day: {tot['fatG']:.0f} g fat "
                      f"— below the 40 g floor hormones need")

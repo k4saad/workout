@@ -1,0 +1,148 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../data/db/database.dart';
+import '../data/db/tables.dart';
+import '../data/fuel_service.dart';
+import '../domain/fuel/fuel_plan.dart';
+import 'providers.dart';
+import 'session_providers.dart';
+
+final fuelServiceProvider = Provider<FuelService>(
+  (ref) => FuelService(ref.watch(databaseProvider)),
+);
+
+/// Which meal was chosen for each slot today, when it differs from the
+/// default. Swapping is a per-day decision, so it lives with the day's logs.
+final chosenMealsProvider =
+    FutureProvider.family<Map<String, String>, DateTime>((ref, day) async {
+      final rows = await ref.watch(fuelServiceProvider).mealsOn(day);
+      return {for (final r in rows) r.slotId: r.templateId};
+    });
+
+/// Calories he has APPLIED and not reverted, in force on [day].
+final extraKcalProvider = FutureProvider.family<int, DateTime>(
+  (ref, day) => ref.watch(fuelServiceProvider).appliedExtraKcal(on: day),
+);
+
+/// The plan for one date: the right phase, the right kind of day, his swaps
+/// and his adjustments already folded in.
+final fuelDayProvider = FutureProvider.family<FuelDay, DateTime>((
+  ref,
+  day,
+) async {
+  final plan = await ref.watch(fuelPlanProvider.future);
+  final bundle = await ref.watch(bundleProvider.future);
+  final planned = bundle.calendar.forDate(day);
+
+  return plan.forDay(
+    // Before the programme starts, and after it ends, eat like week one and
+    // week twelve respectively rather than seeing nothing.
+    weekNo: (planned.weekNo ?? 1).clamp(1, bundle.programme.totalWeeks),
+    isTrainingDay: planned.day?.isTrainingDay ?? false,
+    extraKcal: await ref.watch(extraKcalProvider(day).future),
+    chosen: await ref.watch(chosenMealsProvider(day).future),
+  );
+});
+
+/// What has actually been eaten today.
+final eatenTodayProvider = FutureProvider.family<EatenMacros, DateTime>(
+  (ref, day) => ref.watch(fuelServiceProvider).eatenOn(day),
+);
+
+final waterTodayProvider = FutureProvider.family<int, DateTime>(
+  (ref, day) => ref.watch(fuelServiceProvider).waterOn(day),
+);
+
+final supplementsTodayProvider = FutureProvider.family<Set<String>, DateTime>(
+  (ref, day) => ref.watch(fuelServiceProvider).supplementsOn(day),
+);
+
+/// The last fortnight, which is what gates the "eat more" advice.
+final fuelAdherenceProvider = FutureProvider<FuelAdherence>((ref) async {
+  final today = ref.watch(todayProvider);
+  return ref
+      .watch(fuelServiceProvider)
+      .adherence(from: today.subtract(const Duration(days: 13)), to: today);
+});
+
+final openAdjustmentsProvider = FutureProvider<List<NutritionAdjustment>>(
+  (ref) => ref.watch(fuelServiceProvider).openAdjustments(),
+);
+
+/// Records a decision about one meal and refreshes the day.
+class MealLogController {
+  const MealLogController(this.ref);
+
+  final Ref ref;
+
+  Future<void> log({
+    required DateTime day,
+    required PlannedMeal slot,
+    required MealStatus status,
+  }) async {
+    final m = slot.chosen;
+    await ref
+        .read(fuelServiceProvider)
+        .logMeal(
+          on: day,
+          slotId: slot.slot.id,
+          templateId: m.id,
+          status: status,
+          macros: (
+            kcal: m.kcal.toDouble(),
+            proteinG: m.proteinG,
+            carbsG: m.carbsG,
+            fatG: m.fatG,
+          ),
+        );
+    _refresh(day);
+  }
+
+  /// Swapping is recorded as `planned`: chosen, not yet eaten. Counting it as
+  /// eaten would make every morning look like a day already won.
+  Future<void> swap({
+    required DateTime day,
+    required PlannedMeal slot,
+    required Meal to,
+  }) async {
+    await ref
+        .read(fuelServiceProvider)
+        .logMeal(
+          on: day,
+          slotId: slot.slot.id,
+          templateId: to.id,
+          status: MealStatus.planned,
+          macros: (
+            kcal: to.kcal.toDouble(),
+            proteinG: to.proteinG,
+            carbsG: to.carbsG,
+            fatG: to.fatG,
+          ),
+        );
+    _refresh(day);
+  }
+
+  Future<void> water(DateTime day, int ml) async {
+    await ref.read(fuelServiceProvider).addWater(day, ml);
+    ref.invalidate(waterTodayProvider(day));
+  }
+
+  Future<void> supplement(
+    DateTime day,
+    String id, {
+    required bool taken,
+  }) async {
+    await ref.read(fuelServiceProvider).setSupplement(day, id, taken: taken);
+    ref.invalidate(supplementsTodayProvider(day));
+  }
+
+  void _refresh(DateTime day) {
+    ref
+      ..invalidate(chosenMealsProvider(day))
+      ..invalidate(eatenTodayProvider(day))
+      ..invalidate(fuelDayProvider(day))
+      ..invalidate(fuelAdherenceProvider);
+  }
+}
+
+final mealLogControllerProvider = Provider(MealLogController.new);
