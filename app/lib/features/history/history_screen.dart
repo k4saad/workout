@@ -48,7 +48,7 @@ class HistoryScreen extends ConsumerWidget {
             padding: Gap.pagePadding,
             itemCount: sessions.length,
             separatorBuilder: (_, _) => Gap.m,
-            itemBuilder: (context, i) => _SessionCard(session: sessions[i]),
+            itemBuilder: (context, i) => SessionCard(session: sessions[i]),
           );
         },
       ),
@@ -56,17 +56,31 @@ class HistoryScreen extends ConsumerWidget {
   }
 }
 
-class _SessionCard extends ConsumerWidget {
-  const _SessionCard({required this.session});
+/// One logged session: when, what, and every working set.
+///
+/// Shared by History and the calendar's day sheet, so a session reads the
+/// same wherever it is looked at.
+class SessionCard extends ConsumerWidget {
+  const SessionCard({super.key, required this.session, this.showDate = true});
 
   final Session session;
+
+  /// Off inside a day sheet, which already says what day it is.
+  final bool showDate;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Theme.of(context).textTheme;
     final sets = ref.watch(sessionSetsProvider(session.id)).asData?.value ?? [];
     final working = sets.where((s) => !s.isWarmup).toList();
-    final library = ref.watch(bundleProvider).asData?.value.library;
+    final bundle = ref.watch(bundleProvider).asData?.value;
+    final library = bundle?.library;
+    // The day's name as the programme had it on the date it was planned for;
+    // the stored id if the programme has since changed.
+    final planned = bundle?.calendar.forDate(session.plannedDate).day;
+    final title = planned != null && planned.id == session.dayId
+        ? planned.title
+        : session.dayId;
 
     final duration = session.startedAt != null && session.finishedAt != null
         ? session.finishedAt!.difference(session.startedAt!).inMinutes
@@ -87,9 +101,11 @@ class _SessionCard extends ConsumerWidget {
               children: [
                 Expanded(
                   child: Text(
-                    DateFormat('EEE d MMM')
-                        .format(session.scheduledDate)
-                        .toUpperCase(),
+                    showDate
+                        ? DateFormat('EEE d MMM')
+                              .format(session.scheduledDate)
+                              .toUpperCase()
+                        : 'WEEK ${session.weekNo}',
                     style: t.labelLarge?.copyWith(color: AppTheme.textDim),
                   ),
                 ),
@@ -98,7 +114,7 @@ class _SessionCard extends ConsumerWidget {
             ),
             Gap.xs,
             Text(
-              'Week ${session.weekNo} · ${session.dayId}',
+              showDate ? 'Week ${session.weekNo} · $title' : title,
               style: t.titleMedium,
             ),
             Gap.s,
@@ -184,7 +200,7 @@ class _StatusGlyph extends StatelessWidget {
     final (glyph, color, label) = switch (status) {
       SessionStatus.completed => ('✓', AppTheme.good, 'done'),
       SessionStatus.partial => ('◐', AppTheme.warn, 'partial'),
-      SessionStatus.skipped => ('✕', AppTheme.textDim, 'skipped'),
+      SessionStatus.skipped => ('⊘', AppTheme.textDim, 'skipped'),
       SessionStatus.inProgress => ('▶', AppTheme.oxblood, 'running'),
       SessionStatus.planned => ('○', AppTheme.textDim, 'planned'),
     };

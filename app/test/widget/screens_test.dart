@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:keller_twelve/app/providers.dart';
+import 'package:keller_twelve/app/session_providers.dart';
 import 'package:keller_twelve/core/theme/app_theme.dart';
+import 'package:keller_twelve/data/db/database.dart';
 import 'package:keller_twelve/data/programme_repository.dart';
 import 'package:keller_twelve/domain/calendar/programme_calendar.dart';
 import 'package:keller_twelve/domain/plates/lattice.dart';
@@ -29,6 +31,7 @@ void main() {
 
   late Directory tmp;
   late ProgrammeBundle bundle;
+  late AppDatabase db;
 
   setUpAll(() async {
     tmp = Directory.systemTemp.createTempSync('kt_widget_');
@@ -50,10 +53,15 @@ void main() {
     if (tmp.existsSync()) tmp.deleteSync(recursive: true);
   });
 
+  // The Week tab reads what happened as well as what is planned.
+  setUp(() => db = AppDatabase.memory());
+  tearDown(() => db.close());
+
   /// Pins "now" so tests do not drift with the wall clock.
   Widget harness(Widget child, {DateTime? today, int? week}) => ProviderScope(
     overrides: [
       bundleProvider.overrideWith((ref) => bundle),
+      databaseProvider.overrideWithValue(db),
       todayProvider.overrideWith(
         () => _FixedToday(today ?? bundle.programme.startDate),
       ),

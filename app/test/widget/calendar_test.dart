@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:keller_twelve/app/providers.dart';
 import 'package:keller_twelve/app/session_providers.dart';
 import 'package:keller_twelve/core/theme/app_theme.dart';
@@ -50,6 +51,20 @@ void main() {
   DateTime day(int week, int offset) =>
       ProgrammeCalendar.addDays(cal.startOfWeek(week), offset);
 
+  Future<void> settle(WidgetTester tester) async {
+    for (var i = 0; i < 14; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+  }
+
+  String title(DateTime m) => DateFormat('MMMM yyyy').format(m);
+
+  /// In the grid, not in the key under it, which repeats every mark.
+  Finder inGrid(Finder f) => find.descendant(
+    of: find.byKey(const ValueKey('month-grid')),
+    matching: f,
+  );
+
   Future<void> seedSession(
     int week,
     int offset,
@@ -92,8 +107,9 @@ void main() {
   testWidgets('renders a month grid without overflowing', (tester) async {
     await draw(tester);
     expect(tester.takeException(), isNull);
-    // Monday-first weekday header.
-    expect(find.text('M'), findsWidgets);
+    // Monday-first weekday header, in words a glance can read.
+    expect(find.text('Mon'), findsOneWidget);
+    expect(find.text('Sun'), findsOneWidget);
   });
 
   testWidgets('shows programme week numbers, not ISO weeks', (tester) async {
@@ -105,7 +121,7 @@ void main() {
   testWidgets('a completed session gets a tick', (tester) async {
     await seedSession(5, 0, 'b-mon', SessionStatus.completed);
     await draw(tester, today: day(6, 0));
-    expect(find.text('✓'), findsWidgets);
+    expect(inGrid(find.text('✓')), findsOneWidget);
   });
 
   testWidgets('a past unlogged required session reads as missed', (
@@ -113,20 +129,22 @@ void main() {
   ) async {
     await draw(tester, today: day(6, 0));
     // Week 5 has five required sessions, none logged.
-    expect(find.text('✕'), findsWidgets);
+    expect(inGrid(find.text('✕')), findsWidgets);
   });
 
   testWidgets('a moved session shows the moved glyph', (tester) async {
     await seedSession(5, 0, 'b-mon', SessionStatus.completed, movedTo: 2);
     await draw(tester, today: day(6, 0));
-    expect(find.text('↷'), findsWidgets);
+    expect(inGrid(find.text('↷')), findsOneWidget);
   });
 
   testWidgets('adherence and streak are shown', (tester) async {
     await seedSession(5, 0, 'b-mon', SessionStatus.completed);
     await seedSession(5, 1, 'b-tue', SessionStatus.completed);
     await draw(tester, today: day(5, 2));
-    expect(find.textContaining('adherence'), findsWidgets);
+    // Against what was due, not against all sixty sessions.
+    expect(find.textContaining('of what was due'), findsOneWidget);
+    expect(find.textContaining('of the programme'), findsOneWidget);
     expect(find.textContaining('streak 2'), findsWidgets);
   });
 
@@ -177,6 +195,91 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
     }
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a swipe turns the month, and Today comes back', (tester) async {
+    final today = day(5, 0);
+    await draw(tester, today: today);
+    expect(find.text(title(today)), findsOneWidget);
+    expect(find.text('Today'), findsNothing, reason: 'already on today');
+
+    await tester.drag(find.byType(PageView), const Offset(-300, 0));
+    await settle(tester);
+    final next = DateTime(today.year, today.month + 1);
+    expect(find.text(title(next)), findsOneWidget);
+
+    await tester.tap(find.text('Today'));
+    await settle(tester);
+    expect(find.text(title(today)), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('skipped and missed read differently', (tester) async {
+    await seedSession(5, 0, 'b-mon', SessionStatus.skipped);
+    await draw(tester, today: day(5, 3));
+    expect(inGrid(find.text('⊘')), findsOneWidget, reason: 'Monday, skipped');
+    expect(
+      inGrid(find.text('✕')),
+      findsWidgets,
+      reason: 'Tuesday, never logged',
+    );
+  });
+
+  testWidgets('a moved session leaves an arrow, not a cross', (tester) async {
+    await seedSession(5, 0, 'b-mon', SessionStatus.completed, movedTo: 2);
+    await draw(tester, today: day(5, 1));
+    expect(inGrid(find.text('→')), findsOneWidget, reason: 'Monday: away');
+    // A cell carries one glyph, so Monday's arrow is Monday not being ✕.
+    expect(inGrid(find.text('↷')), findsOneWidget, reason: 'Wednesday: here');
+  });
+
+  testWidgets('two sessions on one date are both on the sheet', (tester) async {
+    await seedSession(5, 0, 'b-mon', SessionStatus.completed, movedTo: 1);
+    await seedSession(5, 1, 'b-tue', SessionStatus.completed);
+    await draw(tester, today: day(5, 3));
+    expect(find.text('✓+1'), findsOneWidget, reason: 'the cell counts both');
+
+    await tester.tap(find.text('✓+1'));
+    await settle(tester);
+    expect(find.text('LOGGED HERE: TWO SESSIONS'), findsOneWidget);
+    expect(find.textContaining('Moved here from'), findsOneWidget);
+    expect(find.text('Correct it'), findsNWidgets(2));
+  });
+
+  testWidgets('the date a session left says where it went', (tester) async {
+    await seedSession(5, 0, 'b-mon', SessionStatus.completed, movedTo: 2);
+    await draw(tester, today: day(5, 3));
+    await tester.tap(inGrid(find.text('→')));
+    await settle(tester);
+    expect(find.textContaining('Moved to'), findsOneWidget);
+    expect(
+      find.text('Log it from memory'),
+      findsNothing,
+      reason: 'it was done, just not here',
+    );
+  });
+
+  testWidgets('a checkpoint week carries a flag, and a weigh-in a mark', (
+    tester,
+  ) async {
+    final week4 = day(4, 1);
+    await db.upsertBodyweight(week4, 50.6);
+    await draw(tester, today: day(4, 3));
+    // The month's grid runs from week 1 to week 5; 1 and 4 are checkpoints.
+    expect(inGrid(find.byIcon(Icons.flag_rounded)), findsNWidgets(2));
+    expect(inGrid(find.byIcon(Icons.monitor_weight_outlined)), findsOneWidget);
+    expect(find.text('WHAT THE MARKS MEAN'), findsOneWidget);
+  });
+
+  testWidgets('the month is summed up under the grid', (tester) async {
+    await seedSession(5, 0, 'b-mon', SessionStatus.completed);
+    final today = day(5, 1);
+    await draw(tester, today: today);
+    expect(
+      find.text(DateFormat('MMMM').format(today).toUpperCase()),
+      findsOneWidget,
+    );
+    expect(find.textContaining('sessions due'), findsOneWidget);
   });
 }
 

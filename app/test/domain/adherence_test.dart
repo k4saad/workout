@@ -57,7 +57,7 @@ void main() {
       const cases = {
         RecordStatus.completed: '✓',
         RecordStatus.partial: '◐',
-        RecordStatus.skipped: '✕',
+        RecordStatus.skipped: '⊘',
         RecordStatus.inProgress: '▶',
       };
       cases.forEach((status, glyph) {
@@ -237,6 +237,99 @@ void main() {
     });
   });
 
+  // ---------------------------------------------------------------- v3 ----
+  // The Phase 5 calendar bugs, each pinned by the test that would have
+  // caught it.
+
+  group('adherence is measured against what was DUE', () {
+    test('two for two on Wednesday of a new block is 100 %, not 13 %', () {
+      final records = [
+        record(5, 0, 'b-mon', RecordStatus.completed),
+        record(5, 1, 'b-tue', RecordStatus.completed),
+      ];
+      final stats = merge.adherence(5, 7, records, day(5, 2));
+      expect(stats.planned, 15, reason: 'the whole range, still there');
+      expect(stats.due, 2);
+      expect(stats.percent, 100, reason: 'adherence: done over due');
+      expect(stats.progressPercent, 13, reason: 'progress: done over planned');
+    });
+
+    test('with nothing due yet there is no adherence to report', () {
+      final stats = merge.adherence(5, 5, const [], day(5, 0));
+      expect(stats.due, 0);
+      expect(stats.hasDue, isFalse);
+    });
+
+    test('training today counts today; not having trained yet does not', () {
+      final done = [record(5, 0, 'b-mon', RecordStatus.completed)];
+      final morning = merge.adherence(5, 5, const [], day(5, 0));
+      final evening = merge.adherence(5, 5, done, day(5, 0));
+      expect(morning.due, 0);
+      expect(evening.due, 1);
+      expect(evening.percent, 100);
+    });
+  });
+
+  group('the streak survives the morning', () {
+    test('today, not trained yet, does not break it', () {
+      final records = [
+        record(1, 0, 'f-mon', RecordStatus.completed),
+        record(1, 1, 'f-tue', RecordStatus.completed),
+      ];
+      // Wednesday morning: Wednesday's session is later today.
+      final stats = merge.adherence(1, 1, records, day(1, 2));
+      expect(stats.currentStreak, 2);
+    });
+
+    test('trained today, it grows', () {
+      final records = [
+        record(1, 0, 'f-mon', RecordStatus.completed),
+        record(1, 1, 'f-tue', RecordStatus.completed),
+        record(1, 2, 'f-wed', RecordStatus.completed),
+      ];
+      final stats = merge.adherence(1, 1, records, day(1, 2));
+      expect(stats.currentStreak, 3);
+    });
+  });
+
+  group('moved sessions', () {
+    test('the date a session moved AWAY from is not a missed session', () {
+      final entries = merge.entriesFor(calendar.startOfWeek(5), day(5, 6), [
+        record(5, 0, 'b-mon', RecordStatus.completed, movedToOffset: 2),
+      ]);
+      final monday = entries[0];
+      expect(monday.missed(day(6, 0)), isFalse);
+      expect(monday.movedAway, hasLength(1));
+      expect(monday.glyph(day(6, 0)), '→');
+    });
+
+    test('two sessions on one date are both kept', () {
+      // Monday's session moved onto Tuesday, and Tuesday's was done too.
+      final entries = merge.entriesFor(calendar.startOfWeek(5), day(5, 6), [
+        record(5, 0, 'b-mon', RecordStatus.completed, movedToOffset: 1),
+        record(5, 1, 'b-tue', RecordStatus.completed),
+      ]);
+      final tuesday = entries[1];
+      expect(tuesday.records, hasLength(2));
+      expect(tuesday.record!.dayId, 'b-tue', reason: 'its own session first');
+    });
+  });
+
+  group('skipped is not missed', () {
+    test('a deliberate skip and a no-show carry different glyphs', () {
+      final skipped = merge.entriesFor(calendar.startOfWeek(5), day(5, 0), [
+        record(5, 0, 'b-mon', RecordStatus.skipped),
+      ]).first;
+      final missed = merge
+          .entriesFor(calendar.startOfWeek(5), day(5, 0), const [])
+          .first;
+      final today = day(6, 0);
+      expect(skipped.glyph(today), '⊘');
+      expect(missed.glyph(today), '✕');
+      expect(skipped.missed(today), isFalse);
+    });
+  });
+
   group('the whole-programme view', () {
     test('twelve weeks of required sessions is sixty', () {
       final stats = merge.adherence(1, 12, const [], calendar.lastDate);
@@ -246,6 +339,100 @@ void main() {
     test('an empty programme reports zero rather than dividing by zero', () {
       expect(AdherenceStats.empty.rate, 0);
       expect(AdherenceStats.empty.percent, 0);
+    });
+  });
+  group('the state of a day, in one word', () {
+    final today = day(6, 0);
+
+    EntryState stateOf(List<SessionRecord> rs, int offset, {DateTime? on}) =>
+        merge
+            .entriesFor(day(5, offset), day(5, offset), rs)
+            .single
+            .state(on ?? today);
+
+    test('its own session says what happened to it', () {
+      const cases = {
+        RecordStatus.completed: EntryState.done,
+        RecordStatus.partial: EntryState.partial,
+        RecordStatus.skipped: EntryState.skipped,
+        RecordStatus.inProgress: EntryState.inProgress,
+      };
+      cases.forEach((status, state) {
+        expect(
+          stateOf([record(5, 0, 'b-mon', status)], 0),
+          state,
+          reason: status.name,
+        );
+      });
+    });
+
+    test('moved away, moved here, missed, and nothing yet', () {
+      final moved = [
+        record(5, 0, 'b-mon', RecordStatus.completed, movedToOffset: 2),
+      ];
+      expect(stateOf(moved, 0), EntryState.movedAway);
+      expect(stateOf(moved, 2), EntryState.movedHere);
+      expect(stateOf(const [], 1), EntryState.missed);
+      expect(
+        stateOf(const [], 1, on: day(5, 0)),
+        EntryState.none,
+        reason: 'the future has not happened',
+      );
+      expect(stateOf(const [], 5), EntryState.none, reason: 'a rest day');
+    });
+
+    test('the glyph follows the state', () {
+      for (final s in EntryState.values) {
+        expect(s.glyph, isNotNull);
+      }
+      expect(EntryState.done.glyph, '✓');
+      expect(EntryState.missed.glyph, '✕');
+      expect(EntryState.skipped.glyph, '⊘');
+      expect(EntryState.movedAway.glyph, '→');
+      expect(EntryState.movedHere.glyph, '↷');
+      expect(EntryState.none.glyph, '');
+    });
+  });
+
+  group('a tally of required sessions', () {
+    List<CalendarEntry> week5(List<SessionRecord> rs) =>
+        merge.entriesFor(calendar.startOfWeek(5), day(5, 6), rs);
+
+    test('Thursday morning, nothing logged: two missed, two due', () {
+      final t = SessionTally.of(week5(const []), day(5, 3));
+      expect(t.required, 5, reason: 'the optional Wednesday is not required');
+      expect(t.missed, 2, reason: 'Monday and Tuesday; Thursday is today');
+      expect(t.due, 2);
+      expect(t.done, 0);
+    });
+
+    test('a session moved later in the week still counts for its day', () {
+      final t = SessionTally.of(
+        week5([
+          record(5, 0, 'b-mon', RecordStatus.completed, movedToOffset: 2),
+          record(5, 1, 'b-tue', RecordStatus.partial),
+        ]),
+        day(5, 3),
+      );
+      expect(t.done, 2);
+      expect(t.missed, 0);
+      expect(t.due, 2);
+    });
+
+    test('done ahead of time is due already; skipped is not missed', () {
+      final t = SessionTally.of(
+        week5([
+          record(5, 0, 'b-mon', RecordStatus.skipped),
+          record(5, 1, 'b-tue', RecordStatus.completed),
+          record(5, 3, 'b-thu', RecordStatus.completed, movedToOffset: 2),
+        ]),
+        day(5, 2),
+      );
+      expect(t.skipped, 1);
+      expect(t.missed, 0);
+      expect(t.done, 2, reason: 'Thursday, trained on Wednesday, counts');
+      expect(t.due, 3);
+      expect(t.remaining, 2);
     });
   });
 }

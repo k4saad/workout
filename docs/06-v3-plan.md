@@ -36,7 +36,7 @@ supermarket staples.
 | 2 — Fuel: the diet plan | **Done** — `d955501` |
 | 3 — Animated exercise demos | **Done** — see below |
 | 4 — GPS runs on OpenStreetMap | **Done** — see below |
-| 5 — Calendar and Week | |
+| 5 — Calendar and Week | **Done** — see below |
 | 6 — Progress photos and Body | |
 | 7 — Launch quote and premium polish | |
 | 8 — Hardening and release | |
@@ -234,6 +234,70 @@ Original figures, drawn from keyframes. No GIFs, no scraping, nothing copyrighte
 - **Bugs:** stale after a live session, "adherence" that was really "programme done",
   streak reset every morning, moved sessions leaving a false ✕, a second session on one
   date disappearing, skipped and missed looking identical.
+
+### What Phase 5 shipped
+
+- **The six bugs, each with a test that failed first:**
+  - *Stale calendar:* sessions are now a live stream. Finish a session and
+    the calendar, the week and the streak already know.
+  - *"Adherence" that was really "programme done":* adherence is done over
+    what was **due** (a perfect first fortnight is 100 %, not 17 %). Progress
+    through the programme is its own number beside it. Optional days count
+    for neither.
+  - *Streak reset every morning:* today does not break the streak until
+    today is over.
+  - *Moved sessions leaving a false ✕:* the date a session moved away from
+    shows **→** and is not missed. The date it moved to shows **↷**.
+  - *A second session on one date disappearing:* a date keeps every session
+    drawn on it. The cell counts them (`✓+1`) and the day sheet lists both.
+  - *Skipped and missed looking identical:* a deliberate skip is **⊘**, a
+    no-show is **✕**. History uses the same glyphs.
+- **Found and fixed on the way:**
+  - Every day-range query in the new providers used an inclusive `between`
+    up to the next midnight. That pulled the 1st of next month's weigh-in
+    into this month, and tomorrow's weigh-in onto today's sheet. The ranges
+    are half-open now, with DST-safe day arithmetic.
+  - "Correct it" on a session moved onto a date opened that date's own
+    session. It now opens the moved session, by its own day and planned
+    date.
+  - The Week tab's deload and test banners had the programme's numbers
+    typed into Dart. They now read each block's `summary` from the data.
+  - "1 sets" is now "1 set".
+- **Calendar:**
+  - Months swipe (the provider is the single source of truth; the pages
+    follow it). "Today" appears when you have wandered off.
+  - A band opens each block, and the week column carries its block colour.
+  - A crimson flag marks a checkpoint week; tap it for the list.
+  - Each cell has a glyph and up to three markers: photo shoot, run,
+    weigh-in, meals hit (85 % of planned portions, halves counting as
+    halves).
+  - Under the grid: the month in numbers (sessions against what was due,
+    missed and skipped, km run, weigh-ins with the change, fed days,
+    shoots) and a key to every mark.
+- **Day sheet:** one place to see and act on a date, from the calendar or
+  the week.
+  - What became of its own session (done, moved and where, missed with the
+    reason to log it).
+  - Every session logged there, with its sets, "Correct it", and "Move to
+    another date".
+  - Start, log from memory, or mark skipped, depending on what the day is.
+  - The weigh-in, meals and kcal against plan, photos, and runs.
+- **Week tab:**
+  - Weeks swipe, with a "This week" button to come back.
+  - A progress card: done of required, one bar segment per session, missed,
+    skipped and still to come.
+  - Every day card says what happened (✓ done, ✕ missed, ⊘ skipped,
+    → moved to Thu 22, ↷ Wed's session done here) and shows any run.
+  - The checkpoint's list on checkpoint weeks, with "Take the photos" in
+    the current week.
+  - Tapping a day opens its sheet.
+- **Cut, said out loud:**
+  - Checkpoint items do not tick themselves yet. That needs the capture
+    screen to record what it took, which is Phase 6.
+  - The small "from memory" mark moved out of the calendar cell (no room
+    beside four other signs). It is on the sheet and the week card.
+  - A session that has not been started cannot be moved ahead of time; only
+    logged sessions move, as before.
 
 ## Phase 6 — Progress photos and Body
 

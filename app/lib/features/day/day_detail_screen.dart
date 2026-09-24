@@ -101,7 +101,7 @@ class _DayBody extends StatelessWidget {
                 icon: Icons.schedule_outlined,
               ),
             if (day.totalWorkingSets > 0)
-              InfoChip(label: '${day.totalWorkingSets} sets'),
+              InfoChip(label: setsLabel(day.totalWorkingSets)),
             if (day.optional) const InfoChip(label: 'optional'),
           ],
         ),

@@ -111,6 +111,9 @@ class KindRail extends StatelessWidget {
   }
 }
 
+/// "1 set", "18 sets".
+String setsLabel(int n) => n == 1 ? '1 set' : '$n sets';
+
 /// A small labelled pill, used for sets/reps/rest/load.
 class InfoChip extends StatelessWidget {
   const InfoChip({

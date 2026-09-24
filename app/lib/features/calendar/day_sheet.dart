@@ -7,29 +7,32 @@ import '../../app/calendar_providers.dart';
 import '../../app/providers.dart';
 import '../../app/run_providers.dart';
 import '../../app/session_providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
+import '../../data/db/database.dart';
+import '../../data/db/tables.dart';
 import '../../domain/calendar/adherence.dart';
 import '../../domain/run/run.dart';
 import '../common/widgets.dart';
+import '../history/history_screen.dart';
+import 'calendar_screen.dart';
 
-/// What you get when you tap a day.
+/// Everything that happened on a date, and what can be done about it.
 ///
-/// The behaviour depends entirely on what the day IS, because "today,
-/// planned" and "three weeks ago, missed" want completely different things
-/// from you.
+/// The actions depend on what the day IS, because "today, planned" and
+/// "three weeks ago, missed" want completely different things from you.
 Future<void> showDaySheet(
   BuildContext context,
   WidgetRef ref,
   CalendarEntry entry,
-) {
-  return showModalBottomSheet<void>(
-    context: context,
-    backgroundColor: AppTheme.surface,
-    isScrollControlled: true,
-    showDragHandle: true,
-    builder: (context) => _DaySheet(entry: entry),
-  );
-}
+) => showAppSheet<void>(context, builder: (_) => _DaySheet(entry: entry));
+
+bool _sameDay(DateTime a, DateTime b) =>
+    a.year == b.year && a.month == b.month && a.day == b.day;
+
+String _iso(DateTime d) =>
+    '${d.year.toString().padLeft(4, '0')}-'
+    '${d.month.toString().padLeft(2, '0')}-'
+    '${d.day.toString().padLeft(2, '0')}';
 
 class _DaySheet extends ConsumerWidget {
   const _DaySheet({required this.entry});
@@ -40,209 +43,166 @@ class _DaySheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Theme.of(context).textTheme;
     final today = ref.watch(todayProvider);
+    final programme = ref.watch(bundleProvider).asData?.value.programme;
     final day = entry.planned.day;
     final week = entry.planned.weekNo;
-    final record = entry.record;
+    final block = entry.planned.block;
+    final state = entry.state(today);
+    final sessions =
+        ref.watch(sessionsOnProvider(entry.date)).asData?.value ??
+        const <Session>[];
 
-    final isToday =
-        entry.date.year == today.year &&
-        entry.date.month == today.month &&
-        entry.date.day == today.day;
-    final isPast = entry.date.isBefore(
-      DateTime(today.year, today.month, today.day),
-    );
+    final midnight = DateTime(today.year, today.month, today.day);
+    final isToday = _sameDay(entry.date, today);
+    final isPast = entry.date.isBefore(midnight);
+    final checkpoint = week == null ? null : programme?.checkpointForWeek(week);
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              DateFormat('EEEE d MMMM').format(entry.date),
-              style: t.headlineSmall,
-            ),
-            if (week != null)
-              Text(
-                'Week $week'
-                '${entry.planned.block != null ? ' · ${entry.planned.block!.name}' : ''}',
-                style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-              ),
-            Gap.m,
+    // This date's own session has not been dealt with, here or elsewhere.
+    final open =
+        day != null &&
+        day.isTrainingDay &&
+        entry.movedAway.isEmpty &&
+        !entry.records.any((r) => _sameDay(r.plannedDate, entry.date));
 
-            if (day == null) ...[
-              Text(
-                week == null ? 'Outside the programme.' : 'Nothing scheduled.',
-                style: t.bodyLarge?.copyWith(color: AppTheme.textDim),
-              ),
-            ] else ...[
-              Row(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          DateFormat('EEEE d MMMM').format(entry.date),
+          style: t.headlineSmall,
+        ),
+        if (week != null)
+          Text(
+            'Week $week${block == null ? '' : ' · ${block.name}'}',
+            style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+          ),
+        if (checkpoint != null) ...[
+          Gap.s,
+          InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: () => showCheckpointSheet(context, checkpoint),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
                 children: [
-                  Text(
-                    AppTheme.glyphForKind(day.kind),
-                    style: TextStyle(color: AppTheme.forKind(day.kind)),
+                  const Icon(
+                    Icons.flag_rounded,
+                    size: 18,
+                    color: AppTheme.crimson,
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(day.title, style: t.titleLarge)),
+                  Gap.s,
+                  Expanded(
+                    child: Text(
+                      'Checkpoint week: photos and measurements',
+                      style: t.bodyMedium,
+                    ),
+                  ),
+                  const Icon(Icons.chevron_right, color: AppTheme.textDim),
                 ],
+              ),
+            ),
+          ),
+        ],
+        Gap.m,
+
+        if (day == null)
+          Text(
+            week == null ? 'Outside the programme.' : 'Nothing scheduled.',
+            style: t.bodyLarge?.copyWith(color: AppTheme.textDim),
+          )
+        else ...[
+          Row(
+            children: [
+              Text(
+                AppTheme.glyphForKind(day.kind),
+                style: TextStyle(color: AppTheme.forKind(day.kind)),
+              ),
+              const SizedBox(width: 8),
+              Expanded(child: Text(day.title, style: t.titleLarge)),
+            ],
+          ),
+          if (day.isTrainingDay) ...[
+            Gap.s,
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (day.estMinutes > 0)
+                  InfoChip(label: '${day.estMinutes} min'),
+                if (day.totalWorkingSets > 0)
+                  InfoChip(label: setsLabel(day.totalWorkingSets)),
+                if (day.optional) const InfoChip(label: 'optional'),
+              ],
+            ),
+          ],
+          _OwnSessionState(entry: entry, state: state),
+          Gap.m,
+
+          if (open) ...[
+            Gap.s,
+            if (isToday)
+              _Action(
+                icon: Icons.play_arrow_rounded,
+                label: 'Start session',
+                primary: true,
+                onTap: () => _go(context, '/run/$week/${day.id}'),
+              )
+            else if (isPast) ...[
+              _Action(
+                icon: Icons.edit_note,
+                label: 'Log it from memory',
+                primary: true,
+                onTap: () => _go(
+                  context,
+                  '/run/$week/${day.id}?date=${_iso(entry.date)}',
+                ),
               ),
               Gap.s,
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  if (day.estMinutes > 0)
-                    InfoChip(label: '${day.estMinutes} min'),
-                  if (day.totalWorkingSets > 0)
-                    InfoChip(label: '${day.totalWorkingSets} sets'),
-                  if (day.optional) const InfoChip(label: 'optional'),
-                  if (record != null) InfoChip(label: record.status.name),
-                  if (record?.loggedRetroactively ?? false)
-                    const InfoChip(label: 'from memory'),
-                  if (record?.wasMoved ?? false)
-                    InfoChip(
-                      label:
-                          'moved from '
-                          '${DateFormat('d MMM').format(record!.plannedDate)}',
-                    ),
-                ],
+              _Action(
+                icon: Icons.do_not_disturb_on_outlined,
+                label: 'Mark as skipped',
+                onTap: () async {
+                  await _markSkipped(ref, entry);
+                  if (context.mounted) Navigator.pop(context);
+                },
               ),
-
-              if (entry.missed(today)) ...[
-                Gap.m,
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.warn.withValues(alpha: 0.10),
-                    border: Border.all(
-                      color: AppTheme.warn.withValues(alpha: 0.5),
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    'This one never got logged. Log it from memory rather '
-                    'than leaving a hole — the progression engine reads '
-                    'this history, and a gap makes it suggest stale loads.',
-                    style: t.bodyMedium,
-                  ),
-                ),
-              ],
-
-              Gap.l,
-
-              // ---- the actions, by what the day actually is ----------------
-              if (day.isTrainingDay) ...[
-                if (isToday && record == null)
-                  _Action(
-                    icon: Icons.play_arrow_rounded,
-                    label: 'Start session',
-                    primary: true,
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push('/run/$week/${day.id}');
-                    },
-                  )
-                else if (record?.status == RecordStatus.inProgress)
-                  _Action(
-                    icon: Icons.play_arrow_rounded,
-                    label: 'Resume session',
-                    primary: true,
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push('/run/$week/${day.id}');
-                    },
-                  )
-                else if (isPast && record == null) ...[
-                  _Action(
-                    icon: Icons.edit_note,
-                    label: 'Log it from memory',
-                    primary: true,
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(
-                        '/run/$week/${day.id}'
-                        '?date=${_iso(entry.date)}',
-                      );
-                    },
-                  ),
-                  Gap.s,
-                  _Action(
-                    icon: Icons.block,
-                    label: 'Mark as skipped',
-                    onTap: () async {
-                      await _markSkipped(ref, entry);
-                      if (context.mounted) Navigator.pop(context);
-                    },
-                  ),
-                ] else if (record != null) ...[
-                  _Action(
-                    icon: Icons.list_alt,
-                    label: 'See what you did',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.go('/history');
-                    },
-                  ),
-                  Gap.s,
-                  _Action(
-                    icon: Icons.edit,
-                    label: 'Correct it',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(
-                        '/run/$week/${day.id}?date=${_iso(entry.date)}',
-                      );
-                    },
-                  ),
-                ] else ...[
-                  // Future.
-                  _Action(
-                    icon: Icons.visibility_outlined,
-                    label: 'Preview the session',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push('/week/$week/day/${day.id}');
-                    },
-                  ),
-                ],
-              ] else ...[
-                Text(
-                  day.note ?? 'Rest day.',
-                  style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                ),
-              ],
-
-              if (record != null) ...[
-                Gap.s,
-                _Action(
-                  icon: Icons.event_repeat,
-                  label: 'Move to another date',
-                  onTap: () async {
-                    final to = await showDatePicker(
-                      context: context,
-                      initialDate: entry.date,
-                      firstDate: DateTime(entry.date.year - 1),
-                      lastDate: DateTime(entry.date.year + 1),
-                    );
-                    if (to == null) return;
-                    await _move(ref, entry, to);
-                    if (context.mounted) Navigator.pop(context);
-                  },
-                ),
-              ],
             ],
-            _DayRuns(date: entry.date),
+            if (isToday || isPast) Gap.s,
+            _Action(
+              icon: Icons.visibility_outlined,
+              label: 'See the session',
+              onTap: () => _go(context, '/week/$week/day/${day.id}'),
+            ),
+          ] else if (!day.isTrainingDay)
+            Text(
+              day.note ?? 'Rest day.',
+              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+            ),
+        ],
+
+        if (sessions.isNotEmpty) ...[
+          SectionHeader(
+            sessions.length == 1 ? 'Logged here' : 'Logged here: two sessions',
+          ),
+          for (final s in sessions) ...[
+            _LoggedSession(session: s, date: entry.date, today: today),
+            Gap.m,
           ],
-        ),
-      ),
+        ],
+
+        _DayExtras(date: entry.date, future: !isPast && !isToday),
+      ],
     );
   }
 
-  static String _iso(DateTime d) =>
-      '${d.year.toString().padLeft(4, '0')}-'
-      '${d.month.toString().padLeft(2, '0')}-'
-      '${d.day.toString().padLeft(2, '0')}';
+  /// Closes the sheet, then navigates. The router is taken first: after the
+  /// pop this sheet's context is on its way out.
+  static void _go(BuildContext context, String location) {
+    final router = GoRouter.of(context);
+    Navigator.pop(context);
+    router.push(location);
+  }
 
   Future<void> _markSkipped(WidgetRef ref, CalendarEntry entry) async {
     final bundle = await ref.read(bundleProvider.future);
@@ -260,19 +220,152 @@ class _DaySheet extends ConsumerWidget {
       retroactive: true,
     );
     await service.markSkipped(session.id);
-    ref.invalidate(allRecordsProvider);
     ref.invalidate(historyProvider);
   }
+}
 
-  Future<void> _move(WidgetRef ref, CalendarEntry entry, DateTime to) async {
-    final db = ref.read(databaseProvider);
-    final existing = await db.sessionForDay(
-      entry.planned.day!.id,
-      entry.record!.plannedDate,
+/// What became of this date's own session, in a glyph and a word.
+class _OwnSessionState extends StatelessWidget {
+  const _OwnSessionState({required this.entry, required this.state});
+
+  final CalendarEntry entry;
+  final EntryState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    Widget line(String glyph, String text, Color colour) => Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 22,
+            child: Text(glyph, style: TextStyle(color: colour, fontSize: 17)),
+          ),
+          Expanded(
+            child: Text(text, style: t.titleMedium!.copyWith(color: colour)),
+          ),
+        ],
+      ),
     );
-    if (existing == null) return;
-    await ref.read(sessionServiceProvider).reschedule(existing.id, to);
-    ref.invalidate(allRecordsProvider);
+
+    if (state == EntryState.missed) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 14),
+        child: ToneBanner(
+          tone: Tone.warn,
+          icon: Icons.close_rounded,
+          title: 'Missed',
+          body:
+              'This one never got logged. Log it from memory rather than '
+              'leaving a hole — the progression engine reads this history, '
+              'and a gap makes it suggest stale loads.',
+        ),
+      );
+    }
+    if (entry.movedAway.isNotEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final r in entry.movedAway)
+            line(
+              EntryState.movedAway.glyph,
+              'Moved to ${DateFormat('EEE d MMM').format(r.scheduledDate)}'
+              '${switch (r.status) {
+                RecordStatus.completed || RecordStatus.partial => ', done there',
+                RecordStatus.skipped => ', and skipped',
+                _ => '',
+              }}',
+              AppTheme.text,
+            ),
+        ],
+      );
+    }
+    final own = entry.own;
+    if (own == null || !_sameDay(own.plannedDate, entry.date)) {
+      return const SizedBox.shrink();
+    }
+    // Its own session is here, so the state is that session's.
+    final word = stateWord(state);
+    if (word.isEmpty) return const SizedBox.shrink();
+    return line(
+      state.glyph,
+      '${word[0].toUpperCase()}${word.substring(1)}'
+      '${own.loggedRetroactively ? ' · from memory' : ''}',
+      stateColour(state),
+    );
+  }
+}
+
+/// A session stored on this date, with what can be done to it.
+class _LoggedSession extends ConsumerWidget {
+  const _LoggedSession({
+    required this.session,
+    required this.date,
+    required this.today,
+  });
+
+  final Session session;
+  final DateTime date;
+  final DateTime today;
+
+  /// The runner finds a session by its day and its PLANNED date, so a
+  /// session moved here is opened as what it is, not as this date's.
+  String get _runPath =>
+      '/run/${session.weekNo}/${session.dayId}'
+      '${_sameDay(session.plannedDate, today) ? '' : '?date=${_iso(session.plannedDate)}'}';
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Theme.of(context).textTheme;
+    final movedHere = !_sameDay(session.plannedDate, date);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (movedHere)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              '${EntryState.movedHere.glyph}  Moved here from '
+              '${DateFormat('EEE d MMM').format(session.plannedDate)}',
+              style: t.titleSmall,
+            ),
+          ),
+        SessionCard(session: session, showDate: false),
+        Gap.s,
+        if (session.status == SessionStatus.inProgress)
+          _Action(
+            icon: Icons.play_arrow_rounded,
+            label: 'Resume session',
+            primary: true,
+            onTap: () => _DaySheet._go(context, _runPath),
+          )
+        else
+          _Action(
+            icon: Icons.edit_outlined,
+            label: session.status == SessionStatus.skipped
+                ? 'Log it after all'
+                : 'Correct it',
+            onTap: () => _DaySheet._go(context, _runPath),
+          ),
+        Gap.s,
+        _Action(
+          icon: Icons.event_repeat,
+          label: 'Move to another date',
+          onTap: () async {
+            final to = await showDatePicker(
+              context: context,
+              initialDate: date,
+              firstDate: DateTime(date.year - 1),
+              lastDate: DateTime(date.year + 1),
+            );
+            if (to == null) return;
+            await ref.read(sessionServiceProvider).reschedule(session.id, to);
+            if (context.mounted) Navigator.pop(context);
+          },
+        ),
+      ],
+    );
   }
 }
 
@@ -313,50 +406,79 @@ class _Action extends StatelessWidget {
   }
 }
 
-/// The runs recorded on a day, each one tap from its trail.
-class _DayRuns extends ConsumerWidget {
-  const _DayRuns({required this.date});
+/// The rest of the day: the weigh-in, the food, the photos, the runs.
+class _DayExtras extends ConsumerWidget {
+  const _DayExtras({required this.date, required this.future});
 
   final DateTime date;
+  final bool future;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (future) return const SizedBox.shrink();
+    final t = Theme.of(context).textTheme;
+    final d = ref.watch(dayDetailsProvider(date)).asData?.value;
     final runs =
         ref.watch(runsBetweenProvider((from: date, to: date))).asData?.value ??
         const [];
-    if (runs.isEmpty) return const SizedBox.shrink();
-    final t = Theme.of(context).textTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Gap.m,
-        for (final r in runs)
-          InkWell(
-            borderRadius: BorderRadius.circular(10),
-            onTap: () {
-              Navigator.pop(context);
-              context.go('/progress/runs/${r.id}');
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                children: [
-                  const Icon(Icons.route_rounded, color: AppTheme.crimson),
-                  Gap.m,
-                  Expanded(
-                    child: Text(
-                      '${formatKm(r.distanceM)} km · '
-                      '${formatClock(r.movingMs)}'
-                      '${r.exerciseId == null ? ' · free run' : ''}',
-                      style: t.titleMedium,
-                    ),
+
+    Widget row(IconData icon, String text, {Color colour = AppTheme.textDim}) =>
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              Icon(icon, color: colour),
+              Gap.m,
+              Expanded(child: Text(text, style: t.titleMedium)),
+            ],
+          ),
+        );
+
+    final rows = <Widget>[
+      if (d?.weighInKg case final kg?)
+        row(Icons.monitor_weight_outlined, '${kg.toStringAsFixed(1)} kg'),
+      if (d != null && d.mealsPlanned > 0)
+        row(
+          Icons.restaurant_rounded,
+          d.mealsEaten == 0
+              ? 'No meals logged'
+              : '${d.mealsEaten} of ${d.mealsPlanned} meals · '
+                    '${d.kcalEaten.round()} of ${d.kcalPlanned.round()} kcal',
+        ),
+      if (d?.shoot ?? false)
+        row(Icons.photo_camera_outlined, 'Progress photos taken'),
+      for (final r in runs)
+        InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () {
+            final router = GoRouter.of(context);
+            Navigator.pop(context);
+            router.go('/progress/runs/${r.id}');
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              children: [
+                const Icon(Icons.route_rounded, color: AppTheme.crimson),
+                Gap.m,
+                Expanded(
+                  child: Text(
+                    '${formatKm(r.distanceM)} km · '
+                    '${formatClock(r.movingMs)}'
+                    '${r.exerciseId == null ? ' · free run' : ''}',
+                    style: t.titleMedium,
                   ),
-                  const Icon(Icons.chevron_right, color: AppTheme.textDim),
-                ],
-              ),
+                ),
+                const Icon(Icons.chevron_right, color: AppTheme.textDim),
+              ],
             ),
           ),
-      ],
+        ),
+    ];
+    if (rows.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [const SectionHeader('The rest of the day'), ...rows],
     );
   }
 }
