@@ -13,6 +13,7 @@ import '../../data/db/database.dart';
 import '../../domain/models/exercise.dart';
 import '../common/widgets.dart';
 import 'widgets/clip_player.dart';
+import 'widgets/motion_demo.dart';
 
 /// Everything known about one movement.
 ///
@@ -38,7 +39,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
       body: ListView(
         padding: Gap.pagePadding,
         children: [
-          if (ex.media.hasStill) _Still(path: ex.media.still!),
+          _DemoHero(exerciseId: ex.id),
 
           Gap.m,
           Wrap(
@@ -61,12 +62,9 @@ class ExerciseDetailScreen extends ConsumerWidget {
               child: FilledButton.icon(
                 onPressed: () => _openVideo(ex),
                 icon: const Icon(Icons.play_circle_outline),
-                label: const Text('Watch demo'),
+                label: const Text('Watch it on video'),
               ),
             ),
-          ] else ...[
-            Gap.m,
-            _NoVideoNote(exerciseId: ex.id),
           ],
 
           if (ex.soloSafety != null) ...[
@@ -122,6 +120,16 @@ class ExerciseDetailScreen extends ConsumerWidget {
             ),
           ],
 
+          if (ex.media.hasStill) ...[
+            Gap.l,
+            Text(
+              'Reference photo',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Gap.s,
+            _Still(path: ex.media.still!, licence: ex.media.stillLicence),
+          ],
+
           Gap.l,
           _ClipsSection(exerciseId: ex.id, clips: clips),
           Gap.xl,
@@ -142,45 +150,113 @@ class ExerciseDetailScreen extends ConsumerWidget {
   }
 }
 
-class _Still extends StatelessWidget {
-  const _Still({required this.path});
+/// The demo, big, at the top: the first thing the screen answers is "what
+/// does this look like". A tap holds the frame to study a position; the
+/// muscles it lights are named in the chips underneath, so crimson is never
+/// the only thing saying which.
+class _DemoHero extends StatefulWidget {
+  const _DemoHero({required this.exerciseId});
 
-  final String path;
+  final String exerciseId;
+
+  @override
+  State<_DemoHero> createState() => _DemoHeroState();
+}
+
+class _DemoHeroState extends State<_DemoHero> {
+  bool _paused = false;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Image.asset(
-        path,
-        fit: BoxFit.contain,
-        errorBuilder: (_, _, _) => const SizedBox.shrink(),
+    final t = Theme.of(context).textTheme;
+    return Semantics(
+      button: true,
+      label: _paused ? 'Play the demo' : 'Pause the demo',
+      child: GestureDetector(
+        onTap: () => setState(() => _paused = !_paused),
+        child: Container(
+          height: 260,
+          decoration: BoxDecoration(
+            gradient: AppTheme.surfaceGradient,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppTheme.outlineSoft),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: ExerciseDemo(
+                  exerciseId: widget.exerciseId,
+                  paused: _paused,
+                  padding: 14,
+                ),
+              ),
+              Positioned(
+                left: 12,
+                bottom: 10,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: AppTheme.crimson,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'working muscles',
+                      style: t.labelSmall?.copyWith(color: AppTheme.textDim),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                right: 8,
+                bottom: 4,
+                child: Icon(
+                  _paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+                  size: 20,
+                  color: AppTheme.textFaint,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-class _NoVideoNote extends StatelessWidget {
-  const _NoVideoNote({required this.exerciseId});
+class _Still extends StatelessWidget {
+  const _Still({required this.path, this.licence});
 
-  final String exerciseId;
+  final String path;
+  final String? licence;
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceHigh,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        'No demo link yet. These are filled in by hand rather than guessed — '
-        'an invented URL cannot be verified, and a wrong demo teaches the '
-        'wrong movement.\n\n'
-        'Add one under `$exerciseId` in docs/05-demo-checklist.md.',
-        style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.asset(
+            path,
+            fit: BoxFit.contain,
+            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+          ),
+        ),
+        if (licence != null) ...[
+          Gap.xs,
+          Text(
+            licence!,
+            style: Theme.of(context).textTheme.labelSmall
+                ?.copyWith(color: AppTheme.textFaint),
+          ),
+        ],
+      ],
     );
   }
 }

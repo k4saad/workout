@@ -14,6 +14,7 @@ import '../../domain/models/day.dart';
 import '../../domain/models/exercise.dart';
 import '../common/widgets.dart';
 import '../exercises/exercise_detail_screen.dart';
+import '../exercises/widgets/motion_demo.dart';
 import 'session_controller.dart';
 import 'widgets/rest_timer_bar.dart';
 import 'widgets/set_input.dart';
@@ -737,21 +738,36 @@ class _FocusCard extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Expanded(child: Text(exercise.name, style: t.headlineSmall)),
-                // One tap to the demo and back. A demo you have to leave the
-                // session to find does not get watched — and this pushes a
-                // route rather than replacing one, so you come back to the
-                // exact set you were on.
-                IconButton(
-                  tooltip: 'How do I do this?',
-                  icon: const Icon(Icons.help_outline),
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) =>
-                          ExerciseDetailScreen(exerciseId: p.exerciseId),
+                // The movement, moving, right beside its name: between sets
+                // this is the reminder. One tap opens the full demo and
+                // cues -- a pushed route, so back returns to the exact set.
+                Tooltip(
+                  message: 'How do I do this?',
+                  child: Material(
+                    color: AppTheme.surfaceHigh,
+                    borderRadius: BorderRadius.circular(12),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) =>
+                              ExerciseDetailScreen(exerciseId: p.exerciseId),
+                        ),
+                      ),
+                      child: SizedBox(
+                        width: 88,
+                        height: 88,
+                        child: ExerciseDemo(
+                          exerciseId: p.exerciseId,
+                          padding: 4,
+                          tight: true,
+                        ),
+                      ),
                     ),
                   ),
                 ),
+                const SizedBox(width: 14),
+                Expanded(child: Text(exercise.name, style: t.headlineSmall)),
               ],
             ),
             Gap.s,

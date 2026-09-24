@@ -5,6 +5,7 @@ import '../../app/exercise_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/models/exercise.dart';
 import 'exercise_detail_screen.dart';
+import 'widgets/motion_demo.dart';
 
 /// Every movement in the programme, searchable.
 class ExerciseLibraryScreen extends ConsumerStatefulWidget {
@@ -163,18 +164,7 @@ class _Row extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 4),
-      leading: exercise.media.hasStill
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                exercise.media.still!,
-                width: 52,
-                height: 52,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const _NoImage(),
-              ),
-            )
-          : const _NoImage(),
+      leading: _Thumb(exerciseId: exercise.id),
       title: Text(exercise.name, style: t.titleMedium),
       subtitle: Text(
         exercise.primaryMuscles.join(', '),
@@ -196,22 +186,28 @@ class _Row extends StatelessWidget {
   }
 }
 
-class _NoImage extends StatelessWidget {
-  const _NoImage();
+/// The movement at its most telling moment, not animated: seventy-eight
+/// figures moving at once in a list is noise, not information.
+class _Thumb extends StatelessWidget {
+  const _Thumb({required this.exerciseId});
+
+  final String exerciseId;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 52,
-      height: 52,
+      width: 56,
+      height: 56,
       decoration: BoxDecoration(
         color: AppTheme.surfaceHigh,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
       ),
-      child: const Icon(
-        Icons.fitness_center,
-        size: 20,
-        color: AppTheme.textDim,
+      clipBehavior: Clip.antiAlias,
+      child: ExerciseDemo(
+        exerciseId: exerciseId,
+        animate: false,
+        padding: 3,
+        tight: true,
       ),
     );
   }

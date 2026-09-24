@@ -31,6 +31,13 @@ Follow the phases in order; do not skip ahead.
   programme files, plus a byte-for-byte mirror of the authored files
   (`schema.json`, `quotes.json`, `fuel.json`, `motions.json`). `test/data/asset_mirror_test.dart` fails
   if they drift. Never edit an asset copy by hand.
+- **The diet and the exercise demos are generated too.** `fuel.json` comes from
+  `tools/gen_fuel.py` (portions solved, not typed) and `motions.json` from
+  `tools/gen_motions.py` (poses solved: bar over mid-foot, planted feet, straight
+  deadlift arms). Change the generator, never the JSON. The whole chain:
+  `python tools/gen.py && python tools/gen_fuel.py && python tools/gen_motions.py && python tools/validate.py`.
+- **Demos are original figures.** Keyframed, drawn by the app's own painter, provenance
+  `original work` on every clip (gate V18). No GIF, no video frame, no traced photo.
 - **A superset must not force a re-plate.** Members of the same `groupId` either share a
   load or pair a loaded movement with a bodyweight / cable / banded one. Otherwise the
   superset saves no time and the 60-minute ceiling breaks.

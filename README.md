@@ -68,12 +68,14 @@ Loads and session lengths are **computed, never typed** — that is what stops v
 19-unloadable-weights bug from recurring.
 
 ```bash
-python tools/gen.py && python tools/validate.py
+python tools/gen.py && python tools/gen_fuel.py && python tools/gen_motions.py && python tools/validate.py
 ```
 
+`tools/gen_fuel.py` solves the diet's portions; `tools/gen_motions.py` poses the
+exercise demos (original keyframed figures, checked frame by frame by the app's tests).
 `tools/gen.py` snaps every `startLoadKg` onto the plate lattice and computes every
 `estMinutes` from the prescriptions, ramp sets and implement changes.
-`tools/validate.py` runs gates V1–V13 and prints a report: session lengths, weekly sets
+`tools/validate.py` runs gates V1–V18 and prints a report: session lengths, weekly sets
 per muscle, push/pull balance, pattern frequency and macro arithmetic. Exit code 0 means
 the data is sound.
 

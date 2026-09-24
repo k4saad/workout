@@ -171,6 +171,7 @@ abstract final class Screenshot {
       await repo.loadLibrary();
       await repo.loadInventory();
       await repo.loadProgramme();
+      await repo.loadMotions();
     });
     final router = buildRouter();
     await tester.pumpWidget(
