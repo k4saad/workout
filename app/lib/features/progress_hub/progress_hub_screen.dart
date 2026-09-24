@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/body_providers.dart';
 import '../../app/progress_providers.dart';
+import '../../app/run_providers.dart';
 import '../../app/providers.dart';
 import '../../core/ui/ui.dart';
 import '../../domain/metrics/bodyweight_trend.dart';
+import '../../domain/run/run.dart';
 
 /// The Progress tab: every way of seeing that it is working.
 ///
@@ -21,6 +23,7 @@ class ProgressHubScreen extends ConsumerWidget {
     final weights = ref.watch(weightEntriesProvider).asData?.value ?? const [];
     final shoots = ref.watch(shootsProvider).asData?.value ?? const [];
     final week = ref.watch(currentWeekProvider);
+    final runs = ref.watch(finishedRunsProvider).asData?.value ?? const [];
 
     // The same 7-day average and weekly rate the Body screen and Today use.
     // A single scale reading swings a kilo on water; the hub must not
@@ -55,6 +58,18 @@ class ProgressHubScreen extends ConsumerWidget {
                   : 'No shoots yet · take the first one this week')
             : 'shoot${shoots.length == 1 ? '' : 's'} · private to this phone',
         onTap: () => context.go('/progress/photos'),
+      ),
+      _HubCard(
+        icon: Icons.route_outlined,
+        title: 'Runs',
+        value: runs.isEmpty
+            ? '—'
+            : '${formatKm(runs.fold<double>(0, (a, r) => a + r.distanceM))} km',
+        caption: runs.isEmpty
+            ? 'Trail, splits and pace for every run'
+            : '${runs.length} run${runs.length == 1 ? '' : 's'} · '
+                  'last ${formatKm(runs.first.distanceM)} km',
+        onTap: () => context.go('/progress/runs'),
       ),
       _HubCard(
         icon: Icons.fitness_center,

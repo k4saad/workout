@@ -99,6 +99,20 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('a run on the plan offers the GPS tracker', (tester) async {
+    await open(tester, 'b-sun');
+    expect(find.text('Easy run'), findsWidgets);
+    expect(find.text('Run it with GPS'), findsOneWidget);
+    // The steppers stay, for a run with the phone left at home.
+    expect(find.textContaining('Log it by hand'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a lift has no GPS button', (tester) async {
+    await open(tester, 'b-mon');
+    expect(find.text('Run it with GPS'), findsNothing);
+  });
+
   testWidgets('warnings block the work until acknowledged', (tester) async {
     await open(tester, 'b-thu');
     // Deadlift day carries the bar-height warning.

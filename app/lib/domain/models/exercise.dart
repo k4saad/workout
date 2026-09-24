@@ -91,6 +91,9 @@ class Exercise {
   bool get isSoloRisk => tags.contains('soloRisk');
   bool get isMainLift => tags.contains('mainLift');
 
+  /// A run worth recording on the map (the library's `gps` tag).
+  bool get gpsTracked => tags.contains('gps');
+
   /// Case-insensitive match against name and aliases, for library search.
   bool matches(String query) {
     final q = query.trim().toLowerCase();

@@ -15,6 +15,8 @@ import '../features/more/more_screen.dart';
 import '../features/progress/capture_screen.dart';
 import '../features/progress/progress_screen.dart';
 import '../features/progress_hub/progress_hub_screen.dart';
+import '../features/runs/live_run_screen.dart';
+import '../features/runs/runs_screen.dart';
 import '../features/session/session_runner_screen.dart';
 import '../features/settings/calibration_screen.dart';
 import '../features/settings/programme_file_screen.dart';
@@ -114,6 +116,18 @@ GoRouter buildRouter() {
                     builder: (_, _) => const ProgressScreen(),
                   ),
                   GoRoute(
+                    path: 'runs',
+                    builder: (_, _) => const RunsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        builder: (_, state) => RunDetailScreen(
+                          runId: int.parse(state.pathParameters['id']!),
+                        ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
                     path: 'lifts',
                     builder: (_, _) => const StatsScreen(),
                     routes: [
@@ -192,6 +206,17 @@ GoRouter buildRouter() {
           retroDate: state.uri.queryParameters['date'] == null
               ? null
               : DateTime.parse(state.uri.queryParameters['date']!),
+        ),
+      ),
+      // The live run tracker: a programme run passes its RunLaunch as
+      // `extra`; a free run passes nothing.
+      GoRoute(
+        path: '/track',
+        parentNavigatorKey: rootKey,
+        builder: (_, state) => LiveRunScreen(
+          launch: state.extra is RunLaunch
+              ? state.extra! as RunLaunch
+              : const RunLaunch(),
         ),
       ),
       GoRoute(

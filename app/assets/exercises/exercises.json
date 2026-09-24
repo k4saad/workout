@@ -1507,7 +1507,8 @@
       ],
       "tags": [
         "conditioning",
-        "timed"
+        "timed",
+        "gps"
       ],
       "equipmentNote": null,
       "progressionNote": null
@@ -1671,7 +1672,8 @@
       "substitutes": [],
       "tags": [
         "conditioning",
-        "test"
+        "test",
+        "gps"
       ],
       "equipmentNote": null,
       "progressionNote": null
@@ -2773,7 +2775,8 @@
       ],
       "tags": [
         "conditioning",
-        "timed"
+        "timed",
+        "gps"
       ],
       "equipmentNote": null,
       "progressionNote": null

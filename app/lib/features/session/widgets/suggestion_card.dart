@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../domain/models/enums.dart';
 import '../../../domain/progression/progression_engine.dart';
 
 /// What to put on the bar, and why.
@@ -10,9 +11,16 @@ import '../../../domain/progression/progression_engine.dart';
 /// sentence explaining why it went up, stayed put, or came down, so the
 /// decision is never a black box.
 class SuggestionCard extends StatelessWidget {
-  const SuggestionCard({super.key, required this.suggestion});
+  const SuggestionCard({
+    super.key,
+    required this.suggestion,
+    this.unit = RepUnit.reps,
+  });
 
   final LoadSuggestion suggestion;
+
+  /// What the targets count: a run's are minutes, never "1500 reps".
+  final RepUnit unit;
 
   Color get _accent {
     if (suggestion.isStalled) return AppTheme.warn;
@@ -54,12 +62,13 @@ class SuggestionCard extends StatelessWidget {
                   children: [
                     if (s.suggestedKg != null)
                       Text(
-                        '${_fmt(s.suggestedKg!)} kg  ·  ${s.repLabel} reps',
+                        '${_fmt(s.suggestedKg!)} kg  ·  '
+                        '${unit.rangeLabel(s.repTargetMin, s.repTargetMax)}',
                         style: t.titleLarge?.copyWith(color: _accent),
                       )
                     else
                       Text(
-                        '${s.repLabel} reps',
+                        unit.rangeLabel(s.repTargetMin, s.repTargetMax),
                         style: t.titleLarge?.copyWith(color: _accent),
                       ),
                     Gap.xs,

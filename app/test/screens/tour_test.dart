@@ -31,6 +31,8 @@ const routes = <(String, String)>[
   ('exercise-squat', '/more/exercises/barbell-back-squat'),
   ('exercise-pullup', '/more/exercises/pull-up'),
   ('runner', '/run/1/f-mon'),
+  ('runner-run', '/run/5/b-sun'),
+  ('runs', '/progress/runs'),
   ('cardio', '/more/cardio'),
   ('settings', '/more/settings'),
   ('settings-gym', '/more/settings/gym'),

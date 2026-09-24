@@ -1403,6 +1403,15 @@ for e in byid.values():
     e.setdefault("progressionNote", None)
     e["media"].setdefault("stillLicence", None)
 
+# v3: the runs worth recording on the map. A tag, so the app asks the data
+# which movements can be tracked instead of knowing exercise ids. Strides are
+# left out on purpose: fifteen seconds of GPS is noise, not a trail.
+GPS_TRACKED = {"easy-run", "run-intervals", "five-k-time-trial"}
+for _eid in sorted(GPS_TRACKED):
+    _tags = byid[_eid].setdefault("tags", [])
+    if "gps" not in _tags:
+        _tags.append("gps")
+
 EXERCISES = {
     "schemaVersion": 2, "revision": 3,
     "notes": ("Exercise library for The Keller Twelve. 72 definitions carried from v1, four "

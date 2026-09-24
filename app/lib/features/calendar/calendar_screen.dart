@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../app/calendar_providers.dart';
 import '../../app/providers.dart';
+import '../../app/run_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/calendar/adherence.dart';
 import '../../domain/models/enums.dart';
@@ -57,7 +58,26 @@ class CalendarScreen extends ConsumerWidget {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(8, 0, 8, 24),
-                child: _MonthGrid(entries: entries, today: today),
+                child: _MonthGrid(
+                  entries: entries,
+                  today: today,
+                  runDays: entries.isEmpty
+                      ? const {}
+                      : {
+                          for (final r
+                              in ref
+                                      .watch(
+                                        runsBetweenProvider((
+                                          from: entries.first.date,
+                                          to: entries.last.date,
+                                        )),
+                                      )
+                                      .asData
+                                      ?.value ??
+                                  const [])
+                            DateTime(r.runOn.year, r.runOn.month, r.runOn.day),
+                        },
+                ),
               ),
             ),
           ],
@@ -165,10 +185,17 @@ class _WeekdayHeader extends StatelessWidget {
 }
 
 class _MonthGrid extends StatelessWidget {
-  const _MonthGrid({required this.entries, required this.today});
+  const _MonthGrid({
+    required this.entries,
+    required this.today,
+    this.runDays = const {},
+  });
 
   final List<CalendarEntry> entries;
   final DateTime today;
+
+  /// Days with a GPS run on them, programme or free.
+  final Set<DateTime> runDays;
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +230,13 @@ class _MonthGrid extends StatelessWidget {
                   ),
                   for (final e in row)
                     Expanded(
-                      child: _Cell(entry: e, today: today),
+                      child: _Cell(
+                        entry: e,
+                        today: today,
+                        ran: runDays.contains(
+                          DateTime(e.date.year, e.date.month, e.date.day),
+                        ),
+                      ),
                     ),
                 ],
               ),
@@ -215,10 +248,13 @@ class _MonthGrid extends StatelessWidget {
 }
 
 class _Cell extends ConsumerWidget {
-  const _Cell({required this.entry, required this.today});
+  const _Cell({required this.entry, required this.today, this.ran = false});
 
   final CalendarEntry entry;
   final DateTime today;
+
+  /// A GPS run was recorded this day.
+  final bool ran;
 
   bool get _isToday =>
       entry.date.year == today.year &&
@@ -268,6 +304,13 @@ class _Cell extends ConsumerWidget {
                         ),
                       ),
                       const Spacer(),
+                      if (ran)
+                        const Icon(
+                          Icons.route_rounded,
+                          size: 12,
+                          color: AppTheme.crimson,
+                          semanticLabel: 'Ran',
+                        ),
                       if (entry.record?.loggedRetroactively ?? false)
                         const Icon(
                           Icons.edit_note,

@@ -10,11 +10,15 @@ import '../../app/providers.dart';
 import '../../app/session_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/db/tables.dart';
+import '../../data/run_repository.dart';
 import '../../domain/models/day.dart';
+import '../../domain/models/enums.dart';
 import '../../domain/models/exercise.dart';
+import '../../domain/run/run.dart';
 import '../common/widgets.dart';
 import '../exercises/exercise_detail_screen.dart';
 import '../exercises/widgets/motion_demo.dart';
+import '../runs/live_run_screen.dart';
 import 'session_controller.dart';
 import 'widgets/rest_timer_bar.dart';
 import 'widgets/set_input.dart';
@@ -165,6 +169,59 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
         () => _state = ref.read(runnerControllerProvider).enterShortMode(s),
       );
     }
+  }
+
+  /// Opens the live run tracker for a run on today's plan. It logs its own
+  /// set when finished; coming back, the runner reloads to show it.
+  Future<void> _runWithGps(RunnerItem item, Exercise exercise) async {
+    final s = _state;
+    if (s == null) return;
+    final p = item.prescription;
+    final amount = item.targetRepsMax;
+    final RunTarget? target = switch (p.unit) {
+      RepUnit.sec => RunTarget.duration(amount),
+      RepUnit.m => RunTarget.distance(amount),
+      RepUnit.reps => null,
+    };
+    final label = switch (p.unit) {
+      RepUnit.sec => '${(amount / 60).round()} min',
+      RepUnit.m => '${formatKm(amount.toDouble())} km',
+      RepUnit.reps => '',
+    };
+    final saved = await context.push<bool>(
+      '/track',
+      extra: RunLaunch(
+        title: label.isEmpty ? exercise.name : '${exercise.name} · $label',
+        exerciseName: exercise.name,
+        link: RunLink(
+          sessionId: s.session.id,
+          weekNo: widget.weekNo,
+          dayId: widget.dayId,
+          prescriptionId: p.id,
+          exerciseId: p.exerciseId,
+          target: target,
+          targetRepsMin: item.targetRepsMin,
+          targetRepsMax: item.targetRepsMax,
+        ),
+      ),
+    );
+    if (saved == true) await _reload();
+  }
+
+  /// Reads the session's sets back from the database, keeping the focus.
+  Future<void> _reload() async {
+    final s = _state;
+    if (s == null) return;
+    final loaded = await ref
+        .read(runnerControllerProvider)
+        .load(
+          s.session,
+          s.day,
+          focusIndex: s.focusIndex,
+          shortMode: s.shortMode,
+          suggestions: s.suggestions,
+        );
+    if (mounted) setState(() => _state = loaded);
   }
 
   Future<void> _logCurrentSet(
@@ -422,6 +479,7 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
                     }),
                     onLog: (it, ex, {bool warmup = false}) =>
                         _logCurrentSet(it, ex, isWarmup: warmup),
+                    onRunWithGps: _runWithGps,
                     onUndo: () async {
                       final updated = await ref
                           .read(runnerControllerProvider)
@@ -564,6 +622,7 @@ class _RunnerBody extends StatelessWidget {
     required this.onFocus,
     required this.onLog,
     required this.onUndo,
+    this.onRunWithGps,
   });
 
   final RunnerState state;
@@ -578,6 +637,7 @@ class _RunnerBody extends StatelessWidget {
   final ValueChanged<int> onFocus;
   final void Function(RunnerItem, Exercise, {bool warmup}) onLog;
   final VoidCallback onUndo;
+  final void Function(RunnerItem, Exercise)? onRunWithGps;
 
   @override
   Widget build(BuildContext context) {
@@ -619,6 +679,7 @@ class _RunnerBody extends StatelessWidget {
             onPendingChanged: onPendingChanged,
             onLog: onLog,
             onUndo: onUndo,
+            onRunWithGps: onRunWithGps,
           ),
       ],
     );
@@ -694,6 +755,7 @@ class _FocusCard extends ConsumerWidget {
     required this.onPendingChanged,
     required this.onLog,
     required this.onUndo,
+    this.onRunWithGps,
   });
 
   final RunnerItem item;
@@ -704,6 +766,7 @@ class _FocusCard extends ConsumerWidget {
   final ValueChanged<PendingSet> onPendingChanged;
   final void Function(RunnerItem, Exercise, {bool warmup}) onLog;
   final VoidCallback onUndo;
+  final void Function(RunnerItem, Exercise)? onRunWithGps;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -776,10 +839,11 @@ class _FocusCard extends ConsumerWidget {
               runSpacing: 8,
               children: [
                 InfoChip(
-                  label:
-                      '${p.sets} × ${p.repRangeLabel}'
-                      '${p.unit.short.isEmpty ? '' : ' ${p.unit.short}'}'
-                      '${p.perSide ? ' / side' : ''}',
+                  label: p.unit == RepUnit.reps
+                      ? '${p.sets} × ${p.repRangeLabel}'
+                            '${p.perSide ? ' / side' : ''}'
+                      : '${p.sets} × ${p.unit.rangeLabel(p.repsMin, p.repsMax)}'
+                            '${p.perSide ? ' / side' : ''}',
                   emphasis: true,
                 ),
                 if (p.restSec > 0)
@@ -787,7 +851,10 @@ class _FocusCard extends ConsumerWidget {
                     label: '${p.restSec}s rest',
                     icon: Icons.timer_outlined,
                   ),
-                if (p.targetRir != null) InfoChip(label: 'RIR ${p.targetRir}'),
+                // Reps in reserve means something for a set of reps; for a
+                // run or a hold it is noise.
+                if (p.targetRir != null && p.unit == RepUnit.reps)
+                  InfoChip(label: 'RIR ${p.targetRir}'),
                 if (p.tempo != null) InfoChip(label: p.tempo!),
                 if (p.warmupRamp) const InfoChip(label: 'ramp first'),
               ],
@@ -808,7 +875,7 @@ class _FocusCard extends ConsumerWidget {
 
             if (suggestion != null) ...[
               Gap.m,
-              SuggestionCard(suggestion: suggestion),
+              SuggestionCard(suggestion: suggestion, unit: p.unit),
             ],
 
             if (p.coachNote != null) ...[
@@ -816,6 +883,29 @@ class _FocusCard extends ConsumerWidget {
               Text(
                 p.coachNote!,
                 style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+              ),
+            ],
+
+            // A run on the plan can be recorded on the map; the time and
+            // distance then log themselves as this set. The steppers below
+            // stay for a treadmill, or a phone left at home.
+            if (exercise.gpsTracked &&
+                next != null &&
+                onRunWithGps != null) ...[
+              Gap.m,
+              FilledButton.icon(
+                onPressed: () => onRunWithGps!(item, exercise),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(56),
+                ),
+                icon: const Icon(Icons.route_rounded),
+                label: const Text('Run it with GPS'),
+              ),
+              Gap.xs,
+              Text(
+                'Records the route and logs the time and distance as this '
+                'set. No phone with you? Log it by hand below.',
+                style: t.bodySmall?.copyWith(color: AppTheme.textDim),
               ),
             ],
 

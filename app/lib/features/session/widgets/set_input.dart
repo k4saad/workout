@@ -98,7 +98,10 @@ class SetInput extends StatelessWidget {
             max: 3600,
             step: 5,
             unit: 's',
-            target: '${prescription.repRangeLabel} s',
+            target: prescription.unit.rangeLabel(
+              prescription.repsMin,
+              prescription.repsMax,
+            ),
             onChanged: (v) => onChanged(value.copyWith(durationSec: v)),
           ),
           SetInputKind.distance => _RepsStepper(
@@ -107,11 +110,15 @@ class SetInput extends StatelessWidget {
             max: 50000,
             step: 100,
             unit: 'm',
-            target: '${prescription.repRangeLabel} m',
+            target: prescription.unit.rangeLabel(
+              prescription.repsMin,
+              prescription.repsMax,
+            ),
             onChanged: (v) => onChanged(value.copyWith(distanceM: v)),
           ),
         },
-        if (prescription.targetRir != null) ...[
+        if (prescription.targetRir != null &&
+            prescription.unit == RepUnit.reps) ...[
           Gap.m,
           _RirChips(
             value: value.rir,
@@ -372,14 +379,16 @@ class LastTimeLine extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     if (sets.isEmpty) {
       return Text(
-        'First time — start at the prescribed load and leave reps in '
-        'the tank.',
+        unit == RepUnit.reps
+            ? 'First time — start at the prescribed load and leave reps in '
+                  'the tank.'
+            : 'First time — easy, by feel. Nothing to beat yet.',
         style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
       );
     }
 
     final values = unit == RepUnit.sec
-        ? sets.map((s) => '${s.durationSec ?? 0}s').join(', ')
+        ? sets.map((s) => unit.amountLabel(s.durationSec ?? 0)).join(', ')
         : sets.map((s) => '${s.reps ?? 0}').join(', ');
 
     final loads = sets

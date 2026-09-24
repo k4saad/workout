@@ -125,6 +125,38 @@ enum RepUnit {
     RepUnit.m => 'm',
   };
 
+  /// A target range in words: `8–10 reps`, `30–45 s`, `24–26 min`, `5 km`.
+  /// Anything two minutes or longer reads in minutes, a kilometre or more in
+  /// kilometres.
+  String rangeLabel(int min, int max) {
+    String range(String a, String b) => a == b ? a : '$a–$b';
+    switch (this) {
+      case RepUnit.reps:
+        return '${range('$min', '$max')} reps';
+      case RepUnit.sec:
+        if (max < 120) return '${range('$min', '$max')} s';
+        return '${range(_trim(min / 60), _trim(max / 60))} min';
+      case RepUnit.m:
+        if (max < 1000) return '${range('$min', '$max')} m';
+        return '${range(_trim(min / 1000), _trim(max / 1000))} km';
+    }
+  }
+
+  /// One logged amount: `8`, `45 s`, `25:37`, `4.87 km`.
+  String amountLabel(int v) => switch (this) {
+    RepUnit.reps => '$v',
+    RepUnit.sec =>
+      v < 120 ? '$v s' : '${v ~/ 60}:${(v % 60).toString().padLeft(2, '0')}',
+    RepUnit.m => v < 1000 ? '$v m' : '${(v / 1000).toStringAsFixed(2)} km',
+  };
+
+  static String _trim(double v) {
+    final s = v.toStringAsFixed(2);
+    return s.contains('.')
+        ? s.replaceFirst(RegExp(r'0+$'), '').replaceFirst(RegExp(r'\.$'), '')
+        : s;
+  }
+
   String toJson() => name;
 }
 

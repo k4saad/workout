@@ -5,9 +5,11 @@ import 'package:intl/intl.dart';
 
 import '../../app/calendar_providers.dart';
 import '../../app/providers.dart';
+import '../../app/run_providers.dart';
 import '../../app/session_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/calendar/adherence.dart';
+import '../../domain/run/run.dart';
 import '../common/widgets.dart';
 
 /// What you get when you tap a day.
@@ -230,6 +232,7 @@ class _DaySheet extends ConsumerWidget {
                 ),
               ],
             ],
+            _DayRuns(date: entry.date),
           ],
         ),
       ),
@@ -306,6 +309,54 @@ class _Action extends StatelessWidget {
         icon: Icon(icon),
         label: Text(label),
       ),
+    );
+  }
+}
+
+/// The runs recorded on a day, each one tap from its trail.
+class _DayRuns extends ConsumerWidget {
+  const _DayRuns({required this.date});
+
+  final DateTime date;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final runs =
+        ref.watch(runsBetweenProvider((from: date, to: date))).asData?.value ??
+        const [];
+    if (runs.isEmpty) return const SizedBox.shrink();
+    final t = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Gap.m,
+        for (final r in runs)
+          InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () {
+              Navigator.pop(context);
+              context.go('/progress/runs/${r.id}');
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                children: [
+                  const Icon(Icons.route_rounded, color: AppTheme.crimson),
+                  Gap.m,
+                  Expanded(
+                    child: Text(
+                      '${formatKm(r.distanceM)} km · '
+                      '${formatClock(r.movingMs)}'
+                      '${r.exerciseId == null ? ' · free run' : ''}',
+                      style: t.titleMedium,
+                    ),
+                  ),
+                  const Icon(Icons.chevron_right, color: AppTheme.textDim),
+                ],
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

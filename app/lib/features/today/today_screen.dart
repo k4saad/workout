@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/providers.dart';
+import '../../app/run_providers.dart';
 import '../../app/session_providers.dart';
 import '../../domain/calendar/programme_calendar.dart';
 import '../../domain/models/enums.dart';
@@ -57,6 +58,7 @@ class TodayScreen extends ConsumerWidget {
                 totalWeeks: b.programme.totalWeeks,
               ),
               const _ResumeBanner(),
+              const _OpenRunBanner(),
               BackupNag(
                 hasTrainingData:
                     (ref.watch(completedSessionCountProvider).asData?.value ??
@@ -139,6 +141,52 @@ class _ResumeBanner extends ConsumerWidget {
                   context.push('/run/${resumable.weekNo}/${resumable.dayId}'),
               style: FilledButton.styleFrom(minimumSize: const Size(96, 48)),
               child: const Text('Resume'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A run the app was killed or closed during. It is still open in the
+/// database; the tracker picks it up as a new stretch of trail.
+class _OpenRunBanner extends ConsumerWidget {
+  const _OpenRunBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final open = ref.watch(openRunProvider).asData?.value;
+    if (open == null) return const SizedBox.shrink();
+    final t = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: AppCard(
+        accent: AppTheme.crimson,
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            const Icon(Icons.route_rounded, color: AppTheme.crimson),
+            Gap.m,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Run still open', style: t.titleMedium),
+                  Text(
+                    'Pick it up where the trail stopped, or finish it.',
+                    style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+                  ),
+                ],
+              ),
+            ),
+            FilledButton(
+              onPressed: () async {
+                await context.push<bool>('/track');
+                ref.invalidate(openRunProvider);
+              },
+              style: FilledButton.styleFrom(minimumSize: const Size(96, 48)),
+              child: const Text('Open'),
             ),
           ],
         ),

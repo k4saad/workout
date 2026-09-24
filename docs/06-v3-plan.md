@@ -35,7 +35,7 @@ supermarket staples.
 | 1 — The programme a coach would sign off | **Done** — `8282b8d`, finished in `e6cd785` |
 | 2 — Fuel: the diet plan | **Done** — `d955501` |
 | 3 — Animated exercise demos | **Done** — see below |
-| 4 — GPS runs on OpenStreetMap | |
+| 4 — GPS runs on OpenStreetMap | **Done** — see below |
 | 5 — Calendar and Week | |
 | 6 — Progress photos and Body | |
 | 7 — Launch quote and premium polish | |
@@ -196,6 +196,34 @@ Original figures, drawn from keyframes. No GIFs, no scraping, nothing copyrighte
 - A run started from a programme cardio day logs its time and distance into that
   session, which also fixes the runner storing seconds as reps.
 - OSM tile policy: user agent, attribution, no bulk prefetch, bounded cache, dark tiles.
+
+### What Phase 4 shipped
+
+- **The run maths** (`app/lib/domain/run/`, pure Dart, test-first): haversine, a fix
+  filter (accuracy, stale, impossible jumps), distance counted in steps so GPS drift
+  standing at a crossing adds nothing, auto-pause with hysteresis on displacement
+  speed, moving time, current and average pace, kilometre splits, a 100 m pace
+  profile, climb with a smoothed altimeter, and a pace guide centred on his OWN recent
+  easy runs (median ± 6 %), not on a number typed into the programme.
+- **The tracker** persists every accepted point as it arrives. Pause breaks the trail
+  and counts nothing across it; a run open when the app was killed is picked up as a
+  new segment (Today and the Runs page both offer it).
+- **Screens:** a full-screen live run (outside the tab bar) with the trail on dark
+  OpenStreetMap tiles, distance big enough to read at pace, pause, and a finish that
+  has to be held for 1.2 s; the end of it is the summary (fitted trail with start and
+  finish markers, splits with the quickest marked, pace chart, effort 1–10). Progress
+  gets a Runs page (totals, free run, every run with its trail shape) and a page per
+  run; the calendar marks run days and the day sheet lists them.
+- **Programme runs:** the runs the library tags `gps` (easy run, intervals, the 5K)
+  show "Run it with GPS" in the session runner. The finished run logs itself as the
+  set: seconds in the seconds column, metres in the metres column. The runner now
+  reads a run as `24–26 min` and a 5K as `5 km`, and shows no RIR for timed or
+  distance work (the "seconds as reps" labels are gone).
+- **Tile policy:** app-id User-Agent, visible attribution linking to the OSM copyright
+  page, only on-screen tiles, an 80 MB cache in app-private storage.
+- **Cut, said out loud:** screen-off recording, the foreground notification and the
+  real tiles can only be proved on the phone; they go on the on-device checklist in
+  Phase 8. The 5K time trial gets no pace guide (a test is not run to a band).
 
 ## Phase 5 — Calendar and Week
 
