@@ -106,20 +106,64 @@ void main() {
   });
 
   group('backup rules exclude the private media', () {
-    test('cloud backup excludes photos, clips and the database', () {
+    // Everything the app keeps is in path_provider's documents directory,
+    // which on Android is <data dir>/app_flutter/: the "root" domain. The
+    // v2 rules named the "file" and "database" domains — folders the app
+    // never writes to — so they excluded nothing.
+    final exclude = RegExp(r'<exclude\s+domain="(\w+)"\s+path="([^"]+)"');
+
+    Set<String> excluded(String xml) => {
+      for (final m in exclude.allMatches(xml)) '${m.group(1)}:${m.group(2)}',
+    };
+
+    test('cloud backup excludes everything the app keeps', () {
       final rules = read('android/app/src/main/res/xml/backup_rules.xml');
-      for (final path in ['photos/', 'clips/', 'keller_twelve.sqlite']) {
-        expect(rules, contains(path));
-      }
+      expect(excluded(rules), contains('root:app_flutter/'));
     });
 
-    test('Android 12+ extraction rules exclude them too', () {
+    test('Android 12+ cloud backup excludes it too', () {
       final rules = read(
         'android/app/src/main/res/xml/data_extraction_rules.xml',
       );
-      expect(rules, contains('<cloud-backup>'));
-      expect(rules, contains('photos/'));
-      expect(rules, contains('clips/'));
+      final cloud = rules.substring(
+        rules.indexOf('<cloud-backup>'),
+        rules.indexOf('</cloud-backup>'),
+      );
+      expect(excluded(cloud), contains('root:app_flutter/'));
+    });
+
+    test('a phone-to-phone transfer carries no photo, thumbnail or clip', () {
+      // allowBackup="false" does NOT stop this on Android 12+.
+      final rules = read(
+        'android/app/src/main/res/xml/data_extraction_rules.xml',
+      );
+      final transfer = rules.substring(
+        rules.indexOf('<device-transfer>'),
+        rules.indexOf('</device-transfer>'),
+      );
+      expect(
+        excluded(transfer),
+        containsAll([
+          'root:app_flutter/photos/',
+          'root:app_flutter/thumbs/',
+          'root:app_flutter/clips/',
+        ]),
+      );
+    });
+
+    test('no rule points at a folder the app does not use', () {
+      for (final f in ['backup_rules.xml', 'data_extraction_rules.xml']) {
+        for (final rule in excluded(read('android/app/src/main/res/xml/$f'))) {
+          expect(rule, startsWith('root:app_flutter/'), reason: '$f: $rule');
+        }
+      }
+    });
+
+    test('the media folders are the ones the repository writes to', () {
+      final repo = read('lib/data/media_repository.dart');
+      for (final dir in ['photos', 'clips', 'thumbs']) {
+        expect(repo, contains("Dir = '$dir'"), reason: dir);
+      }
     });
   });
 

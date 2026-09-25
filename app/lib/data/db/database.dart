@@ -417,23 +417,33 @@ int? schemaVersionOf(File file) {
 LazyDatabase openConnection() {
   return LazyDatabase(() async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dir.path, 'keller_twelve.sqlite'));
-
-    final onDisk = schemaVersionOf(file);
-    final migrationComing =
-        onDisk != null && onDisk > 0 && onDisk < AppDatabase.currentSchema;
-
-    if (migrationComing) {
-      final backup = File(
-        p.join(dir.path, 'keller_twelve.premigration.v$onDisk.sqlite'),
-      );
-      try {
-        await file.copy(backup.path);
-      } catch (_) {
-        // A failed pre-migration copy must not stop the app opening. The
-        // alternative — refusing to launch — loses the session either way.
-      }
-    }
-    return NativeDatabase.createInBackground(file);
+    return NativeDatabase.createInBackground(await prepareDatabaseFile(dir));
   });
+}
+
+/// The database file in [dir], with a copy taken first whenever the file is
+/// behind the current schema: `keller_twelve.premigration.v<N>.sqlite`. A
+/// migration runs in a transaction, so one that fails leaves the file at the
+/// old version, and the next launch simply copies it again.
+///
+/// Split out of [openConnection] so the copy can be rehearsed against a real
+/// old database in a test, without a phone.
+Future<File> prepareDatabaseFile(Directory dir) async {
+  final file = File(p.join(dir.path, 'keller_twelve.sqlite'));
+  final onDisk = schemaVersionOf(file);
+  final migrationComing =
+      onDisk != null && onDisk > 0 && onDisk < AppDatabase.currentSchema;
+
+  if (migrationComing) {
+    final backup = File(
+      p.join(dir.path, 'keller_twelve.premigration.v$onDisk.sqlite'),
+    );
+    try {
+      await file.copy(backup.path);
+    } catch (_) {
+      // A failed pre-migration copy must not stop the app opening. The
+      // alternative — refusing to launch — loses the session either way.
+    }
+  }
+  return file;
 }

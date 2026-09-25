@@ -27,7 +27,7 @@ supermarket staples.
 
 ---
 
-## Where this stands (2026-09-24)
+## Where this stands (2026-09-25)
 
 | Phase | State |
 |---|---|
@@ -39,7 +39,7 @@ supermarket staples.
 | 5 — Calendar and Week | **Done** — see below |
 | 6 — Progress photos and Body | **Done** — see below |
 | 7 — Launch quote and premium polish | **Done** — see below |
-| 8 — Hardening and release | |
+| 8 — Hardening and release | **Done** — APK built; on-device checks in `docs/07-on-device-checklist.md` |
 
 Phase 1's review found 24 issues and its fixer was interrupted partway,
 leaving eight failing engine tests — written for confirmed findings, none
@@ -436,3 +436,54 @@ Original figures, drawn from keyframes. No GIFs, no scraping, nothing copyrighte
 - Full adversarial review across the release; privacy audit; migration rehearsal from a
   real v0.11 database; release APK built and signed with Saad's key; docs updated.
 - What cannot be checked without the phone goes on the on-device checklist.
+
+### What Phase 8 shipped
+
+- **The migration, rehearsed on a real v0.11 database.** The v0.11.0+11
+  code itself, checked out at `8af0b7c`, logged two weeks through its own
+  services: 110 sets, a partial, a skip, a moved session, one left open when
+  the app died, weigh-ins, the tape, cardio, food ticks, a niggle, a stall
+  counter and a photo shoot. That file is `app/test/fixtures/v0.11.0+11.sqlite`.
+  `v011_rehearsal_test.dart` opens it with v0.12 and checks:
+  - the pre-migration copy is byte-identical;
+  - every row survives, and the file is v3;
+  - the new tables take rows;
+  - the open session still resumes;
+  - the photo rows are kept;
+  - a second launch takes no second copy;
+  - the upgraded database backs up and restores whole.
+
+  `prepareDatabaseFile` was split out of `openConnection` so the copy could
+  be rehearsed at all.
+- **A privacy bug, found and fixed.** Every backup exclusion named the
+  `file` and `database` domains, but the app keeps everything in
+  path_provider's documents directory, `app_flutter/`. So the rules excluded
+  folders the app never uses. On Android 12+, `allowBackup="false"` does not
+  stop a phone-to-phone transfer, so a new phone would have received the
+  progress photos. The rules now name `root:app_flutter/…`: cloud backup
+  excludes all of it, and a device transfer excludes photos, thumbnails and
+  clips. The audit test checks the domain and the path, not a substring.
+- **A stale "today", fixed.** The date was read once, and Android keeps the
+  app in memory for days. The next morning it could still show yesterday's
+  session and quote. It now rolls over on every resume and at midnight
+  (calendar midnight, DST-safe), and a hand-pinned date stays pinned.
+- **The release:**
+  - `apk/keller-twelve-0.12.0+12-arm64.apk` and `-arm32.apk`, signed with
+    Saad's key.
+  - Certificate `389b93bc…b7b5`, the same as v0.11's, so it installs as an
+    update and keeps the data.
+  - Version code 2011 → 2012.
+  - The merged-manifest permissions differ from v0.11 by exactly the five
+    approved for v3: INTERNET, fine and coarse location, FOREGROUND_SERVICE,
+    FOREGROUND_SERVICE_LOCATION. There is no background location.
+- **Said out loud:**
+  - The merged manifest still carries permissions v0.11 already had, added
+    by plugins, not by app code: RECORD_AUDIO (camera),
+    READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE up to Android 9 (file
+    and image pickers), and USE_BIOMETRIC. None is new. Stripping them would
+    be a manifest change to discuss, not to slip in.
+  - The build warns that the CupertinoIcons font is absent. No app code uses
+    it; the framework's adaptive widgets reference it and this Material-only
+    app never draws them.
+  - The rest is on the phone: `docs/07-on-device-checklist.md`.
+

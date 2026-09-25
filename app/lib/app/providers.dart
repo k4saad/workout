@@ -61,14 +61,34 @@ final bundleProvider = FutureProvider<ProgrammeBundle>((ref) async {
 /// "Now", as a date. Overridable in tests and by the debug date picker, so a
 /// screen never calls DateTime.now() directly.
 class TodayNotifier extends Notifier<DateTime> {
+  bool _pinned = false;
+
   @override
   DateTime build() {
     final n = DateTime.now();
     return DateTime(n.year, n.month, n.day);
   }
 
-  void set(DateTime d) => state = DateTime(d.year, d.month, d.day);
+  /// Pins the date by hand; [refresh] leaves it alone from then on.
+  void set(DateTime d) {
+    _pinned = true;
+    state = DateTime(d.year, d.month, d.day);
+  }
+
+  /// Moves on to the new date once the clock has passed midnight. Android
+  /// keeps the app in memory for days, and opened the next morning it must
+  /// not still be showing yesterday. Called on resume and at midnight.
+  void refresh([DateTime Function() now = DateTime.now]) {
+    if (_pinned) return;
+    final n = now();
+    final d = DateTime(n.year, n.month, n.day);
+    if (d != state) state = d;
+  }
 }
+
+/// The midnight after [t], by the calendar rather than by adding 24 hours:
+/// the night the clocks change is 23 or 25 hours long.
+DateTime nextMidnight(DateTime t) => DateTime(t.year, t.month, t.day + 1);
 
 final todayProvider = NotifierProvider<TodayNotifier, DateTime>(
   TodayNotifier.new,

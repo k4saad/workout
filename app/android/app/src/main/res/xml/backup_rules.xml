@@ -5,10 +5,13 @@
   Progress photos are shirtless photos of one person. They must never leave
   the device by any path the athlete did not explicitly choose. If allowBackup
   is ever flipped back on, these exclusions still stand.
+
+  Paths are in the "root" domain because everything the app keeps lives in
+  path_provider's documents directory, which on Android is
+  <data dir>/app_flutter/ — not files/ (the "file" domain) and not
+  databases/ (the "database" domain). Rules written against those domains
+  excluded folders the app never uses.
 -->
 <full-backup-content>
-    <exclude domain="file" path="photos/" />
-    <exclude domain="file" path="clips/" />
-    <exclude domain="file" path="thumbs/" />
-    <exclude domain="database" path="keller_twelve.sqlite" />
+    <exclude domain="root" path="app_flutter/" />
 </full-backup-content>

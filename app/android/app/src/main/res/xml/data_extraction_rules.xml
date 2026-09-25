@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Android 12+ equivalent of backup_rules.xml. See that file for why. -->
+<!--
+  Android 12+ equivalent of backup_rules.xml. See that file for why the
+  paths are in the "root" domain under app_flutter/.
+
+  On Android 12+ allowBackup="false" turns cloud backup off but NOT a direct
+  phone-to-phone transfer, so the device-transfer rules below are the ones
+  that actually decide what travels.
+-->
 <data-extraction-rules>
     <cloud-backup>
-        <exclude domain="file" path="photos/" />
-        <exclude domain="file" path="clips/" />
-        <exclude domain="file" path="thumbs/" />
-        <exclude domain="database" path="keller_twelve.sqlite" />
+        <exclude domain="root" path="app_flutter/" />
     </cloud-backup>
     <device-transfer>
         <!-- A direct phone-to-phone transfer is the athlete moving their own
              device, not a cloud upload, so the training log may come along.
-             Photos still do not. -->
-        <exclude domain="file" path="photos/" />
-        <exclude domain="file" path="clips/" />
+             Photos, their thumbnails and form clips still do not. -->
+        <exclude domain="root" path="app_flutter/photos/" />
+        <exclude domain="root" path="app_flutter/thumbs/" />
+        <exclude domain="root" path="app_flutter/clips/" />
     </device-transfer>
 </data-extraction-rules>
