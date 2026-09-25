@@ -547,7 +547,7 @@ class _CompareState extends ConsumerState<_Compare> {
         ],
       ),
     );
-    if (id != null) setState(() => set(id));
+    if (id != null && mounted) setState(() => set(id));
   }
 }
 

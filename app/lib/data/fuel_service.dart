@@ -156,9 +156,16 @@ class FuelService {
     required DateTime from,
     required DateTime to,
   }) async {
-    final rows = await (db.select(
+    final logged = await (db.select(
       db.mealLogs,
     )..where((m) => m.loggedOn.isBetweenValues(_d(from), _d(to)))).get();
+    // A swap is recorded as `planned`: a choice of meal, not a decision
+    // about eating it. Counted, a week swapped ahead on the Plan would read
+    // as a week of missed meals.
+    final rows = [
+      for (final r in logged)
+        if (r.status != MealStatus.planned) r,
+    ];
     var eaten = 0.0;
     for (final r in rows) {
       eaten += r.portion;
@@ -197,6 +204,10 @@ class FuelService {
       (db.update(db.nutritionAdjustments)..where((a) => a.id.equals(id))).write(
         NutritionAdjustmentsCompanion(revertedOn: Value(_d(on))),
       );
+
+  /// Every adjustment ever made, standing or taken off.
+  Future<List<NutritionAdjustment>> allAdjustments() =>
+      db.select(db.nutritionAdjustments).get();
 
   /// Everything still standing, so the UI can show what is being added and
   /// let him take it back.

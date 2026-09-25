@@ -392,8 +392,11 @@ class Programme {
   /// keyed by weekday, so week 1 is Monday-anchored even when the start date
   /// falls mid-week.
   DateTime get anchorMonday {
-    final d = DateTime(startDate.year, startDate.month, startDate.day);
-    return d.subtract(Duration(days: d.weekday - DateTime.monday));
+    return DateTime(
+      startDate.year,
+      startDate.month,
+      startDate.day - (startDate.weekday - DateTime.monday),
+    );
   }
 
   factory Programme.fromJson(Map<String, dynamic> j) => Programme(

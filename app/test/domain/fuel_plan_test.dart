@@ -135,6 +135,31 @@ void main() {
     });
   });
 
+  group('the next meal to eat', () {
+    final day = plan.forDay(weekNo: 1, isTrainingDay: true, weekday: 1);
+    String? next(String now, [Set<String> logged = const {}]) =>
+        day.nextToEat(now: now, logged: logged)?.slot.id;
+
+    test('a meal just due is still the next one', () {
+      // v3 compared the clock only: at 10:35 the 10:30 meal had vanished.
+      expect(next('10:35'), 'mid_morning');
+    });
+
+    test('a meal logged is not next any more', () {
+      expect(next('10:20', {'mid_morning'}), 'lunch');
+      expect(next('07:00', {'breakfast', 'mid_morning'}), 'lunch');
+    });
+
+    test('a meal two hours gone gives way to the one coming', () {
+      expect(next('15:10'), 'pre_training');
+      expect(next('14:50'), 'lunch');
+    });
+
+    test('with everything logged, the day is done', () {
+      expect(next('23:00', {for (final s in day.slots) s.slot.id}), isNull);
+    });
+  });
+
   group('swapping a meal', () {
     test('choosing another option keeps the day on target', () {
       final day = plan.forDay(weekNo: 1, isTrainingDay: true);
@@ -173,6 +198,12 @@ void main() {
       );
       expect(boosted.totals.kcal, closeTo(base.totals.kcal + 250, 60));
       expect(boosted.extraKcal, 250);
+    });
+
+    test('a cut takes its calories off, too', () {
+      final base = plan.forDay(weekNo: 1, isTrainingDay: true);
+      final cut = plan.forDay(weekNo: 1, isTrainingDay: true, extraKcal: -200);
+      expect(cut.totals.kcal, closeTo(base.totals.kcal - 200, 0.001));
     });
 
     test('with no adjustment the day is exactly the phase', () {

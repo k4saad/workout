@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart' show GoRouterHelper;
 
 import '../../app/body_providers.dart';
 import '../../app/providers.dart';
@@ -28,6 +29,54 @@ class _CardioScreenState extends ConsumerState<CardioScreen> {
   DateTime? _startedAt;
   String? _runningLabel;
 
+  /// Read in initState: [dispose] may not reach through `ref`.
+  late final _notifications = ref.read(notificationServiceProvider);
+
+  @override
+  void dispose() {
+    // Leaving mid-interval must not leave the phone calling rounds from a
+    // timer nobody can see or stop.
+    if (_running != null) _notifications.cancelIntervals();
+    super.dispose();
+  }
+
+  void _stop() {
+    _notifications.cancelIntervals();
+    setState(() {
+      _running = null;
+      _startedAt = null;
+    });
+  }
+
+  Future<void> _leave() async {
+    if (!await _confirmLeave() || !mounted) return;
+    _stop();
+    Navigator.of(context).pop();
+  }
+
+  Future<bool> _confirmLeave() async {
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Stop the timer?'),
+        content: const Text(
+          'Leaving stops the interval. What is done so far is not logged.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Keep going'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Stop and leave'),
+          ),
+        ],
+      ),
+    );
+    return leave ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
@@ -36,115 +85,128 @@ class _CardioScreenState extends ConsumerState<CardioScreen> {
     final cardio = bundle?.programme.cardioForWeek(week);
     final logs = ref.watch(cardioLogsProvider).asData?.value ?? [];
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Cardio')),
-      body: ListView(
-        padding: Gap.pagePadding,
-        children: [
-          if (cardio != null) _WeekTargets(week: week, cardio: cardio),
+    return PopScope(
+      canPop: _running == null,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _leave();
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Cardio')),
+        body: ListView(
+          padding: Gap.pagePadding,
+          children: [
+            if (cardio != null) _WeekTargets(week: week, cardio: cardio),
 
-          if (_running != null && _startedAt != null) ...[
+            if (_running != null && _startedAt != null) ...[
+              Gap.l,
+              IntervalTimerPanel(
+                spec: _running!,
+                startedAt: _startedAt!,
+                onFinished: _onIntervalFinished,
+              ),
+              Gap.m,
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton.icon(
+                  onPressed: _stop,
+                  icon: const Icon(Icons.stop),
+                  label: const Text('Stop'),
+                ),
+              ),
+            ] else ...[
+              Gap.l,
+              Text('Start a timer', style: t.titleLarge),
+              Gap.s,
+              Text(
+                'Skipping ramps over four weeks on purpose — it is the '
+                'commonest way untrained calves and Achilles tendons get hurt. '
+                'Always on the interlocking mats, never bare concrete.',
+                style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+              ),
+              Gap.m,
+              _IntervalButton(
+                label: 'Skipping · 6 × 45 s',
+                spec: const IntervalSpec(
+                  rounds: 6,
+                  workSec: 45,
+                  restSec: 45,
+                  prepareSec: 10,
+                  label: 'Skipping',
+                ),
+                onStart: _start,
+              ),
+              Gap.s,
+              _IntervalButton(
+                label: 'Skipping · 8 × 30 s fast',
+                spec: const IntervalSpec(
+                  rounds: 8,
+                  workSec: 30,
+                  restSec: 30,
+                  prepareSec: 10,
+                  label: 'Skipping',
+                ),
+                onStart: _start,
+              ),
+              Gap.s,
+              _IntervalButton(
+                label: 'Heavy bag · 3 × 2 min',
+                spec: const IntervalSpec(
+                  rounds: 3,
+                  workSec: 120,
+                  restSec: 60,
+                  prepareSec: 15,
+                  label: 'Bag rounds',
+                ),
+                onStart: _start,
+              ),
+              Gap.s,
+              Text(
+                'Wraps or gloves on, always. Straight punches, move your feet, '
+                'breathe out on every shot.',
+                style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+              ),
+            ],
+
             Gap.l,
-            IntervalTimerPanel(
-              spec: _running!,
-              startedAt: _startedAt!,
-              onFinished: _onIntervalFinished,
+            const Divider(),
+            Gap.m,
+            Text('Runs', style: t.titleLarge),
+            Gap.xs,
+            Text(
+              'Record one with GPS: the route, the pace and the splits. On a '
+              'treadmill or without the phone, log it by hand.',
+              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
             ),
             Gap.m,
             SizedBox(
               width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => context.push<bool>('/track'),
+                icon: const Icon(Icons.directions_run),
+                label: const Text('Record a run'),
+              ),
+            ),
+            Gap.s,
+            SizedBox(
+              width: double.infinity,
               height: 52,
               child: OutlinedButton.icon(
-                onPressed: () => setState(() {
-                  _running = null;
-                  _startedAt = null;
-                }),
-                icon: const Icon(Icons.stop),
-                label: const Text('Stop'),
+                onPressed: _logRun,
+                icon: const Icon(Icons.edit_note),
+                label: const Text('Log one by hand'),
               ),
             ),
-          ] else ...[
-            Gap.l,
-            Text('Start a timer', style: t.titleLarge),
-            Gap.s,
-            Text(
-              'Skipping ramps over four weeks on purpose — it is the '
-              'commonest way untrained calves and Achilles tendons get hurt. '
-              'Always on the interlocking mats, never bare concrete.',
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-            ),
-            Gap.m,
-            _IntervalButton(
-              label: 'Skipping · 6 × 45 s',
-              spec: const IntervalSpec(
-                rounds: 6,
-                workSec: 45,
-                restSec: 45,
-                prepareSec: 10,
-                label: 'Skipping',
-              ),
-              onStart: _start,
-            ),
-            Gap.s,
-            _IntervalButton(
-              label: 'Skipping · 8 × 30 s fast',
-              spec: const IntervalSpec(
-                rounds: 8,
-                workSec: 30,
-                restSec: 30,
-                prepareSec: 10,
-                label: 'Skipping',
-              ),
-              onStart: _start,
-            ),
-            Gap.s,
-            _IntervalButton(
-              label: 'Heavy bag · 3 × 2 min',
-              spec: const IntervalSpec(
-                rounds: 3,
-                workSec: 120,
-                restSec: 60,
-                prepareSec: 15,
-                label: 'Bag rounds',
-              ),
-              onStart: _start,
-            ),
-            Gap.s,
-            Text(
-              'Wraps or gloves on, always. Straight punches, move your feet, '
-              'breathe out on every shot.',
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-            ),
-          ],
 
-          Gap.l,
-          const Divider(),
-          Gap.m,
-          Text('Log a run', style: t.titleLarge),
-          Gap.xs,
-          Text(
-            'No GPS — your phone already has a running app. This just '
-            'records that it happened.',
-            style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-          ),
-          Gap.m,
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: _logRun,
-              icon: const Icon(Icons.directions_run),
-              label: const Text('Log a run'),
-            ),
-          ),
-
-          if (logs.isNotEmpty) ...[
-            Gap.l,
-            Text('Recent', style: t.titleLarge),
-            Gap.s,
-            for (final log in logs.take(12)) _CardioRow(log: log),
+            if (logs.isNotEmpty) ...[
+              Gap.l,
+              Text('Recent', style: t.titleLarge),
+              Gap.s,
+              for (final log in logs.take(12)) _CardioRow(log: log),
+            ],
+            Gap.xl,
           ],
-          Gap.xl,
-        ],
+        ),
       ),
     );
   }
@@ -202,88 +264,98 @@ class _CardioScreenState extends ConsumerState<CardioScreen> {
     }
   }
 
+  /// A run done without the tracker: time on steppers, distance if it is
+  /// known, and how hard. No keyboard — v3 had one here, and silently saved
+  /// nothing when the minutes were typed as "30.5".
   Future<void> _logRun() async {
-    final minutes = TextEditingController();
-    final km = TextEditingController();
-    var effort = 5;
-
-    final saved = await showDialog<bool>(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setLocal) => AlertDialog(
-          backgroundColor: AppTheme.surface,
-          title: const Text('Log a run'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: minutes,
-                keyboardType: TextInputType.number,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  labelText: 'Duration',
-                  suffixText: 'min',
-                ),
-              ),
-              TextField(
-                controller: km,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: const InputDecoration(
-                  labelText: 'Distance (optional)',
-                  suffixText: 'km',
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'How hard? $effort / 10',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              Slider(
-                value: effort.toDouble(),
-                min: 1,
-                max: 10,
-                divisions: 9,
-                onChanged: (v) => setLocal(() => effort = v.round()),
-              ),
-              Text(
-                'Every run in this programme is conversational except the '
-                'week-12 time trial. Above 6 and you are racing it.',
-                style: Theme.of(context).textTheme.bodyMedium
-                    ?.copyWith(color: AppTheme.textDim),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Save'),
-            ),
-          ],
-        ),
-      ),
+    final run = await showAppSheet<({int minutes, double km, int effort})>(
+      context,
+      builder: (context) => const _RunLogSheet(),
     );
-
-    if (saved != true) return;
-    final mins = int.tryParse(minutes.text);
-    if (mins == null) return;
-    final distance = double.tryParse(km.text.replaceAll(',', '.'));
-
+    if (run == null) return;
     await ref
         .read(bodyServiceProvider)
         .logCardio(
           kind: CardioKind.run,
           on: ref.read(todayProvider),
-          durationSec: mins * 60,
-          distanceM: distance == null ? null : (distance * 1000).round(),
-          effort: effort,
+          durationSec: run.minutes * 60,
+          distanceM: run.km <= 0 ? null : (run.km * 1000).round(),
+          effort: run.effort,
         );
     ref.invalidate(cardioLogsProvider);
+  }
+}
+
+class _RunLogSheet extends StatefulWidget {
+  const _RunLogSheet();
+
+  @override
+  State<_RunLogSheet> createState() => _RunLogSheetState();
+}
+
+class _RunLogSheetState extends State<_RunLogSheet> {
+  double _minutes = 30;
+  double _km = 0;
+  int _effort = 4;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Log a run', style: t.headlineSmall),
+        Gap.m,
+        Text('How long', style: t.titleMedium),
+        Gap.s,
+        ValueStepper(
+          value: _minutes,
+          onChanged: (v) => setState(() => _minutes = v),
+          step: 1,
+          bigStep: 5,
+          min: 1,
+          max: 240,
+          decimals: 0,
+          unit: 'min',
+        ),
+        Gap.m,
+        Text('How far, if you know', style: t.titleMedium),
+        Gap.s,
+        ValueStepper(
+          value: _km,
+          onChanged: (v) => setState(() => _km = v),
+          step: 0.1,
+          bigStep: 1,
+          max: 50,
+          unit: 'km',
+        ),
+        Gap.m,
+        Text('How hard? $_effort / 10', style: t.titleMedium),
+        Slider(
+          value: _effort.toDouble(),
+          min: 1,
+          max: 10,
+          divisions: 9,
+          label: '$_effort',
+          onChanged: (v) => setState(() => _effort = v.round()),
+        ),
+        Text(
+          'Every run in this programme is conversational except the week-12 '
+          'time trial. Above 6 and you are racing it.',
+          style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+        ),
+        Gap.m,
+        FilledButton(
+          onPressed: () => Navigator.pop(context, (
+            minutes: _minutes.round(),
+            km: _km,
+            effort: _effort,
+          )),
+          child: const Text('Save the run'),
+        ),
+      ],
+    );
   }
 }
 
@@ -354,13 +426,13 @@ class _Line extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: AppTheme.textDim),
           const SizedBox(width: 10),
+          Text(label, style: t.bodyMedium?.copyWith(color: AppTheme.textDim)),
+          const SizedBox(width: 12),
+          // The value is the programme's own words ("Tue 6 x 60 s · Sun 3 x
+          // 60 s"): it wraps at a large text size rather than running off.
           Expanded(
-            child: Text(
-              label,
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-            ),
+            child: Text(value, style: t.bodyLarge, textAlign: TextAlign.end),
           ),
-          Text(value, style: t.bodyLarge),
         ],
       ),
     );

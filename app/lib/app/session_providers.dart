@@ -74,6 +74,23 @@ final suggestionProvider =
 ///
 /// Checked on launch: you should never lose a session because the phone
 /// decided to reclaim memory between sets.
+/// The runner path that opens [session] itself.
+///
+/// The runner finds a session by its day and its PLANNED date, and assumes
+/// today when none is given. A session planned for another day — left open
+/// past midnight, or moved — must say its date, or the runner starts a
+/// second session for the same day and the first is orphaned.
+String sessionRunPath(Session session, {required DateTime today}) {
+  final p = session.plannedDate;
+  final same =
+      p.year == today.year && p.month == today.month && p.day == today.day;
+  final iso =
+      '${p.year.toString().padLeft(4, '0')}-'
+      '${p.month.toString().padLeft(2, '0')}-'
+      '${p.day.toString().padLeft(2, '0')}';
+  return '/run/${session.weekNo}/${session.dayId}${same ? '' : '?date=$iso'}';
+}
+
 final resumableSessionProvider = FutureProvider<Session?>(
   (ref) => ref.watch(sessionServiceProvider).resumable(),
 );

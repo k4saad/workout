@@ -128,6 +128,21 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('a logged meal shows as logged, at once', (tester) async {
+    await pump(tester);
+    expect(find.widgetWithText(FilledButton, 'Eaten'), findsNothing);
+
+    await tester.tap(find.text('Eaten').first);
+    await settle(tester);
+    await settle(tester);
+    expect(
+      find.widgetWithText(FilledButton, 'Eaten'),
+      findsOneWidget,
+      reason: 'the button he tapped must say it took',
+    );
+    expect(find.byIcon(Icons.check), findsWidgets, reason: 'not by fill alone');
+  });
+
   testWidgets('half a meal counts as half, not as nothing', (tester) async {
     await pump(tester);
 

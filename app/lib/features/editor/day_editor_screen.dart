@@ -488,7 +488,7 @@ class _DaySettingsSheetState extends ConsumerState<DaySettingsSheet> {
         ],
       ),
     );
-    if (ok == true && title.text.trim().isNotEmpty) {
+    if (ok == true && mounted && title.text.trim().isNotEmpty) {
       setState(
         () => _warnings.add(
           DayWarning(title: title.text.trim(), body: body.text.trim()),

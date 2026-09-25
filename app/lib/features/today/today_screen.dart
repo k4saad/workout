@@ -97,7 +97,7 @@ class TodayScreen extends ConsumerWidget {
               if (active)
                 // The plan he has to go and look for is the plan he stops
                 // following in week three.
-                NextMealCard(now: DateTime.now()),
+                const NextMealCard(),
               Gap.m,
               const _WeighInCard(),
               if (active && week != null) ...[
@@ -197,8 +197,9 @@ class _ResumeBanner extends ConsumerWidget {
         icon: Icons.play_circle_outline,
         title: 'Session in progress',
         body: 'Week ${resumable.weekNo}. Pick it up where you left it.',
-        onTap: () =>
-            context.push('/run/${resumable.weekNo}/${resumable.dayId}'),
+        onTap: () => context.push(
+          sessionRunPath(resumable, today: ref.read(todayProvider)),
+        ),
       ),
     );
   }
@@ -539,20 +540,23 @@ class _WeekStrip extends ConsumerWidget {
       child: Column(
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('THIS WEEK', style: AppTheme.overline),
-              const Spacer(),
-              Text(
-                '${tally.done} of ${tally.required} done',
-                style: t.labelLarge!.copyWith(color: AppTheme.textDim),
-              ),
-              if (streak != null && streak.currentStreak > 1) ...[
-                Gap.s,
-                Text(
-                  '· ${streak.currentStreak} in a row',
+              Gap.s,
+              // One text that can wrap: at a large text size the tally and
+              // the streak ran off the card.
+              Expanded(
+                child: Text(
+                  [
+                    '${tally.done} of ${tally.required} done',
+                    if (streak != null && streak.currentStreak > 1)
+                      '${streak.currentStreak} in a row',
+                  ].join(' · '),
+                  textAlign: TextAlign.end,
                   style: t.labelLarge!.copyWith(color: AppTheme.textDim),
                 ),
-              ],
+              ),
             ],
           ),
           Gap.m,

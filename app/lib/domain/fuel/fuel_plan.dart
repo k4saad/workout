@@ -490,9 +490,10 @@ class FuelDay {
       m = m + s.chosen.macros;
     }
     if (module != null) m = m + plan.macrosOf(module!.items);
-    if (extraKcal > 0) {
-      // An applied booster is calories he has agreed to add on top. It is not
-      // modelled as food because he chooses how to take it.
+    if (extraKcal != 0) {
+      // An applied change is calories he has agreed to add on top (or, for
+      // the waist rule, take off). It is not modelled as food because he
+      // chooses how to take it.
       m = m + Macros(kcal: extraKcal.toDouble());
     }
     return m;
@@ -534,10 +535,27 @@ class FuelDay {
     ],
   );
 
-  /// The next meal due at [time], or the first of tomorrow when the day is
-  /// done. Drives the card on Today.
-  PlannedMeal? nextAfter(String time) =>
-      slots.firstWhereOrNull((s) => s.slot.time.compareTo(time) >= 0);
+  /// The next meal to eat at [now] (`HH:mm`): the first one not yet
+  /// [logged] whose time is no more than [graceMinutes] gone. Null when the
+  /// day's food is done. Drives the card on Today.
+  ///
+  /// v3 compared the clock only, so a meal vanished the minute its time
+  /// passed — eaten or not — and one already eaten stayed "next" until then.
+  PlannedMeal? nextToEat({
+    required String now,
+    Set<String> logged = const {},
+    int graceMinutes = 120,
+  }) {
+    int minutes(String hhmm) {
+      final p = hhmm.split(':');
+      return int.parse(p[0]) * 60 + int.parse(p[1]);
+    }
+
+    final from = minutes(now) - graceMinutes;
+    return slots.firstWhereOrNull(
+      (s) => !logged.contains(s.slot.id) && minutes(s.slot.time) >= from,
+    );
+  }
 }
 
 /// The eating plan: `assets/nutrition/fuel.json`, generated.

@@ -162,10 +162,21 @@ class RunnerState {
     return now.difference(start).inMinutes;
   }
 
+  /// A session open this long was interrupted — left overnight, the app
+  /// killed — not trained slowly: its clock says nothing about the budget.
+  static const interruptedAfterMinutes = 180;
+
+  bool wasInterrupted(DateTime now) =>
+      elapsedMinutes(now) > interruptedAfterMinutes;
+
   /// True when the session is running long, there is still work left, and
   /// short mode would actually cut something — the moment to offer it.
+  ///
+  /// Never for an interrupted session: resumed the next morning, it used to
+  /// open on "You are 1,480 minutes in — cut the last superset".
   bool isRunningLong(DateTime now) =>
       elapsedMinutes(now) >= 45 &&
+      !wasInterrupted(now) &&
       !shortMode &&
       shortModeCut.isNotEmpty &&
       visibleItems.where((i) => !i.isComplete).length > 1;

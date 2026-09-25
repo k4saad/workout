@@ -48,6 +48,14 @@ enum NutritionVerdict {
 
   /// Losing weight while trying to gain.
   losing,
+
+  /// The scale says eat more, but the plan is not being eaten: the calories
+  /// are already on the plate. Eat the plan first.
+  offPlan,
+
+  /// A calorie change went in recently and has not had its weeks on the
+  /// scale yet. Changing again now is chasing noise.
+  settling,
 }
 
 class NutritionAdvice {
@@ -93,8 +101,7 @@ class BodyweightTrend {
     return [
       for (final e in sorted)
         () {
-          final from = _dateOnly(e.date)
-              .subtract(Duration(days: windowDays - 1));
+          final from = _daysBefore(_dateOnly(e.date), windowDays - 1);
           final window = sorted.where(
             (x) =>
                 !_dateOnly(x.date).isBefore(from) &&
@@ -123,11 +130,11 @@ class BodyweightTrend {
     if (p.length < 2) return null;
 
     final last = p.last;
-    final cutoff = last.date.subtract(Duration(days: overWeeks * 7));
+    final cutoff = _daysBefore(last.date, overWeeks * 7);
     final earlier = p.where((x) => !x.date.isAfter(cutoff)).toList();
     final first = earlier.isNotEmpty ? earlier.last : p.first;
 
-    final days = last.date.difference(first.date).inDays;
+    final days = _daysBetween(first.date, last.date);
     if (days <= 0) return null;
     return (last.average - first.average) / days * 7;
   }
@@ -136,14 +143,23 @@ class BodyweightTrend {
   ///
   /// "Rise" allows a small tolerance so that scale noise inside a genuine
   /// plateau does not reset the counter and hide the plateau.
-  int flatWeeks(List<WeightEntry> entries, {double toleranceKg = 0.1}) {
+  ///
+  /// With [since] — the day a calorie change went in — only the weeks after
+  /// it count: the weeks that made the case for that change have been
+  /// answered, and must not make it again.
+  int flatWeeks(
+    List<WeightEntry> entries, {
+    double toleranceKg = 0.1,
+    DateTime? since,
+  }) {
     final p = points(entries);
     if (p.length < 2) return 0;
 
     final last = p.last;
     var weeks = 0;
     for (var w = 1; w <= 12; w++) {
-      final at = last.date.subtract(Duration(days: w * 7));
+      final at = _daysBefore(last.date, w * 7);
+      if (since != null && at.isBefore(_dateOnly(since))) break;
       final earlier = p.where((x) => !x.date.isAfter(at)).toList();
       if (earlier.isEmpty) break;
       final ref = earlier.last;
@@ -153,11 +169,79 @@ class BodyweightTrend {
     return weeks;
   }
 
+  /// The share of planned meals eaten below which "eat more" becomes "eat
+  /// the plan".
+  static const adherenceFloor = 0.85;
+
   /// What to do about the food, given the programme's own rules.
+  ///
+  /// [adherence] is the share of the logged meals actually eaten over the
+  /// last fortnight (null when nothing was logged: then the scale alone
+  /// decides). [lastAdjustedOn] is the day the most recent calorie change
+  /// went in: for the programme's flat-weeks span after it, no new change
+  /// is asked for, and the flat count starts again from it.
   NutritionAdvice advise(
     List<WeightEntry> entries,
     NutritionRules rules, {
     double? waistChangeCm,
+    double? adherence,
+    DateTime? lastAdjustedOn,
+  }) {
+    final p = points(entries);
+    final settled = lastAdjustedOn == null
+        ? null
+        : DateTime(
+            lastAdjustedOn.year,
+            lastAdjustedOn.month,
+            lastAdjustedOn.day + rules.flatWeeksBeforeBump * 7,
+          );
+    final settling =
+        settled != null && p.isNotEmpty && p.last.date.isBefore(settled);
+
+    // While settling, ask the whole history whether the scale wants a
+    // change; after, count only from the change that answered the last one.
+    final advice = _advise(
+      entries,
+      rules,
+      waistChangeCm: waistChangeCm,
+      since: settling ? null : lastAdjustedOn,
+    );
+    if (!advice.needsAction) return advice;
+
+    if (settling) {
+      final weeks = rules.flatWeeksBeforeBump;
+      return NutritionAdvice(
+        verdict: NutritionVerdict.settling,
+        message:
+            'The last calorie change is still settling in. Give it '
+            '$weeks week${weeks == 1 ? '' : 's'} on the scale before '
+            'changing the food again.',
+        flatWeeks: advice.flatWeeks,
+        weeklyChangeKg: advice.weeklyChangeKg,
+      );
+    }
+    if (advice.kcalDelta > 0 &&
+        adherence != null &&
+        adherence < adherenceFloor) {
+      final pct = (adherence * 100).round();
+      return NutritionAdvice(
+        verdict: NutritionVerdict.offPlan,
+        message:
+            'You ate $pct% of the planned meals over the last two weeks. '
+            'The calories are already in the plan: eat it before adding '
+            'more.',
+        flatWeeks: advice.flatWeeks,
+        weeklyChangeKg: advice.weeklyChangeKg,
+      );
+    }
+    return advice;
+  }
+
+  NutritionAdvice _advise(
+    List<WeightEntry> entries,
+    NutritionRules rules, {
+    double? waistChangeCm,
+    DateTime? since,
   }) {
     final p = points(entries);
     if (p.length < 4) {
@@ -184,7 +268,7 @@ class BodyweightTrend {
       );
     }
 
-    final flat = flatWeeks(entries);
+    final flat = flatWeeks(entries, since: since);
     final change = weeklyChange(entries);
 
     // Losing is checked BEFORE flat. Going backwards also reads as "not
@@ -246,4 +330,19 @@ class BodyweightTrend {
   }
 
   static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  /// [n] calendar days before [d]. Not `subtract(Duration(days: n))`: a
+  /// Duration is hours, and the weekend the clocks change has a 23- or
+  /// 25-hour day, which lands the result an hour off midnight — and drops
+  /// or adds a weigh-in at the edge of the window.
+  static DateTime _daysBefore(DateTime d, int n) =>
+      DateTime(d.year, d.month, d.day - n);
+
+  /// Calendar days from [a] to [b], counted in UTC so a clock change in
+  /// between is not an hour short of a day.
+  static int _daysBetween(DateTime a, DateTime b) => DateTime.utc(
+    b.year,
+    b.month,
+    b.day,
+  ).difference(DateTime.utc(a.year, a.month, a.day)).inDays;
 }

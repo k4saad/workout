@@ -476,11 +476,30 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
       body: Column(
         children: [
           _SessionHeader(state: s),
-          if (s.day.warnings.isNotEmpty && !_warningsDismissed)
-            _WarningStack(
-              warnings: s.day.warnings,
-              onDismiss: () => setState(() => _warningsDismissed = true),
+          // The warnings take their own height up to 40 % of the screen and
+          // scroll beyond it, and the button
+          // that dismisses them is pinned under them: at a large text size
+          // on a small phone the stack used to push that button off the
+          // screen, and the session could not be started.
+          if (s.day.warnings.isNotEmpty && !_warningsDismissed) ...[
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(context).height * 0.4,
+              ),
+              child: _WarningStack(warnings: s.day.warnings),
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton(
+                  onPressed: () => setState(() => _warningsDismissed = true),
+                  child: const Text('Read it — start the session'),
+                ),
+              ),
+            ),
+          ],
           Expanded(
             child: library == null
                 ? const SkeletonPage(cards: 2)
@@ -557,9 +576,11 @@ class _SessionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    final elapsed = state.elapsedMinutes(DateTime.now());
+    final now = DateTime.now();
+    final elapsed = state.elapsedMinutes(now);
+    final interrupted = state.wasInterrupted(now);
     final estimate = state.day.estMinutes;
-    final over = estimate > 0 && elapsed > estimate;
+    final over = !interrupted && estimate > 0 && elapsed > estimate;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
@@ -571,17 +592,39 @@ class _SessionHeader extends StatelessWidget {
                 '${state.doneSets} / ${state.plannedSets} sets',
                 style: t.labelLarge?.copyWith(color: AppTheme.textDim),
               ),
-              const Spacer(),
-              Icon(
-                Icons.schedule_outlined,
-                size: 15,
-                color: over ? AppTheme.warn : AppTheme.textDim,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                estimate > 0 ? '$elapsed / $estimate min' : '$elapsed min',
-                style: t.labelLarge?.copyWith(
-                  color: over ? AppTheme.warn : AppTheme.textDim,
+              Gap.s,
+              // Expanded and right-aligned: at a large text size, or with a
+              // big number, it wraps rather than running off the screen.
+              Expanded(
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 4),
+                          child: Icon(
+                            interrupted
+                                ? Icons.history_toggle_off
+                                : Icons.schedule_outlined,
+                            size: 15,
+                            color: over ? AppTheme.warn : AppTheme.textDim,
+                          ),
+                        ),
+                      ),
+                      TextSpan(
+                        text: interrupted
+                            ? 'picked up again'
+                            : estimate > 0
+                            ? '$elapsed / $estimate min'
+                            : '$elapsed min',
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.end,
+                  style: t.labelLarge?.copyWith(
+                    color: over ? AppTheme.warn : AppTheme.textDim,
+                  ),
                 ),
               ),
               if (state.shortMode) ...[
@@ -607,33 +650,22 @@ class _SessionHeader extends StatelessWidget {
 }
 
 class _WarningStack extends StatelessWidget {
-  const _WarningStack({required this.warnings, required this.onDismiss});
+  const _WarningStack({required this.warnings});
 
   final List<DayWarning> warnings;
-  final VoidCallback onDismiss;
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-      child: Column(
-        children: [
-          for (final w in warnings) ...[
-            WarningBanner(warning: w),
-            const SizedBox(height: 8),
-          ],
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: OutlinedButton(
-              onPressed: onDismiss,
-              child: const Text('Read it — start the session'),
-            ),
-          ),
+  Widget build(BuildContext context) => SingleChildScrollView(
+    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+    child: Column(
+      children: [
+        for (final w in warnings) ...[
+          WarningBanner(warning: w),
+          const SizedBox(height: 8),
         ],
-      ),
-    );
-  }
+      ],
+    ),
+  );
 }
 
 class _RunnerBody extends StatelessWidget {

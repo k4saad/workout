@@ -33,7 +33,7 @@ class MealCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Theme.of(context).textTheme;
     final plan = ref.watch(fuelPlanProvider).asData?.value;
-    final meals = ref.watch(_statusProvider(date)).asData?.value ?? {};
+    final meals = ref.watch(mealStatusProvider(date)).asData?.value ?? {};
     final status = meals[slot.slot.id];
 
     final done = status == MealStatus.eaten;
@@ -159,13 +159,6 @@ class MealCard extends ConsumerWidget {
       .log(day: date, slot: slot, status: status);
 }
 
-/// What each slot was logged as today.
-final _statusProvider =
-    FutureProvider.family<Map<String, MealStatus>, DateTime>((ref, day) async {
-      final rows = await ref.watch(fuelServiceProvider).mealsOn(day);
-      return {for (final r in rows) r.slotId: r.status};
-    });
-
 class _Action extends StatelessWidget {
   const _Action({
     required this.label,
@@ -181,11 +174,14 @@ class _Action extends StatelessWidget {
   Widget build(BuildContext context) {
     const size = Size(0, 46);
     const pad = EdgeInsets.symmetric(horizontal: 4);
+    // Selected carries a tick as well as the fill: colour is never the only
+    // thing that says which one took.
     return selected
-        ? FilledButton(
+        ? FilledButton.icon(
             onPressed: onTap,
             style: FilledButton.styleFrom(minimumSize: size, padding: pad),
-            child: Text(label),
+            icon: const Icon(Icons.check, size: 18),
+            label: Text(label),
           )
         : OutlinedButton(
             onPressed: onTap,

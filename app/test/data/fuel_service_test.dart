@@ -134,6 +134,26 @@ void main() {
       expect(a.rate, closeTo(0.5, 0.001));
     });
 
+    test('a swap is a choice of meal, not a meal missed', () async {
+      await fuel.logMeal(
+        on: monday,
+        slotId: 'a',
+        templateId: 't',
+        status: MealStatus.planned,
+        macros: (kcal: 400, proteinG: 20.0, carbsG: 50.0, fatG: 12.0),
+      );
+      await fuel.logMeal(
+        on: monday,
+        slotId: 'b',
+        templateId: 't',
+        status: MealStatus.eaten,
+        macros: (kcal: 400, proteinG: 20.0, carbsG: 50.0, fatG: 12.0),
+      );
+      final a = await fuel.adherence(from: monday, to: monday);
+      expect(a.planned, 1);
+      expect(a.rate, 1.0);
+    });
+
     test('nothing logged is nothing claimed', () async {
       final a = await fuel.adherence(from: monday, to: monday);
       expect(a.planned, 0);

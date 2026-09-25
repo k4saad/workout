@@ -253,7 +253,7 @@ class _InheritedNoteState extends ConsumerState<_InheritedNote> {
         ],
       ),
     );
-    if (ok != true) return;
+    if (ok != true || !mounted) return;
 
     setState(() => _busy = true);
     final result = await ref

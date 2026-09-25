@@ -274,7 +274,7 @@ class _ApplyButtonState extends ConsumerState<_ApplyButton> {
         ],
       ),
     );
-    if (ok != true) return;
+    if (ok != true || !mounted) return;
 
     setState(() => _busy = true);
     final result = await ref

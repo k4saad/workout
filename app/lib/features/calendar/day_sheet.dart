@@ -309,11 +309,9 @@ class _LoggedSession extends ConsumerWidget {
   final DateTime date;
   final DateTime today;
 
-  /// The runner finds a session by its day and its PLANNED date, so a
-  /// session moved here is opened as what it is, not as this date's.
-  String get _runPath =>
-      '/run/${session.weekNo}/${session.dayId}'
-      '${_sameDay(session.plannedDate, today) ? '' : '?date=${_iso(session.plannedDate)}'}';
+  /// Opens the session as what it is, not as this date's: see
+  /// [sessionRunPath].
+  String get _runPath => sessionRunPath(session, today: today);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

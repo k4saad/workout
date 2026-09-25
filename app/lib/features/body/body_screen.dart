@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart' show GoRouterHelper;
 import 'package:intl/intl.dart' show DateFormat;
 
 import '../../app/body_providers.dart';
+import '../../app/fuel_providers.dart';
 import '../../app/progress_providers.dart';
 import '../../app/providers.dart';
 import '../../app/session_providers.dart';
@@ -50,6 +51,7 @@ class BodyScreen extends ConsumerWidget {
           children: [
             _WeightCard(entries: entries),
             if (advice != null) ...[Gap.l, _AdviceCard(advice: advice)],
+            const _Adjustments(),
             Gap.l,
             const _TapeCard(),
           ],
@@ -124,9 +126,13 @@ class _WeightCard extends ConsumerWidget {
                   style: t.titleMedium?.copyWith(color: AppTheme.textDim),
                 ),
                 const SizedBox(width: 10),
-                Text(
-                  '7-day average',
-                  style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+                // Flexible: at a large text size the big number takes the
+                // row, and the label wraps rather than running off it.
+                Flexible(
+                  child: Text(
+                    '7-day average',
+                    style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+                  ),
                 ),
               ],
             ),
@@ -198,13 +204,15 @@ Future<void> showWeighIn(BuildContext context, WidgetRef ref) async {
   await ref.read(databaseProvider).upsertBodyweight(today, kg);
 }
 
-class _AdviceCard extends StatelessWidget {
+/// What the scale says to do about the food — and, when it says change
+/// it, the button that does. The rule was advice nobody could act on.
+class _AdviceCard extends ConsumerWidget {
   const _AdviceCard({required this.advice});
 
   final NutritionAdvice advice;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final (tone, icon, word) = switch (advice.verdict) {
       NutritionVerdict.onTrack => (
         Tone.good,
@@ -219,16 +227,119 @@ class _AdviceCard extends StatelessWidget {
         Icons.hourglass_empty,
         'Too early to tell',
       ),
+      NutritionVerdict.offPlan => (Tone.warn, Icons.restaurant, 'Eat the plan'),
+      NutritionVerdict.settling => (
+        Tone.info,
+        Icons.hourglass_top,
+        'Settling in',
+      ),
     };
-    return ToneBanner(
-      tone: tone,
-      icon: icon,
-      title: advice.needsAction
-          ? (advice.kcalDelta > 0
-                ? 'Add ${advice.kcalDelta} kcal'
-                : 'Cut ${advice.kcalDelta.abs()} kcal')
-          : word,
-      body: advice.message,
+    final delta = advice.kcalDelta;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ToneBanner(
+          tone: tone,
+          icon: icon,
+          title: advice.needsAction
+              ? (delta > 0 ? 'Add $delta kcal' : 'Cut ${delta.abs()} kcal')
+              : word,
+          body: advice.message,
+        ),
+        if (advice.needsAction) ...[
+          Gap.s,
+          FilledButton.icon(
+            onPressed: () => _apply(context, ref),
+            icon: Icon(delta > 0 ? Icons.add : Icons.remove),
+            label: Text(
+              '${delta > 0 ? 'Add' : 'Take'} ${delta.abs()} kcal a day',
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Future<void> _apply(BuildContext context, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(context);
+    await ref
+        .read(adjustmentControllerProvider)
+        .apply(
+          on: ref.read(todayProvider),
+          kcalDelta: advice.kcalDelta,
+          reason: advice.verdict.name,
+        );
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          'Fuel now plans ${advice.kcalDelta > 0 ? '+' : '−'}'
+          '${advice.kcalDelta.abs()} kcal a day, from today.',
+        ),
+      ),
+    );
+  }
+}
+
+/// The calorie changes in force, each with the way to take it off.
+class _Adjustments extends ConsumerWidget {
+  const _Adjustments();
+
+  static String _why(String reason) => switch (reason) {
+    'flat' => 'the scale was flat',
+    'losing' => 'weight was falling',
+    'tooFast' => 'the waist grew past its limit',
+    _ => reason,
+  };
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final open = ref.watch(openAdjustmentsProvider).asData?.value ?? const [];
+    if (open.isEmpty) return const SizedBox.shrink();
+    final t = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: 22),
+      child: AppCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Calorie changes in force', style: t.titleMedium),
+            Gap.s,
+            for (final a in open)
+              Row(
+                children: [
+                  Icon(
+                    a.kcalDelta > 0 ? Icons.add_circle_outline : Icons.remove,
+                    color: AppTheme.textDim,
+                  ),
+                  Gap.s,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${a.kcalDelta > 0 ? '+' : '−'}'
+                          '${a.kcalDelta.abs()} kcal a day',
+                          style: t.bodyLarge,
+                        ),
+                        Text(
+                          'Since ${DateFormat('d MMM').format(a.appliedOn)}, '
+                          'because ${_why(a.reason)}',
+                          style: t.bodySmall?.copyWith(color: AppTheme.textDim),
+                        ),
+                      ],
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => ref
+                        .read(adjustmentControllerProvider)
+                        .takeOff(a.id, on: ref.read(todayProvider)),
+                    child: const Text('Take it off'),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

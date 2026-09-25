@@ -35,6 +35,30 @@ void main() {
     ];
   }
 
+  group('across the clocks changing', () {
+    // Midnights, as the database stores them: +0.05 kg every day.
+    List<WeightEntry> from(DateTime first, int days) => [
+      for (var i = 0; i < days; i++)
+        WeightEntry(
+          date: DateTime(first.year, first.month, first.day + i),
+          kg: 50 + 0.05 * i,
+        ),
+    ];
+
+    test('the week-wide window still holds seven weigh-ins (25 Oct)', () {
+      final p = trend.points(from(DateTime(2026, 10, 1), 31));
+      for (final x in p.skip(6)) {
+        expect(x.sampleCount, 7, reason: '${x.date}');
+      }
+    });
+
+    test('the weekly rate counts calendar days, not hours (28 Mar)', () {
+      // 1 March to 5 April 2027: the fortnight measured spans the change.
+      final entries = from(DateTime(2027, 3, 1), 36);
+      expect(trend.weeklyChange(entries), closeTo(0.35, 1e-9));
+    });
+  });
+
   group('the rolling average', () {
     test('a single reading averages to itself', () {
       final p = trend.points(daily([50.0]));
@@ -152,6 +176,67 @@ void main() {
       expect(advice.kcalDelta, 250);
       expect(advice.message, contains('food problem'));
       expect(advice.needsAction, isTrue);
+    });
+
+    group('before it asks for more food', () {
+      // 28 days flat, ending Sunday 25 October.
+      final flat = gaining(50, 0.0, 28);
+      final lastDay = DateTime(2026, 10, 25);
+
+      test('a plan not being eaten is eaten first', () {
+        final advice = trend.advise(flat, rules, adherence: 0.6);
+        expect(advice.verdict, NutritionVerdict.offPlan);
+        expect(advice.kcalDelta, 0, reason: 'more food on paper fixes nothing');
+        expect(advice.message, contains('60%'));
+      });
+
+      test('a plan being eaten still gets the bump', () {
+        final advice = trend.advise(flat, rules, adherence: 0.9);
+        expect(advice.verdict, NutritionVerdict.flat);
+        expect(advice.kcalDelta, 250);
+      });
+
+      test('with no meals logged, the scale alone decides', () {
+        expect(trend.advise(flat, rules).kcalDelta, 250);
+      });
+
+      test('a change just made gets its weeks to work', () {
+        final advice = trend.advise(
+          flat,
+          rules,
+          lastAdjustedOn: DateTime(2026, 10, 18),
+        );
+        expect(advice.verdict, NutritionVerdict.settling);
+        expect(advice.kcalDelta, 0, reason: 'no stacking +250 on +250');
+      });
+
+      test('still flat two weeks after it, it fires again', () {
+        final advice = trend.advise(
+          flat,
+          rules,
+          lastAdjustedOn: DateTime(2026, 10, 11),
+        );
+        expect(advice.verdict, NutritionVerdict.flat);
+        expect(advice.kcalDelta, 250);
+      });
+
+      test('the flat count starts again at the change', () {
+        expect(trend.flatWeeks(flat), greaterThanOrEqualTo(3));
+        // Ten days since the change: one whole flat week, not three.
+        expect(trend.flatWeeks(flat, since: DateTime(2026, 10, 15)), 1);
+        expect(lastDay.difference(DateTime(2026, 10, 15)).inDays, 10);
+      });
+
+      test('a waist cut settles too', () {
+        final advice = trend.advise(
+          flat,
+          rules,
+          waistChangeCm: 4,
+          lastAdjustedOn: DateTime(2026, 10, 20),
+        );
+        expect(advice.verdict, NutritionVerdict.settling);
+        expect(advice.kcalDelta, 0);
+      });
     });
 
     test('leaves a working plan alone', () {

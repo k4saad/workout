@@ -7,6 +7,9 @@ import '../../core/ui/ui.dart';
 import '../../data/fuel_service.dart';
 import '../../domain/fuel/fuel_plan.dart';
 import '../common/widgets.dart';
+
+import 'package:go_router/go_router.dart' show GoRouter;
+
 import 'fuel_week_view.dart';
 import 'widgets/meal_card.dart';
 import 'widgets/swap_sheet.dart';
@@ -103,18 +106,7 @@ class _Body extends ConsumerWidget {
           style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
         ),
 
-        if (day.extraKcal != 0) ...[
-          Gap.m,
-          ToneBanner(
-            tone: Tone.good,
-            icon: Icons.trending_up,
-            title:
-                '${day.extraKcal > 0 ? '+' : ''}${day.extraKcal} kcal applied',
-            body:
-                'On top of the phase target, and it stays on until you take '
-                'it off in Body → adjustments.',
-          ),
-        ],
+        if (day.extraKcal != 0) ...[Gap.m, _ExtraBanner(day: day)],
 
         Gap.l,
         const SectionHeader('The day'),
@@ -157,6 +149,38 @@ class _Body extends ConsumerWidget {
     await ref
         .read(mealLogControllerProvider)
         .swap(day: date, slot: slot, to: picked);
+  }
+}
+
+/// A calorie change in force: what it is, as food when the plan has a
+/// booster for it, and the way to the page that takes it off.
+class _ExtraBanner extends ConsumerWidget {
+  const _ExtraBanner({required this.day});
+
+  final FuelDay day;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final open = ref.watch(openAdjustmentsProvider).asData?.value ?? const [];
+    final foods = [
+      for (final a in open)
+        if (a.moduleId case final id?)
+          if (day.plan.module(id) case final m?)
+            for (final i in m.items)
+              '${day.plan.food(i.foodId)?.name ?? i.foodId} '
+                  '${i.grams.round()} g',
+    ];
+    final up = day.extraKcal > 0;
+    return ToneBanner(
+      tone: Tone.good,
+      icon: up ? Icons.trending_up : Icons.trending_down,
+      title: '${up ? '+' : '−'}${day.extraKcal.abs()} kcal a day, applied',
+      body: [
+        if (foods.isNotEmpty) 'As food: ${foods.join(' · ')}.',
+        'On top of the phase target until you take it off on the Body page.',
+      ].join(' '),
+      onTap: () => GoRouter.of(context).go('/progress/body'),
+    );
   }
 }
 
