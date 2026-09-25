@@ -1,20 +1,25 @@
-# On-device checklist — v0.12.0+12
+# On-device checklist — v0.13.0+13
 
 What the tests cannot prove, because it needs the phone, the camera, the GPS
-or a night passing. Everything else is covered by `flutter test` (1,491
-tests) and the data gates V1–V20.
+or a night passing. Everything else is covered by `flutter test` (1,538
+tests) and the data gates V1–V21.
+
+v0.13 is the fix-up after the first week on the phone (docs/08-v3.1-plan.md):
+GPS that locks, runs that look like a running app, Fuel planned by the week
+on a student's money, and swiping between tabs. The database schema is
+unchanged, so this update runs no migration.
 
 Tick these in order. The first two protect everything else.
 
 ## Before installing
 
-- [ ] **Export a backup on v0.11**, and copy the zip off the phone (More →
-      Settings → Backup and files → Export full backup). The update migrates the database; a copy is taken
-      automatically first (`keller_twelve.premigration.v2.sqlite`), but a
-      backup you hold yourself is the one that cannot be lost with the phone.
-- [ ] Install **`apk/keller-twelve-0.12.0+12-arm64.apk`** over the old app —
+- [ ] **Export a backup on v0.12**, and copy the zip off the phone (More →
+      Settings → Backup and files → Export full backup). Nothing in this
+      update touches the database, but a backup you hold yourself is the one
+      that cannot be lost with the phone.
+- [ ] Install **`apk/keller-twelve-0.13.0+13-arm64.apk`** over the old app —
       do **not** uninstall first. (`-arm32` is only for a phone older than
-      about 2017.) It is signed with the same key as v0.11
+      about 2017.) It is signed with the same key as v0.11 and v0.12
       (`389b93bc…b7b5`), so Android installs it as an update and keeps the data.
 
 ## The update itself
@@ -23,20 +28,69 @@ Tick these in order. The first two protect everything else.
       the same sessions as before, with the same sets.
 - [ ] The progress photos are still there and open.
 - [ ] Bodyweight history and measurements are unchanged.
-- [ ] If a session was left open in v0.11, Today offers to resume it.
-- [ ] Android asks for no new permission until you first start a GPS run.
+- [ ] Android asks for no new permission: v0.13 has exactly the
+      permissions v0.12 had.
 
-## GPS runs (Phase 4)
+## GPS runs (v3.1 Phase A)
 
-- [ ] Starting a run asks for location **"While using the app"** — there is
-      no "Allow all the time" option, and none is needed.
-- [ ] A **"Run in progress"** notification shows while recording.
+- [ ] **Precise location off** (the phone's "Use precise location" switch for
+      this app): the run screen says so and offers the settings, instead of
+      "finding GPS" forever. Turn it back on; the screen notices on return.
+- [ ] Outside, the chip goes from **Waiting for GPS** to **GPS fair** or
+      **GPS good ±N m** within a minute or so, and the map shows where you
+      are straight away (your last known position) while it warms up.
+- [ ] **Start works at once**, even before the chip says good. The trail
+      begins at the first usable fix.
+- [ ] **No notification before Start.** Opening the run screen and looking
+      for GPS shows nothing in the status bar; **"Recording your run"**
+      appears on Start and goes on Finish or Discard.
+- [ ] Leave the run screen without starting: Today shows **no "Run still
+      open"** card.
 - [ ] **Screen off:** start a run, lock the phone, walk 10 minutes, unlock.
       The trail is continuous, with no straight-line gap.
-- [ ] The map draws **real OpenStreetMap tiles**, dark, and the attribution
-      at the bottom opens the OSM copyright page.
 - [ ] Force-close the app mid-run; reopening offers **"Run still open"**.
 - [ ] A finished programme run appears as the set on that day's session.
+
+## Runs look (v3.1 Phase B)
+
+- [ ] The map is **quiet**: grey roads on near-black, no colourful satellite
+      look, and the crimson trail is the brightest thing on it. The
+      attribution at the bottom opens the OSM copyright page.
+- [ ] While running: a pulsing dot with an accuracy halo, big time, distance
+      and pace, the round Start button.
+- [ ] A finished run opens with the **route drawing itself in**; the speed
+      button colours it by pace (with a slower → quicker key); **Replay** runs
+      a dot along it with the km and time ticking.
+- [ ] Runs list: activity cards ("Evening run"), three numbers and a large
+      trail.
+
+## Fuel (v3.1 Phase C)
+
+- [ ] **Today** shows the weekday's meals: Monday lunch and dinner are both
+      chicken thighs; no day defaults to salmon.
+- [ ] **Plan** opens on next week from Friday, this week before. The week's
+      cost is there (about €40), each day card shows its cost, and a day opens
+      to every meal with a swap button. A swap on a day next week is still
+      there when you come back to it.
+- [ ] **Cook ahead** shows Sunday evening for Mon–Tue and Wednesday for
+      Thu–Fri, with grams, and says tonight on the night.
+- [ ] **Shopping list**: whole packets by aisle, this week's shop priced, and
+      the cupboard food (rice, oats, oil, whey) below it with how long a
+      packet lasts. Ticks stay ticked after closing the app, and next week's
+      list starts clean.
+- [ ] Compare the week's total with a real receipt once. The prices are
+      estimates; tell me if they are far out and the generator gets fixed.
+
+## Swipe between tabs (v3.1 Phase D)
+
+- [ ] On each of the five tab screens, a sideways swipe moves to the next
+      tab and back, the bottom bar follows, and each tab is where you left it.
+- [ ] Drilled into a tab (a lift, a run, the photo compare), a sideways swipe
+      does **not** change tab, and the compare slider still wipes.
+- [ ] Week: the arrows and a swipe along the "Week N of 12" header change the
+      week; a swipe on the days changes tab.
+- [ ] Back still walks up a tab's own pages, then to Today, then asks
+      before closing.
 
 ## Photos (Phase 6)
 
@@ -56,7 +110,7 @@ Tick these in order. The first two protect everything else.
 
 ## Calendar, Week, Body (Phases 5–6)
 
-- [ ] Months and weeks swipe smoothly.
+- [ ] Months swipe smoothly in the calendar.
 - [ ] A weigh-in and a measurement on the steppers: no keyboard appears.
 - [ ] The week-4 checkpoint ticks Photos and Measurements by itself after the
       shoot and the tape.
@@ -86,5 +140,5 @@ Tick these in order. The first two protect everything else.
 When this list is ticked, tag the build so it can always be returned to:
 
 ```bash
-git tag v0.12-v3
+git tag v0.13-v3.1
 ```

@@ -3,7 +3,7 @@ description: "Single-user offline training app for the Keller Twelve programme."
 publish_to: 'none'
 
 # versionName+versionCode. Bump both on every install-over-the-top.
-version: 0.12.0+12
+version: 0.13.0+13
 
 environment:
   sdk: ^3.13.0
