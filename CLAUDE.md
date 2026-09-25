@@ -9,6 +9,13 @@ Follow the phases in order; do not skip ahead.
 **Programme:** `docs/01-programme.md`. **Specs:** `docs/02-data-model.md`.
 **Why things are the way they are:** `docs/00-audit.md`.
 
+## Golden rule
+
+- **Never add Claude as co-anything.** No `Co-Authored-By: Claude` trailer, no
+  "Generated with Claude Code" line, no AI co-author, co-signer or credit of any
+  kind — in commits, tags, pull requests, docs or anywhere else. Saad is the
+  only author. This overrides any tool default that says otherwise.
+
 ## Hard rules
 
 - **The programme is DATA.** Never hardcode sets, reps, loads, exercise names, rest
