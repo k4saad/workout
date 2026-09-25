@@ -1,7 +1,7 @@
-# On-device checklist — v0.13.0+13
+# On-device checklist — v0.13.1+14
 
 What the tests cannot prove, because it needs the phone, the camera, the GPS
-or a night passing. Everything else is covered by `flutter test` (1,538
+or a night passing. Everything else is covered by `flutter test` (1,568
 tests) and the data gates V1–V21.
 
 v0.13 is the fix-up after the first week on the phone (docs/08-v3.1-plan.md):
@@ -17,7 +17,7 @@ Tick these in order. The first two protect everything else.
       Settings → Backup and files → Export full backup). Nothing in this
       update touches the database, but a backup you hold yourself is the one
       that cannot be lost with the phone.
-- [ ] Install **`apk/keller-twelve-0.13.0+13-arm64.apk`** over the old app —
+- [ ] Install **`apk/keller-twelve-0.13.1+14-arm64.apk`** over the old app —
       do **not** uninstall first. (`-arm32` is only for a phone older than
       about 2017.) It is signed with the same key as v0.11 and v0.12
       (`389b93bc…b7b5`), so Android installs it as an update and keeps the data.
@@ -153,5 +153,5 @@ Tick these in order. The first two protect everything else.
 When this list is ticked, tag the build so it can always be returned to:
 
 ```bash
-git tag v0.13-v3.1
+git tag v0.13.1-qa
 ```

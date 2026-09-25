@@ -37,7 +37,7 @@ final notificationServiceProvider = Provider<NotificationService>(
 ///
 /// MUST match `version:` in pubspec.yaml — `test/version_test.dart` fails the
 /// build if the two drift apart, which they already did once.
-const appVersion = '0.13.0+13';
+const appVersion = '0.13.1+14';
 
 final backupServiceProvider = Provider<BackupService>(
   (ref) =>
