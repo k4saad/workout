@@ -81,6 +81,19 @@ Tick these in order. The first two protect everything else.
 - [ ] Compare the week's total with a real receipt once. The prices are
       estimates; tell me if they are far out and the generator gets fixed.
 
+## After the QA pass (docs/09-qa-pass.md)
+
+- [ ] Body, with the scale flat for two weeks: **Add 250 kcal a day** adds
+      it; Fuel's target rises and shows it as food; **Take it off** on Body
+      removes it.
+- [ ] Cardio: start a skipping timer, press **Stop**, lock the phone and
+      wait a minute: no round alarms go off.
+- [ ] Leave a session open, come back after midnight, tap **Session in
+      progress**: the same session opens (History shows one, not two).
+- [ ] On Fuel, tap **Eaten**: the button fills and shows a tick at once.
+- [ ] Restore a backup: the app reloads onto Today, showing the backup's
+      data, and a setting toggled afterwards stays as restored.
+
 ## Swipe between tabs (v3.1 Phase D)
 
 - [ ] On each of the five tab screens, a sideways swipe moves to the next

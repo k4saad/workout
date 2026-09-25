@@ -122,6 +122,32 @@ day 1, deload, test week, the last day, after the end — with seeded history:
 **Back robot (J15):** back from 15 drill-downs lands on the parent, in the
 same tab, never on "Close the app?": 15/15.
 
+| Q18 | L | Session runner | After logging a niggle: "stop the set and use the substitute" — with no substitute in sight. They are on the exercise page ("If this one is not working today"), one tap from the runner. | Copy now says where |
+| Q19 | L | Fuel data | The rest-day "Lentils and couscous" promised "no cooking beyond a kettle" — with 60 g of dry red lentils in it. | Note fixed in `gen_fuel.py`, regenerated |
+
+**Data review:** fuel notes scanned for promises their food contradicts
+(Q19; the rest agree); gates V1–V21 pass; the stale "phone already has a
+running app" copy was the one piece of text describing a feature that no
+longer exists (Q6).
+
+**Left for Saad** (CLAUDE.md, "what to ask me about"):
+
+1. **Logging a substitute mid-session.** Sixty-five exercises carry
+   authored substitutes, and they are shown, but a session can only log the
+   prescribed exercise. Swapping in the runner would record sets under the
+   substitute's own id (history already supports it); it touches exercise
+   selection, so it waits for your word.
+2. **What this pass cannot reach.** No emulator or phone here: GPS, the
+   camera, notifications with the screen off, the midnight roll-over on a
+   real clock — `docs/07-on-device-checklist.md` has those, including the
+   new Body → "Add 250 kcal a day" loop and the restore reload.
+
+**How to run it again:**
+
+```bash
+flutter test --dart-define=QA=true test/qa/
+```
+
 **Layout robot (J14):** 22 screens × {360×640, 360×640 at 1.3×, 412×915 at
 2.0×}, real fonts, every list swept to the end. First run: 4 overflows in 2
 places (Q11, Q14). After the fixes: **0 issues in 66 renders**.

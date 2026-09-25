@@ -1157,7 +1157,7 @@
       "id": "chickpea_couscous",
       "slotId": "afternoon",
       "name": "Lentils and couscous",
-      "note": "Rest-day second lunch. No cooking beyond a kettle.",
+      "note": "Rest-day second lunch. The red lentils simmer in fifteen minutes while the couscous soaks in kettle water.",
       "items": [
         {
           "foodId": "linsen_rot",

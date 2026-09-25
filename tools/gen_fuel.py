@@ -294,7 +294,8 @@ TEMPLATES = [
 
     # ---- rest-day afternoon: 530 kcal -------------------------------------
     ("afternoon", "chickpea_couscous", "Lentils and couscous",
-     "Rest-day second lunch. No cooking beyond a kettle.",
+     "Rest-day second lunch. The red lentils simmer in fifteen minutes "
+     "while the couscous soaks in kettle water.",
      [("linsen_rot", 60), ("olivenoel", 6), ("paprika", 80),
       ("zwiebel", 40)], "couscous"),
     ("afternoon", "eggs_bread_big", "Eggs, bread and avocado",

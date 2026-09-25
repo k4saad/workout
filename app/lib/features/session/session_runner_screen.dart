@@ -376,8 +376,8 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Logged. If it is more than a niggle, stop the set and use '
-            'the substitute.',
+            'Logged. If it is more than a niggle, stop the set: tap the '
+            'exercise for the ones that can stand in for it.',
           ),
         ),
       );
