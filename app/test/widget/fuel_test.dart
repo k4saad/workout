@@ -3,10 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:keller_twelve/app/providers.dart';
 import 'package:keller_twelve/app/session_providers.dart';
+import 'package:keller_twelve/app/settings_providers.dart';
 import 'package:keller_twelve/core/theme/app_theme.dart';
 import 'package:keller_twelve/data/db/database.dart';
+import 'package:keller_twelve/data/db/tables.dart';
+import 'package:keller_twelve/data/preferences_service.dart';
 import 'package:keller_twelve/data/programme_repository.dart';
 import 'package:keller_twelve/features/fuel/fuel_screen.dart';
 
@@ -68,6 +72,9 @@ void main() {
           programmeRepositoryProvider.overrideWithValue(repo),
           databaseProvider.overrideWithValue(db),
           todayProvider.overrideWith(() => _FixedToday(trainingDay)),
+          preferencesServiceProvider.overrideWithValue(
+            PreferencesService(documentsDir: tmp),
+          ),
         ],
         child: MaterialApp(theme: AppTheme.dark, home: const FuelScreen()),
       ),
@@ -168,16 +175,135 @@ void main() {
     expect(find.textContaining('muscle is built today'), findsOneWidget);
   });
 
-  testWidgets('the shopping list says packets, not grams', (tester) async {
+  testWidgets('a day buys one main: chicken twice, not chicken and salmon', (
+    tester,
+  ) async {
+    // trainingDay is a Monday: the rotation's chicken day.
+    expect(trainingDay.weekday, DateTime.monday);
     await pump(tester);
+    expect(find.text('Chicken thighs, rice and vegetables'), findsOneWidget);
+    expect(find.text('Chicken thighs and potatoes'), findsOneWidget);
+    expect(find.text('Salmon and potatoes'), findsNothing);
+  });
 
-    await tester.tap(find.byTooltip('Shopping and guide'));
+  Future<void> openPlan(WidgetTester tester) async {
+    await pump(tester);
+    await tester.tap(find.text('Plan'));
+    await settle(tester);
+    await settle(tester);
+  }
+
+  testWidgets('the plan lays out a week: cost, cooking ahead, the days', (
+    tester,
+  ) async {
+    await openPlan(tester);
+
+    expect(find.text('This week'), findsOneWidget);
+    expect(find.text('Next week'), findsOneWidget);
+    expect(find.text('FOOD THIS WEEK'), findsOneWidget);
+    expect(find.text('COOK AHEAD'), findsOneWidget);
+    expect(find.text('Sunday evening'), findsOneWidget);
+    expect(find.text('THE WEEK'), findsOneWidget);
+    // Seven days, Monday first.
+    for (var i = 0; i < 7; i++) {
+      final d = DateTime(
+        trainingDay.year,
+        trainingDay.month,
+        trainingDay.day + i,
+      );
+      // (The prep night falls on some of them too.)
+      expect(find.text(DateFormat('EEE d MMM').format(d)), findsWidgets);
+    }
+    expect(find.text('TODAY'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('next week is a different week, planned the same way', (
+    tester,
+  ) async {
+    await openPlan(tester);
+    final monday = DateFormat('EEE d MMM').format(trainingDay);
+    expect(find.text(monday), findsOneWidget);
+
+    await tester.tap(find.text('Next week'));
+    await settle(tester);
+    await settle(tester);
+    expect(find.text(monday), findsNothing);
+    expect(
+      find.text(
+        DateFormat('EEE d MMM').format(
+          DateTime(trainingDay.year, trainingDay.month, trainingDay.day + 7),
+        ),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('TODAY'), findsNothing);
+  });
+
+  testWidgets('a meal on a day next week swaps for that date', (tester) async {
+    await openPlan(tester);
+    await tester.tap(find.text('Next week'));
     await settle(tester);
     await settle(tester);
 
-    expect(find.text('A week of this'), findsOneWidget);
+    final tuesday = DateTime(
+      trainingDay.year,
+      trainingDay.month,
+      trainingDay.day + 8,
+    );
+    await tester.tap(find.text(DateFormat('EEE d MMM').format(tuesday)));
+    await settle(tester);
+    await tester.tap(find.byTooltip('Swap dinner'));
+    await settle(tester);
+    await tester.tap(find.text('Salmon and potatoes'));
+    await settle(tester);
+    await settle(tester);
+
+    final rows = await db.select(db.mealLogs).get();
+    expect(rows, hasLength(1));
+    expect(rows.single.templateId, 'salmon_potato');
+    expect(rows.single.status, MealStatus.planned);
+    expect(rows.single.loggedOn, tuesday);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the shopping list is packets and prices, ticked at the shelf', (
+    tester,
+  ) async {
+    await openPlan(tester);
+
+    expect(find.text('SHOPPING LIST'), findsOneWidget);
     // Half a tub of quark is not a thing you can buy.
     expect(find.textContaining(' x 500 g'), findsWidgets);
+    expect(find.textContaining("this week's shop"), findsOneWidget);
+    // The kilo tub of whey is not bought every week.
+    expect(find.text('CUPBOARD, WHEN IT RUNS OUT'), findsOneWidget);
+    expect(find.textContaining('lasts'), findsWidgets);
+
+    final quark = find.text('Magerquark');
+    await tester.ensureVisible(quark);
+    await tester.pump();
+    await tester.tap(quark);
+    await settle(tester);
+    expect(
+      find.descendant(
+        of: find.ancestor(of: quark, matching: find.byType(InkWell)),
+        matching: find.byIcon(Icons.check_box),
+      ),
+      findsOneWidget,
+    );
+    // Real file IO: outside the test's fake clock, or it never completes.
+    final prefs = await tester.runAsync(
+      () => PreferencesService(documentsDir: tmp).load(),
+    );
+    expect(prefs!.shoppingTicksFor(trainingDay), {'magerquark'});
+
+    // The halal buying guide sits under the list.
+    await tester.scrollUntilVisible(
+      find.text('Buying it halal'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Buying it halal'), findsOneWidget);
   });
 }

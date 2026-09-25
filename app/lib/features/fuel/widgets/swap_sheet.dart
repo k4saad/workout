@@ -60,7 +60,8 @@ class SwapSheet extends StatelessWidget {
                             ),
                             Gap.xs,
                             Text(
-                              '${m.kcal} kcal · ${m.proteinG.round()} g protein',
+                              '${m.kcal} kcal · ${m.proteinG.round()} g protein'
+                              '${m.costEur > 0 ? ' · €${m.costEur.toStringAsFixed(2)}' : ''}',
                               style: t.bodySmall?.copyWith(
                                 color: AppTheme.textDim,
                               ),

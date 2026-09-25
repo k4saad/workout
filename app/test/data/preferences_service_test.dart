@@ -169,6 +169,27 @@ void main() {
       expect(p.ticksFor(8), {2});
     });
 
+    test('a shopping tick belongs to its week, and old weeks fall away', () {
+      final mon = DateTime(2026, 10, 5);
+      final next = DateTime(2026, 10, 12);
+      var p = const Preferences().withShoppingTickToggled(mon, 'reis');
+      expect(p.shoppingTicksFor(mon), {'reis'});
+      expect(p.shoppingTicksFor(next), isEmpty);
+      p = p.withShoppingTickToggled(next, 'eier');
+      expect(p.shoppingTicksFor(next), {'eier'});
+      p = p.withShoppingTickToggled(mon, 'reis');
+      expect(p.shoppingTicksFor(mon), isEmpty);
+
+      // A month on, last month's list is not kept forever.
+      p = p.withShoppingTickToggled(DateTime(2026, 11, 16), 'skyr');
+      expect(p.shoppingTicksFor(next), isEmpty);
+      expect(
+        Preferences.fromJson(p.toJson())
+            .shoppingTicksFor(DateTime(2026, 11, 16)),
+        {'skyr'},
+      );
+    });
+
     test('survives a round trip, and a bad timer falls back', () {
       final p = const Preferences(
         captureFront: false,

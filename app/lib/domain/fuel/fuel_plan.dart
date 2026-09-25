@@ -1,5 +1,9 @@
 import 'package:collection/collection.dart';
 
+/// The Monday of [d]'s week, at midnight: the week a plan is shopped for.
+DateTime mondayOf(DateTime d) =>
+    DateTime(d.year, d.month, d.day - d.weekday + 1);
+
 /// One food as the packet states it, per 100 g.
 class Food {
   const Food({
@@ -11,6 +15,8 @@ class Food {
     required this.carbsG,
     required this.fatG,
     required this.packG,
+    this.priceEurPerKg = 0,
+    this.keeps = false,
     this.note,
   });
 
@@ -30,6 +36,14 @@ class Food {
   /// shelf; this is what turns 640 g of quark into two tubs.
   final int packG;
 
+  /// A discounter shelf price, estimated by the generator — enough to plan a
+  /// student's week by, not a receipt.
+  final double priceEurPerKg;
+
+  /// Keeps for weeks — dry, tinned, bottled or frozen — so it is bought when
+  /// it runs out, not every week.
+  final bool keeps;
+
   final String? note;
 
   factory Food.fromJson(Map<String, dynamic> j) => Food(
@@ -41,6 +55,8 @@ class Food {
     carbsG: (j['carbsG'] as num).toDouble(),
     fatG: (j['fatG'] as num).toDouble(),
     packG: (j['packG'] as num).toInt(),
+    priceEurPerKg: (j['priceEurPerKg'] as num?)?.toDouble() ?? 0,
+    keeps: j['keeps'] as bool? ?? false,
     note: j['note'] as String?,
   );
 }
@@ -98,6 +114,9 @@ class Meal {
     required this.proteinG,
     required this.carbsG,
     required this.fatG,
+    this.costEur = 0,
+    this.protein,
+    this.batch = false,
     this.note,
   });
 
@@ -112,6 +131,19 @@ class Meal {
   final double proteinG;
   final double carbsG;
   final double fatG;
+
+  /// What its food costs, at the generator's shelf prices.
+  final double costEur;
+
+  /// The main protein it is built around — `chicken`, `fish`, `mince`,
+  /// `legumes`, `eggs` — or null for the dairy-and-oats backbone.
+  final String? protein;
+
+  /// Cooked on a prep night and eaten from the fridge.
+  final bool batch;
+
+  /// The mains that cost money: a day should buy one of these, not two.
+  static const meatOrFish = {'chicken', 'fish', 'mince'};
 
   Macros get macros => Macros(
     kcal: kcal.toDouble(),
@@ -132,6 +164,9 @@ class Meal {
     proteinG: (j['proteinG'] as num).toDouble(),
     carbsG: (j['carbsG'] as num).toDouble(),
     fatG: (j['fatG'] as num).toDouble(),
+    costEur: (j['costEur'] as num?)?.toDouble() ?? 0,
+    protein: j['protein'] as String?,
+    batch: j['batch'] as bool? ?? false,
   );
 }
 
@@ -259,6 +294,132 @@ class GuideEntry {
       GuideEntry(title: j['title'] as String, body: j['body'] as String);
 }
 
+/// The default meals for one weekday: one main protein for lunch and
+/// dinner, so it is bought and cooked once.
+class RotationDay {
+  const RotationDay({
+    required this.weekday,
+    required this.theme,
+    required this.meals,
+  });
+
+  /// [DateTime.monday] (1) to [DateTime.sunday] (7).
+  final int weekday;
+
+  /// What the day is built around: "Chicken", "Lentils".
+  final String theme;
+
+  /// Slot id to meal id.
+  final Map<String, String> meals;
+
+  factory RotationDay.fromJson(Map<String, dynamic> j) => RotationDay(
+    weekday: (j['weekday'] as num).toInt(),
+    theme: j['theme'] as String,
+    meals: (j['meals'] as Map).cast<String, String>(),
+  );
+}
+
+/// One evening of cooking ahead.
+class PrepSession {
+  const PrepSession({
+    required this.cookOn,
+    required this.label,
+    required this.covers,
+  });
+
+  /// The weekday it is cooked on.
+  final int cookOn;
+  final String label;
+
+  /// The weekdays it feeds.
+  final List<int> covers;
+
+  factory PrepSession.fromJson(Map<String, dynamic> j) => PrepSession(
+    cookOn: (j['cookOn'] as num).toInt(),
+    label: j['label'] as String,
+    covers: [for (final d in j['covers'] as List) (d as num).toInt()],
+  );
+}
+
+/// How the week is cooked ahead: when, for which days, and which foods are
+/// worth cooking in bulk.
+class PrepPlan {
+  const PrepPlan({
+    required this.keepsDays,
+    required this.sessions,
+    required this.foods,
+  });
+
+  /// How long cooked food keeps in the fridge.
+  final int keepsDays;
+  final List<PrepSession> sessions;
+
+  /// The foods a prep night cooks: the proteins and the starches. The salad
+  /// is cut on the day.
+  final Set<String> foods;
+
+  factory PrepPlan.fromJson(Map<String, dynamic> j) => PrepPlan(
+    keepsDays: (j['keepsDays'] as num).toInt(),
+    sessions: [
+      for (final s in j['sessions'] as List)
+        PrepSession.fromJson(s as Map<String, dynamic>),
+    ],
+    foods: {for (final f in j['foods'] as List) f as String},
+  );
+}
+
+/// What a student can spend on food.
+class FuelBudget {
+  const FuelBudget({
+    required this.eurPerDay,
+    required this.eurPerWeek,
+    this.note,
+  });
+
+  final double eurPerDay;
+  final double eurPerWeek;
+  final String? note;
+
+  factory FuelBudget.fromJson(Map<String, dynamic> j) => FuelBudget(
+    eurPerDay: (j['eurPerDay'] as num).toDouble(),
+    eurPerWeek: (j['eurPerWeek'] as num).toDouble(),
+    note: j['note'] as String?,
+  );
+}
+
+/// One meal a prep night cooks for.
+class PrepMeal {
+  const PrepMeal({required this.date, required this.slot, required this.meal});
+
+  final DateTime date;
+  final MealSlot slot;
+  final Meal meal;
+}
+
+/// One food to cook, and how much of it — weighed as the meal weighs it
+/// (rice, lentils and pasta dry).
+class PrepItem {
+  const PrepItem({required this.food, required this.grams});
+
+  final Food food;
+  final double grams;
+}
+
+/// A prep night, resolved against the meals actually chosen.
+class PrepNight {
+  const PrepNight({
+    required this.session,
+    required this.cookDate,
+    required this.meals,
+    required this.cook,
+  });
+
+  final PrepSession session;
+  final DateTime cookDate;
+  final List<PrepMeal> meals;
+  final List<PrepItem> cook;
+}
+
 /// One slot on one day: what is planned, and what else it could be.
 class PlannedMeal {
   const PlannedMeal({
@@ -285,6 +446,13 @@ class GroceryLine {
 
   /// Rounded UP. Half a tub of quark is not a thing you can buy.
   final int packs;
+
+  /// What those whole packets cost at the till.
+  double get costEur => packs * food.packG / 1000 * food.priceEurPerKg;
+
+  /// How many of these days one packet covers — for a week's list, how
+  /// many weeks a packet of cupboard food lasts.
+  double get packLastsWeeks => grams <= 0 ? 0 : food.packG / grams;
 }
 
 /// A day of eating, resolved.
@@ -297,11 +465,15 @@ class FuelDay {
     required this.phase,
     required this.module,
     required this.extraKcal,
+    this.weekday,
   });
 
   final FuelPlan plan;
   final int weekNo;
   final bool isTrainingDay;
+
+  /// Which day of the week it is, when known: it picks the default meals.
+  final int? weekday;
   final List<PlannedMeal> slots;
   final FuelPhase? phase;
 
@@ -326,12 +498,25 @@ class FuelDay {
     return m;
   }
 
+  /// What the day's food costs, module included.
+  double get costEur =>
+      slots.fold<double>(0, (a, s) => a + s.chosen.costEur) +
+      (module == null ? 0 : plan.costOf(module!.items));
+
+  /// The meat and fish the day's meals are built around. More than one is
+  /// two things to buy and cook.
+  Set<String> get meatOrFish => {
+    for (final s in slots)
+      if (s.chosen.protein case final p? when Meal.meatOrFish.contains(p)) p,
+  };
+
   /// The same day with one slot swapped. Unknown ids are ignored — a stale
   /// choice saved against an edited plan must not throw mid-meal.
   FuelDay choosing(String slotId, String mealId) => FuelDay(
     plan: plan,
     weekNo: weekNo,
     isTrainingDay: isTrainingDay,
+    weekday: weekday,
     phase: phase,
     module: module,
     extraKcal: extraKcal,
@@ -371,6 +556,9 @@ class FuelPlan {
     required this.hydrationMl,
     required this.trainingExtraMl,
     this.hydrationNote,
+    this.rotation = const [],
+    this.prep,
+    this.budget,
   }) : _foodById = {for (final f in foods) f.id: f};
 
   final List<Food> foods;
@@ -383,6 +571,11 @@ class FuelPlan {
   final int hydrationMl;
   final int trainingExtraMl;
   final String? hydrationNote;
+
+  /// The default meals, a weekday at a time.
+  final List<RotationDay> rotation;
+  final PrepPlan? prep;
+  final FuelBudget? budget;
 
   final Map<String, Food> _foodById;
 
@@ -415,10 +608,27 @@ class FuelPlan {
     return m;
   }
 
+  /// What a list of weighed items costs.
+  double costOf(List<MealItem> items) {
+    var eur = 0.0;
+    for (final i in items) {
+      final f = _foodById[i.foodId];
+      if (f != null) eur += f.priceEurPerKg * i.grams / 1000;
+    }
+    return eur;
+  }
+
+  RotationDay? rotationFor(int weekday) =>
+      rotation.firstWhereOrNull((r) => r.weekday == weekday);
+
   List<Meal> mealsFor(String slotId) =>
       meals.where((m) => m.slotId == slotId).toList();
 
   /// The day's plan.
+  ///
+  /// Each slot is his swap if he made one, else [weekday]'s default from the
+  /// rotation, else the slot's first meal. v3 always took the first — which
+  /// put chicken at lunch AND salmon at dinner, every day of the week.
   ///
   /// [extraKcal] is an adjustment he has APPLIED and that is still standing —
   /// v2 recomputed the bump on every read and stored nothing, so the moment it
@@ -428,8 +638,10 @@ class FuelPlan {
     required bool isTrainingDay,
     int extraKcal = 0,
     Map<String, String> chosen = const {},
+    int? weekday,
   }) {
     final phase = phaseForWeek(weekNo);
+    final defaults = weekday == null ? null : rotationFor(weekday)?.meals;
     final mod = phase?.moduleId == null ? null : module(phase!.moduleId!);
 
     final applicable =
@@ -443,22 +655,97 @@ class FuelPlan {
       phase: phase,
       module: mod,
       extraKcal: extraKcal,
+      weekday: weekday,
       slots: [
         for (final s in applicable)
           if (mealsFor(s.id).isNotEmpty)
             () {
               final options = mealsFor(s.id);
-              final pick = chosen[s.id];
+              Meal? find(String? id) =>
+                  options.firstWhereOrNull((m) => m.id == id);
               return PlannedMeal(
                 slot: s,
                 choices: options,
                 chosen:
-                    options.firstWhereOrNull((m) => m.id == pick) ??
+                    find(chosen[s.id]) ??
+                    find(defaults?[s.id]) ??
                     options.first,
               );
             }(),
       ],
     );
+  }
+
+  /// A prep night reads in the order it is cooked: the protein first, then
+  /// the pulses, then the starches, heaviest first within each.
+  static int _cookingOrder(PrepItem a, PrepItem b) {
+    const order = ['meat', 'fish', 'legume', 'grain', 'veg'];
+    int rank(PrepItem i) {
+      final r = order.indexOf(i.food.category);
+      return r < 0 ? order.length : r;
+    }
+
+    final c = rank(a).compareTo(rank(b));
+    return c != 0 ? c : b.grams.compareTo(a.grams);
+  }
+
+  /// The prep nights for the week starting [monday], resolved against the
+  /// meals chosen in [week] (Monday first).
+  ///
+  /// A night cooks the prep foods of every batch meal on the days it covers,
+  /// summed per food; a night whose days have nothing to cook ahead — he
+  /// swapped it all away — is left out. A night can fall before the week:
+  /// Sunday's cooking is for Monday.
+  List<PrepNight> prepNights({
+    required DateTime monday,
+    required List<FuelDay> week,
+  }) {
+    final p = prep;
+    if (p == null) return const [];
+    final start = DateTime(monday.year, monday.month, monday.day);
+    DateTime dateOf(int weekday) =>
+        DateTime(start.year, start.month, start.day + weekday - 1);
+
+    final nights = <PrepNight>[];
+    for (final session in p.sessions) {
+      final covered = [
+        for (final wd in session.covers)
+          if (wd >= 1 && wd <= week.length) wd,
+      ];
+      if (covered.isEmpty) continue;
+      final ahead = (covered.first - session.cookOn) % 7;
+      final first = dateOf(covered.first);
+      final cookDate = DateTime(first.year, first.month, first.day - ahead);
+
+      final meals = <PrepMeal>[];
+      final grams = <String, double>{};
+      for (final wd in covered) {
+        for (final s in week[wd - 1].slots) {
+          if (!s.chosen.batch) continue;
+          meals.add(PrepMeal(date: dateOf(wd), slot: s.slot, meal: s.chosen));
+          for (final i in s.chosen.items) {
+            if (!p.foods.contains(i.foodId)) continue;
+            grams[i.foodId] = (grams[i.foodId] ?? 0) + i.grams;
+          }
+        }
+      }
+      if (meals.isEmpty) continue;
+
+      final cook = [
+        for (final e in grams.entries)
+          if (_foodById[e.key] case final f?) PrepItem(food: f, grams: e.value),
+      ]..sort(_cookingOrder);
+      nights.add(
+        PrepNight(
+          session: session,
+          cookDate: cookDate,
+          meals: meals,
+          cook: cook,
+        ),
+      );
+    }
+    nights.sort((a, b) => a.cookDate.compareTo(b.cookDate));
+    return nights;
   }
 
   /// Everything a set of days needs, by food, rounded up to whole packets and
@@ -518,6 +805,18 @@ class FuelPlan {
       hydrationMl: (hydration['dailyMl'] as num?)?.toInt() ?? 3000,
       trainingExtraMl: (hydration['trainingExtraMl'] as num?)?.toInt() ?? 700,
       hydrationNote: hydration['note'] as String?,
+      rotation: [
+        for (final r in j['rotation'] as List? ?? const [])
+          RotationDay.fromJson(r as Map<String, dynamic>),
+      ],
+      prep: switch (j['prep']) {
+        final Map<String, dynamic> m => PrepPlan.fromJson(m),
+        _ => null,
+      },
+      budget: switch (j['budget']) {
+        final Map<String, dynamic> m => FuelBudget.fromJson(m),
+        _ => null,
+      },
     );
   }
 }

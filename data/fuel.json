@@ -17,7 +17,8 @@
       "name": "Magerquark",
       "category": "dairy",
       "packG": 500,
-      "note": "The backbone of this plan. 500 g is 60 g of protein for about a euro."
+      "note": "The backbone of this plan. 500 g is 60 g of protein for about a euro.",
+      "priceEurPerKg": 2.4
     },
     {
       "id": "skyr",
@@ -27,7 +28,8 @@
       "fatG": 0.2,
       "name": "Skyr natur",
       "category": "dairy",
-      "packG": 450
+      "packG": 450,
+      "priceEurPerKg": 3.1
     },
     {
       "id": "huettenkaese",
@@ -37,7 +39,8 @@
       "fatG": 4.2,
       "name": "Hüttenkäse",
       "category": "dairy",
-      "packG": 200
+      "packG": 200,
+      "priceEurPerKg": 5.0
     },
     {
       "id": "vollmilch",
@@ -48,7 +51,8 @@
       "name": "Vollmilch 3,5 %",
       "category": "dairy",
       "packG": 1000,
-      "note": "Whole milk, not skimmed. You are trying to gain weight."
+      "note": "Whole milk, not skimmed. You are trying to gain weight.",
+      "priceEurPerKg": 1.05
     },
     {
       "id": "griech_joghurt",
@@ -58,7 +62,8 @@
       "fatG": 10.0,
       "name": "Griechischer Joghurt 10 %",
       "category": "dairy",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 3.5
     },
     {
       "id": "gouda",
@@ -69,7 +74,8 @@
       "name": "Gouda jung, am Stück",
       "category": "dairy",
       "packG": 400,
-      "note": "Check the label says mikrobielles Lab — animal rennet is not halal."
+      "note": "Check the label says mikrobielles Lab — animal rennet is not halal.",
+      "priceEurPerKg": 8.5
     },
     {
       "id": "eier",
@@ -80,7 +86,8 @@
       "name": "Eier Größe M",
       "category": "dairy",
       "packG": 580,
-      "note": "One egg is about 58 g. A 10-pack is 580 g."
+      "note": "One egg is about 58 g. A 10-pack is 580 g.",
+      "priceEurPerKg": 4.0
     },
     {
       "id": "whey",
@@ -91,7 +98,9 @@
       "name": "Whey Protein neutral",
       "category": "supplement",
       "packG": 1000,
-      "note": "Neutral, not flavoured: flavoured tubs often carry undeclared alcohol carriers."
+      "note": "Neutral, not flavoured: flavoured tubs often carry undeclared alcohol carriers.",
+      "priceEurPerKg": 24.0,
+      "keeps": true
     },
     {
       "id": "haehnchenbrust",
@@ -101,7 +110,8 @@
       "fatG": 1.5,
       "name": "Hähnchenbrustfilet (halal)",
       "category": "meat",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 11.0
     },
     {
       "id": "haehnchenschenkel",
@@ -112,7 +122,20 @@
       "name": "Hähnchenschenkel (halal)",
       "category": "meat",
       "packG": 600,
-      "note": "Cheaper and far more forgiving in a pan than breast."
+      "note": "Cheaper and far more forgiving in a pan than breast.",
+      "priceEurPerKg": 5.5
+    },
+    {
+      "id": "haehnchen_ok",
+      "kcal": 125,
+      "proteinG": 19.5,
+      "carbsG": 0.0,
+      "fatG": 5.0,
+      "name": "Hähnchenoberschenkel ohne Knochen (halal)",
+      "category": "meat",
+      "packG": 600,
+      "note": "Boneless thigh: cheaper than breast, and it stays juicy when it is cooked on Sunday and eaten on Tuesday.",
+      "priceEurPerKg": 8.0
     },
     {
       "id": "rinderhack",
@@ -122,7 +145,8 @@
       "fatG": 15.0,
       "name": "Rinderhackfleisch 15 % (halal)",
       "category": "meat",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 10.0
     },
     {
       "id": "thunfisch",
@@ -133,7 +157,9 @@
       "name": "Thunfisch im eigenen Saft",
       "category": "fish",
       "packG": 150,
-      "note": "Drained weight. A tin is about 150 g in, 110 g out."
+      "note": "Drained weight. A tin is about 150 g in, 110 g out.",
+      "priceEurPerKg": 11.5,
+      "keeps": true
     },
     {
       "id": "lachs",
@@ -143,7 +169,9 @@
       "fatG": 14.0,
       "name": "Lachsfilet TK",
       "category": "fish",
-      "packG": 400
+      "packG": 400,
+      "priceEurPerKg": 18.0,
+      "keeps": true
     },
     {
       "id": "linsen_rot",
@@ -153,7 +181,9 @@
       "fatG": 1.5,
       "name": "Rote Linsen, trocken",
       "category": "legume",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 3.2,
+      "keeps": true
     },
     {
       "id": "kichererbsen",
@@ -163,7 +193,9 @@
       "fatG": 2.6,
       "name": "Kichererbsen (Dose, abgetropft)",
       "category": "legume",
-      "packG": 265
+      "packG": 265,
+      "priceEurPerKg": 3.0,
+      "keeps": true
     },
     {
       "id": "kidneybohnen",
@@ -173,7 +205,9 @@
       "fatG": 0.6,
       "name": "Kidneybohnen (Dose, abgetropft)",
       "category": "legume",
-      "packG": 265
+      "packG": 265,
+      "priceEurPerKg": 3.0,
+      "keeps": true
     },
     {
       "id": "tofu",
@@ -183,7 +217,8 @@
       "fatG": 8.5,
       "name": "Tofu natur",
       "category": "legume",
-      "packG": 400
+      "packG": 400,
+      "priceEurPerKg": 4.5
     },
     {
       "id": "haferflocken",
@@ -194,7 +229,9 @@
       "name": "Haferflocken zart",
       "category": "grain",
       "packG": 500,
-      "note": "Weigh them dry. Cooked oats are mostly water."
+      "note": "Weigh them dry. Cooked oats are mostly water.",
+      "priceEurPerKg": 1.3,
+      "keeps": true
     },
     {
       "id": "reis",
@@ -205,7 +242,9 @@
       "name": "Basmatireis, roh",
       "category": "grain",
       "packG": 1000,
-      "note": "Dry weight. 100 g dry is roughly 260 g cooked."
+      "note": "Dry weight. 100 g dry is roughly 260 g cooked.",
+      "priceEurPerKg": 2.0,
+      "keeps": true
     },
     {
       "id": "nudeln",
@@ -215,7 +254,9 @@
       "fatG": 2.5,
       "name": "Vollkornnudeln, roh",
       "category": "grain",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 2.2,
+      "keeps": true
     },
     {
       "id": "couscous",
@@ -225,7 +266,9 @@
       "fatG": 1.0,
       "name": "Couscous, roh",
       "category": "grain",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 2.6,
+      "keeps": true
     },
     {
       "id": "bulgur",
@@ -235,7 +278,9 @@
       "fatG": 1.3,
       "name": "Bulgur, roh",
       "category": "grain",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 3.0,
+      "keeps": true
     },
     {
       "id": "kartoffeln",
@@ -245,7 +290,8 @@
       "fatG": 0.1,
       "name": "Kartoffeln",
       "category": "veg",
-      "packG": 2500
+      "packG": 2500,
+      "priceEurPerKg": 1.0
     },
     {
       "id": "suesskartoffel",
@@ -255,7 +301,8 @@
       "fatG": 0.1,
       "name": "Süßkartoffel",
       "category": "veg",
-      "packG": 1000
+      "packG": 1000,
+      "priceEurPerKg": 2.5
     },
     {
       "id": "vollkornbrot",
@@ -266,7 +313,8 @@
       "name": "Vollkornbrot",
       "category": "grain",
       "packG": 500,
-      "note": "A slice is about 45 g."
+      "note": "A slice is about 45 g.",
+      "priceEurPerKg": 2.4
     },
     {
       "id": "banane",
@@ -277,7 +325,8 @@
       "name": "Banane",
       "category": "fruit",
       "packG": 120,
-      "note": "A medium banana is about 120 g peeled."
+      "note": "A medium banana is about 120 g peeled.",
+      "priceEurPerKg": 1.5
     },
     {
       "id": "datteln",
@@ -288,7 +337,9 @@
       "name": "Datteln, getrocknet",
       "category": "fruit",
       "packG": 200,
-      "note": "Sunnah, and the densest carbohydrate on the shelf."
+      "note": "Sunnah, and the densest carbohydrate on the shelf.",
+      "priceEurPerKg": 7.5,
+      "keeps": true
     },
     {
       "id": "rosinen",
@@ -298,7 +349,9 @@
       "fatG": 0.5,
       "name": "Rosinen",
       "category": "fruit",
-      "packG": 200
+      "packG": 200,
+      "priceEurPerKg": 6.0,
+      "keeps": true
     },
     {
       "id": "honig",
@@ -308,7 +361,9 @@
       "fatG": 0.0,
       "name": "Honig",
       "category": "fruit",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 8.0,
+      "keeps": true
     },
     {
       "id": "apfel",
@@ -318,7 +373,8 @@
       "fatG": 0.2,
       "name": "Apfel",
       "category": "fruit",
-      "packG": 180
+      "packG": 180,
+      "priceEurPerKg": 2.5
     },
     {
       "id": "orange",
@@ -328,7 +384,8 @@
       "fatG": 0.1,
       "name": "Orange",
       "category": "fruit",
-      "packG": 200
+      "packG": 200,
+      "priceEurPerKg": 2.2
     },
     {
       "id": "erdnussmus",
@@ -339,7 +396,9 @@
       "name": "Erdnussmus (100 % Erdnüsse)",
       "category": "fat",
       "packG": 350,
-      "note": "Ingredients should read: peanuts. Maybe salt."
+      "note": "Ingredients should read: peanuts. Maybe salt.",
+      "priceEurPerKg": 7.5,
+      "keeps": true
     },
     {
       "id": "mandeln",
@@ -349,7 +408,9 @@
       "fatG": 50.0,
       "name": "Mandeln",
       "category": "fat",
-      "packG": 200
+      "packG": 200,
+      "priceEurPerKg": 12.0,
+      "keeps": true
     },
     {
       "id": "walnuesse",
@@ -359,7 +420,9 @@
       "fatG": 65.0,
       "name": "Walnüsse",
       "category": "fat",
-      "packG": 200
+      "packG": 200,
+      "priceEurPerKg": 15.0,
+      "keeps": true
     },
     {
       "id": "olivenoel",
@@ -369,7 +432,9 @@
       "fatG": 100.0,
       "name": "Olivenöl",
       "category": "fat",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 11.0,
+      "keeps": true
     },
     {
       "id": "rapsoel",
@@ -379,7 +444,9 @@
       "fatG": 100.0,
       "name": "Rapsöl",
       "category": "fat",
-      "packG": 1000
+      "packG": 1000,
+      "priceEurPerKg": 2.3,
+      "keeps": true
     },
     {
       "id": "tahin",
@@ -389,7 +456,9 @@
       "fatG": 54.0,
       "name": "Sesammus (Tahin)",
       "category": "fat",
-      "packG": 300
+      "packG": 300,
+      "priceEurPerKg": 10.0,
+      "keeps": true
     },
     {
       "id": "avocado",
@@ -399,7 +468,8 @@
       "fatG": 15.0,
       "name": "Avocado",
       "category": "fat",
-      "packG": 200
+      "packG": 200,
+      "priceEurPerKg": 5.0
     },
     {
       "id": "spinat_tk",
@@ -409,7 +479,9 @@
       "fatG": 0.4,
       "name": "Blattspinat TK",
       "category": "veg",
-      "packG": 450
+      "packG": 450,
+      "priceEurPerKg": 2.2,
+      "keeps": true
     },
     {
       "id": "brokkoli",
@@ -419,7 +491,8 @@
       "fatG": 0.4,
       "name": "Brokkoli",
       "category": "veg",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 3.0
     },
     {
       "id": "tomaten",
@@ -429,7 +502,8 @@
       "fatG": 0.2,
       "name": "Tomaten",
       "category": "veg",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 3.0
     },
     {
       "id": "gurke",
@@ -439,7 +513,8 @@
       "fatG": 0.1,
       "name": "Gurke",
       "category": "veg",
-      "packG": 400
+      "packG": 400,
+      "priceEurPerKg": 1.8
     },
     {
       "id": "paprika",
@@ -449,7 +524,8 @@
       "fatG": 0.3,
       "name": "Paprika",
       "category": "veg",
-      "packG": 400
+      "packG": 400,
+      "priceEurPerKg": 4.5
     },
     {
       "id": "zwiebel",
@@ -459,7 +535,8 @@
       "fatG": 0.1,
       "name": "Zwiebel",
       "category": "veg",
-      "packG": 1000
+      "packG": 1000,
+      "priceEurPerKg": 1.3
     },
     {
       "id": "karotten",
@@ -469,7 +546,8 @@
       "fatG": 0.2,
       "name": "Karotten",
       "category": "veg",
-      "packG": 1000
+      "packG": 1000,
+      "priceEurPerKg": 1.1
     },
     {
       "id": "passata",
@@ -479,7 +557,22 @@
       "fatG": 0.2,
       "name": "Passierte Tomaten",
       "category": "veg",
-      "packG": 500
+      "packG": 500,
+      "priceEurPerKg": 1.6,
+      "keeps": true
+    },
+    {
+      "id": "gemuese_tk",
+      "kcal": 45,
+      "proteinG": 2.5,
+      "carbsG": 6.0,
+      "fatG": 0.5,
+      "name": "Gemüsemischung TK",
+      "category": "veg",
+      "packG": 750,
+      "note": "Frozen mixed vegetables: cheaper than fresh, already cut, and nothing goes off in the drawer.",
+      "priceEurPerKg": 2.4,
+      "keeps": true
     }
   ],
   "slots": [
@@ -579,7 +672,8 @@
       "kcal": 538,
       "proteinG": 28.8,
       "carbsG": 66.0,
-      "fatG": 16.9
+      "fatG": 16.9,
+      "costEur": 0.72
     },
     {
       "id": "eggs_bread",
@@ -607,7 +701,8 @@
       "kcal": 543,
       "proteinG": 26.2,
       "carbsG": 58.9,
-      "fatG": 18.5
+      "fatG": 18.5,
+      "costEur": 1.09
     },
     {
       "id": "quark_oats",
@@ -635,7 +730,8 @@
       "kcal": 547,
       "proteinG": 26.4,
       "carbsG": 89.4,
-      "fatG": 7.1
+      "fatG": 7.1,
+      "costEur": 0.66
     },
     {
       "id": "dates_nuts",
@@ -659,7 +755,8 @@
       "kcal": 330,
       "proteinG": 9.8,
       "carbsG": 41.5,
-      "fatG": 13.3
+      "fatG": 13.3,
+      "costEur": 0.72
     },
     {
       "id": "bread_cheese",
@@ -683,7 +780,8 @@
       "kcal": 332,
       "proteinG": 12.9,
       "carbsG": 43.2,
-      "fatG": 9.8
+      "fatG": 9.8,
+      "costEur": 0.8
     },
     {
       "id": "banana_shake",
@@ -711,35 +809,112 @@
       "kcal": 330,
       "proteinG": 20.4,
       "carbsG": 44.7,
-      "fatG": 8.0
+      "fatG": 8.0,
+      "costEur": 0.71
     },
     {
       "id": "chicken_rice",
       "slotId": "lunch",
-      "name": "Chicken, rice and broccoli",
-      "note": "Cook the rice for two days at once.",
+      "name": "Chicken thighs, rice and vegetables",
+      "note": "Cooked on prep night with the dinner's chicken. Reheat until steaming.",
       "items": [
         {
-          "foodId": "haehnchenbrust",
-          "grams": 115
+          "foodId": "haehnchen_ok",
+          "grams": 130
         },
         {
-          "foodId": "brokkoli",
+          "foodId": "gemuese_tk",
           "grams": 150
+        },
+        {
+          "foodId": "rapsoel",
+          "grams": 8
+        },
+        {
+          "foodId": "reis",
+          "grams": 75
+        }
+      ],
+      "kcal": 563,
+      "proteinG": 34.7,
+      "carbsG": 66.8,
+      "fatG": 15.9,
+      "costEur": 1.57,
+      "protein": "chicken",
+      "batch": true
+    },
+    {
+      "id": "chickpea_rice",
+      "slotId": "lunch",
+      "name": "Chickpea curry with rice",
+      "note": "Half a tin of chickpeas, passata, spinach, onion, with a spoon of skyr on top. Cook the whole tin: the other half is tonight's dinner.",
+      "items": [
+        {
+          "foodId": "kichererbsen",
+          "grams": 130
+        },
+        {
+          "foodId": "passata",
+          "grams": 100
+        },
+        {
+          "foodId": "zwiebel",
+          "grams": 50
+        },
+        {
+          "foodId": "spinat_tk",
+          "grams": 100
         },
         {
           "foodId": "rapsoel",
           "grams": 10
         },
         {
+          "foodId": "skyr",
+          "grams": 100
+        },
+        {
           "foodId": "reis",
-          "grams": 85
+          "grams": 50
         }
       ],
-      "kcal": 559,
-      "proteinG": 37.0,
-      "carbsG": 71.5,
-      "fatG": 13.1
+      "kcal": 564,
+      "proteinG": 28.1,
+      "carbsG": 73.8,
+      "fatG": 14.7,
+      "costEur": 1.27,
+      "protein": "legumes",
+      "batch": true
+    },
+    {
+      "id": "egg_rice",
+      "slotId": "lunch",
+      "name": "Egg fried rice",
+      "note": "Yesterday's rice is better than fresh for this. Three eggs, frozen veg.",
+      "items": [
+        {
+          "foodId": "eier",
+          "grams": 174
+        },
+        {
+          "foodId": "gemuese_tk",
+          "grams": 150
+        },
+        {
+          "foodId": "rapsoel",
+          "grams": 5
+        },
+        {
+          "foodId": "reis",
+          "grams": 60
+        }
+      ],
+      "kcal": 560,
+      "proteinG": 30.2,
+      "carbsG": 56.2,
+      "fatG": 22.8,
+      "costEur": 1.19,
+      "protein": "eggs"
     },
     {
       "id": "lentil_bulgur",
@@ -749,7 +924,7 @@
       "items": [
         {
           "foodId": "linsen_rot",
-          "grams": 75
+          "grams": 65
         },
         {
           "foodId": "zwiebel",
@@ -757,7 +932,7 @@
         },
         {
           "foodId": "olivenoel",
-          "grams": 8
+          "grams": 12
         },
         {
           "foodId": "passata",
@@ -768,10 +943,13 @@
           "grams": 50
         }
       ],
-      "kcal": 561,
-      "proteinG": 26.2,
-      "carbsG": 83.7,
-      "fatG": 10.0
+      "kcal": 562,
+      "proteinG": 23.8,
+      "carbsG": 78.5,
+      "fatG": 13.9,
+      "costEur": 0.73,
+      "protein": "legumes",
+      "batch": true
     },
     {
       "id": "tuna_pasta",
@@ -803,7 +981,9 @@
       "kcal": 556,
       "proteinG": 39.9,
       "carbsG": 63.4,
-      "fatG": 13.6
+      "fatG": 13.6,
+      "costEur": 2.15,
+      "protein": "fish"
     },
     {
       "id": "mince_potato",
@@ -831,7 +1011,9 @@
       "kcal": 561,
       "proteinG": 32.5,
       "carbsG": 59.5,
-      "fatG": 20.1
+      "fatG": 20.1,
+      "costEur": 1.8,
+      "protein": "mince"
     },
     {
       "id": "banana_dates",
@@ -851,7 +1033,8 @@
       "kcal": 248,
       "proteinG": 2.6,
       "carbsG": 57.7,
-      "fatG": 0.6
+      "fatG": 0.6,
+      "costEur": 0.55
     },
     {
       "id": "rice_honey",
@@ -871,7 +1054,8 @@
       "kcal": 253,
       "proteinG": 4.2,
       "carbsG": 57.4,
-      "fatG": 0.5
+      "fatG": 0.5,
+      "costEur": 0.27
     },
     {
       "id": "oat_shake",
@@ -891,7 +1075,8 @@
       "kcal": 252,
       "proteinG": 6.6,
       "carbsG": 46.0,
-      "fatG": 3.3
+      "fatG": 3.3,
+      "costEur": 0.28
     },
     {
       "id": "whey_banana",
@@ -915,7 +1100,8 @@
       "kcal": 279,
       "proteinG": 24.9,
       "carbsG": 32.5,
-      "fatG": 5.8
+      "fatG": 5.8,
+      "costEur": 0.91
     },
     {
       "id": "quark_honey",
@@ -939,7 +1125,8 @@
       "kcal": 274,
       "proteinG": 18.1,
       "carbsG": 49.0,
-      "fatG": 0.6
+      "fatG": 0.6,
+      "costEur": 0.74
     },
     {
       "id": "milk_oats",
@@ -963,7 +1150,8 @@
       "kcal": 280,
       "proteinG": 20.6,
       "carbsG": 32.4,
-      "fatG": 6.6
+      "fatG": 6.6,
+      "costEur": 0.4
     },
     {
       "id": "chickpea_couscous",
@@ -995,7 +1183,9 @@
       "kcal": 535,
       "proteinG": 23.4,
       "carbsG": 85.6,
-      "fatG": 7.8
+      "fatG": 7.8,
+      "costEur": 0.84,
+      "protein": "legumes"
     },
     {
       "id": "eggs_bread_big",
@@ -1023,7 +1213,8 @@
       "kcal": 529,
       "proteinG": 28.2,
       "carbsG": 47.3,
-      "fatG": 21.7
+      "fatG": 21.7,
+      "costEur": 1.31
     },
     {
       "id": "quark_bowl",
@@ -1051,13 +1242,233 @@
       "kcal": 525,
       "proteinG": 29.0,
       "carbsG": 73.1,
-      "fatG": 11.7
+      "fatG": 11.7,
+      "costEur": 0.67
+    },
+    {
+      "id": "chicken_potato",
+      "slotId": "dinner",
+      "name": "Chicken thighs and potatoes",
+      "note": "The other half of prep night's chicken. Potatoes boiled in the same go.",
+      "items": [
+        {
+          "foodId": "haehnchen_ok",
+          "grams": 130
+        },
+        {
+          "foodId": "gemuese_tk",
+          "grams": 150
+        },
+        {
+          "foodId": "rapsoel",
+          "grams": 6
+        },
+        {
+          "foodId": "kartoffeln",
+          "grams": 340
+        }
+      ],
+      "kcal": 521,
+      "proteinG": 35.9,
+      "carbsG": 60.0,
+      "fatG": 13.6,
+      "costEur": 1.75,
+      "protein": "chicken",
+      "batch": true
+    },
+    {
+      "id": "lentil_dal",
+      "slotId": "dinner",
+      "name": "Red lentil dal with rice",
+      "note": "Lentils, passata, onion, spinach, cumin, skyr stirred through at the end. The cheapest good dinner there is.",
+      "items": [
+        {
+          "foodId": "reis",
+          "grams": 50
+        },
+        {
+          "foodId": "passata",
+          "grams": 100
+        },
+        {
+          "foodId": "zwiebel",
+          "grams": 30
+        },
+        {
+          "foodId": "spinat_tk",
+          "grams": 80
+        },
+        {
+          "foodId": "rapsoel",
+          "grams": 8
+        },
+        {
+          "foodId": "skyr",
+          "grams": 100
+        },
+        {
+          "foodId": "linsen_rot",
+          "grams": 40
+        }
+      ],
+      "kcal": 514,
+      "proteinG": 28.5,
+      "carbsG": 72.2,
+      "fatG": 9.8,
+      "costEur": 0.93,
+      "protein": "legumes",
+      "batch": true
+    },
+    {
+      "id": "shakshuka",
+      "slotId": "dinner",
+      "name": "Shakshuka with bread",
+      "note": "Eggs poached in tomato, pepper and onion. One pan, fifteen minutes.",
+      "items": [
+        {
+          "foodId": "eier",
+          "grams": 174
+        },
+        {
+          "foodId": "passata",
+          "grams": 150
+        },
+        {
+          "foodId": "zwiebel",
+          "grams": 40
+        },
+        {
+          "foodId": "paprika",
+          "grams": 80
+        },
+        {
+          "foodId": "olivenoel",
+          "grams": 5
+        },
+        {
+          "foodId": "vollkornbrot",
+          "grams": 70
+        }
+      ],
+      "kcal": 523,
+      "proteinG": 30.3,
+      "carbsG": 42.8,
+      "fatG": 23.2,
+      "costEur": 1.57,
+      "protein": "eggs"
+    },
+    {
+      "id": "chickpea_bowl",
+      "slotId": "dinner",
+      "name": "Chickpeas, couscous and a quark dip",
+      "note": "Couscous needs only a kettle. The other half of the tin, pepper, cucumber, and quark with garlic and lemon.",
+      "items": [
+        {
+          "foodId": "kichererbsen",
+          "grams": 130
+        },
+        {
+          "foodId": "paprika",
+          "grams": 80
+        },
+        {
+          "foodId": "gurke",
+          "grams": 80
+        },
+        {
+          "foodId": "olivenoel",
+          "grams": 8
+        },
+        {
+          "foodId": "magerquark",
+          "grams": 100
+        },
+        {
+          "foodId": "couscous",
+          "grams": 50
+        }
+      ],
+      "kcal": 512,
+      "proteinG": 27.8,
+      "carbsG": 67.2,
+      "fatG": 12.5,
+      "costEur": 1.35,
+      "protein": "legumes",
+      "batch": true
+    },
+    {
+      "id": "tuna_potato",
+      "slotId": "dinner",
+      "name": "Tuna and potato salad",
+      "note": "Boiled potatoes, a tin of tuna, cucumber, onion, oil. Cold is fine.",
+      "items": [
+        {
+          "foodId": "thunfisch",
+          "grams": 110
+        },
+        {
+          "foodId": "gurke",
+          "grams": 80
+        },
+        {
+          "foodId": "zwiebel",
+          "grams": 30
+        },
+        {
+          "foodId": "olivenoel",
+          "grams": 12
+        },
+        {
+          "foodId": "kartoffeln",
+          "grams": 385
+        }
+      ],
+      "kcal": 518,
+      "proteinG": 35.0,
+      "carbsG": 61.5,
+      "fatG": 13.6,
+      "costEur": 1.96,
+      "protein": "fish"
+    },
+    {
+      "id": "mince_pasta",
+      "slotId": "dinner",
+      "name": "Pasta with mince sauce",
+      "note": "Sunday: mince, passata, onion, carrot. Once a week — mince is the dear one.",
+      "items": [
+        {
+          "foodId": "rinderhack",
+          "grams": 100
+        },
+        {
+          "foodId": "passata",
+          "grams": 150
+        },
+        {
+          "foodId": "zwiebel",
+          "grams": 50
+        },
+        {
+          "foodId": "karotten",
+          "grams": 60
+        },
+        {
+          "foodId": "nudeln",
+          "grams": 60
+        }
+      ],
+      "kcal": 513,
+      "proteinG": 30.1,
+      "carbsG": 54.5,
+      "fatG": 17.0,
+      "costEur": 1.5,
+      "protein": "mince"
     },
     {
       "id": "salmon_potato",
       "slotId": "dinner",
       "name": "Salmon and potatoes",
-      "note": "Frozen fillet, oven, done.",
+      "note": "Frozen fillet, oven, done. The dearest dinner here — a treat, not a habit.",
       "items": [
         {
           "foodId": "lachs",
@@ -1079,7 +1490,9 @@
       "kcal": 518,
       "proteinG": 32.4,
       "carbsG": 42.3,
-      "fatG": 23.5
+      "fatG": 23.5,
+      "costEur": 2.84,
+      "protein": "fish"
     },
     {
       "id": "tofu_stirfry",
@@ -1111,7 +1524,9 @@
       "kcal": 513,
       "proteinG": 27.8,
       "carbsG": 49.5,
-      "fatG": 21.6
+      "fatG": 21.6,
+      "costEur": 1.31,
+      "protein": "legumes"
     },
     {
       "id": "chicken_salad",
@@ -1143,7 +1558,9 @@
       "kcal": 522,
       "proteinG": 36.3,
       "carbsG": 53.6,
-      "fatG": 14.0
+      "fatG": 14.0,
+      "costEur": 2.12,
+      "protein": "chicken"
     },
     {
       "id": "quark_small",
@@ -1159,7 +1576,8 @@
       "kcal": 121,
       "proteinG": 21.6,
       "carbsG": 7.2,
-      "fatG": 0.5
+      "fatG": 0.5,
+      "costEur": 0.43
     },
     {
       "id": "skyr_small",
@@ -1175,7 +1593,8 @@
       "kcal": 120,
       "proteinG": 20.9,
       "carbsG": 7.6,
-      "fatG": 0.4
+      "fatG": 0.4,
+      "costEur": 0.59
     },
     {
       "id": "milk_glass",
@@ -1195,7 +1614,8 @@
       "kcal": 120,
       "proteinG": 4.8,
       "carbsG": 14.2,
-      "fatG": 4.9
+      "fatG": 4.9,
+      "costEur": 0.23
     }
   ],
   "modules": [
@@ -1331,5 +1751,142 @@
       "title": "Reading a label",
       "body": "Nährwerte je 100 g is what this plan is built on. Compare per 100 g, never per portion — the portion on the packet is whatever flatters the number."
     }
-  ]
+  ],
+  "rotation": [
+    {
+      "weekday": 1,
+      "theme": "Chicken",
+      "meals": {
+        "breakfast": "porridge_pb",
+        "mid_morning": "banana_shake",
+        "lunch": "chicken_rice",
+        "pre_training": "oat_shake",
+        "post_training": "milk_oats",
+        "afternoon": "quark_bowl",
+        "dinner": "chicken_potato",
+        "before_bed": "quark_small"
+      }
+    },
+    {
+      "weekday": 2,
+      "theme": "Lentils",
+      "meals": {
+        "breakfast": "quark_oats",
+        "mid_morning": "bread_cheese",
+        "lunch": "lentil_bulgur",
+        "pre_training": "banana_dates",
+        "post_training": "quark_honey",
+        "afternoon": "eggs_bread_big",
+        "dinner": "lentil_dal",
+        "before_bed": "quark_small"
+      }
+    },
+    {
+      "weekday": 3,
+      "theme": "Eggs",
+      "meals": {
+        "breakfast": "porridge_pb",
+        "mid_morning": "banana_shake",
+        "lunch": "egg_rice",
+        "pre_training": "rice_honey",
+        "post_training": "milk_oats",
+        "afternoon": "quark_bowl",
+        "dinner": "shakshuka",
+        "before_bed": "milk_glass"
+      }
+    },
+    {
+      "weekday": 4,
+      "theme": "Chicken",
+      "meals": {
+        "breakfast": "eggs_bread",
+        "mid_morning": "dates_nuts",
+        "lunch": "chicken_rice",
+        "pre_training": "oat_shake",
+        "post_training": "whey_banana",
+        "afternoon": "quark_bowl",
+        "dinner": "chicken_potato",
+        "before_bed": "quark_small"
+      }
+    },
+    {
+      "weekday": 5,
+      "theme": "Chickpeas",
+      "meals": {
+        "breakfast": "quark_oats",
+        "mid_morning": "bread_cheese",
+        "lunch": "chickpea_rice",
+        "pre_training": "banana_dates",
+        "post_training": "milk_oats",
+        "afternoon": "eggs_bread_big",
+        "dinner": "chickpea_bowl",
+        "before_bed": "quark_small"
+      }
+    },
+    {
+      "weekday": 6,
+      "theme": "Tuna",
+      "meals": {
+        "breakfast": "porridge_pb",
+        "mid_morning": "banana_shake",
+        "lunch": "tuna_pasta",
+        "pre_training": "rice_honey",
+        "post_training": "milk_oats",
+        "afternoon": "quark_bowl",
+        "dinner": "tuna_potato",
+        "before_bed": "quark_small"
+      }
+    },
+    {
+      "weekday": 7,
+      "theme": "Mince",
+      "meals": {
+        "breakfast": "eggs_bread",
+        "mid_morning": "dates_nuts",
+        "lunch": "mince_potato",
+        "pre_training": "oat_shake",
+        "post_training": "milk_oats",
+        "afternoon": "quark_bowl",
+        "dinner": "mince_pasta",
+        "before_bed": "quark_small"
+      }
+    }
+  ],
+  "prep": {
+    "keepsDays": 3,
+    "sessions": [
+      {
+        "cookOn": 7,
+        "label": "Sunday evening",
+        "covers": [
+          1,
+          2
+        ]
+      },
+      {
+        "cookOn": 3,
+        "label": "Wednesday evening",
+        "covers": [
+          4,
+          5
+        ]
+      }
+    ],
+    "foods": [
+      "haehnchen_ok",
+      "haehnchenbrust",
+      "linsen_rot",
+      "kichererbsen",
+      "reis",
+      "bulgur",
+      "couscous",
+      "kartoffeln",
+      "nudeln"
+    ]
+  },
+  "budget": {
+    "eurPerDay": 7.0,
+    "eurPerWeek": 45.0,
+    "note": "Estimated discounter prices, 2026. Check your receipt."
+  }
 }

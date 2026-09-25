@@ -24,6 +24,7 @@ class Preferences {
     this.captureFront = true,
     this.captureTimerSec = 10,
     this.checkpointTicks = const [],
+    this.shoppingTicks = const [],
   });
 
   static const defaultAthleteName = 'Saad';
@@ -63,6 +64,10 @@ class Preferences {
   /// can check itself are never stored here.
   final List<String> checkpointTicks;
 
+  /// Shopping-list lines in the basket, as `yyyy-mm-dd:foodId` against the
+  /// Monday of the week being shopped for.
+  final List<String> shoppingTicks;
+
   /// The self-timer lengths offered.
   static const captureTimers = [3, 5, 10];
 
@@ -83,6 +88,36 @@ class Preferences {
                 if (k != key) k,
             ]
           : [...checkpointTicks, key],
+    );
+  }
+
+  static String _weekKey(DateTime monday) =>
+      '${monday.year.toString().padLeft(4, '0')}-'
+      '${monday.month.toString().padLeft(2, '0')}-'
+      '${monday.day.toString().padLeft(2, '0')}';
+
+  /// The foods ticked off the list for the week starting [monday].
+  Set<String> shoppingTicksFor(DateTime monday) {
+    final prefix = '${_weekKey(monday)}:';
+    return {
+      for (final k in shoppingTicks)
+        if (k.startsWith(prefix)) k.substring(prefix.length),
+    };
+  }
+
+  /// Ticks or unticks [foodId] on [monday]'s list. Weeks more than a
+  /// fortnight before it are dropped: nobody shops last month's list.
+  Preferences withShoppingTickToggled(DateTime monday, String foodId) {
+    final key = '${_weekKey(monday)}:$foodId';
+    final oldest = _weekKey(
+      DateTime(monday.year, monday.month, monday.day - 14),
+    );
+    final kept = [
+      for (final k in shoppingTicks)
+        if (k != key && k.split(':').first.compareTo(oldest) >= 0) k,
+    ];
+    return copyWith(
+      shoppingTicks: shoppingTicks.contains(key) ? kept : [...kept, key],
     );
   }
 
@@ -116,6 +151,7 @@ class Preferences {
     bool? captureFront,
     int? captureTimerSec,
     List<String>? checkpointTicks,
+    List<String>? shoppingTicks,
   }) => Preferences(
     eveningReminder: eveningReminder ?? this.eveningReminder,
     reminderHour: reminderHour ?? this.reminderHour,
@@ -129,6 +165,7 @@ class Preferences {
     captureFront: captureFront ?? this.captureFront,
     captureTimerSec: captureTimerSec ?? this.captureTimerSec,
     checkpointTicks: checkpointTicks ?? this.checkpointTicks,
+    shoppingTicks: shoppingTicks ?? this.shoppingTicks,
   );
 
   /// Remembers [id] as the quote of [day], and the round it belongs to.
@@ -172,6 +209,10 @@ class Preferences {
       for (final k in (j['checkpointTicks'] as List?) ?? const [])
         if (k is String) k,
     ],
+    shoppingTicks: [
+      for (final k in (j['shoppingTicks'] as List?) ?? const [])
+        if (k is String) k,
+    ],
   );
 
   Map<String, dynamic> toJson() => {
@@ -187,6 +228,7 @@ class Preferences {
     'captureFront': captureFront,
     'captureTimerSec': captureTimerSec,
     'checkpointTicks': checkpointTicks,
+    'shoppingTicks': shoppingTicks,
   };
 }
 

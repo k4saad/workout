@@ -68,6 +68,10 @@ FOODS = {
     "haehnchenbrust": F(106, 23.0, 0.0, 1.5, "Hähnchenbrustfilet (halal)", "meat", 500),
     "haehnchenschenkel": F(172, 18.0, 0.0, 11.0, "Hähnchenschenkel (halal)", "meat", 600,
                            "Cheaper and far more forgiving in a pan than breast."),
+    "haehnchen_ok": F(125, 19.5, 0.0, 5.0, "Hähnchenoberschenkel ohne Knochen (halal)",
+                      "meat", 600,
+                      "Boneless thigh: cheaper than breast, and it stays juicy "
+                      "when it is cooked on Sunday and eaten on Tuesday."),
     "rinderhack": F(212, 19.0, 0.0, 15.0, "Rinderhackfleisch 15 % (halal)", "meat", 500),
     "thunfisch": F(108, 24.0, 0.0, 1.0, "Thunfisch im eigenen Saft", "fish", 150,
                    "Drained weight. A tin is about 150 g in, 110 g out."),
@@ -121,7 +125,51 @@ FOODS = {
     "zwiebel": F(40, 1.1, 7.0, 0.1, "Zwiebel", "veg", 1000),
     "karotten": F(41, 0.9, 8.0, 0.2, "Karotten", "veg", 1000),
     "passata": F(35, 1.5, 6.0, 0.2, "Passierte Tomaten", "veg", 500),
+    "gemuese_tk": F(45, 2.5, 6.0, 0.5, "Gemüsemischung TK", "veg", 750,
+                    "Frozen mixed vegetables: cheaper than fresh, already cut, "
+                    "and nothing goes off in the drawer."),
 }
+
+# ---------------------------------------------------------------- prices ---
+# Euro per kilo, as a German discounter (Aldi, Lidl, Netto) shelf price in
+# 2026 — ESTIMATES, to plan a week by, not a receipt. For tins and anything
+# sold drained, per kilo of what is eaten. The app says so where it shows a
+# number. He is a student: the default week averages about six euros a
+# day, and no day of it costs more than seven.
+PRICES = {
+    "magerquark": 2.40, "skyr": 3.10, "huettenkaese": 5.00, "vollmilch": 1.05,
+    "griech_joghurt": 3.50, "gouda": 8.50, "eier": 4.00, "whey": 24.00,
+    "haehnchenbrust": 11.00, "haehnchenschenkel": 5.50, "haehnchen_ok": 8.00,
+    "rinderhack": 10.00, "thunfisch": 11.50, "lachs": 18.00,
+    "linsen_rot": 3.20, "kichererbsen": 3.00, "kidneybohnen": 3.00,
+    "tofu": 4.50, "haferflocken": 1.30, "reis": 2.00, "nudeln": 2.20,
+    "couscous": 2.60, "bulgur": 3.00, "kartoffeln": 1.00,
+    "suesskartoffel": 2.50, "vollkornbrot": 2.40, "banane": 1.50,
+    "datteln": 7.50, "rosinen": 6.00, "honig": 8.00, "apfel": 2.50,
+    "orange": 2.20, "erdnussmus": 7.50, "mandeln": 12.00, "walnuesse": 15.00,
+    "olivenoel": 11.00, "rapsoel": 2.30, "tahin": 10.00, "avocado": 5.00,
+    "spinat_tk": 2.20, "brokkoli": 3.00, "tomaten": 3.00, "gurke": 1.80,
+    "paprika": 4.50, "zwiebel": 1.30, "karotten": 1.10, "passata": 1.60,
+    "gemuese_tk": 2.40,
+}
+for fid in FOODS:
+    if fid not in PRICES:
+        raise SystemExit(f"no price for {fid}: every food needs one")
+    FOODS[fid]["priceEurPerKg"] = PRICES[fid]
+
+# What keeps in a cupboard or a freezer for weeks: dry goods, tins, oil, nut
+# butter, frozen vegetables and fish. A week's plan uses part of a packet, so
+# the shopping list asks for these only when they run out -- a list that
+# prices a whole kilo tub of whey every week tells a student the week costs
+# twice what it does.
+KEEPS = {"whey", "linsen_rot", "kichererbsen", "kidneybohnen", "haferflocken",
+         "reis", "nudeln", "couscous", "bulgur", "datteln", "rosinen", "honig",
+         "erdnussmus", "mandeln", "walnuesse", "olivenoel", "rapsoel", "tahin",
+         "thunfisch", "passata", "spinat_tk", "gemuese_tk", "lachs"}
+for fid in KEEPS:
+    if fid not in FOODS:
+        raise SystemExit(f"KEEPS names {fid}, which is not a food")
+    FOODS[fid]["keeps"] = True
 
 # Nothing on this list may contain these. The gate checks the names too, so a
 # future edit that adds "Schinken" fails rather than quietly shipping.
@@ -198,12 +246,20 @@ TEMPLATES = [
      [("banane", 110), ("honig", 10), ("magerquark", 100)], "vollmilch"),
 
     # ---- lunch: 560 kcal --------------------------------------------------
-    ("lunch", "chicken_rice", "Chicken, rice and broccoli",
-     "Cook the rice for two days at once.",
-     [("haehnchenbrust", 115), ("brokkoli", 150), ("rapsoel", 10)], "reis"),
+    ("lunch", "chicken_rice", "Chicken thighs, rice and vegetables",
+     "Cooked on prep night with the dinner's chicken. Reheat until steaming.",
+     [("haehnchen_ok", 130), ("gemuese_tk", 150), ("rapsoel", 8)], "reis"),
+    ("lunch", "chickpea_rice", "Chickpea curry with rice",
+     "Half a tin of chickpeas, passata, spinach, onion, with a spoon of skyr "
+     "on top. Cook the whole tin: the other half is tonight's dinner.",
+     [("kichererbsen", 130), ("passata", 100), ("zwiebel", 50),
+      ("spinat_tk", 100), ("rapsoel", 10), ("skyr", 100)], "reis"),
+    ("lunch", "egg_rice", "Egg fried rice",
+     "Yesterday's rice is better than fresh for this. Three eggs, frozen veg.",
+     [("eier", 174), ("gemuese_tk", 150), ("rapsoel", 5)], "reis"),
     ("lunch", "lentil_bulgur", "Red lentils with bulgur",
      "Mercimek. Cheap, filling, and it reheats better than it cooks.",
-     [("linsen_rot", 75), ("zwiebel", 60), ("olivenoel", 8),
+     [("linsen_rot", 65), ("zwiebel", 60), ("olivenoel", 12),
       ("passata", 100)], "bulgur"),
     ("lunch", "tuna_pasta", "Tuna pasta",
      "A whole tin, wholemeal pasta, passata. Fifteen minutes.",
@@ -250,8 +306,33 @@ TEMPLATES = [
      "haferflocken"),
 
     # ---- dinner: 520 kcal -------------------------------------------------
+    ("dinner", "chicken_potato", "Chicken thighs and potatoes",
+     "The other half of prep night's chicken. Potatoes boiled in the same go.",
+     [("haehnchen_ok", 130), ("gemuese_tk", 150), ("rapsoel", 6)], "kartoffeln"),
+    ("dinner", "lentil_dal", "Red lentil dal with rice",
+     "Lentils, passata, onion, spinach, cumin, skyr stirred through at the "
+     "end. The cheapest good dinner there is.",
+     [("reis", 50), ("passata", 100), ("zwiebel", 30), ("spinat_tk", 80),
+      ("rapsoel", 8), ("skyr", 100)], "linsen_rot"),
+    ("dinner", "shakshuka", "Shakshuka with bread",
+     "Eggs poached in tomato, pepper and onion. One pan, fifteen minutes.",
+     [("eier", 174), ("passata", 150), ("zwiebel", 40), ("paprika", 80),
+      ("olivenoel", 5)], "vollkornbrot"),
+    ("dinner", "chickpea_bowl", "Chickpeas, couscous and a quark dip",
+     "Couscous needs only a kettle. The other half of the tin, pepper, "
+     "cucumber, and quark with garlic and lemon.",
+     [("kichererbsen", 130), ("paprika", 80), ("gurke", 80),
+      ("olivenoel", 8), ("magerquark", 100)], "couscous"),
+    ("dinner", "tuna_potato", "Tuna and potato salad",
+     "Boiled potatoes, a tin of tuna, cucumber, onion, oil. Cold is fine.",
+     [("thunfisch", 110), ("gurke", 80), ("zwiebel", 30),
+      ("olivenoel", 12)], "kartoffeln"),
+    ("dinner", "mince_pasta", "Pasta with mince sauce",
+     "Sunday: mince, passata, onion, carrot. Once a week — mince is the dear one.",
+     [("rinderhack", 100), ("passata", 150), ("zwiebel", 50),
+      ("karotten", 60)], "nudeln"),
     ("dinner", "salmon_potato", "Salmon and potatoes",
-     "Frozen fillet, oven, done.",
+     "Frozen fillet, oven, done. The dearest dinner here — a treat, not a habit.",
      [("lachs", 120), ("brokkoli", 120), ("olivenoel", 6)], "kartoffeln"),
     ("dinner", "tofu_stirfry", "Tofu and vegetables",
      "Whatever is in the drawer, hot pan, soy sauce.",
@@ -273,6 +354,79 @@ TEMPLATES = [
      "When you cannot face another spoonful of quark.",
      [("honig", 10)], "vollmilch"),
 ]
+
+# What each meal is built around, and whether it is cooked ahead.
+#
+# `protein` is the MAIN protein, the one that costs money and needs cooking:
+# a day's default lunch and dinner share one, so it is bought and cooked
+# once. Dairy, oats and eggs at breakfast are the cheap backbone, not a main.
+# `batch` meals are cooked on prep night and keep three days in the fridge.
+MEAL_META = {
+    "chicken_rice": ("chicken", True), "chicken_potato": ("chicken", True),
+    "chicken_salad": ("chicken", False),
+    "lentil_bulgur": ("legumes", True), "lentil_dal": ("legumes", True),
+    "chickpea_rice": ("legumes", True), "chickpea_bowl": ("legumes", True),
+    "chickpea_couscous": ("legumes", False),
+    "egg_rice": ("eggs", False), "shakshuka": ("eggs", False),
+    "tuna_pasta": ("fish", False), "tuna_potato": ("fish", False),
+    "salmon_potato": ("fish", False),
+    "mince_potato": ("mince", False), "mince_pasta": ("mince", False),
+    "tofu_stirfry": ("legumes", False),
+}
+MEAT_OR_FISH = {"chicken", "fish", "mince"}
+
+# The week, a day at a time: one main protein per day for lunch and dinner,
+# the cheap backbone around it, and the dear things rarely. Chicken twice
+# (cooked Sunday for Monday, Wednesday for Thursday), mince once, on Sunday
+# when there is time to cook it. No salmon — it is still a swap.
+#
+# (weekday 1-7, theme, {slot: meal})
+ROTATION = [
+    (1, "Chicken", {"breakfast": "porridge_pb", "mid_morning": "banana_shake",
+                    "lunch": "chicken_rice", "pre_training": "oat_shake",
+                    "post_training": "milk_oats", "afternoon": "quark_bowl",
+                    "dinner": "chicken_potato", "before_bed": "quark_small"}),
+    (2, "Lentils", {"breakfast": "quark_oats", "mid_morning": "bread_cheese",
+                    "lunch": "lentil_bulgur", "pre_training": "banana_dates",
+                    "post_training": "quark_honey", "afternoon": "eggs_bread_big",
+                    "dinner": "lentil_dal", "before_bed": "quark_small"}),
+    (3, "Eggs", {"breakfast": "porridge_pb", "mid_morning": "banana_shake",
+                 "lunch": "egg_rice", "pre_training": "rice_honey",
+                 "post_training": "milk_oats", "afternoon": "quark_bowl",
+                 "dinner": "shakshuka", "before_bed": "milk_glass"}),
+    (4, "Chicken", {"breakfast": "eggs_bread", "mid_morning": "dates_nuts",
+                    "lunch": "chicken_rice", "pre_training": "oat_shake",
+                    "post_training": "whey_banana", "afternoon": "quark_bowl",
+                    "dinner": "chicken_potato", "before_bed": "quark_small"}),
+    (5, "Chickpeas", {"breakfast": "quark_oats", "mid_morning": "bread_cheese",
+                      "lunch": "chickpea_rice", "pre_training": "banana_dates",
+                      "post_training": "milk_oats", "afternoon": "eggs_bread_big",
+                      "dinner": "chickpea_bowl", "before_bed": "quark_small"}),
+    (6, "Tuna", {"breakfast": "porridge_pb", "mid_morning": "banana_shake",
+                 "lunch": "tuna_pasta", "pre_training": "rice_honey",
+                 "post_training": "milk_oats", "afternoon": "quark_bowl",
+                 "dinner": "tuna_potato", "before_bed": "quark_small"}),
+    (7, "Mince", {"breakfast": "eggs_bread", "mid_morning": "dates_nuts",
+                  "lunch": "mince_potato", "pre_training": "oat_shake",
+                  "post_training": "milk_oats", "afternoon": "quark_bowl",
+                  "dinner": "mince_pasta", "before_bed": "quark_small"}),
+]
+
+# Prep nights: what is cooked when, for which days. Cooked chicken, rice and
+# pulses keep three days in the fridge.
+PREP = {
+    "keepsDays": 3,
+    "sessions": [
+        {"cookOn": 7, "label": "Sunday evening", "covers": [1, 2]},
+        {"cookOn": 3, "label": "Wednesday evening", "covers": [4, 5]},
+    ],
+    "foods": ["haehnchen_ok", "haehnchenbrust", "linsen_rot", "kichererbsen",
+              "reis", "bulgur", "couscous", "kartoffeln", "nudeln"],
+}
+
+# Budget, per day: the ceiling the default week must stay under.
+BUDGET_EUR_PER_DAY = 7.00
+BUDGET_EUR_PER_WEEK = 45.00
 
 # Phase modules. The base day is 2,600 kcal; the later phases ADD to it rather
 # than being authored again, because three separate plans is three things to
@@ -392,6 +546,8 @@ for slot_id, tid, name, note, fixed, flex in TEMPLATES:
             fail(f"{tid}: {fid} at {grams} g is under its {floor} g minimum")
 
     m = macros(items)
+    cost = sum(FOODS[fid]["priceEurPerKg"] * g / 1000 for fid, g in items)
+    main, batch = MEAL_META.get(tid, (None, False))
     built.append({
         "id": tid, "slotId": slot_id, "name": name, "note": note,
         "items": [{"foodId": fid, "grams": grams} for fid, grams in items],
@@ -399,6 +555,9 @@ for slot_id, tid, name, note, fixed, flex in TEMPLATES:
         "proteinG": round(m["proteinG"], 1),
         "carbsG": round(m["carbsG"], 1),
         "fatG": round(m["fatG"], 1),
+        "costEur": round(cost, 2),
+        **({"protein": main} if main else {}),
+        **({"batch": True} if batch else {}),
     })
 
     dk = m["kcal"] - kcal_t
@@ -472,6 +631,53 @@ for day_kind, slot_ids in [
                 fail(f"{day_kind} {label}, {bound} day: {tot['fatG']:.0f} g fat "
                      f"— below the 40 g floor hormones need")
 
+# ---------------------------------------------------- the default week ----
+# Every rotation day, training and rest, must hit its calories, clear the
+# protein, carbohydrate and fat floors, stay under the budget, and have at
+# most ONE meat-or-fish main. (Swaps are his choice; the default is ours.)
+BUILT = {t["id"]: t for t in built}
+week_cost = {"training": 0.0, "rest": 0.0}
+for wd, theme, meals in ROTATION:
+    for day_kind, slot_ids in [
+        ("training", ["breakfast", "mid_morning", "lunch", "pre_training",
+                      "post_training", "dinner", "before_bed"]),
+        ("rest", ["breakfast", "mid_morning", "lunch", "afternoon", "dinner",
+                  "before_bed"]),
+    ]:
+        chosen = []
+        for sid in slot_ids:
+            mid = meals.get(sid)
+            t = BUILT.get(mid)
+            if t is None or t["slotId"] != sid:
+                fail(f"rotation day {wd} ({theme}): {sid} -> {mid} is not a {sid} meal")
+                continue
+            chosen.append(t)
+        tot = {k: sum(t[k] for t in chosen) for k in ("kcal", "proteinG", "carbsG", "fatG")}
+        cost = sum(t["costEur"] for t in chosen)
+        week_cost[day_kind] += cost
+        target = 2600
+        if abs(tot["kcal"] - target) > target * 0.03:
+            fail(f"rotation day {wd} {day_kind}: {tot['kcal']} kcal against {target}")
+        if tot["proteinG"] < 110:
+            fail(f"rotation day {wd} {day_kind}: {tot['proteinG']:.0f} g protein, under 110")
+        if tot["carbsG"] < 250:
+            fail(f"rotation day {wd} {day_kind}: {tot['carbsG']:.0f} g carbohydrate, under 250")
+        if tot["fatG"] < 40:
+            fail(f"rotation day {wd} {day_kind}: {tot['fatG']:.0f} g fat, under 40")
+        if cost > BUDGET_EUR_PER_DAY:
+            fail(f"rotation day {wd} {day_kind}: EUR {cost:.2f}, over the "
+                 f"EUR {BUDGET_EUR_PER_DAY:.2f} a day a student can spend")
+        mains = {t.get("protein") for t in chosen if t.get("protein") in MEAT_OR_FISH}
+        if len(mains) > 1:
+            fail(f"rotation day {wd} ({theme}): two meat/fish mains {sorted(mains)} "
+                 f"— one protein a day, bought and cooked once")
+        if any(t["id"] == "salmon_potato" for t in chosen):
+            fail(f"rotation day {wd}: salmon is a treat swap, not a default")
+for kind, c in week_cost.items():
+    if c > BUDGET_EUR_PER_WEEK:
+        fail(f"the default week, all {kind} days: EUR {c:.2f}, over "
+             f"EUR {BUDGET_EUR_PER_WEEK:.2f}")
+
 # ------------------------------------------------------------- halal check ---
 for fid, f in FOODS.items():
     hay = (f["name"] + " " + (f["note"] or "")).lower()
@@ -526,6 +732,13 @@ doc = {
     ],
     "hydration": HYDRATION,
     "buyingGuide": [{"title": t, "body": b} for t, b in GUIDE],
+    "rotation": [
+        {"weekday": wd, "theme": theme, "meals": meals}
+        for wd, theme, meals in ROTATION
+    ],
+    "prep": PREP,
+    "budget": {"eurPerDay": BUDGET_EUR_PER_DAY, "eurPerWeek": BUDGET_EUR_PER_WEEK,
+               "note": "Estimated discounter prices, 2026. Check your receipt."},
 }
 
 os.makedirs(MIRROR, exist_ok=True)
@@ -536,6 +749,8 @@ for path in (os.path.join(OUT, "fuel.json"), os.path.join(MIRROR, "fuel.json")):
 
 print(f"fuel.json          {len(raw.encode('utf-8')):>8,} bytes   "
       f"{len(FOODS)} foods, {len(built)} meals across {len(SLOTS)} slots")
+print(f"the default week: EUR {week_cost['training']:.2f} if every day trained, "
+      f"EUR {week_cost['rest']:.2f} if every day rested")
 if warnings:
     print(f"\n{len(warnings)} warning(s)")
     for w in warnings:

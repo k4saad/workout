@@ -55,6 +55,17 @@ class PreferencesNotifier extends AsyncNotifier<Preferences> {
     await notifications.scheduleSessionReminders(reminders);
   }
 
+  /// Ticks a line of a week's shopping list. Saved without re-laying the
+  /// reminders: nothing about the evening changed.
+  Future<void> toggleShoppingTick(DateTime monday, String foodId) async {
+    final current = await future;
+    state = AsyncData(
+      await ref
+          .read(preferencesServiceProvider)
+          .save(current.withShoppingTickToggled(monday, foodId)),
+    );
+  }
+
   /// Records that a full backup just landed somewhere.
   Future<void> markBackedUp(DateTime at) async {
     final current = state.asData?.value ?? const Preferences();

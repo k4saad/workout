@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Validation gates V1-V13 from docs/02-data-model.md, section 1.6, plus V14-V20
-added in v3 (docs/06-v3-plan.md).
+added in v3 (docs/06-v3-plan.md) and V21 in v3.1 (docs/08-v3.1-plan.md).
 
 These are the same assertions Phase 1 ports to `flutter test`. Run this after any
 edit to data/*.json, and after any change to tools/gen.py.
@@ -654,6 +654,80 @@ for k in ("quran", "hadith", "greek", "roman"):
         fail("V20", f"no {k} quotes")
 print(f"V20 quotes: {len(qs)} ({', '.join(f'{k} {v}' for k, v in sorted(kinds.items()))})")
 
+# ============ V21 the default week feeds him on a student's money ==========
+# docs/08-v3.1-plan.md, Phase C. Checked from the written fuel.json, not from
+# the generator's own arithmetic: every food has a price, every meal's cost
+# is its foods' cost, every weekday of the rotation names a real meal for
+# every slot, lands on its calories and floors, has ONE meat-or-fish main at
+# most, never defaults to salmon, and stays under the budget; the prep nights
+# cook only for days the food keeps to.
+fuel = load("fuel.json")
+FOOD = {f["id"]: f for f in fuel["foods"]}
+MEAL = {m["id"]: m for m in fuel["meals"]}
+for fid, f in FOOD.items():
+    if not isinstance(f.get("priceEurPerKg"), (int, float)) or f["priceEurPerKg"] <= 0:
+        fail("V21", f"{fid}: no price per kilo")
+for mid, m in MEAL.items():
+    cost = sum(FOOD[i["foodId"]]["priceEurPerKg"] * i["grams"] / 1000
+               for i in m["items"] if i["foodId"] in FOOD)
+    if abs(cost - m.get("costEur", -1)) > 0.011:
+        fail("V21", f"{mid}: costEur {m.get('costEur')} but its foods cost {cost:.2f}")
+budget = fuel.get("budget", {})
+per_day = budget.get("eurPerDay", 0)
+per_week = budget.get("eurPerWeek", 0)
+rot = {r["weekday"]: r for r in fuel.get("rotation", [])}
+if sorted(rot) != list(range(1, 8)):
+    fail("V21", f"the rotation covers weekdays {sorted(rot)}, not 1-7")
+base = next((ph for ph in fuel["phases"] if ph["moduleId"] is None), None)
+SLOT_DAYS = {sl["id"]: sl["days"] for sl in fuel["slots"]}
+week_total = {"training": 0.0, "rest": 0.0}
+for wd, r in sorted(rot.items()):
+    for kind in ("training", "rest"):
+        ids = [sid for sid, d in SLOT_DAYS.items() if d in ("both", kind)]
+        meals = []
+        for sid in ids:
+            m = MEAL.get(r["meals"].get(sid))
+            if m is None or m["slotId"] != sid:
+                fail("V21", f"weekday {wd}: {sid} -> {r['meals'].get(sid)} is not a {sid} meal")
+            else:
+                meals.append(m)
+        kcal = sum(m["kcal"] for m in meals)
+        prot = sum(m["proteinG"] for m in meals)
+        cost = sum(m["costEur"] for m in meals)
+        week_total[kind] += cost
+        if base and abs(kcal - base["kcal"]) > base["kcal"] * 0.03:
+            fail("V21", f"weekday {wd} {kind}: {kcal} kcal against {base['kcal']}")
+        if base and prot < base["proteinG"]:
+            fail("V21", f"weekday {wd} {kind}: {prot:.0f} g protein, under {base['proteinG']}")
+        if sum(m["carbsG"] for m in meals) < 250 or sum(m["fatG"] for m in meals) < 40:
+            fail("V21", f"weekday {wd} {kind}: under the carbohydrate or fat floor")
+        if cost > per_day + 1e-9:
+            fail("V21", f"weekday {wd} {kind}: EUR {cost:.2f}, over EUR {per_day:.2f}")
+        mains = {m.get("protein") for m in meals} & {"chicken", "fish", "mince"}
+        if len(mains) > 1:
+            fail("V21", f"weekday {wd}: {sorted(mains)} — one meat or fish a day")
+        if any(any(FOOD[i["foodId"]]["name"].startswith("Lachs") for i in m["items"])
+               for m in meals):
+            fail("V21", f"weekday {wd}: salmon by default")
+for kind, c in week_total.items():
+    if c > per_week + 1e-9:
+        fail("V21", f"the {kind} week: EUR {c:.2f}, over EUR {per_week:.2f}")
+prep = fuel.get("prep", {})
+keeps = prep.get("keepsDays", 0)
+for sess in prep.get("sessions", []):
+    for day in sess["covers"]:
+        ahead = (day - sess["cookOn"]) % 7
+        if ahead < 1 or ahead > keeps:
+            fail("V21", f"prep on day {sess['cookOn']} for day {day}: "
+                        f"{ahead} days ahead, and cooked food keeps {keeps}")
+    for day in sess["covers"]:
+        if not any(MEAL.get(mid, {}).get("batch") for mid in rot.get(day, {"meals": {}})["meals"].values()):
+            fail("V21", f"prep on day {sess['cookOn']} covers day {day}, "
+                        f"which has nothing to cook ahead")
+print(f"V21 fuel budget: the default week EUR {week_total['training']:.2f} "
+      f"(training) / {week_total['rest']:.2f} (rest), ceiling "
+      f"EUR {per_day:.2f} a day, {len(prep.get('sessions', []))} prep nights")
+
 # --------------------------------------------------------------- verdict ----
 print()
 print("=" * 74)
@@ -667,5 +741,5 @@ if failures:
     for f in failures:
         print(f"  X {f}")
     sys.exit(1)
-print("ALL GATES PASSED (V1-V20)")
+print("ALL GATES PASSED (V1-V21)")
 sys.exit(0)

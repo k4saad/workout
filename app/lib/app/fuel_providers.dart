@@ -41,7 +41,24 @@ final fuelDayProvider = FutureProvider.family<FuelDay, DateTime>((
     isTrainingDay: planned.day?.isTrainingDay ?? false,
     extraKcal: await ref.watch(extraKcalProvider(day).future),
     chosen: await ref.watch(chosenMealsProvider(day).future),
+    weekday: day.weekday,
   );
+});
+
+/// The seven days from [monday]: what the Plan lays out, cooks ahead for
+/// and shops for. Each day is [fuelDayProvider], so a swap on one day
+/// refreshes the week.
+final fuelWeekProvider = FutureProvider.family<List<FuelDay>, DateTime>((
+  ref,
+  monday,
+) async {
+  return [
+    for (var i = 0; i < 7; i++)
+      await ref.watch(
+        fuelDayProvider(DateTime(monday.year, monday.month, monday.day + i))
+            .future,
+      ),
+  ];
 });
 
 /// What has actually been eaten today.

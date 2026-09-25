@@ -7,66 +7,73 @@ import '../../core/ui/ui.dart';
 import '../../data/fuel_service.dart';
 import '../../domain/fuel/fuel_plan.dart';
 import '../common/widgets.dart';
+import 'fuel_week_view.dart';
 import 'widgets/meal_card.dart';
 import 'widgets/swap_sheet.dart';
 
-/// The Fuel tab: what to eat today, and whether it got eaten.
+/// The Fuel tab: what to eat today, and — under Plan — the week ahead,
+/// cooked and shopped for.
 ///
-/// Laid out as the day runs, not as a list of food groups. The session is the
-/// fixed point everything else is placed around — that is how the plan is
-/// actually lived, and it is why the two meals nearest training say so.
-class FuelScreen extends ConsumerWidget {
+/// Today is laid out as the day runs, not as a list of food groups. The
+/// session is the fixed point everything else is placed around — that is
+/// how the plan is actually lived, and it is why the two meals nearest
+/// training say so.
+class FuelScreen extends ConsumerStatefulWidget {
   const FuelScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FuelScreen> createState() => _FuelScreenState();
+}
+
+class _FuelScreenState extends ConsumerState<FuelScreen> {
+  bool _plan = false;
+
+  @override
+  Widget build(BuildContext context) {
     final today = ref.watch(todayProvider);
     final async = ref.watch(fuelDayProvider(today));
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Fuel'),
-        actions: [
-          IconButton(
-            tooltip: 'Shopping and guide',
-            icon: const Icon(Icons.local_grocery_store_outlined),
-            onPressed: () => _openGroceries(context, ref),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(64),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            // Tapped, not swiped: a sideways swipe on this tab is the swipe
+            // to the next tab.
+            child: SegmentedButton<bool>(
+              expandedInsets: EdgeInsets.zero,
+              showSelectedIcon: true,
+              segments: const [
+                ButtonSegment(
+                  value: false,
+                  label: Text('Today'),
+                  icon: Icon(Icons.restaurant),
+                ),
+                ButtonSegment(
+                  value: true,
+                  label: Text('Plan'),
+                  icon: Icon(Icons.event_note),
+                ),
+              ],
+              selected: {_plan},
+              onSelectionChanged: (v) => setState(() => _plan = v.first),
+            ),
           ),
-        ],
-      ),
-      body: async.when(
-        loading: () => const SkeletonPage(),
-        error: (e, _) => AsyncScaffoldBody(
-          loading: false,
-          error: e,
-          child: const SizedBox(),
         ),
-        data: (day) => _Body(day: day, date: today),
       ),
-    );
-  }
-
-  Future<void> _openGroceries(BuildContext context, WidgetRef ref) async {
-    final plan = await ref.read(fuelPlanProvider.future);
-    final today = ref.read(todayProvider);
-    final day = await ref.read(fuelDayProvider(today).future);
-    if (!context.mounted) return;
-
-    // A week of the day he is on: five training days, two rest.
-    final week = [
-      for (var i = 0; i < 7; i++)
-        plan.forDay(
-          weekNo: day.weekNo,
-          isTrainingDay: i < 5,
-          extraKcal: day.extraKcal,
-        ),
-    ];
-
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppTheme.surface,
-      builder: (_) => _GrocerySheet(lines: plan.groceries(week), plan: plan),
+      body: _plan
+          ? const FuelWeekView()
+          : async.when(
+              loading: () => const SkeletonPage(),
+              error: (e, _) => AsyncScaffoldBody(
+                loading: false,
+                error: e,
+                child: const SizedBox(),
+              ),
+              data: (day) => _Body(day: day, date: today),
+            ),
     );
   }
 }
@@ -418,81 +425,6 @@ class _Supplements extends ConsumerWidget {
             ),
           ),
       ],
-    );
-  }
-}
-
-class _GrocerySheet extends StatelessWidget {
-  const _GrocerySheet({required this.lines, required this.plan});
-
-  final List<GroceryLine> lines;
-  final FuelPlan plan;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('A week of this', style: t.titleLarge),
-            Gap.xs,
-            Text(
-              'Five training days and two rest days of the meals currently '
-              'chosen, rounded up to whole packets.',
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-            ),
-            Gap.m,
-            Flexible(
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  for (final l in lines)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(l.food.name, style: t.bodyLarge),
-                          ),
-                          Text(
-                            '${l.packs} x ${l.food.packG} g',
-                            style: t.bodyMedium?.copyWith(
-                              color: AppTheme.textDim,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  Gap.l,
-                  Text('Buying it halal', style: t.titleLarge),
-                  Gap.s,
-                  for (final g in plan.buyingGuide)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(g.title, style: t.titleMedium),
-                          Gap.xs,
-                          Text(
-                            g.body,
-                            style: t.bodyMedium?.copyWith(
-                              color: AppTheme.textDim,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

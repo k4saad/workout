@@ -209,6 +209,272 @@ void main() {
     });
   });
 
+  group('what it costs', () {
+    test(
+      'every food has a price, and every meal costs what its food costs',
+      () {
+        for (final f in plan.foods) {
+          expect(f.priceEurPerKg, greaterThan(0), reason: f.id);
+        }
+        for (final m in plan.meals) {
+          var eur = 0.0;
+          for (final i in m.items) {
+            eur += plan.food(i.foodId)!.priceEurPerKg * i.grams / 1000;
+          }
+          expect(m.costEur, closeTo(eur, 0.011), reason: m.id);
+        }
+      },
+    );
+
+    test('a day costs its meals, plus the phase module', () {
+      final day = plan.forDay(weekNo: 6, isTrainingDay: true, weekday: 1);
+      final meals = day.slots.fold<double>(0, (a, s) => a + s.chosen.costEur);
+      final module = plan.costOf(day.module!.items);
+      expect(module, greaterThan(0));
+      expect(day.costEur, closeTo(meals + module, 0.001));
+    });
+
+    test('cupboard food says how long a packet lasts', () {
+      final week = [
+        for (var wd = 1; wd <= 7; wd++)
+          plan.forDay(weekNo: 1, isTrainingDay: wd <= 5, weekday: wd),
+      ];
+      final lines = plan.groceries(week);
+      final oats = lines.firstWhere((l) => l.food.id == 'haferflocken');
+      expect(oats.food.keeps, isTrue);
+      expect(oats.packLastsWeeks, closeTo(oats.food.packG / oats.grams, 1e-9));
+      final quark = lines.firstWhere((l) => l.food.id == 'magerquark');
+      expect(quark.food.keeps, isFalse, reason: 'bought fresh every week');
+    });
+
+    test('a grocery line costs the whole packets you pay for', () {
+      final lines = plan.groceries([
+        plan.forDay(weekNo: 1, isTrainingDay: true, weekday: 1),
+      ]);
+      for (final l in lines) {
+        expect(
+          l.costEur,
+          closeTo(l.packs * l.food.packG / 1000 * l.food.priceEurPerKg, 0.001),
+        );
+      }
+    });
+  });
+
+  group('the default week', () {
+    List<FuelDay> week({required bool training, int weekNo = 1}) => [
+      for (var wd = 1; wd <= 7; wd++)
+        plan.forDay(weekNo: weekNo, isTrainingDay: training, weekday: wd),
+    ];
+
+    test('covers every weekday', () {
+      for (var wd = 1; wd <= 7; wd++) {
+        expect(plan.rotationFor(wd), isNotNull, reason: 'weekday $wd');
+      }
+    });
+
+    test('each weekday starts from its own meals, not the first option', () {
+      for (var wd = 1; wd <= 7; wd++) {
+        final day = plan.forDay(weekNo: 1, isTrainingDay: true, weekday: wd);
+        final r = plan.rotationFor(wd)!;
+        for (final s in day.slots) {
+          expect(s.chosen.id, r.meals[s.slot.id], reason: '$wd ${s.slot.id}');
+        }
+      }
+      final lunches = {
+        for (final d in week(training: true))
+          d.slots.firstWhere((s) => s.slot.id == 'lunch').chosen.id,
+      };
+      expect(lunches.length, greaterThan(3), reason: 'a week, not one day x7');
+    });
+
+    test('no default day buys two meats, or meat and fish', () {
+      for (final training in [true, false]) {
+        for (final d in week(training: training)) {
+          expect(
+            d.meatOrFish.length,
+            lessThanOrEqualTo(1),
+            reason: 'weekday ${d.weekday}: ${d.meatOrFish}',
+          );
+        }
+      }
+    });
+
+    test('salmon is never a default, and always a swap', () {
+      for (final training in [true, false]) {
+        for (final d in week(training: training)) {
+          for (final s in d.slots) {
+            expect(
+              s.chosen.items.map((i) => i.foodId),
+              isNot(contains('lachs')),
+              reason: 'weekday ${d.weekday} ${s.slot.id}',
+            );
+          }
+        }
+      }
+      final dinner = plan
+          .forDay(weekNo: 1, isTrainingDay: true, weekday: 1)
+          .slots
+          .firstWhere((s) => s.slot.id == 'dinner');
+      expect(
+        dinner.choices.expand((m) => m.items).map((i) => i.foodId),
+        contains('lachs'),
+      );
+    });
+
+    test('every default day lands on its phase', () {
+      for (final training in [true, false]) {
+        for (final weekNo in [1, 6, 11]) {
+          final target = plan.phaseForWeek(weekNo)!;
+          for (final d in week(training: training, weekNo: weekNo)) {
+            expect(
+              d.totals.kcal,
+              closeTo(target.kcal.toDouble(), target.kcal * 0.03),
+              reason: 'week $weekNo weekday ${d.weekday}',
+            );
+            expect(d.totals.proteinG, greaterThanOrEqualTo(target.proteinG));
+          }
+        }
+      }
+    });
+
+    test('fits a student budget, a day and a week', () {
+      final budget = plan.budget!;
+      for (final training in [true, false]) {
+        final days = week(training: training);
+        for (final d in days) {
+          expect(d.costEur, lessThanOrEqualTo(budget.eurPerDay));
+        }
+        final total = days.fold<double>(0, (a, d) => a + d.costEur);
+        expect(total, lessThanOrEqualTo(budget.eurPerWeek));
+      }
+    });
+
+    test('his swap wins over the weekday', () {
+      final day = plan.forDay(
+        weekNo: 1,
+        isTrainingDay: true,
+        weekday: 1,
+        chosen: const {'dinner': 'salmon_potato'},
+      );
+      expect(
+        day.slots.firstWhere((s) => s.slot.id == 'dinner').chosen.id,
+        'salmon_potato',
+      );
+    });
+
+    test('with no weekday, the day still resolves', () {
+      final day = plan.forDay(weekNo: 1, isTrainingDay: true);
+      expect(day.weekday, isNull);
+      for (final s in day.slots) {
+        expect(s.choices, contains(s.chosen));
+      }
+    });
+  });
+
+  test('a week is shopped from its Monday', () {
+    expect(mondayOf(DateTime(2026, 10, 5)), DateTime(2026, 10, 5));
+    expect(mondayOf(DateTime(2026, 10, 11, 21, 30)), DateTime(2026, 10, 5));
+    // Across a month end and the clocks going back (25 October).
+    expect(mondayOf(DateTime(2026, 11, 1)), DateTime(2026, 10, 26));
+  });
+
+  group('prep nights', () {
+    // Monday 5 October 2026.
+    final monday = DateTime(2026, 10, 5);
+    List<FuelDay> weekOf({Map<int, Map<String, String>> swaps = const {}}) => [
+      for (var wd = 1; wd <= 7; wd++)
+        plan.forDay(
+          weekNo: 1,
+          isTrainingDay: wd <= 5,
+          weekday: wd,
+          chosen: swaps[wd] ?? const {},
+        ),
+    ];
+
+    double cooked(PrepNight n, String foodId) =>
+        n.cook.where((c) => c.food.id == foodId).fold(0, (a, c) => a + c.grams);
+
+    test('each night falls before the days it cooks for', () {
+      final nights = plan.prepNights(monday: monday, week: weekOf());
+      expect(nights, isNotEmpty);
+      final keeps = plan.prep!.keepsDays;
+      for (final n in nights) {
+        for (final m in n.meals) {
+          final ahead = m.date.difference(n.cookDate).inDays;
+          expect(ahead, inInclusiveRange(1, keeps), reason: n.session.label);
+        }
+      }
+    });
+
+    test('the first night is the Sunday before the week', () {
+      final first = plan.prepNights(monday: monday, week: weekOf()).first;
+      expect(first.cookDate, DateTime(2026, 10, 4));
+      expect(first.cookDate.weekday, DateTime.sunday);
+    });
+
+    test('it cooks exactly what the batch meals of those days use', () {
+      final week = weekOf();
+      for (final n in plan.prepNights(monday: monday, week: week)) {
+        final expected = <String, double>{};
+        for (final wd in n.session.covers) {
+          for (final s in week[wd - 1].slots) {
+            if (!s.chosen.batch) continue;
+            for (final i in s.chosen.items) {
+              if (!plan.prep!.foods.contains(i.foodId)) continue;
+              expected[i.foodId] = (expected[i.foodId] ?? 0) + i.grams;
+            }
+          }
+        }
+        expect(expected, isNotEmpty);
+        for (final e in expected.entries) {
+          expect(cooked(n, e.key), closeTo(e.value, 0.001), reason: e.key);
+        }
+        expect(n.cook.length, expected.length);
+      }
+    });
+
+    test('it reads in cooking order: the protein first', () {
+      final first = plan.prepNights(monday: monday, week: weekOf()).first;
+      expect(first.cook.first.food.category, 'meat');
+      final cats = first.cook.map((c) => c.food.category).toList();
+      expect(cats.indexOf('grain'), greaterThan(cats.indexOf('legume')));
+    });
+
+    test('a meal swapped away is not cooked for', () {
+      final chickenOnMonday = cooked(
+        plan.prepNights(monday: monday, week: weekOf()).first,
+        'haehnchen_ok',
+      );
+      expect(chickenOnMonday, greaterThan(0));
+      final swapped = plan
+          .prepNights(
+            monday: monday,
+            week: weekOf(
+              swaps: const {
+                1: {'lunch': 'egg_rice'},
+              },
+            ),
+          )
+          .first;
+      expect(cooked(swapped, 'haehnchen_ok'), lessThan(chickenOnMonday));
+      expect(swapped.meals.map((m) => m.meal.id), isNot(contains('egg_rice')));
+    });
+
+    test('a night with nothing to cook is left out', () {
+      final noBatch = {
+        for (var wd = 1; wd <= 7; wd++)
+          wd: {'lunch': 'egg_rice', 'dinner': 'shakshuka'},
+      };
+      expect(
+        plan.prepNights(
+          monday: monday,
+          week: weekOf(swaps: noBatch),
+        ),
+        isEmpty,
+      );
+    });
+  });
+
   group('halal, checked in the app and not only in the generator', () {
     test('nothing on the list is pork, alcohol or unstated gelatine', () {
       const banned = [
