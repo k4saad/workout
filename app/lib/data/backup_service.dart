@@ -218,25 +218,47 @@ class BackupService {
     final docs = await _docs();
     final archive = ZipDecoder().decodeBytes(await zip.readAsBytes());
 
+    // The database first, all or nothing: if it fails, nothing on disk has
+    // been touched either.
+    final data = archive.files.where((f) => f.isFile && f.name == dataEntry);
+    if (data.isNotEmpty) {
+      await _importRows(
+        jsonDecode(utf8.decode(data.first.content as List<int>))
+            as Map<String, dynamic>,
+      );
+    }
+
+    // Then the files — only the ones a backup is made of, and only inside
+    // the app's own folder. A zip names its own paths, and `../` in one
+    // would otherwise write wherever it pointed.
     for (final f in archive.files) {
-      if (!f.isFile) continue;
-      final content = f.content as List<int>;
-
-      if (f.name == manifestEntry) continue;
-
-      if (f.name == dataEntry) {
-        await _importRows(
-          jsonDecode(utf8.decode(content)) as Map<String, dynamic>,
-        );
+      if (!f.isFile || f.name == manifestEntry || f.name == dataEntry) {
         continue;
       }
-
-      final target = File(p.join(docs.path, f.name));
+      final target = _safeTarget(docs, f.name);
+      if (target == null) continue;
       await target.parent.create(recursive: true);
-      await target.writeAsBytes(content, flush: true);
+      await target.writeAsBytes(f.content as List<int>, flush: true);
     }
 
     return manifest;
+  }
+
+  /// Where [entry] may be restored to, or null when it is not part of a
+  /// backup or would land outside [docs].
+  static File? _safeTarget(Directory docs, String entry) {
+    final name = entry.replaceAll(r'\', '/');
+    final known =
+        name == programmeEntry ||
+        name == inventoryEntry ||
+        name == preferencesEntry ||
+        name.startsWith(photosPrefix) ||
+        name.startsWith(clipsPrefix);
+    if (!known || p.isAbsolute(name)) return null;
+    final root = p.normalize(p.absolute(docs.path));
+    final target = p.normalize(p.absolute(p.join(root, name)));
+    if (!p.isWithin(root, target)) return null;
+    return File(target);
   }
 
   /// Every row of every table, keyed by table name.
@@ -256,8 +278,13 @@ class BackupService {
     // a transaction, so it brackets one.
     await db.customStatement('PRAGMA foreign_keys = OFF');
     try {
-      await db.wipe();
+      // The wipe inside the same transaction as the inserts. v3 wiped first
+      // and committed it, so an import that failed part way — a row this
+      // schema cannot hold — left an empty database.
       await db.transaction(() async {
+        for (final t in db.allTables) {
+          await db.delete(t).go();
+        }
         for (final t in db.allTables) {
           final name = t.actualTableName;
           final rows = (dump[name] as List?)?.cast<Map<String, dynamic>>();

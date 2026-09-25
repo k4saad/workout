@@ -178,6 +178,27 @@ void main() {
     expect(await db.select(db.supplementLogs).get(), hasLength(1));
   });
 
+  testWidgets('after the programme ends, the food stays at week twelve', (
+    tester,
+  ) async {
+    // Two weeks past the last day, before a new cycle is built. v3 fell
+    // back to week one's 2,600 kcal: 300 a day gone the week the programme
+    // finished.
+    final programme = await repo.loadProgramme();
+    trainingDay = DateTime(
+      programme.startDate.year,
+      programme.startDate.month,
+      programme.startDate.day + programme.totalWeeks * 7 + 14,
+    );
+    await pump(tester);
+    final target = find.textContaining(RegExp(r'^of \d+$'));
+    expect(target, findsOneWidget);
+    final kcal = int.parse(
+      (tester.widget<Text>(target).data ?? '').replaceFirst('of ', ''),
+    );
+    expect(kcal, greaterThan(2800));
+  });
+
   testWidgets('a rest day swaps the session meals for one afternoon meal', (
     tester,
   ) async {

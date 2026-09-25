@@ -11,6 +11,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../app/editor_providers.dart';
 import '../../app/settings_providers.dart';
 import '../../app/session_providers.dart';
+import '../../app/restart_scope.dart';
 import '../../core/ui/ui.dart';
 import '../../data/backup_service.dart';
 import '../../data/programme_editor_service.dart';
@@ -244,8 +245,32 @@ class _ProgrammeFileScreenState extends ConsumerState<ProgrammeFileScreen> {
     if (!ok) return;
 
     await backup.restore(File(path));
-    ref.read(programmeEditControllerProvider.notifier).refreshAfterRestore();
-    _say('Restored ${manifest.summary}.');
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.surface,
+        title: const Text('Restored'),
+        content: Text(
+          '${manifest.summary}. The app reloads now, so everything on screen '
+          'is what the backup holds.',
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Reload'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    // A cold start's worth of fresh reads. Only the programme was reloaded
+    // before, and preferences held in memory would have been written back
+    // over the restored ones at the next toggle.
+    if (!RestartScope.restart(context)) {
+      ref.read(programmeEditControllerProvider.notifier).refreshAfterRestore();
+      _say('Restored ${manifest.summary}.');
+    }
   });
 
   Future<bool> _confirm({

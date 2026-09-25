@@ -45,8 +45,13 @@ final fuelDayProvider = FutureProvider.family<FuelDay, DateTime>((
 
   return plan.forDay(
     // Before the programme starts, and after it ends, eat like week one and
-    // week twelve respectively rather than seeing nothing.
-    weekNo: (planned.weekNo ?? 1).clamp(1, bundle.programme.totalWeeks),
+    // week twelve respectively rather than seeing nothing. (v3 read a null
+    // week as week one either side, so the day after week twelve dropped
+    // 300 kcal.)
+    weekNo: (planned.weekNo ?? bundle.calendar.weekNumberFor(day)).clamp(
+      1,
+      bundle.programme.totalWeeks,
+    ),
     isTrainingDay: planned.day?.isTrainingDay ?? false,
     extraKcal: await ref.watch(extraKcalProvider(day).future),
     chosen: await ref.watch(chosenMealsProvider(day).future),

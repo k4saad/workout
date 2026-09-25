@@ -80,6 +80,34 @@ void main() {
       ),
   ];
 
+  group('a load of nothing', () {
+    // The load stepper goes down to 0 kg, and a set logged there (an empty
+    // hand, a slip of the thumb) used to divide by zero in the next
+    // suggestion — `step / lastLoad * 100` — and throw as the session opened.
+    test('top of the range at 0 kg suggests a real load, not a crash', () {
+      for (final engine in [fineEngine, coarseEngine]) {
+        final s = engine.suggest(
+          prescription: squat(),
+          history: sets([8, 8, 8, 8], load: 0),
+          now: now,
+        );
+        expect(s.suggestedKg, isNotNull);
+        expect(s.suggestedKg!.isFinite, isTrue);
+        expect(s.reason, isNot(contains('Infinity')));
+        expect(s.reason, isNot(contains('NaN')));
+      }
+    });
+
+    test('falling short at 0 kg repeats, without a crash', () {
+      final s = fineEngine.suggest(
+        prescription: squat(),
+        history: sets([3, 3, 3, 3], load: 0),
+        now: now,
+      );
+      expect(s.reason, isNot(contains('NaN')));
+    });
+  });
+
   group('A-1 — no history at all', () {
     test('suggests the programme start', () {
       final s = fineEngine.suggest(

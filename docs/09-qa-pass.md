@@ -107,6 +107,21 @@ misleading screen · **L** rough edge.
 | Q13 | M | Session runner | A session resumed hours later counted the whole night: the header read "1480 / 45 min" and the runner opened on "Running long — you are 1480 minutes in, cut the last superset". The header row also had no give. | Fixed: over three hours open is an interruption; the budget stops, the header says "picked up again" and wraps. Test |
 | Q14 | L | Today week strip | "2 of 5 done · 3 in a row" ran off the card at a large text size. (Layout robot.) | Fixed |
 
+| Q15 | M | Fuel after the programme | The day after week 12, Fuel fell back to week one: 2,596 kcal instead of ~2,900 — 300 a day gone the week the programme ends, for someone whose problem is eating enough. The code's own comment said "week twelve". (Timeline robot screenshot.) | Fixed, test |
+| Q16 | H | Backup restore | A restore that failed part way (a row the schema cannot hold) left an **empty database**: the wipe was committed before the import's transaction. Files could be written before the data had imported; and a zip entry like `../x` was written outside the app's folder. The "newer schema refuses" test never called restore. | Fixed: data first, wipe and inserts in one transaction, then only a backup's own entries, each checked to stay inside. Tests |
+| Q17 | M | After a restore | Only the programme was reloaded. Preferences held in memory would be written back over the restored ones at the next toggle; the equipment, Fuel, stats and run lists showed pre-restore data until a cold start. | Fixed: the app restarts in place (`RestartScope`: new provider container, database reopened). Test |
+
+Checked and sound: a 0 kg set does not break the next suggestion (tests
+kept), pace with no distance, calendar moves (live streams), the plate and
+chart divisions.
+
+**Timeline robot (J1, J12):** 13 screens at six moments — the day before,
+day 1, deload, test week, the last day, after the end — with seeded history:
+0 framework errors; screenshots read for sense (found Q15).
+
+**Back robot (J15):** back from 15 drill-downs lands on the parent, in the
+same tab, never on "Close the app?": 15/15.
+
 **Layout robot (J14):** 22 screens × {360×640, 360×640 at 1.3×, 412×915 at
 2.0×}, real fonts, every list swept to the end. First run: 4 overflows in 2
 places (Q11, Q14). After the fixes: **0 issues in 66 renders**.

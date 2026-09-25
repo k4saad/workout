@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:archive/archive.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:keller_twelve/data/backup_service.dart';
@@ -231,7 +232,114 @@ void main() {
     await expectLater(() => backup.restore(stripped), throwsA(anything));
   });
 
+  /// [zip] rewritten: [edit] may change the manifest and data, and
+  /// [extra] adds entries.
+  Future<File> tampered(
+    File zip, {
+    void Function(Map<String, dynamic> manifest, Map<String, dynamic> data)?
+    edit,
+    Map<String, List<int>> extra = const {},
+  }) async {
+    final src = ZipDecoder().decodeBytes(await zip.readAsBytes());
+    Map<String, dynamic> read(String name) => jsonDecode(
+      utf8.decode(
+        src.files.firstWhere((f) => f.name == name).content as List<int>,
+      ),
+    ) as Map<String, dynamic>;
+    final manifest = read(BackupService.manifestEntry);
+    final data = read(BackupService.dataEntry);
+    edit?.call(manifest, data);
+    final out = Archive();
+    for (final f in src.files) {
+      if (!f.isFile) continue;
+      final bytes = switch (f.name) {
+        BackupService.manifestEntry => utf8.encode(jsonEncode(manifest)),
+        BackupService.dataEntry => utf8.encode(jsonEncode(data)),
+        _ => f.content as List<int>,
+      };
+      out.addFile(ArchiveFile.bytes(f.name, Uint8List.fromList(bytes)));
+    }
+    extra.forEach(
+      (name, bytes) =>
+          out.addFile(ArchiveFile.bytes(name, Uint8List.fromList(bytes))),
+    );
+    final file = File(p.join(docs.path, 'tampered.zip'));
+    await file.writeAsBytes(ZipEncoder().encode(out), flush: true);
+    return file;
+  }
+
+  test('a restore that fails half way leaves everything as it was', () async {
+    await seed();
+    final zip = File(p.join(docs.path, 'backup.zip'));
+    await backup.export(zip);
+    // A row this schema cannot hold: the import fails part way through.
+    final bad = await tampered(
+      zip,
+      edit: (_, data) => (data['set_logs'] as List).add({
+        ...(data['set_logs'] as List).first as Map<String, dynamic>,
+        'id': 999,
+        'no_such_column': 1,
+      }),
+    );
+    File(p.join(docs.path, 'programmes', 'programme.json'))
+        .writeAsStringSync(jsonEncode({'id': 'keller-twelve', 'revision': 8}));
+
+    await expectLater(() => backup.restore(bad), throwsA(anything));
+
+    // v3 wiped first, outside the import's transaction: a failure here left
+    // an EMPTY database.
+    expect(await db.select(db.setLogs).get(), hasLength(4));
+    expect(await db.select(db.bodyweights).get(), hasLength(1));
+    // Nor were the files overwritten by a restore that did not happen.
+    expect(
+      File(p.join(docs.path, 'programmes', 'programme.json'))
+          .readAsStringSync(),
+      contains('"revision":8'),
+    );
+  });
+
+  test('a restore only writes inside the app\'s own folders', () async {
+    await seed();
+    final zip = File(p.join(docs.path, 'backup.zip'));
+    await backup.export(zip);
+    final outside = p.join(docs.parent.path, 'kt-escaped.txt');
+    addTearDown(() {
+      final f = File(outside);
+      if (f.existsSync()) f.deleteSync();
+    });
+    final evil = await tampered(
+      zip,
+      extra: {
+        '../kt-escaped.txt': utf8.encode('out of the sandbox'),
+        'photos/../../kt-escaped.txt': utf8.encode('out again'),
+        'somewhere/else.bin': [1, 2, 3],
+      },
+    );
+
+    await backup.restore(evil);
+    expect(File(outside).existsSync(), isFalse);
+    expect(
+      File(p.join(docs.path, 'somewhere', 'else.bin')).existsSync(),
+      isFalse,
+      reason: 'only the entries a backup is made of',
+    );
+    // The real contents still came back.
+    expect(await db.select(db.setLogs).get(), hasLength(4));
+  });
+
   test('a backup from a newer schema refuses to restore', () async {
+    await seed();
+    final zip = File(p.join(docs.path, 'backup.zip'));
+    await backup.export(zip);
+    final future = await tampered(
+      zip,
+      edit: (m, _) => m['schemaVersion'] = db.schemaVersion + 5,
+    );
+    await expectLater(() => backup.restore(future), throwsStateError);
+    expect(await db.select(db.setLogs).get(), hasLength(4));
+  });
+
+  test('the manifest of a newer schema says so', () async {
     await seed();
     final zip = File(p.join(docs.path, 'future.zip'));
     await backup.export(zip);
