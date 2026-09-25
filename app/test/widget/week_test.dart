@@ -121,14 +121,14 @@ void main() {
     expect(find.textContaining('missed'), findsNothing);
   });
 
-  testWidgets('a swipe changes the week and This week comes back', (
+  testWidgets('a swipe on the header changes the week; This week comes back', (
     tester,
   ) async {
     await draw(tester, day(3, 2));
     expect(find.textContaining('Week 3 of 12'), findsOneWidget);
     expect(find.text('This week'), findsNothing);
 
-    await tester.drag(find.byType(PageView), const Offset(-300, 0));
+    await tester.drag(find.text('Week 3 of 12'), const Offset(-300, 0));
     await _settle(tester);
     expect(find.textContaining('Week 4 of 12'), findsOneWidget);
 
@@ -136,6 +136,13 @@ void main() {
     await _settle(tester);
     expect(find.textContaining('Week 3 of 12'), findsOneWidget);
     expect(find.text('This week'), findsNothing);
+  });
+
+  testWidgets('a swipe on the days is left for the tabs', (tester) async {
+    await draw(tester, day(3, 2));
+    await tester.drag(find.byType(PageView), const Offset(-300, 0));
+    await _settle(tester);
+    expect(find.textContaining('Week 3 of 12'), findsOneWidget);
   });
 
   testWidgets('a checkpoint week lists what it asks for', (tester) async {

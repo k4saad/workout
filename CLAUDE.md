@@ -99,6 +99,10 @@ Follow the phases in order; do not skip ahead.
   Drill-downs navigate to a NESTED route so the stack builds and back walks up
   it. `context.go` to a sibling top-level route REPLACES the stack — that is
   what made back quit the app, and it must not come back.
+- **A sideways swipe on a tab's root screen moves between tabs**
+  (`SwipeBranchContainer`). Drill-downs keep their own sideways gestures,
+  and nothing on a tab root may page sideways itself (the Week tab changes
+  week by arrows and a header swipe for this reason).
 - The session runner, the photo capture screen and the live run tracker are
   **outside the shell**, full screen. Mid-set, a tab bar is four ways to lose
   your place. Enter them with `context.push`, leave with `pop`, and give each

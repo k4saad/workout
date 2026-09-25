@@ -117,73 +117,117 @@ class AppShell extends StatelessWidget {
   }
 }
 
-/// Holds every tab's navigator alive and fades the incoming one in.
+/// Every tab's navigator, side by side: swipe sideways on a tab's own
+/// screen for the next tab, tap the bar to jump.
 ///
-/// The structure around each child NEVER changes with the index — only the
-/// values fed to it — so switching tabs cannot rebuild a tab's navigator and
-/// lose its place. Inactive tabs are Offstage (and their tickers paused), so
-/// they cost nothing and finders in tests do not see them.
-class FadeBranchContainer extends StatefulWidget {
-  const FadeBranchContainer({
+/// A swipe follows the finger — the neighbouring tab slides in under it —
+/// and commits past half way, exactly like the bar would. It only works on a
+/// tab's ROOT screen: a drill-down (a lift, a run, the library) keeps its
+/// sideways gestures for itself, and back walks its stack as before.
+/// Anything inside a tab that drags sideways itself — the photo wipe, a
+/// slider, a horizontal list — wins the gesture, because the innermost
+/// recognizer claims it first.
+///
+/// go_router hands each branch in a keep-alive proxy, so a tab scrolled out
+/// of view keeps its navigator and its place. Only the tabs on screen tick;
+/// the rest are paused. Finders in tests do not see a tab that is out of
+/// view, as with the old stacked container.
+class SwipeBranchContainer extends StatefulWidget {
+  const SwipeBranchContainer({
     super.key,
-    required this.currentIndex,
+    required this.shell,
     required this.children,
   });
 
-  final int currentIndex;
+  final StatefulNavigationShell shell;
   final List<Widget> children;
 
   @override
-  State<FadeBranchContainer> createState() => _FadeBranchContainerState();
+  State<SwipeBranchContainer> createState() => _SwipeBranchContainerState();
 }
 
-class _FadeBranchContainerState extends State<FadeBranchContainer>
+class _SwipeBranchContainerState extends State<SwipeBranchContainer>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
+  late final PageController _pages = PageController(
+    initialPage: widget.shell.currentIndex,
+  )..addListener(_track);
+
+  /// A tap on the bar cuts, then fades the tab in, as it always has; a swipe
+  /// needs no fade — the tab is already there.
+  late final AnimationController _fade = AnimationController(
     vsync: this,
     duration: AppMotion.medium,
     value: 1,
   );
-  late final Animation<double> _fade = CurvedAnimation(
-    parent: _c,
+  late final Animation<double> _opacity = CurvedAnimation(
+    parent: _fade,
     curve: AppMotion.curve,
   );
 
+  /// The tabs with any part on screen: the only ones whose tickers run.
+  late Set<int> _onScreen = {widget.shell.currentIndex};
+
+  int get _index => widget.shell.currentIndex;
+
+  /// On a tab's root screen, not somewhere drilled into it.
+  bool get _atRoot {
+    final root = widget.shell.route.branches[_index].defaultRoute?.path;
+    final here = widget.shell.shellRouteContext.routerState.uri.path;
+    return root == null || here == root;
+  }
+
+  void _track() {
+    final page = _pages.page;
+    if (page == null) return;
+    final now = {page.floor(), page.ceil()};
+    if (now.length != _onScreen.length || !now.containsAll(_onScreen)) {
+      setState(() => _onScreen = now);
+    }
+  }
+
   @override
-  void didUpdateWidget(FadeBranchContainer old) {
+  void didUpdateWidget(SwipeBranchContainer old) {
     super.didUpdateWidget(old);
-    if (old.currentIndex != widget.currentIndex) {
-      if (AppMotion.reduced(context)) {
-        _c.value = 1;
-      } else {
-        _c.forward(from: 0);
-      }
+    if (!_pages.hasClients) return;
+    final shown = (_pages.page ?? _index.toDouble()).round();
+    if (shown == _index) return; // a swipe: already there
+    // The bar was tapped. Jump, and fade the tab in. (On-screen first, so
+    // the jump's own page listener finds nothing to rebuild.)
+    _onScreen = {_index};
+    _pages.jumpToPage(_index);
+    if (AppMotion.reduced(context)) {
+      _fade.value = 1;
+    } else {
+      _fade.forward(from: 0);
     }
   }
 
   @override
   void dispose() {
-    _c.dispose();
+    _pages
+      ..removeListener(_track)
+      ..dispose();
+    _fade.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => Stack(
-    fit: StackFit.expand,
-    children: [
-      for (var i = 0; i < widget.children.length; i++)
-        Offstage(
-          offstage: i != widget.currentIndex,
-          child: TickerMode(
-            enabled: i == widget.currentIndex,
-            child: FadeTransition(
-              opacity: i == widget.currentIndex
-                  ? _fade
-                  : kAlwaysCompleteAnimation,
-              child: widget.children[i],
-            ),
-          ),
-        ),
-    ],
+  Widget build(BuildContext context) => FadeTransition(
+    opacity: _opacity,
+    child: PageView(
+      controller: _pages,
+      physics: _atRoot
+          ? const PageScrollPhysics()
+          : const NeverScrollableScrollPhysics(),
+      onPageChanged: (i) {
+        if (i == _index) return;
+        HapticFeedback.selectionClick();
+        widget.shell.goBranch(i);
+      },
+      children: [
+        for (var i = 0; i < widget.children.length; i++)
+          TickerMode(enabled: _onScreen.contains(i), child: widget.children[i]),
+      ],
+    ),
   );
 }

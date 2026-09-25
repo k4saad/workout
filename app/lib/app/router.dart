@@ -53,13 +53,13 @@ GoRouter buildRouter() {
     routes: [
       StatefulShellRoute(
         builder: (_, _, shell) => AppShell(shell: shell),
-        navigatorContainerBuilder: (_, shell, children) => FadeBranchContainer(
-          currentIndex: shell.currentIndex,
-          children: children,
-        ),
+        navigatorContainerBuilder: (_, shell, children) =>
+            SwipeBranchContainer(shell: shell, children: children),
         branches: [
           // ---- 1. Today ----------------------------------------------------
           StatefulShellBranch(
+            // Built ahead, so a swipe slides in a tab, not a blank.
+            preload: true,
             routes: [
               GoRoute(
                 path: '/',
@@ -76,6 +76,7 @@ GoRouter buildRouter() {
 
           // ---- 2. Week -----------------------------------------------------
           StatefulShellBranch(
+            preload: true,
             routes: [
               GoRoute(
                 path: '/week',
@@ -99,6 +100,7 @@ GoRouter buildRouter() {
 
           // ---- 3. Fuel -----------------------------------------------------
           StatefulShellBranch(
+            preload: true,
             routes: [
               GoRoute(path: '/fuel', builder: (_, _) => const FuelScreen()),
             ],
@@ -106,6 +108,7 @@ GoRouter buildRouter() {
 
           // ---- 4. Progress -------------------------------------------------
           StatefulShellBranch(
+            preload: true,
             routes: [
               GoRoute(
                 path: '/progress',
@@ -156,6 +159,7 @@ GoRouter buildRouter() {
 
           // ---- 5. More -----------------------------------------------------
           StatefulShellBranch(
+            preload: true,
             routes: [
               GoRoute(
                 path: '/more',

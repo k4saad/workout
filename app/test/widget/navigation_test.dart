@@ -117,6 +117,60 @@ void main() {
     }
   });
 
+  int selectedTab(WidgetTester tester) =>
+      tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex;
+
+  /// A sideways fling across the top of the screen in front of you.
+  Future<void> swipe(WidgetTester tester, String title, double dx) async {
+    await tester.flingFrom(
+      tester.getCenter(find.widgetWithText(AppBar, title)),
+      Offset(dx, 0),
+      1500,
+    );
+    // The slide home starts on the next frame; then give it a second.
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await settle(tester);
+  }
+
+  testWidgets('a sideways swipe moves between the tabs, both ways', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    expect(selectedTab(tester), 0);
+
+    await swipe(tester, 'The Keller Twelve', -300);
+    expect(selectedTab(tester), 1);
+    expect(find.widgetWithText(AppBar, 'Week'), findsOneWidget);
+
+    await swipe(tester, 'Week', -300);
+    expect(selectedTab(tester), 2);
+    expect(find.widgetWithText(AppBar, 'Fuel'), findsOneWidget);
+
+    await swipe(tester, 'Fuel', 300);
+    expect(selectedTab(tester), 1);
+    expect(find.widgetWithText(AppBar, 'Week'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Fuel'), findsNothing);
+  });
+
+  testWidgets('a drilled-in screen keeps its sideways gestures', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await tapTab(tester, 'More');
+    await tester.tap(find.text('Exercises'));
+    await settle(tester);
+
+    await swipe(tester, 'Exercises', 300);
+    expect(selectedTab(tester), 4);
+    expect(find.widgetWithText(AppBar, 'Exercises'), findsOneWidget);
+
+    // Back at the root, the swipe is the tabs' again.
+    await pressBack(tester);
+    await swipe(tester, 'More', 300);
+    expect(selectedTab(tester), 3);
+  });
+
   testWidgets('back from a drilled-in screen returns, it does not quit', (
     tester,
   ) async {

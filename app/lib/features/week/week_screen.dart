@@ -17,7 +17,11 @@ import '../common/widgets.dart';
 import '../progress/checkpoint_checklist.dart';
 
 /// The programme a week at a time: what is on, what got done, and what
-/// is still to come. Swipe for the next week.
+/// is still to come.
+///
+/// The arrows, or a swipe along the week's header, change the week. A swipe
+/// anywhere else on the page is the swipe to the next tab — one gesture, one
+/// meaning — so the pages here only move when they are told to.
 class WeekScreen extends ConsumerStatefulWidget {
   const WeekScreen({super.key});
 
@@ -96,6 +100,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
           void go(int w) => select.select(w == current ? null : w);
           return PageView.builder(
             controller: pages,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: total,
             onPageChanged: (p) {
               if (!_driving) go(p + 1);
@@ -228,6 +233,26 @@ class _WeekBar extends StatelessWidget {
     final span =
         '${DateFormat('d MMM').format(first)} – '
         '${DateFormat('d MMM').format(last)}';
+    var dx = 0.0;
+    // Swiped along the header: this drag is claimed here, before the tab
+    // swipe underneath can take it.
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onHorizontalDragStart: (_) => dx = 0,
+      onHorizontalDragUpdate: (d) => dx += d.delta.dx,
+      onHorizontalDragEnd: (d) {
+        final v = d.primaryVelocity ?? 0;
+        if (dx < -48 || v < -400) {
+          onNext?.call();
+        } else if (dx > 48 || v > 400) {
+          onPrev?.call();
+        }
+      },
+      child: _row(t, span),
+    );
+  }
+
+  Widget _row(TextTheme t, String span) {
     return Row(
       children: [
         IconButton(
