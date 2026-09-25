@@ -149,58 +149,103 @@ class _RunTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Theme.of(context).textTheme;
     final track = ref.watch(runTrackProvider(run.id)).asData?.value;
+    final library = ref.watch(libraryProvider).asData?.value;
+    final started = DateTime.fromMillisecondsSinceEpoch(run.startedAtMs);
     final pace = run.distanceM < 10 || run.movingMs <= 0
         ? null
         : (run.movingMs / 1000) / (run.distanceM / 1000);
+    final kind = run.exerciseId == null
+        ? 'Free run'
+        : library?.resolve(run.exerciseId!).name ?? 'Programme run';
+
+    Widget figure(String label, String value, [String? unit]) => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: AppTheme.overline.copyWith(fontSize: 10.5),
+        ),
+        const SizedBox(height: 2),
+        // Shrinks rather than overflows: "12:05 /km" at a large text size
+        // in a third of a small phone.
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: AlignmentDirectional.centerStart,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(value, style: AppTheme.numeric(22)),
+              if (unit != null) ...[
+                const SizedBox(width: 3),
+                Text(
+                  unit,
+                  style: t.labelMedium!.copyWith(color: AppTheme.textDim),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+
     return AppCard(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.zero,
       onTap: () => context.go('/progress/runs/${run.id}'),
       semanticLabel:
-          'Run on ${DateFormat('d MMMM').format(run.runOn)}, '
+          '${runTitle(started)} on ${DateFormat('d MMMM').format(run.runOn)}, '
           '${formatKm(run.distanceM)} kilometres',
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(runTitle(started), style: t.titleMedium),
+                      Text(
+                        '${DateFormat('EEE d MMM · HH:mm').format(started)}'
+                        ' · $kind',
+                        style: t.bodySmall!.copyWith(color: AppTheme.textDim),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: AppTheme.textFaint),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: figure('Distance', formatKm(run.distanceM), 'km'),
+                ),
+                Expanded(child: figure('Pace', formatPace(pace), '/km')),
+                Expanded(child: figure('Time', formatClock(run.movingMs))),
+              ],
+            ),
+          ),
           Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceHigh,
-              borderRadius: BorderRadius.circular(AppRadius.s),
+            height: 150,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF121216), Color(0xFF0C0C0F)],
+              ),
+              border: Border(top: BorderSide(color: AppTheme.outlineSoft)),
             ),
             child: track == null
                 ? null
                 : CustomPaint(painter: TrailThumbPainter(track.segments)),
           ),
-          Gap.m,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  DateFormat('EEE d MMM').format(run.runOn),
-                  style: t.bodySmall!.copyWith(color: AppTheme.textDim),
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(formatKm(run.distanceM), style: AppTheme.numeric(26)),
-                    const SizedBox(width: 3),
-                    Text(
-                      'km',
-                      style: t.labelLarge!.copyWith(color: AppTheme.textDim),
-                    ),
-                  ],
-                ),
-                Text(
-                  '${formatClock(run.movingMs)} · ${formatPace(pace)} /km'
-                  '${run.exerciseId == null ? '' : ' · programme'}',
-                  style: t.bodySmall!.copyWith(color: AppTheme.textDim),
-                ),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right, color: AppTheme.textFaint),
         ],
       ),
     );
@@ -300,17 +345,25 @@ class TrailThumbPainter extends CustomPainter {
     final k = math.cos((minLat + maxLat) / 2 * math.pi / 180);
     final w = math.max(1e-9, (maxLng - minLng) * k);
     final h = math.max(1e-9, maxLat - minLat);
-    const pad = 8.0;
+    final pad = size.height > 100 ? 18.0 : 8.0;
     final s = math.min((size.width - pad * 2) / w, (size.height - pad * 2) / h);
     final ox = (size.width - w * s) / 2;
     final oy = (size.height - h * s) / 2;
     Offset o(RunFix p) =>
         Offset(ox + (p.lng - minLng) * k * s, oy + (maxLat - p.lat) * s);
 
-    final paint = Paint()
+    // The same trail as on the map: a soft glow, then the line.
+    final glow = Paint()
+      ..color = AppTheme.crimson.withValues(alpha: 0.35)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size.height > 100 ? 9 : 5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
+    final line = Paint()
       ..color = AppTheme.crimson
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
+      ..strokeWidth = size.height > 100 ? 3.5 : 2
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
     for (final seg in segments) {
@@ -319,9 +372,12 @@ class TrailThumbPainter extends CustomPainter {
       for (final p in seg.skip(1)) {
         path.lineTo(o(p).dx, o(p).dy);
       }
-      canvas.drawPath(path, paint);
+      canvas
+        ..drawPath(path, glow)
+        ..drawPath(path, line);
     }
-    canvas.drawCircle(o(pts.first), 3, Paint()..color = AppTheme.text);
+    canvas.drawCircle(o(pts.first), 4, Paint()..color = AppTheme.text);
+    canvas.drawCircle(o(pts.last), 4, Paint()..color = AppTheme.crimsonBright);
   }
 
   @override

@@ -132,7 +132,18 @@ void main() {
 
     router.go('/progress/runs/$id');
     await Screenshot.settle(tester, rounds: 24);
+    await tester.pump(const Duration(seconds: 2)); // the route draws in
+    await Screenshot.settle(tester);
     await Screenshot.capture(tester, 'run_detail');
+
+    await tester.tap(find.byTooltip('Colour the route by pace'));
+    await Screenshot.settle(tester);
+    await Screenshot.capture(tester, 'run_detail_pace');
+
+    await tester.tap(find.byTooltip('Replay'));
+    await tester.pump(const Duration(seconds: 5));
+    await Screenshot.settle(tester);
+    await Screenshot.capture(tester, 'run_replay');
   });
 
   testWidgets('the run, live', skip: !_enabled, (tester) async {

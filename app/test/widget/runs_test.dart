@@ -133,13 +133,10 @@ void main() {
   ) async {
     final results = await pumpLive(tester);
     expect(find.text('Waiting for GPS'), findsOneWidget);
-    final start = tester.widget<ButtonStyleButton>(
-      find.ancestor(
-        of: find.text('Start'),
-        matching: find.byWidgetPredicate((w) => w is ButtonStyleButton),
-      ),
+    final start = tester.widget<InkWell>(
+      find.ancestor(of: find.text('Start'), matching: find.byType(InkWell)),
     );
-    expect(start.onPressed, isNotNull, reason: 'Start never waits for a fix');
+    expect(start.onTap, isNotNull, reason: 'Start never waits for a fix');
 
     gps.controller.add(fix(0, 0));
     await settle(tester);
@@ -172,6 +169,10 @@ void main() {
     expect(saved.distanceM, closeTo(360, 6));
     expect(gps.listening, isFalse, reason: 'the GPS goes off at the end');
 
+    // The "hold the button" hint from the earlier tap covers the bottom of
+    // the screen until it goes.
+    await tester.pump(const Duration(seconds: 5));
+    await settle(tester);
     await tester.ensureVisible(find.text('4'));
     await tester.tap(find.text('4'));
     await settle(tester);

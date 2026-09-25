@@ -243,6 +243,7 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
                 child: RunMap(
                   segments: s.segments,
                   position: s.position,
+                  accuracyM: s.accuracyM,
                   follow: _follow,
                 ),
               ),
@@ -339,15 +340,7 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
         final waitedLong = locatingFor > const Duration(seconds: 20);
         return Column(
           children: [
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: _busy ? null : _start,
-                style: FilledButton.styleFrom(minimumSize: tall),
-                icon: const Icon(Icons.directions_run_rounded),
-                label: const Text('Start'),
-              ),
-            ),
+            _StartButton(onTap: _busy ? null : _start),
             if (!ready)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
@@ -897,4 +890,60 @@ class _HoldToFinishState extends State<HoldToFinish>
       ),
     );
   }
+}
+
+/// The big round Start, the one thing to press.
+class _StartButton extends StatelessWidget {
+  const _StartButton({required this.onTap});
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Semantics(
+      button: true,
+      label: 'Start the run',
+      child: Material(
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
+        elevation: 0,
+        child: Ink(
+          width: 104,
+          height: 104,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: AppTheme.crimsonGradient,
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.crimson.withValues(alpha: 0.45),
+                blurRadius: 24,
+                spreadRadius: -4,
+              ),
+            ],
+          ),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onTap,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.directions_run_rounded,
+                  color: Colors.white,
+                  size: 30,
+                ),
+                Text(
+                  'Start',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }

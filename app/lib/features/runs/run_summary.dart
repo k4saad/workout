@@ -6,7 +6,22 @@ import 'package:intl/intl.dart' show DateFormat;
 import '../../core/ui/ui.dart';
 import '../../data/db/database.dart';
 import '../../domain/run/run.dart';
-import 'run_map.dart';
+import 'route_hero.dart';
+
+/// A run's name, the way a running app names it: by the time of day.
+String runTitle(DateTime started) {
+  final h = started.hour;
+  final part = h < 5
+      ? 'Night'
+      : h < 12
+      ? 'Morning'
+      : h < 17
+      ? 'Afternoon'
+      : h < 21
+      ? 'Evening'
+      : 'Night';
+  return '$part run';
+}
 
 /// A finished run, read back: where it went, how far, how fast, and how it
 /// felt. Shared by the end of the live screen and the run's own page.
@@ -34,9 +49,7 @@ class RunSummaryView extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     final started = DateTime.fromMillisecondsSinceEpoch(run.startedAtMs);
-    final segments = [
-      for (final s in track.segments) [for (final f in s) f.point],
-    ];
+    final hasTrail = track.segments.any((s) => s.length > 1);
     final pace = run.distanceM < 10 || run.movingMs <= 0
         ? null
         : (run.movingMs / 1000) / (run.distanceM / 1000);
@@ -44,6 +57,7 @@ class RunSummaryView extends StatelessWidget {
     return ListView(
       padding: Gap.pagePadding,
       children: [
+        Text(runTitle(started), style: t.headlineSmall),
         Text(
           DateFormat('EEEE d MMMM · HH:mm').format(started),
           style: t.bodyMedium!.copyWith(color: AppTheme.textDim),
@@ -61,15 +75,13 @@ class RunSummaryView extends StatelessWidget {
           ),
         ],
         Gap.m,
-        ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadius.l),
-          child: SizedBox(
-            height: 230,
-            child: segments.every((s) => s.isEmpty)
-                ? const _NoTrail()
-                : RunMap(segments: segments, showFinish: true),
+        if (hasTrail)
+          RouteHero(track: track)
+        else
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.l),
+            child: const SizedBox(height: 180, child: _NoTrail()),
           ),
-        ),
         Gap.m,
         AppCard(
           child: Column(
