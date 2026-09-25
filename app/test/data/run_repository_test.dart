@@ -140,6 +140,18 @@ void main() {
       expect(run.sessionId, sid);
     });
 
+    test(
+      'an open run with no trail is tidied; one with a trail is kept',
+      () async {
+        final empty = await repo.start();
+        final real = await repo.start();
+        await repo.addPoint(real, fix(0, 0), segmentStart: true);
+        expect(await repo.tidyEmptyRuns(), 1);
+        expect(await repo.byId(empty), isNull);
+        expect((await repo.active())?.id, real);
+      },
+    );
+
     test('discarding removes the run and every point', () async {
       final id = await repo.start();
       await repo.addPoint(id, fix(0, 0), segmentStart: true);
@@ -211,14 +223,93 @@ void main() {
       await tracker.settled();
     }
 
-    test('waits for a usable fix before it is ready', () async {
+    test('a fair fix is enough to be ready; a vague one is not', () async {
       await tracker.prepare();
       expect(tracker.snapshot.status, TrackerStatus.locating);
       await send(fix(0, 0, accuracy: 80));
       expect(tracker.snapshot.status, TrackerStatus.locating);
-      await send(fix(1, 0, accuracy: 8));
-      expect(tracker.snapshot.status, TrackerStatus.ready);
-      expect(tracker.snapshot.accuracyM, 8);
+      await send(fix(1, 0, accuracy: 28));
+      expect(
+        tracker.snapshot.status,
+        TrackerStatus.ready,
+        reason: '±28 m is a normal first fix on a phone',
+      );
+      expect(tracker.snapshot.accuracyM, 28);
+    });
+
+    test('approximate location is named, not left to spin', () async {
+      gps.access = LocationAccess.approximate;
+      await tracker.prepare();
+      expect(tracker.snapshot.status, TrackerStatus.approximate);
+    });
+
+    test(
+      'Start works before any usable fix; the trail waits for one',
+      () async {
+        await tracker.prepare();
+        await send(fix(0, 0, accuracy: 90));
+        clockMs = fix(0, 0).tMs;
+        await tracker.start();
+        expect(tracker.snapshot.status, TrackerStatus.recording);
+        await send(fix(1, 0, accuracy: 90));
+        final id = tracker.snapshot.runId!;
+        expect(await repo.points(id), isEmpty, reason: 'too vague to draw');
+        clockMs = fix(20, 0).tMs;
+        await send(fix(20, 0, accuracy: 18));
+        expect(await repo.points(id), hasLength(1));
+        expect(tracker.snapshot.elapsedMs, 20000, reason: 'the clock ran');
+      },
+    );
+
+    test(
+      'a vague but usable fix still draws; a hopeless one does not',
+      () async {
+        await tracker.prepare();
+        await tracker.start();
+        final id = tracker.snapshot.runId!;
+        for (var s = 0; s < 10; s++) {
+          clockMs = fix(s, 0).tMs;
+          await send(fix(s, s * 3.0, accuracy: 35));
+        }
+        await send(fix(10, 30, accuracy: 60));
+        expect(await repo.points(id), hasLength(10));
+      },
+    );
+
+    test('the notification runs only while recording', () async {
+      await tracker.prepare();
+      expect(gps.recordingListeners, 0, reason: 'looking is not recording');
+      expect(gps.plainListeners, 1);
+      await tracker.start();
+      expect(gps.recordingListeners, 1);
+      expect(gps.plainListeners, 0);
+      await send(fix(0, 0));
+      await tracker.finish();
+      expect(gps.recordingListeners + gps.plainListeners, 0);
+    });
+
+    test(
+      'the last known position shows at once, and counts for nothing',
+      () async {
+        gps.last = fix(0, 0, accuracy: 15);
+        await tracker.prepare();
+        expect(tracker.snapshot.position, isNotNull);
+        expect(
+          tracker.snapshot.status,
+          TrackerStatus.locating,
+          reason: 'an old position is not a fix to start on',
+        );
+      },
+    );
+
+    test('leaving before anything was recorded leaves no open run', () async {
+      await tracker.prepare();
+      await tracker.start();
+      final id = tracker.snapshot.runId!;
+      tracker.dispose();
+      await tracker.closed;
+      expect(await repo.byId(id), isNull);
+      expect(await repo.active(), isNull);
     });
 
     test('says so when location is refused', () async {
@@ -315,26 +406,35 @@ void main() {
 
 class _FakeLocation implements LocationSource {
   LocationAccess access = LocationAccess.granted;
+  RunFix? last;
   final controller = StreamController<RunFix>.broadcast(sync: true);
-  int _listeners = 0;
+  int plainListeners = 0;
+  int recordingListeners = 0;
 
-  bool get listening => _listeners > 0;
+  bool get listening => plainListeners + recordingListeners > 0;
 
   @override
   Future<LocationAccess> ensureAccess() async => access;
 
   @override
-  Stream<RunFix> watch() {
+  Future<RunFix?> lastKnown() async => last;
+
+  @override
+  Stream<RunFix> watch({bool recording = false}) {
     late StreamController<RunFix> out;
     StreamSubscription<RunFix>? sub;
     out = StreamController<RunFix>(
       sync: true,
       onListen: () {
-        _listeners++;
+        recording ? recordingListeners++ : plainListeners++;
         sub = controller.stream.listen(out.add);
       },
       onCancel: () async {
-        _listeners = math.max(0, _listeners - 1);
+        if (recording) {
+          recordingListeners = math.max(0, recordingListeners - 1);
+        } else {
+          plainListeners = math.max(0, plainListeners - 1);
+        }
         await sub?.cancel();
       },
     );

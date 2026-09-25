@@ -19,10 +19,12 @@ enum FixVerdict {
 /// Conservative on purpose: a dropped fix costs a metre of trail, a bad one
 /// costs a 400 m spike and a pace nobody can run.
 class FixFilter {
-  FixFilter({this.maxAccuracyM = 25, this.maxSpeedMps = 9});
+  FixFilter({this.maxAccuracyM = 40, this.maxSpeedMps = 9});
 
-  /// Anything vaguer is dropped. 25 m is about a street's width with both
-  /// pavements.
+  /// Anything vaguer is dropped. 40 m, not tighter: distance is counted in
+  /// steps of at least half the accuracy (RunTrack), so a vague fix adds
+  /// trail but not metres, while dropping it leaves a straight-line gap. At
+  /// 25 m a phone in a street of tall houses dropped half its fixes.
   final double maxAccuracyM;
 
   /// Faster than a sprinter, far faster than an easy run: 32 km/h.

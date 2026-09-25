@@ -43,9 +43,13 @@ final paceBandProvider = FutureProvider.family<PaceBand?, String?>(
 );
 
 /// A run left open when the app was closed or killed.
-final openRunProvider = FutureProvider<Run?>(
-  (ref) => ref.watch(runRepositoryProvider).active(),
-);
+final openRunProvider = FutureProvider<Run?>((ref) async {
+  final repo = ref.watch(runRepositoryProvider);
+  // A Start that never got a fix, left behind when the app was killed, is
+  // not a run to offer back.
+  await repo.tidyEmptyRuns(olderThan: const Duration(minutes: 10));
+  return repo.active();
+});
 
 /// Finished runs on each day of [range], for the calendar.
 final runsBetweenProvider =

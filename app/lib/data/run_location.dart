@@ -5,11 +5,12 @@ import 'run_tracker.dart';
 
 /// The phone's GPS, through geolocator.
 ///
-/// Listening starts geolocator's foreground service: a visible, ongoing
-/// "Run in progress" notification, started from a tap in the app, which is
-/// what lets a run record with the screen off. When the last listener goes,
-/// the service stops. There is no background location: the manifest does not
-/// ask for it, and nothing here needs it.
+/// Only a RECORDING stream starts geolocator's foreground service: a visible,
+/// ongoing "Recording your run" notification, started from a tap in the app,
+/// which is what lets a run record with the screen off. Looking for a fix
+/// before Start is an ordinary foreground stream with no notification, so the
+/// phone never says a run is going when none is. There is no background
+/// location: the manifest does not ask for it, and nothing here needs it.
 ///
 /// Fixes stay on the phone. This file hands them to the tracker and nothing
 /// else; the tracker writes them to the app-private database.
@@ -25,40 +26,60 @@ class GeolocatorSource implements LocationSource {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
-    return switch (permission) {
-      LocationPermission.always ||
-      LocationPermission.whileInUse => LocationAccess.granted,
-      LocationPermission.deniedForever => LocationAccess.deniedForever,
-      LocationPermission.denied ||
-      LocationPermission.unableToDetermine => LocationAccess.denied,
+    final granted = switch (permission) {
+      LocationPermission.always || LocationPermission.whileInUse => true,
+      _ => false,
     };
+    if (!granted) {
+      return permission == LocationPermission.deniedForever
+          ? LocationAccess.deniedForever
+          : LocationAccess.denied;
+    }
+    // Android asks "precise or approximate" in the same dialog. Approximate
+    // is a fix a kilometre wide: the run would sit on "waiting" forever.
+    final accuracy = await Geolocator.getLocationAccuracy();
+    return accuracy == LocationAccuracyStatus.reduced
+        ? LocationAccess.approximate
+        : LocationAccess.granted;
   }
 
   @override
-  Stream<RunFix> watch() =>
+  Future<RunFix?> lastKnown() async {
+    try {
+      final p = await Geolocator.getLastKnownPosition();
+      return p == null ? null : _fix(p);
+    } on Object {
+      return null;
+    }
+  }
+
+  @override
+  Stream<RunFix> watch({bool recording = false}) =>
       Geolocator.getPositionStream(
         locationSettings: AndroidSettings(
           accuracy: LocationAccuracy.best,
           distanceFilter: 0,
           intervalDuration: const Duration(seconds: 1),
-          foregroundNotificationConfig: const ForegroundNotificationConfig(
-            notificationTitle: 'Run in progress',
-            notificationText: 'Recording your route. It stays on this phone.',
-            notificationChannelName: 'Run tracking',
-            enableWakeLock: true,
-            setOngoing: true,
-          ),
+          foregroundNotificationConfig: recording
+              ? const ForegroundNotificationConfig(
+                  notificationTitle: 'Recording your run',
+                  notificationText: 'Your route stays on this phone.',
+                  notificationChannelName: 'Run tracking',
+                  enableWakeLock: true,
+                  setOngoing: true,
+                )
+              : null,
         ),
-      ).map(
-        (p) => RunFix(
-          tMs: p.timestamp.millisecondsSinceEpoch,
-          lat: p.latitude,
-          lng: p.longitude,
-          accuracyM: p.accuracy,
-          altitudeM: p.altitudeAccuracy > 0 ? p.altitude : null,
-          speedMps: p.speed >= 0 ? p.speed : null,
-        ),
-      );
+      ).map(_fix);
+
+  static RunFix _fix(Position p) => RunFix(
+    tMs: p.timestamp.millisecondsSinceEpoch,
+    lat: p.latitude,
+    lng: p.longitude,
+    accuracyM: p.accuracy,
+    altitudeM: p.altitudeAccuracy > 0 ? p.altitude : null,
+    speedMps: p.speed >= 0 ? p.speed : null,
+  );
 
   @override
   Future<void> openSettings() async {

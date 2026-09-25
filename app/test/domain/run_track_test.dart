@@ -75,6 +75,13 @@ void main() {
       );
     });
 
+    test('takes a vague but usable fix: ±35 m adds trail, not metres', () {
+      // Distance is counted in steps of at least half the accuracy, so a
+      // vaguer fix cannot invent distance; dropping it would leave a gap.
+      final f = FixFilter();
+      expect(f.judge(fix(0, origin, accuracy: 35)), FixVerdict.accept);
+    });
+
     test('refuses a fix older than the last one', () {
       final f = FixFilter();
       expect(f.judge(fix(5000, origin)), FixVerdict.accept);

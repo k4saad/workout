@@ -8,7 +8,16 @@ import 'db/tables.dart';
 import 'run_repository.dart';
 
 /// Whether the phone will say where it is.
-enum LocationAccess { granted, denied, deniedForever, serviceOff }
+enum LocationAccess {
+  granted,
+
+  /// Granted, but only "approximate": a fix a kilometre wide. Android asks
+  /// precise-or-approximate in the same dialog, and a run needs precise.
+  approximate,
+  denied,
+  deniedForever,
+  serviceOff,
+}
 
 /// Where fixes come from. The real one wraps the location plugin and its
 /// foreground service (run_location.dart); tests feed their own.
@@ -16,10 +25,15 @@ abstract interface class LocationSource {
   /// Checks, and if needed asks for, location permission.
   Future<LocationAccess> ensureAccess();
 
-  /// Fixes, about one a second, for as long as someone listens. On the
-  /// phone, listening runs the "Run in progress" foreground service, so the
-  /// run keeps recording with the screen off.
-  Stream<RunFix> watch();
+  /// Fixes, about one a second, for as long as someone listens. With
+  /// [recording], listening runs the foreground service and its "Recording
+  /// your run" notification, so the run keeps recording with the screen off.
+  /// Without it — while only looking for a fix — there is no notification.
+  Stream<RunFix> watch({bool recording = false});
+
+  /// The phone's last known position, at once: something to show on the map
+  /// while the GPS warms up. Never counted.
+  Future<RunFix?> lastKnown();
 
   /// Opens the app's system settings, for a permission refused for good.
   Future<void> openSettings();
@@ -43,6 +57,9 @@ enum TrackerStatus {
 
   /// Location is switched off on the phone.
   serviceOff,
+
+  /// Only approximate location is allowed.
+  approximate,
 }
 
 /// Everything the live screen draws, at one moment.
@@ -100,7 +117,7 @@ class RunTracker {
     required this.source,
     this.link,
     int Function()? nowMs,
-    this.readyAccuracyM = 25,
+    this.readyAccuracyM = 30,
   }) : _nowMs = nowMs ?? (() => DateTime.now().millisecondsSinceEpoch);
 
   final RunRepository repo;
@@ -110,7 +127,9 @@ class RunTracker {
   final RunLink? link;
   final int Function() _nowMs;
 
-  /// A fix this sure is good enough to start on.
+  /// A fix this sure means the GPS has found him. Start does not wait for
+  /// it — the clock runs and the trail begins at the first usable fix — but
+  /// the screen says "GPS fair" or "GPS good" rather than "waiting".
   final double readyAccuracyM;
 
   final ValueNotifier<RunSnapshot> state = ValueNotifier(
@@ -123,9 +142,14 @@ class RunTracker {
   RunTrack _track = RunTrack();
   FixFilter _filter = FixFilter();
   StreamSubscription<RunFix>? _sub;
+  bool _subRecording = false;
+  Future<void>? _closing;
   int? _runId;
   bool _nextSegment = true;
   RunFix? _lastRaw;
+
+  /// A position to show before any fix: the phone's last known one.
+  RunFix? _lastShown;
   int? _startedMs;
   int _pausedMs = 0;
   int? _pausedAt;
@@ -138,6 +162,9 @@ class RunTracker {
 
   /// Completes when every fix received so far has been handled.
   Future<void> settled() => _queue;
+
+  /// Completes once [dispose] has finished tidying up.
+  Future<void> get closed => _closing ?? Future.value();
 
   /// Checks permission, picks up an unfinished run if there is one, and
   /// starts listening.
@@ -153,9 +180,17 @@ class RunTracker {
         _status = TrackerStatus.serviceOff;
         _emit();
         return;
+      case LocationAccess.approximate:
+        _status = TrackerStatus.approximate;
+        _emit();
+        return;
       case LocationAccess.granted:
         break;
     }
+
+    // A run left open with no trail is nothing to pick up.
+    await repo.tidyEmptyRuns();
+    if (_disposed) return;
 
     final open = await repo.active();
     if (open != null) {
@@ -170,13 +205,23 @@ class RunTracker {
       if (_status == TrackerStatus.paused) _pausedAt = _nowMs();
     } else if (_runId == null) {
       _status = TrackerStatus.locating;
+      // Somewhere to centre the map while the GPS warms up.
+      final last = await source.lastKnown();
+      if (_disposed) return;
+      if (last != null && _lastRaw == null) _lastShown = last;
     }
-    _listen();
+    await _listen(recording: _runId != null);
     _emit();
   }
 
-  void _listen() {
-    _sub ??= source.watch().listen((f) {
+  /// Listens, recording or not. Switching from one to the other replaces the
+  /// stream, so the notification starts with the run and not before.
+  Future<void> _listen({required bool recording}) async {
+    if (_sub != null && _subRecording == recording) return;
+    await _stopListening();
+    if (_disposed) return;
+    _subRecording = recording;
+    _sub = source.watch(recording: recording).listen((f) {
       _queue = _queue.then((_) => _onFix(f));
     });
   }
@@ -215,8 +260,10 @@ class RunTracker {
     }
   }
 
-  /// Opens the run and records from here. A fresh fix from the last few
-  /// seconds becomes the first point, so the trail starts where he stands.
+  /// Opens the run and records from here, with or without a fix yet: the
+  /// clock starts now and the trail at the first usable fix. A fresh fix
+  /// from the last few seconds becomes the first point, so the trail starts
+  /// where he stands.
   Future<void> start() async {
     if (_runId != null || _disposed) return;
     _runId = await repo.start(link: link);
@@ -226,12 +273,10 @@ class RunTracker {
     _nextSegment = true;
     _status = TrackerStatus.recording;
     final seed = _lastRaw;
-    if (seed != null &&
-        (seed.accuracyM ?? double.infinity) <= readyAccuracyM &&
-        _nowMs() - seed.tMs <= 5000) {
+    if (seed != null && _nowMs() - seed.tMs <= 5000) {
       _queue = _queue.then((_) => _record(seed));
     }
-    _listen();
+    await _listen(recording: true);
     _emit();
     await _queue;
   }
@@ -316,7 +361,7 @@ class RunTracker {
       avgPaceSecPerKm: _track.avgPaceSecPerKm,
       autoPaused: _status == TrackerStatus.recording && _track.autoPaused,
       accuracyM: raw?.accuracyM,
-      position: raw?.point,
+      position: raw?.point ?? _lastShown?.point,
       segments: [
         for (final s in _track.segments) [for (final f in s) f.point],
       ],
@@ -327,12 +372,21 @@ class RunTracker {
   /// The run's numbers as they stand.
   RunTrack get track => _track;
 
-  /// Stops listening. An unfinished run stays open in the database, to be
-  /// picked up by the next [prepare].
+  /// Stops listening. An unfinished run with a trail stays open in the
+  /// database, to be picked up by the next [prepare]; one with nothing on it
+  /// is thrown away, so leaving never leaves a phantom "Run still open".
   void dispose() {
     if (_disposed) return;
     _disposed = true;
-    unawaited(_stopListening());
+    final id = _runId;
+    _closing = () async {
+      await _stopListening();
+      await _queue;
+      if (id != null && _status != TrackerStatus.finished) {
+        final points = await repo.points(id);
+        if (points.isEmpty) await repo.discard(id);
+      }
+    }();
     state.dispose();
   }
 }

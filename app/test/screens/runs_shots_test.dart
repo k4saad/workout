@@ -169,7 +169,10 @@ class _Gps implements LocationSource {
   Future<LocationAccess> ensureAccess() async => LocationAccess.granted;
 
   @override
-  Stream<RunFix> watch() => controller.stream;
+  Future<RunFix?> lastKnown() async => null;
+
+  @override
+  Stream<RunFix> watch({bool recording = false}) => controller.stream;
 
   @override
   Future<void> openSettings() async {}

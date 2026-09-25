@@ -231,6 +231,30 @@ class RunRepository {
   });
 
   /// Finished runs whose day falls in [from]..[to], newest first.
+  /// Removes open runs with no trail — a Start with no fix after it, left
+  /// behind — and returns how many. Today asks "Run still open?" only about
+  /// a run there is something of.
+  ///
+  /// [olderThan] spares a run started moments ago that is still waiting for
+  /// its first fix.
+  Future<int> tidyEmptyRuns({Duration olderThan = Duration.zero}) async {
+    final open =
+        await (db.select(db.runs)..where(
+              (r) =>
+                  r.status.isInValues([RunStatus.recording, RunStatus.paused]),
+            ))
+            .get();
+    final cutoff = _clock().millisecondsSinceEpoch - olderThan.inMilliseconds;
+    var removed = 0;
+    for (final r in open) {
+      if (r.startedAtMs > cutoff) continue;
+      if ((await points(r.id)).isNotEmpty) continue;
+      await discard(r.id);
+      removed++;
+    }
+    return removed;
+  }
+
   Future<List<Run>> finishedBetween(DateTime from, DateTime to) =>
       (db.select(db.runs)
             ..where(

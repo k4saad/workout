@@ -54,22 +54,33 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
   RunTrack? _savedTrack;
   late final DateTime _openedAt = DateTime.now();
 
+  late final AppLifecycleListener _life;
+
   @override
   void initState() {
     super.initState();
     unawaited(_tracker.prepare());
     _tick = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_tracker.snapshot.isLive) _tracker.tick();
-      // "Start anyway" appears after a while without a good fix.
-      if (_tracker.snapshot.status == TrackerStatus.locating && mounted) {
-        setState(() {});
-      }
     });
+    // Back from Settings with precise location on, or Location switched on:
+    // try again without being asked.
+    _life = AppLifecycleListener(
+      onResume: () {
+        final s = _tracker.snapshot.status;
+        if (s == TrackerStatus.approximate ||
+            s == TrackerStatus.denied ||
+            s == TrackerStatus.serviceOff) {
+          unawaited(_tracker.prepare());
+        }
+      },
+    );
   }
 
   @override
   void dispose() {
     _tick?.cancel();
+    _life.dispose();
     _tracker.dispose();
     super.dispose();
   }
@@ -195,6 +206,19 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
               primary: 'Try again',
               onPrimary: _tracker.prepare,
             ),
+            TrackerStatus.approximate => _Blocked(
+              icon: Icons.location_searching,
+              title: 'Precise location is off',
+              body:
+                  'This app has approximate location: a position a '
+                  'kilometre wide, so the GPS would never find you. A run '
+                  'needs precise.\n\nSettings → Permissions → Location → turn '
+                  'on "Use precise location", then come back.',
+              primary: 'Open app settings',
+              onPrimary: _tracker.openSettings,
+              secondary: 'Try again',
+              onSecondary: _tracker.prepare,
+            ),
             _ => _live(s),
           },
         ),
@@ -309,25 +333,35 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
           ],
         );
       default:
+        // Start never waits for a perfect fix: the clock starts now, the
+        // trail at the first usable fix.
         final ready = s.status == TrackerStatus.ready;
-        final waitedLong = locatingFor > const Duration(seconds: 15);
+        final waitedLong = locatingFor > const Duration(seconds: 20);
         return Column(
           children: [
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
-                onPressed: ready && !_busy ? _start : null,
+                onPressed: _busy ? null : _start,
                 style: FilledButton.styleFrom(minimumSize: tall),
-                icon: Icon(
-                  ready ? Icons.directions_run_rounded : Icons.satellite_alt,
-                ),
-                label: Text(ready ? 'Start' : 'Finding GPS…'),
+                icon: const Icon(Icons.directions_run_rounded),
+                label: const Text('Start'),
               ),
             ),
-            if (!ready && waitedLong)
-              TextButton(
-                onPressed: _busy ? null : _start,
-                child: const Text('Start anyway: it records once GPS locks'),
+            if (!ready)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  waitedLong
+                      ? 'Still looking. Step outside, away from tall buildings. '
+                            'You can start anyway: the trail begins once it '
+                            'finds you.'
+                      : 'Finding you. You can start now: the trail begins '
+                            'once the GPS locks.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall!
+                      .copyWith(color: AppTheme.textDim),
+                ),
               ),
           ],
         );
@@ -645,11 +679,11 @@ class _GpsChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final a = accuracyM;
     final (icon, text) = a == null
-        ? (Icons.gps_not_fixed_rounded, 'GPS…')
-        : a <= 10
-        ? (Icons.gps_fixed_rounded, 'GPS ±${a.round()} m')
-        : a <= 25
-        ? (Icons.gps_fixed_rounded, 'GPS ±${a.round()} m · fair')
+        ? (Icons.gps_not_fixed_rounded, 'Waiting for GPS')
+        : a <= 12
+        ? (Icons.gps_fixed_rounded, 'GPS good ±${a.round()} m')
+        : a <= 30
+        ? (Icons.gps_fixed_rounded, 'GPS fair ±${a.round()} m')
         : (Icons.gps_not_fixed_rounded, 'GPS weak ±${a.round()} m');
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

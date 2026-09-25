@@ -128,16 +128,23 @@ void main() {
     await settle(tester, rounds: 10);
   }
 
-  testWidgets('waits for GPS, then starts, records and finishes', (
+  testWidgets('Start is there at once; GPS finds him, records, finishes', (
     tester,
   ) async {
     final results = await pumpLive(tester);
-    expect(find.text('Finding GPS…'), findsOneWidget);
+    expect(find.text('Waiting for GPS'), findsOneWidget);
+    final start = tester.widget<ButtonStyleButton>(
+      find.ancestor(
+        of: find.text('Start'),
+        matching: find.byWidgetPredicate((w) => w is ButtonStyleButton),
+      ),
+    );
+    expect(start.onPressed, isNotNull, reason: 'Start never waits for a fix');
 
     gps.controller.add(fix(0, 0));
     await settle(tester);
     expect(find.text('Start'), findsOneWidget);
-    expect(find.textContaining('GPS ±5 m'), findsOneWidget);
+    expect(find.textContaining('GPS good ±5 m'), findsOneWidget);
 
     await tester.tap(find.text('Start'));
     await settle(tester);
@@ -322,6 +329,15 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+  testWidgets('approximate location says exactly how to fix it', (
+    tester,
+  ) async {
+    gps.access = LocationAccess.approximate;
+    await pumpLive(tester);
+    expect(find.text('Precise location is off'), findsOneWidget);
+    expect(find.textContaining('Use precise location'), findsOneWidget);
+    expect(find.text('Open app settings'), findsOneWidget);
+  });
 }
 
 class _ScriptedGps implements LocationSource {
@@ -335,7 +351,10 @@ class _ScriptedGps implements LocationSource {
   Future<LocationAccess> ensureAccess() async => access;
 
   @override
-  Stream<RunFix> watch() {
+  Future<RunFix?> lastKnown() async => null;
+
+  @override
+  Stream<RunFix> watch({bool recording = false}) {
     late StreamController<RunFix> out;
     StreamSubscription<RunFix>? sub;
     out = StreamController<RunFix>(
