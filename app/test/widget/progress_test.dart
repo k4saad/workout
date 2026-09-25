@@ -36,10 +36,14 @@ void main() {
     if (tmp.existsSync()) tmp.deleteSync(recursive: true);
   });
 
+  // Scrolling, as on the Photos screen: a 9:16 frame and its controls are
+  // taller than the test window.
   Widget wrap(Widget child) => MaterialApp(
     theme: AppTheme.dark,
     home: Scaffold(
-      body: Center(child: SizedBox(width: 300, child: child)),
+      body: SingleChildScrollView(
+        child: Center(child: SizedBox(width: 300, child: child)),
+      ),
     ),
   );
 
@@ -151,13 +155,32 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.play_arrow));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 450));
+      await tester.pump(const Duration(milliseconds: 1150));
       expect(find.text('b'), findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.pause));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 900));
+      await tester.pump(const Duration(milliseconds: 2400));
       expect(find.text('b'), findsOneWidget, reason: 'paused means paused');
+    });
+
+    testWidgets('a frame fades into the next rather than cutting', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(Flipbook(frames: frames, captions: const ['a', 'b', 'c', 'd'])),
+      );
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.chevron_right));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(
+        find.byType(Image),
+        findsNWidgets(2),
+        reason: 'both frames on screen, mid-fade',
+      );
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.byType(Image), findsOneWidget);
     });
 
     testWidgets('a single frame cannot autoplay', (tester) async {

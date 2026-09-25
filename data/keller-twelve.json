@@ -215,6 +215,11 @@
         50.0,
         50.5
       ],
+      "autoTick": {
+        "photos": 0,
+        "measurements": 1,
+        "weighIn": 4
+      },
       "items": [
         "Baseline photos -- all four poses, in the app's capture screen. It keeps them private; the phone's camera app would put them in the gallery",
         "All five measurements: waist, chest, upper arm, thigh, neck",
@@ -229,6 +234,11 @@
         51.0,
         52.0
       ],
+      "autoTick": {
+        "photos": 0,
+        "measurements": 1,
+        "sessionsLogged": 3
+      },
       "items": [
         "Photos",
         "Measurements",
@@ -242,6 +252,10 @@
         53.0,
         54.0
       ],
+      "autoTick": {
+        "photos": 0,
+        "measurements": 1
+      },
       "items": [
         "Photos",
         "Measurements",
@@ -256,6 +270,10 @@
         55.0,
         56.5
       ],
+      "autoTick": {
+        "photos": 0,
+        "measurements": 1
+      },
       "items": [
         "Photos",
         "Measurements",
@@ -359,6 +377,13 @@
       "isFloor": true,
       "note": "3 to 6 strict reps by week 12. The most satisfying number here."
     }
+  ],
+  "measurementSites": [
+    "waist",
+    "chest",
+    "upperArm",
+    "thigh",
+    "neck"
   ],
   "blocks": [
     {

@@ -14,6 +14,7 @@ import '../../domain/run/run.dart' show formatKm;
 import '../calendar/calendar_screen.dart';
 import '../calendar/day_sheet.dart';
 import '../common/widgets.dart';
+import '../progress/checkpoint_checklist.dart';
 
 /// The programme a week at a time: what is on, what got done, and what
 /// is still to come. Swipe for the next week.
@@ -379,8 +380,8 @@ class _WeekProgress extends StatelessWidget {
   }
 }
 
-/// What this week's checkpoint asks for. Ticking them off by themselves is
-/// Phase 6, once the capture screen writes what it took.
+/// What this week's checkpoint asks for, with what is already done
+/// ticked.
 class _CheckpointCard extends StatelessWidget {
   const _CheckpointCard({required this.checkpoint, required this.isCurrent});
 
@@ -400,29 +401,12 @@ class _CheckpointCard extends StatelessWidget {
             children: [
               const Icon(Icons.flag_rounded, color: AppTheme.crimson, size: 20),
               Gap.s,
-              Text('Checkpoint', style: t.titleMedium),
+              Expanded(child: Text('Checkpoint', style: t.titleMedium)),
+              CheckpointCount(week: checkpoint.week),
             ],
           ),
           Gap.s,
-          for (final item in checkpoint.items)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 3),
-                    child: Icon(
-                      Icons.radio_button_unchecked,
-                      size: 15,
-                      color: AppTheme.textDim,
-                    ),
-                  ),
-                  Gap.s,
-                  Expanded(child: Text(item, style: t.bodyMedium)),
-                ],
-              ),
-            ),
+          CheckpointChecklist(checkpoint: checkpoint),
           if (isCurrent) ...[
             Gap.s,
             OutlinedButton.icon(

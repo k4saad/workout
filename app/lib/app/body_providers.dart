@@ -2,7 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/body_service.dart';
 import '../data/db/database.dart';
+import '../data/db/tables.dart';
 import '../domain/metrics/bodyweight_trend.dart';
+import 'progress_providers.dart';
 import 'providers.dart';
 import 'session_providers.dart';
 
@@ -10,9 +12,12 @@ final bodyServiceProvider = Provider<BodyService>(
   (ref) => BodyService(ref.watch(databaseProvider)),
 );
 
-final weightEntriesProvider = FutureProvider<List<WeightEntry>>(
-  (ref) => ref.watch(bodyServiceProvider).weightHistory(),
-);
+/// Every weigh-in, oldest first. Live: a weigh-in saved anywhere redraws
+/// the chart, with no invalidation to forget.
+final weightEntriesProvider = FutureProvider<List<WeightEntry>>((ref) async {
+  final rows = await ref.watch(bodyweightRowsProvider.future);
+  return [for (final r in rows) WeightEntry(date: r.measuredOn, kg: r.kg)];
+});
 
 /// What the flat rule says to do about the food.
 ///
@@ -21,23 +26,18 @@ final weightEntriesProvider = FutureProvider<List<WeightEntry>>(
 /// them, so changing the JSON changes the advice.
 final nutritionAdviceProvider = FutureProvider<NutritionAdvice>((ref) async {
   final bundle = await ref.watch(bundleProvider.future);
-  final service = ref.watch(bodyServiceProvider);
-  final entries = await service.weightHistory();
-  final waist = await service.waistChangeCm();
+  final entries = await ref.watch(weightEntriesProvider.future);
+  final waists = [
+    for (final m in await ref.watch(allMeasurementsProvider.future))
+      if (m.site == MeasurementSite.waist) m.cm,
+  ];
+  final waist = waists.length < 2 ? null : waists.last - waists.first;
   return const BodyweightTrend().advise(
     entries,
     bundle.programme.nutritionRules,
     waistChangeCm: waist,
   );
 });
-
-final todayFoodProvider = FutureProvider<FoodLog?>(
-  (ref) => ref.watch(bodyServiceProvider).foodFor(ref.watch(todayProvider)),
-);
-
-final foodStreakProvider = FutureProvider<int>(
-  (ref) => ref.watch(bodyServiceProvider).foodStreak(ref.watch(todayProvider)),
-);
 
 final cardioLogsProvider = FutureProvider<List<CardioLog>>(
   (ref) => ref.watch(bodyServiceProvider).recentCardio(),

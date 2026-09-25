@@ -19,6 +19,9 @@ class Preferences {
     this.athleteName = defaultAthleteName,
     this.launchQuote = true,
     this.recentQuoteIds = const [],
+    this.captureFront = true,
+    this.captureTimerSec = 10,
+    this.checkpointTicks = const [],
   });
 
   static const defaultAthleteName = 'Saad';
@@ -45,6 +48,41 @@ class Preferences {
   /// Quote ids shown recently, newest first, at most [quoteMemory].
   final List<String> recentQuoteIds;
 
+  /// Progress photos on the front camera: he trains alone, and only the
+  /// screen side lets him see the ghost he is lining up with. Remembered,
+  /// because a shoot on the other lens frames him differently.
+  final bool captureFront;
+
+  /// The self-timer: long enough to prop the phone and step back.
+  final int captureTimerSec;
+
+  /// Checkpoint lines ticked by hand, as `week:index`. The lines the app
+  /// can check itself are never stored here.
+  final List<String> checkpointTicks;
+
+  /// The self-timer lengths offered.
+  static const captureTimers = [3, 5, 10];
+
+  /// Indices ticked by hand in [week]'s checkpoint.
+  Set<int> ticksFor(int week) => {
+    for (final k in checkpointTicks)
+      if (k.split(':') case [final w, final i] when int.tryParse(w) == week)
+        ?int.tryParse(i),
+  };
+
+  /// Ticks or unticks one line of [week]'s checkpoint.
+  Preferences withTickToggled(int week, int index) {
+    final key = '$week:$index';
+    return copyWith(
+      checkpointTicks: checkpointTicks.contains(key)
+          ? [
+              for (final k in checkpointTicks)
+                if (k != key) k,
+            ]
+          : [...checkpointTicks, key],
+    );
+  }
+
   /// How long the app stays quiet about backups.
   static const staleAfterDays = 14;
 
@@ -70,6 +108,9 @@ class Preferences {
     String? athleteName,
     bool? launchQuote,
     List<String>? recentQuoteIds,
+    bool? captureFront,
+    int? captureTimerSec,
+    List<String>? checkpointTicks,
   }) => Preferences(
     eveningReminder: eveningReminder ?? this.eveningReminder,
     reminderHour: reminderHour ?? this.reminderHour,
@@ -78,6 +119,9 @@ class Preferences {
     athleteName: athleteName ?? this.athleteName,
     launchQuote: launchQuote ?? this.launchQuote,
     recentQuoteIds: recentQuoteIds ?? this.recentQuoteIds,
+    captureFront: captureFront ?? this.captureFront,
+    captureTimerSec: captureTimerSec ?? this.captureTimerSec,
+    checkpointTicks: checkpointTicks ?? this.checkpointTicks,
   );
 
   /// Remembers [id] as just shown, newest first, capped at [quoteMemory].
@@ -104,6 +148,15 @@ class Preferences {
       for (final q in (j['recentQuoteIds'] as List?) ?? const [])
         if (q is String) q,
     ],
+    captureFront: j['captureFront'] as bool? ?? true,
+    captureTimerSec: switch (j['captureTimerSec']) {
+      final num n when captureTimers.contains(n.toInt()) => n.toInt(),
+      _ => 10,
+    },
+    checkpointTicks: [
+      for (final k in (j['checkpointTicks'] as List?) ?? const [])
+        if (k is String) k,
+    ],
   );
 
   Map<String, dynamic> toJson() => {
@@ -114,6 +167,9 @@ class Preferences {
     'athleteName': athleteName,
     'launchQuote': launchQuote,
     'recentQuoteIds': recentQuoteIds,
+    'captureFront': captureFront,
+    'captureTimerSec': captureTimerSec,
+    'checkpointTicks': checkpointTicks,
   };
 }
 

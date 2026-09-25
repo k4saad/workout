@@ -37,7 +37,7 @@ supermarket staples.
 | 3 — Animated exercise demos | **Done** — see below |
 | 4 — GPS runs on OpenStreetMap | **Done** — see below |
 | 5 — Calendar and Week | **Done** — see below |
-| 6 — Progress photos and Body | |
+| 6 — Progress photos and Body | **Done** — see below |
 | 7 — Launch quote and premium polish | |
 | 8 — Hardening and release | |
 
@@ -64,7 +64,7 @@ The gate, unchanged and non-negotiable:
 1. `flutter analyze` clean.
 2. `flutter test` green.
 3. `python tools/gen.py && python tools/gen_fuel.py && python tools/gen_motions.py &&
-   python tools/validate.py` — all gates (V1–V18).
+   python tools/validate.py` — all gates (V1–V19).
 4. Screens the phase touched have been **looked at**, not just asserted on.
 5. `dart format .`, one conventional commit.
 
@@ -307,6 +307,65 @@ Original figures, drawn from keyframes. No GIFs, no scraping, nothing copyrighte
   countdown, no empty shoots, no duplicate rows on retake, images processed off the UI
   thread, correct resolution and orientation, thumbnails.
 - Measurements with steppers (no keyboard), per-site history. Weigh-in with a stepper.
+
+### What Phase 6 shipped
+
+- **Checkpoints that tick themselves.** Each checkpoint in the data now says
+  which of its lines the app can check (`autoTick`, written by `gen.py`,
+  guarded by new gate **V19**):
+  - a shoot with every pose;
+  - every site in the programme's new `measurementSites`;
+  - a weigh-in;
+  - no session missing.
+
+  The evidence counts from the checkpoint week and the week before, so a
+  shoot on the Sunday before counts. The other lines are ticked by hand.
+  The same checklist shows on Today, the Week tab and the calendar.
+  (`lib/domain/progress/checkpoint_review.dart`, test-first.)
+- **Capture, rebuilt:**
+  - The preview, the ghost and the review share one frame of the camera's
+    shape, so what lines up on screen lines up in the photos (v2 scaled the
+    ghost to the whole screen).
+  - The front camera by default: he shoots alone, and only the screen side
+    shows the ghost. The lens is remembered.
+  - A 3 / 5 / 10-second timer with pips and a buzz each second. The pips
+    are made in code, so there is no sound file.
+  - Review with Keep or Retake, and Skip for a pose.
+  - No shoot is written until the first photo is kept, so backing out
+    leaves nothing. Empty shoots from v2 are tidied on open.
+  - A retake replaces its row instead of adding one.
+  - Processing runs in an isolate: turned upright once, every EXIF tag
+    stripped (a location tag has no business in these files), 1920 px long
+    edge, and a 480 px thumbnail, all app-private.
+  - Also fixed: two callers seeding the poses at once collided on the
+    primary key.
+- **Photos screen:**
+  - A timeline by programme week, with each checkpoint flagged, the weight
+    and the change since the first shoot.
+  - Compare any two shoots of a pose, as a wipe or side by side.
+  - A time-lapse that crossfades frame to frame.
+  - A viewer per shoot. Deleting deletes the files.
+  - Photos, measurements and weigh-ins are live streams now; nothing needs
+    invalidating.
+- **Body:**
+  - Weigh-in on a stepper (±0.1, ±1, hold to repeat), starting from the
+    last reading.
+  - The tape moved here from Photos: the programme's five sites first, hips
+    and calf as optional, each on a stepper with its history and change.
+  - The waist rule is read from the programme's numbers. It was typed into
+    Dart.
+- **Cut, said out loud:**
+  - Whether a front-camera photo is saved mirrored like its preview (the
+    ghost assumes it is, which is CameraX's default) can only be seen on
+    the phone. So can the pips' volume. Both go on the Phase 8 checklist.
+  - The lens is remembered but not stored per photo, so nothing warns when
+    two compared shoots used different lenses.
+  - The v2 one-tap "Did you hit it?" food card is gone from Body. The Fuel
+    tab is the food log, and the card showed a phase-level kcal target that
+    disagreed with Fuel's per-day plan. Today's "Eat today" card still
+    shows the phase number; Phase 7's Today rebuild replaces it.
+  - Hand ticks live in `preferences.json`, like the other conveniences,
+    not in the training database.
 
 ## Phase 7 — Launch quote and premium polish
 

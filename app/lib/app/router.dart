@@ -14,6 +14,7 @@ import '../features/history/history_screen.dart';
 import '../features/more/more_screen.dart';
 import '../features/progress/capture_screen.dart';
 import '../features/progress/progress_screen.dart';
+import '../features/progress/shoot_viewer_screen.dart';
 import '../features/progress_hub/progress_hub_screen.dart';
 import '../features/runs/live_run_screen.dart';
 import '../features/runs/runs_screen.dart';
@@ -114,6 +115,14 @@ GoRouter buildRouter() {
                   GoRoute(
                     path: 'photos',
                     builder: (_, _) => const ProgressScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':shootId',
+                        builder: (_, state) => ShootViewerScreen(
+                          shootId: state.pathParameters['shootId']!,
+                        ),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: 'runs',

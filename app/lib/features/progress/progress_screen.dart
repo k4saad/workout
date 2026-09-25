@@ -2,40 +2,38 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart' show GoRouterHelper;
+import 'package:intl/intl.dart' show DateFormat;
 
 import '../../app/progress_providers.dart';
 import '../../app/providers.dart';
-import '../../app/session_providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../data/db/database.dart';
-import '../../data/db/tables.dart';
 import '../../data/media_repository.dart';
 import '../common/widgets.dart';
 import 'widgets/compare_widgets.dart';
 
-/// The progress gallery: shoots, poses, comparisons and measurements.
+/// Progress photos: every shoot by week, any two side by side, and each
+/// pose as a time-lapse.
+///
+/// Everything here lives in app-private storage. Nothing on this screen,
+/// or anywhere in the app, can send a photo anywhere.
 class ProgressScreen extends ConsumerWidget {
   const ProgressScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final shoots = ref.watch(shootsProvider);
-    final poses = ref.watch(posesProvider);
-    final stats = ref.watch(mediaStatsProvider).asData?.value;
     final week = ref.watch(currentWeekProvider);
-
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Progress'),
+          title: const Text('Photos'),
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Shoots'),
+              Tab(text: 'Timeline'),
               Tab(text: 'Compare'),
-              Tab(text: 'Measure'),
+              Tab(text: 'Time-lapse'),
             ],
           ),
         ),
@@ -44,72 +42,112 @@ class ProgressScreen extends ConsumerWidget {
           icon: const Icon(Icons.photo_camera),
           label: const Text('New shoot'),
         ),
-        body: TabBarView(
-          children: [
-            _ShootsTab(shoots: shoots, stats: stats),
-            _CompareTab(poses: poses),
-            const _MeasureTab(),
-          ],
+        body: const TabBarView(
+          children: [_Timeline(), _Compare(), _TimeLapse()],
         ),
       ),
     );
   }
 }
 
-class _ShootsTab extends ConsumerWidget {
-  const _ShootsTab({required this.shoots, required this.stats});
+/// Width over height for a photo, from what was stored; 9:16 when unknown.
+double photoAspect(ProgressPhoto? p) =>
+    p == null || p.width <= 0 || p.height <= 0 ? 9 / 16 : p.width / p.height;
 
-  final AsyncValue<List<PhotoShoot>> shoots;
-  final MediaStats? stats;
+String _kg(double kg) => '${kg.toStringAsFixed(1)} kg';
+
+String _signedKg(double d) =>
+    '${d >= 0 ? '+' : '−'}${d.abs().toStringAsFixed(1)} kg';
+
+class _NoShoots extends StatelessWidget {
+  const _NoShoots();
+
+  @override
+  Widget build(BuildContext context) => const EmptyState(
+    icon: Icons.photo_library_outlined,
+    title: 'No shoots yet',
+    body:
+        'Take the baseline four before week 1. Week 1 cannot be shot '
+        'afterwards, and every later shoot lines up against it.\n\n'
+        'These photos never leave this phone.',
+  );
+}
+
+// ----------------------------------------------------------------- timeline
+
+class _Timeline extends ConsumerWidget {
+  const _Timeline();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = Theme.of(context).textTheme;
+    final shootsAsync = ref.watch(shootsProvider);
+    final bundle = ref.watch(bundleProvider).asData?.value;
+    final stats = ref.watch(mediaStatsProvider).asData?.value;
 
-    return shoots.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+    return shootsAsync.when(
+      loading: () => const SkeletonPage(cards: 2),
       error: (e, _) =>
           AsyncScaffoldBody(loading: false, error: e, child: const SizedBox()),
-      data: (list) {
-        if (list.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.photo_library_outlined,
-                  size: 48,
-                  color: AppTheme.textDim,
-                ),
-                Gap.m,
-                Text('No shoots yet', style: t.titleLarge),
-                Gap.s,
-                Text(
-                  'Take the baseline four this week. You cannot shoot week 1 '
-                  'retroactively, and the ghost overlay needs a first frame '
-                  'to line up against.\n\n'
-                  'These photos never leave this phone.',
-                  textAlign: TextAlign.center,
-                  style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                ),
-              ],
-            ),
-          );
+      data: (shoots) {
+        if (shoots.isEmpty) return const _NoShoots();
+        final first = shoots.last;
+
+        // Newest week first; within a week, newest shoot first.
+        final byWeek = <int, List<PhotoShoot>>{};
+        for (final s in shoots) {
+          final w = s.weekNo ?? bundle?.calendar.weekNumberFor(s.shotOn) ?? 0;
+          (byWeek[w] ??= []).add(s);
         }
+        final weeks = byWeek.keys.toList()..sort((a, b) => b.compareTo(a));
 
         return ListView(
-          padding: Gap.pagePadding,
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
           children: [
-            if (stats != null) _StorageBar(stats: stats!),
-            Gap.m,
-            for (final shoot in list) _ShootCard(shoot: shoot),
-            Gap.xl,
+            if (stats != null) _StorageBar(stats: stats),
+            for (final w in weeks) ...[
+              _WeekHeader(
+                week: w,
+                checkpoint: bundle?.programme.checkpointForWeek(w) != null,
+              ),
+              for (final s in byWeek[w]!) ...[
+                _ShootCard(shoot: s, first: first),
+                Gap.m,
+              ],
+            ],
           ],
         );
       },
     );
   }
+}
+
+class _WeekHeader extends StatelessWidget {
+  const _WeekHeader({required this.week, required this.checkpoint});
+
+  final int week;
+  final bool checkpoint;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(4, 18, 4, 10),
+    child: Row(
+      children: [
+        Text(
+          week < 1 ? 'BEFORE WEEK 1' : 'WEEK $week',
+          style: AppTheme.overline,
+        ),
+        if (checkpoint) ...[
+          const SizedBox(width: 8),
+          const Icon(Icons.flag_rounded, size: 14, color: AppTheme.crimson),
+          const SizedBox(width: 4),
+          Text(
+            'checkpoint',
+            style: AppTheme.overline.copyWith(color: AppTheme.crimson),
+          ),
+        ],
+      ],
+    ),
+  );
 }
 
 class _StorageBar extends StatelessWidget {
@@ -120,25 +158,26 @@ class _StorageBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    final colour = stats.isOverBudget
-        ? AppTheme.warn
-        : stats.isNearBudget
-        ? AppTheme.warn
-        : AppTheme.moss;
-
+    final warn = stats.isNearBudget;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(
-              '${stats.photoCount} photos · ${stats.readable}',
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+            const Icon(Icons.lock_outline, size: 16, color: AppTheme.textDim),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                '${stats.photoCount} photos · ${stats.readable}, on this '
+                'phone only',
+                style: t.bodySmall?.copyWith(color: AppTheme.textDim),
+              ),
             ),
-            const Spacer(),
             Text(
-              'of ${stats.budgetReadable}',
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+              '${warn ? '⚠ ' : ''}of ${stats.budgetReadable}',
+              style: t.bodySmall?.copyWith(
+                color: warn ? AppTheme.warn : AppTheme.textDim,
+              ),
             ),
           ],
         ),
@@ -147,9 +186,11 @@ class _StorageBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(3),
           child: LinearProgressIndicator(
             value: stats.fraction,
-            minHeight: 4,
-            backgroundColor: AppTheme.outline,
-            valueColor: AlwaysStoppedAnimation(colour),
+            minHeight: 3,
+            backgroundColor: AppTheme.outlineSoft,
+            valueColor: AlwaysStoppedAnimation(
+              warn ? AppTheme.warn : AppTheme.textDim,
+            ),
           ),
         ),
       ],
@@ -158,192 +199,257 @@ class _StorageBar extends StatelessWidget {
 }
 
 class _ShootCard extends ConsumerWidget {
-  const _ShootCard({required this.shoot});
+  const _ShootCard({required this.shoot, required this.first});
 
   final PhotoShoot shoot;
+  final PhotoShoot first;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Theme.of(context).textTheme;
-    final photos = ref.watch(shootPhotosProvider(shoot.id)).asData?.value ?? [];
-    final media = ref.watch(mediaRepositoryProvider).asData?.value;
+    final photos = ref.watch(shootPhotosProvider(shoot.id));
+    final poses = ref.watch(posesProvider).asData?.value ?? const [];
+    final root = ref.watch(mediaRootProvider).asData?.value;
+    final byPose = {for (final p in photos) p.poseId: p};
+    final kg = shoot.bodyweightKg;
+    final since = kg != null && first.bodyweightKg != null && first != shoot
+        ? kg - first.bodyweightKg!
+        : null;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+      onTap: () => context.push('/progress/photos/${shoot.id}'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      DateFormat('d MMMM yyyy').format(shoot.shotOn),
-                      style: t.titleMedium,
+              Expanded(
+                child: Text(
+                  DateFormat('EEE d MMMM').format(shoot.shotOn),
+                  style: t.titleMedium,
+                ),
+              ),
+              if (kg != null) Text(_kg(kg), style: AppTheme.numeric(18)),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  poses.isEmpty
+                      ? '${photos.length} photos'
+                      : photos.length >= poses.length
+                      ? 'all ${poses.length} poses'
+                      : '${photos.length} of ${poses.length} poses',
+                  style: t.bodySmall?.copyWith(color: AppTheme.textDim),
+                ),
+              ),
+              if (since != null)
+                Text(
+                  '${since >= 0 ? '▲' : '▼'} ${_signedKg(since)} since the first',
+                  style: t.bodySmall?.copyWith(color: AppTheme.textDim),
+                ),
+            ],
+          ),
+          Gap.s,
+          Row(
+            children: [
+              for (final (i, pose) in poses.indexed) ...[
+                if (i > 0) const SizedBox(width: 6),
+                Expanded(
+                  child: AspectRatio(
+                    aspectRatio: photoAspect(byPose[pose.id]),
+                    child: _Thumb(
+                      photo: byPose[pose.id],
+                      root: root,
+                      label: pose.name,
                     ),
-                  ),
-                  IconButton(
-                    tooltip: 'Delete shoot',
-                    icon: const Icon(Icons.delete_outline, size: 20),
-                    onPressed: media == null
-                        ? null
-                        : () => _confirmDelete(context, ref, media),
-                  ),
-                ],
-              ),
-              Wrap(
-                spacing: 8,
-                runSpacing: 6,
-                children: [
-                  if (shoot.weekNo != null)
-                    InfoChip(label: 'week ${shoot.weekNo}'),
-                  if (shoot.bodyweightKg != null)
-                    InfoChip(label: '${shoot.bodyweightKg} kg'),
-                  InfoChip(label: '${photos.length} photos'),
-                ],
-              ),
-              if (photos.isNotEmpty && media != null) ...[
-                Gap.m,
-                SizedBox(
-                  height: 120,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: photos.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 8),
-                    itemBuilder: (context, i) =>
-                        _Thumb(photo: photos[i], media: media),
                   ),
                 ),
               ],
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _confirmDelete(
-    BuildContext context,
-    WidgetRef ref,
-    MediaRepository media,
-  ) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        title: const Text('Delete this shoot?'),
-        content: const Text(
-          'Every photo in it is deleted from the phone permanently. There is '
-          'no copy anywhere else unless you have exported a backup.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Keep'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
-          ),
         ],
       ),
     );
-    if (ok != true) return;
-    await media.deleteShoot(shoot.id);
-    ref.invalidate(shootsProvider);
-    ref.invalidate(mediaStatsProvider);
   }
 }
 
+/// A photo's thumbnail, or a labelled gap where a pose was not taken.
 class _Thumb extends StatelessWidget {
-  const _Thumb({required this.photo, required this.media});
+  const _Thumb({required this.photo, required this.root, required this.label});
 
-  final ProgressPhoto photo;
-  final MediaRepository media;
+  final ProgressPhoto? photo;
+  final Directory? root;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<File>(
-      future: media.fileFor(photo.relativePath),
-      builder: (context, snap) {
-        final file = snap.data;
-        if (file == null || !file.existsSync()) {
-          return Container(
-            width: 90,
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceHigh,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.broken_image_outlined,
-              color: AppTheme.textDim,
-            ),
-          );
-        }
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.file(file, width: 90, fit: BoxFit.cover),
-        );
-      },
+    final r = root;
+    final p = photo;
+    Widget child;
+    if (p == null || r == null) {
+      child = Container(
+        color: AppTheme.surfaceHigh,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(4),
+        child: Text(
+          p == null ? '–\n$label' : '',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.labelSmall
+              ?.copyWith(color: AppTheme.textFaint),
+        ),
+      );
+    } else {
+      final thumb = MediaRepository.thumbFile(r, p.relativePath);
+      child = Image.file(
+        thumb.existsSync()
+            ? thumb
+            : MediaRepository.photoFile(r, p.relativePath),
+        fit: BoxFit.cover,
+        cacheWidth: 360,
+        errorBuilder: (_, _, _) => const ColoredBox(
+          color: AppTheme.surfaceHigh,
+          child: Icon(Icons.broken_image_outlined, color: AppTheme.textDim),
+        ),
+      );
+    }
+    return ClipRRect(borderRadius: BorderRadius.circular(8), child: child);
+  }
+}
+
+// -------------------------------------------------------------- pose picker
+
+class _PoseChips extends ConsumerWidget {
+  const _PoseChips({required this.selected, required this.onSelected});
+
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final poses = ref.watch(posesProvider).asData?.value ?? const [];
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final pose in poses)
+          ChoiceChip(
+            label: Text(pose.name),
+            selected: pose.id == selected,
+            onSelected: (_) => onSelected(pose.id),
+          ),
+      ],
     );
   }
 }
 
-class _CompareTab extends ConsumerStatefulWidget {
-  const _CompareTab({required this.poses});
+/// A photo with its shoot, for captions: "Week 4 · 51.2 kg".
+typedef _Framed = ({ProgressPhoto photo, PhotoShoot? shoot});
 
-  final AsyncValue<List<PhotoPose>> poses;
-
-  @override
-  ConsumerState<_CompareTab> createState() => _CompareTabState();
+List<_Framed> _framed(WidgetRef ref, String poseId) {
+  final shoots = {
+    for (final s in ref.watch(shootsProvider).asData?.value ?? const [])
+      s.id: s,
+  };
+  return [
+    for (final p in ref.watch(posePhotosProvider(poseId)))
+      (photo: p, shoot: shoots[p.shootId]),
+  ];
 }
 
-class _CompareTabState extends ConsumerState<_CompareTab> {
+String _caption(_Framed f, {bool long = false}) {
+  final s = f.shoot;
+  final date = DateFormat(long ? 'd MMM yyyy' : 'd MMM')
+      .format(s?.shotOn ?? f.photo.takenAt);
+  return [
+    if (s?.weekNo case final w?) 'Week $w',
+    date,
+    if (s?.bodyweightKg case final kg?) _kg(kg),
+  ].join(' · ');
+}
+
+// ------------------------------------------------------------------ compare
+
+class _Compare extends ConsumerStatefulWidget {
+  const _Compare();
+
+  @override
+  ConsumerState<_Compare> createState() => _CompareState();
+}
+
+class _CompareState extends ConsumerState<_Compare> {
   String? _poseId;
+  String? _beforeId;
+  String? _afterId;
   bool _wipe = true;
 
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    final poses = widget.poses.asData?.value ?? [];
-    if (poses.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    final poses = ref.watch(posesProvider).asData?.value ?? const [];
+    final root = ref.watch(mediaRootProvider).asData?.value;
+    if (poses.isEmpty || root == null) return const SkeletonPage(cards: 1);
     final poseId = _poseId ?? poses.first.id;
-    final photos = ref.watch(posePhotosProvider(poseId)).asData?.value ?? [];
-    final media = ref.watch(mediaRepositoryProvider).asData?.value;
+    final all = _framed(ref, poseId);
+
+    if ((ref.watch(shootsProvider).asData?.value ?? const []).isEmpty) {
+      return const _NoShoots();
+    }
+
+    // Any two shoots; the first and the latest unless he picks.
+    _Framed? pick(String? id, _Framed? fallback) =>
+        all.where((f) => f.photo.id == id).firstOrNull ?? fallback;
+    final before = pick(_beforeId, all.firstOrNull);
+    final after = pick(_afterId, all.lastOrNull);
 
     return ListView(
-      padding: Gap.pagePadding,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
       children: [
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final pose in poses)
-              ChoiceChip(
-                label: Text(pose.name),
-                selected: pose.id == poseId,
-                onSelected: (_) => setState(() => _poseId = pose.id),
-              ),
-          ],
+        _PoseChips(
+          selected: poseId,
+          onSelected: (id) => setState(() {
+            _poseId = id;
+            _beforeId = _afterId = null;
+          }),
         ),
         Gap.m,
-        if (photos.length < 2)
+        if (all.length < 2 || before == null || after == null)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 40),
             child: Text(
-              photos.isEmpty
+              all.isEmpty
                   ? 'No photos of this pose yet.'
-                  : 'One photo so far. Comparison needs two — come back '
-                        'at the week-4 checkpoint.',
+                  : 'One shot of this pose so far. Comparing needs two — '
+                        'the next checkpoint makes the second.',
               textAlign: TextAlign.center,
               style: t.bodyLarge?.copyWith(color: AppTheme.textDim),
             ),
           )
-        else if (media != null) ...[
+        else ...[
+          Row(
+            children: [
+              Expanded(
+                child: _Picker(
+                  label: 'Before',
+                  value: _caption(before),
+                  onTap: () => _choose(all, before, (id) => _beforeId = id),
+                ),
+              ),
+              Gap.s,
+              Expanded(
+                child: _Picker(
+                  label: 'After',
+                  value: _caption(after),
+                  onTap: () => _choose(all, after, (id) => _afterId = id),
+                ),
+              ),
+            ],
+          ),
+          Gap.m,
           SegmentedButton<bool>(
             segments: const [
               ButtonSegment(value: true, label: Text('Wipe')),
@@ -353,196 +459,174 @@ class _CompareTabState extends ConsumerState<_CompareTab> {
             onSelectionChanged: (s) => setState(() => _wipe = s.first),
           ),
           Gap.m,
-          FutureBuilder<List<File>>(
-            future: Future.wait([
-              media.fileFor(photos.first.relativePath),
-              media.fileFor(photos.last.relativePath),
-            ]),
-            builder: (context, snap) {
-              final files = snap.data;
-              if (files == null || files.any((f) => !f.existsSync())) {
-                return const SizedBox(
-                  height: 200,
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-              final firstLabel = DateFormat('d MMM')
-                  .format(photos.first.takenAt);
-              final lastLabel = DateFormat('d MMM').format(photos.last.takenAt);
-              return _wipe
-                  ? AspectRatio(
-                      aspectRatio: 3 / 4,
-                      child: WipeCompare(
-                        before: files[0],
-                        after: files[1],
-                        beforeLabel: firstLabel,
-                        afterLabel: lastLabel,
-                      ),
-                    )
-                  : SideBySide(
-                      before: files[0],
-                      after: files[1],
-                      beforeCaption: firstLabel,
-                      afterCaption: lastLabel,
-                    );
-            },
-          ),
-          Gap.l,
-          Text('Every shot of this pose', style: t.titleMedium),
-          Gap.s,
-          FutureBuilder<List<File>>(
-            future: Future.wait(
-              photos.map((p) => media.fileFor(p.relativePath)),
-            ),
-            builder: (context, snap) {
-              final files = snap.data;
-              if (files == null) return const SizedBox.shrink();
-              return Flipbook(
-                frames: files.where((f) => f.existsSync()).toList(),
-                captions: photos
-                    .map((p) => DateFormat('d MMM yyyy').format(p.takenAt))
-                    .toList(),
-              );
-            },
-          ),
-        ],
-        Gap.xl,
-      ],
-    );
-  }
-}
-
-class _MeasureTab extends ConsumerWidget {
-  const _MeasureTab();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = Theme.of(context).textTheme;
-
-    return ListView(
-      padding: Gap.pagePadding,
-      children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('The waist is the one that matters', style: t.titleMedium),
-                Gap.s,
-                Text(
-                  'Expect it to grow a little — you are gaining weight. '
-                  'More than 3 cm across twelve weeks means the surplus is '
-                  'too big: cut 200 kcal.\n\n'
-                  'Same time of day, same tape tension, relaxed and exhaled.',
-                  style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+          if (_wipe)
+            AspectRatio(
+              aspectRatio: photoAspect(after.photo),
+              child: WipeCompare(
+                key: ValueKey('${before.photo.id}-${after.photo.id}'),
+                before: MediaRepository.photoFile(
+                  root,
+                  before.photo.relativePath,
                 ),
-              ],
+                after: MediaRepository.photoFile(
+                  root,
+                  after.photo.relativePath,
+                ),
+                beforeLabel: _caption(before),
+                afterLabel: _caption(after),
+              ),
+            )
+          else
+            SideBySide(
+              before: MediaRepository.photoFile(
+                root,
+                before.photo.relativePath,
+              ),
+              after: MediaRepository.photoFile(root, after.photo.relativePath),
+              beforeCaption: _caption(before),
+              afterCaption: _caption(after),
+              aspectRatio: photoAspect(after.photo),
             ),
-          ),
-        ),
-        Gap.l,
-        for (final site in MeasurementSite.values) _MeasurementRow(site: site),
-        Gap.xl,
+          if (_between(before, after) case final text?) ...[
+            Gap.m,
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: t.titleMedium?.copyWith(color: AppTheme.textDim),
+            ),
+          ],
+        ],
       ],
     );
   }
+
+  static String? _between(_Framed a, _Framed b) {
+    final days = b.photo.takenAt.difference(a.photo.takenAt).inDays;
+    final weeks = (days / 7).round();
+    final kgA = a.shoot?.bodyweightKg, kgB = b.shoot?.bodyweightKg;
+    final parts = [
+      if (weeks > 0) '$weeks week${weeks == 1 ? '' : 's'} apart',
+      if (kgA != null && kgB != null) _signedKg(kgB - kgA),
+    ];
+    return parts.isEmpty ? null : parts.join(' · ');
+  }
+
+  Future<void> _choose(
+    List<_Framed> all,
+    _Framed current,
+    void Function(String id) set,
+  ) async {
+    final id = await showAppSheet<String>(
+      context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final f in all.reversed)
+            ListTile(
+              minTileHeight: 52,
+              title: Text(_caption(f, long: true)),
+              trailing: f.photo.id == current.photo.id
+                  ? const Icon(Icons.check, color: AppTheme.crimson)
+                  : null,
+              onTap: () => Navigator.pop(context, f.photo.id),
+            ),
+        ],
+      ),
+    );
+    if (id != null) setState(() => set(id));
+  }
 }
 
-class _MeasurementRow extends ConsumerWidget {
-  const _MeasurementRow({required this.site});
+class _Picker extends StatelessWidget {
+  const _Picker({
+    required this.label,
+    required this.value,
+    required this.onTap,
+  });
 
-  final MeasurementSite site;
-
-  static String label(MeasurementSite s) => switch (s) {
-    MeasurementSite.waist => 'Waist',
-    MeasurementSite.chest => 'Chest',
-    MeasurementSite.upperArm => 'Upper arm',
-    MeasurementSite.thigh => 'Thigh',
-    MeasurementSite.neck => 'Neck',
-    MeasurementSite.hips => 'Hips',
-    MeasurementSite.calf => 'Calf',
-  };
+  final String label;
+  final String value;
+  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    final rows = ref.watch(measurementsProvider(site)).asData?.value ?? [];
-    final latest = rows.isEmpty ? null : rows.last;
-    final first = rows.isEmpty ? null : rows.first;
-    final delta = (latest != null && first != null && rows.length > 1)
-        ? latest.cm - first.cm
-        : null;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+    return AppCard(
+      onTap: onTap,
+      padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+      radius: AppRadius.m,
       child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label(site), style: t.titleMedium),
-                if (latest != null)
-                  Text(
-                    '${latest.cm} cm'
-                    '${delta != null ? '  (${delta >= 0 ? '+' : ''}${delta.toStringAsFixed(1)})' : ''}',
-                    style: t.bodyMedium?.copyWith(
-                      color: site == MeasurementSite.waist && (delta ?? 0) > 3
-                          ? AppTheme.warn
-                          : AppTheme.textDim,
-                    ),
-                  )
-                else
-                  Text(
-                    'not measured',
-                    style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                  ),
+                Text(label.toUpperCase(), style: AppTheme.overline),
+                const SizedBox(height: 2),
+                Text(value, maxLines: 2, style: t.bodyMedium),
               ],
             ),
           ),
-          SizedBox(
-            height: 48,
-            child: OutlinedButton(
-              onPressed: () => _enter(context, ref),
-              child: const Text('Enter'),
-            ),
-          ),
+          const Icon(Icons.expand_more, color: AppTheme.textDim),
         ],
       ),
     );
   }
+}
 
-  Future<void> _enter(BuildContext context, WidgetRef ref) async {
-    final controller = TextEditingController();
-    final value = await showDialog<double>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        title: Text(label(site)),
-        content: TextField(
-          controller: controller,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          autofocus: true,
-          decoration: const InputDecoration(suffixText: 'cm'),
+// --------------------------------------------------------------- time-lapse
+
+class _TimeLapse extends ConsumerStatefulWidget {
+  const _TimeLapse();
+
+  @override
+  ConsumerState<_TimeLapse> createState() => _TimeLapseState();
+}
+
+class _TimeLapseState extends ConsumerState<_TimeLapse> {
+  String? _poseId;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final poses = ref.watch(posesProvider).asData?.value ?? const [];
+    final root = ref.watch(mediaRootProvider).asData?.value;
+    if (poses.isEmpty || root == null) return const SkeletonPage(cards: 1);
+    if ((ref.watch(shootsProvider).asData?.value ?? const []).isEmpty) {
+      return const _NoShoots();
+    }
+    final poseId = _poseId ?? poses.first.id;
+    final all = _framed(ref, poseId);
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+      children: [
+        _PoseChips(
+          selected: poseId,
+          onSelected: (id) => setState(() => _poseId = id),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+        Gap.m,
+        if (all.length < 2)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 40),
+            child: Text(
+              'A time-lapse needs two shots of a pose. It grows with every '
+              'checkpoint.',
+              textAlign: TextAlign.center,
+              style: t.bodyLarge?.copyWith(color: AppTheme.textDim),
+            ),
+          )
+        else
+          Flipbook(
+            key: ValueKey(poseId),
+            frames: [
+              for (final f in all)
+                MediaRepository.photoFile(root, f.photo.relativePath),
+            ],
+            captions: [for (final f in all) _caption(f, long: true)],
+            aspectRatio: photoAspect(all.last.photo),
           ),
-          FilledButton(
-            onPressed: () =>
-                Navigator.pop(context, double.tryParse(controller.text)),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+      ],
     );
-    if (value == null) return;
-    await ref
-        .read(databaseProvider)
-        .upsertMeasurement(ref.read(todayProvider), site, value);
-    ref.invalidate(measurementsProvider(site));
   }
 }

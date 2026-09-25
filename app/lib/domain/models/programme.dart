@@ -213,16 +213,49 @@ class CardioWeek {
   };
 }
 
+/// What the app can see for itself, so a checkpoint item ticks without
+/// being asked twice.
+enum CheckKind {
+  /// A shoot of every pose.
+  photos,
+
+  /// Every site in [Programme.measurementSites].
+  measurements,
+
+  /// Any weigh-in.
+  weighIn,
+
+  /// Every required session so far accounted for: done, or skipped on
+  /// purpose. No holes.
+  sessionsLogged;
+
+  static CheckKind? fromJson(String s) =>
+      values.where((k) => k.name == s).firstOrNull;
+}
+
 class Checkpoint {
   const Checkpoint({
     required this.week,
     required this.items,
     this.expectedWeightKg,
+    this.autoTick = const {},
   });
 
   final int week;
   final List<String> items;
   final List<double>? expectedWeightKg;
+
+  /// Which item each kind of evidence ticks, by index into [items]. The
+  /// rest are ticked by hand.
+  final Map<CheckKind, int> autoTick;
+
+  /// The kind of evidence that ticks item [index], if any.
+  CheckKind? autoFor(int index) {
+    for (final MapEntry(:key, :value) in autoTick.entries) {
+      if (value == index) return key;
+    }
+    return null;
+  }
 
   factory Checkpoint.fromJson(Map<String, dynamic> j) => Checkpoint(
     week: (j['week'] as num).toInt(),
@@ -232,12 +265,21 @@ class Checkpoint {
         : (j['expectedWeightKg'] as List)
               .map((e) => (e as num).toDouble())
               .toList(),
+    autoTick: {
+      for (final MapEntry(:key, :value)
+          in ((j['autoTick'] as Map?) ?? const {}).entries)
+        // An unknown kind is dropped, not a crash: older builds reading a
+        // newer programme.
+        ?CheckKind.fromJson(key as String): (value as num).toInt(),
+    },
   );
 
   Map<String, dynamic> toJson() => {
     'week': week,
     'expectedWeightKg': expectedWeightKg,
     'items': items,
+    if (autoTick.isNotEmpty)
+      'autoTick': {for (final e in autoTick.entries) e.key.name: e.value},
   };
 }
 
@@ -308,6 +350,7 @@ class Programme {
     this.cardioProgression = const [],
     this.checkpoints = const [],
     this.strengthTargets = const [],
+    this.measurementSites = const [],
   });
 
   final String id;
@@ -326,6 +369,10 @@ class Programme {
   final List<Checkpoint> checkpoints;
   final List<StrengthTarget> strengthTargets;
   final List<Block> blocks;
+
+  /// The tape-measure sites a checkpoint asks for, by name (`waist`,
+  /// `upperArm`, ...). The Measure screen leads with these.
+  final List<String> measurementSites;
 
   Block? blockForWeek(int week) =>
       blocks.firstWhereOrNull((b) => b.coversWeek(week));
@@ -379,6 +426,8 @@ class Programme {
     strengthTargets: (j['strengthTargets'] as List? ?? const [])
         .map((e) => StrengthTarget.fromJson(e as Map<String, dynamic>))
         .toList(),
+    measurementSites:
+        (j['measurementSites'] as List?)?.cast<String>().toList() ?? const [],
     blocks: (j['blocks'] as List)
         .map((e) => Block.fromJson(e as Map<String, dynamic>))
         .toList(),
@@ -401,6 +450,7 @@ class Programme {
     'cardioProgression': cardioProgression.map((e) => e.toJson()).toList(),
     'checkpoints': checkpoints.map((e) => e.toJson()).toList(),
     'strengthTargets': strengthTargets.map((e) => e.toJson()).toList(),
+    if (measurementSites.isNotEmpty) 'measurementSites': measurementSites,
     'blocks': blocks.map((e) => e.toJson()).toList(),
   };
 
@@ -424,6 +474,7 @@ class Programme {
     cardioProgression: cardioProgression,
     checkpoints: checkpoints,
     strengthTargets: strengthTargets,
+    measurementSites: measurementSites,
     blocks: blocks ?? this.blocks,
   );
 

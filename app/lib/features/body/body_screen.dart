@@ -1,31 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart' show GoRouterHelper;
+import 'package:intl/intl.dart' show DateFormat;
 
 import '../../app/body_providers.dart';
+import '../../app/progress_providers.dart';
 import '../../app/providers.dart';
 import '../../app/session_providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
+import '../../data/db/database.dart';
+import '../../data/db/tables.dart';
 import '../../domain/metrics/bodyweight_trend.dart';
+import '../../domain/models/programme.dart';
 import '../common/widgets.dart';
 import 'widgets/trend_chart.dart';
 
-/// Bodyweight and food.
+/// The scale and the tape.
 ///
 /// At 167 cm and 50 kg this screen matters more than any lift. The programme
 /// is the easy half; if the scale does not move, nothing else here works.
+/// Food itself is logged on the Fuel tab.
 class BodyScreen extends ConsumerWidget {
   const BodyScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = Theme.of(context).textTheme;
     final entriesAsync = ref.watch(weightEntriesProvider);
-    final adviceAsync = ref.watch(nutritionAdviceProvider);
-    final bundle = ref.watch(bundleProvider).asData?.value;
-    final week = ref.watch(currentWeekProvider);
-    final phase = bundle?.programme.nutritionForWeek(week);
+    final advice = ref.watch(nutritionAdviceProvider).asData?.value;
 
     return Scaffold(
       appBar: AppBar(
@@ -39,75 +40,33 @@ class BodyScreen extends ConsumerWidget {
         ],
       ),
       body: entriesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SkeletonPage(cards: 2),
         error: (e, _) => AsyncScaffoldBody(
           loading: false,
           error: e,
           child: const SizedBox(),
         ),
-        data: (entries) {
-          const trend = BodyweightTrend();
-          final points = trend.points(entries);
-          final advice = adviceAsync.asData?.value;
-
-          return ListView(
-            padding: Gap.pagePadding,
-            children: [
-              _WeightCard(entries: entries, points: points),
-              Gap.l,
-
-              if (advice != null) _AdviceCard(advice: advice),
-
-              if (phase != null) ...[
-                Gap.l,
-                _FoodCard(
-                  kcal: phase.kcal,
-                  proteinG: phase.proteinG,
-                  carbsG: phase.carbsG,
-                  fatG: phase.fatG,
-                  note: phase.note,
-                  kcalDelta: advice?.kcalDelta ?? 0,
-                ),
-              ],
-
-              Gap.l,
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Eating this much at 50 kg', style: t.titleMedium),
-                      Gap.s,
-                      Text(
-                        'Two liquid meals a day solves the whole problem. '
-                        'Milk, oats, peanut butter, banana, whey — 700 to '
-                        '800 kcal in three minutes, and it does not fill you '
-                        'up the way the same calories as chicken and rice '
-                        'would.\n\n'
-                        'Eat before training as well as after. Do not open a '
-                        'meal with salad or soup. Add olive oil to rice you '
-                        'are eating anyway.',
-                        style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Gap.xl,
-            ],
-          );
-        },
+        data: (entries) => ListView(
+          padding: Gap.pagePadding,
+          children: [
+            _WeightCard(entries: entries),
+            if (advice != null) ...[Gap.l, _AdviceCard(advice: advice)],
+            Gap.l,
+            const _TapeCard(),
+          ],
+        ),
       ),
     );
   }
 }
 
+bool _sameDay(DateTime a, DateTime b) =>
+    a.year == b.year && a.month == b.month && a.day == b.day;
+
 class _WeightCard extends ConsumerWidget {
-  const _WeightCard({required this.entries, required this.points});
+  const _WeightCard({required this.entries});
 
   final List<WeightEntry> entries;
-  final List<TrendPoint> points;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -115,128 +74,129 @@ class _WeightCard extends ConsumerWidget {
     const trend = BodyweightTrend();
     final avg = trend.currentAverage(entries);
     final change = trend.weeklyChange(entries);
-    final bundle = ref.watch(bundleProvider).asData?.value;
-    final target = bundle?.programme.athlete.targetWeightKg;
+    final athlete = ref.watch(bundleProvider).asData?.value.programme.athlete;
+    final target = athlete?.targetWeightKg;
+    final today = ref.watch(todayProvider);
+    final todays = entries.where((e) => _sameDay(e.date, today)).firstOrNull;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(child: Text('Bodyweight', style: t.titleLarge)),
-                FilledButton(
-                  onPressed: () => _enter(context, ref),
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text('Bodyweight', style: t.titleLarge)),
+              // An explicit minimum: the theme's filled button is
+              // full-width, which in a Row is infinite.
+              if (todays == null)
+                FilledButton.icon(
+                  onPressed: () => _weighIn(context, ref, athlete),
                   style: FilledButton.styleFrom(
-                    minimumSize: const Size(110, 48),
+                    minimumSize: const Size(120, 48),
                   ),
-                  child: const Text('Weigh in'),
+                  icon: const Icon(Icons.monitor_weight_outlined),
+                  label: const Text('Weigh in'),
+                )
+              else
+                OutlinedButton.icon(
+                  onPressed: () => _weighIn(context, ref, athlete),
+                  icon: const Icon(Icons.check, color: AppTheme.good),
+                  label: Text('${todays.kg.toStringAsFixed(1)} kg today'),
+                ),
+            ],
+          ),
+          Gap.m,
+          if (avg == null)
+            Text(
+              'No weigh-ins yet. Morning, after the toilet, before food, '
+              'most days — the rolling average is what decides anything, '
+              'and it needs feeding.',
+              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+            )
+          else ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(avg.toStringAsFixed(1), style: AppTheme.numeric(44)),
+                const SizedBox(width: 4),
+                Text(
+                  'kg',
+                  style: t.titleMedium?.copyWith(color: AppTheme.textDim),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  '7-day average',
+                  style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
                 ),
               ],
             ),
+            Gap.s,
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (change != null)
+                  InfoChip(
+                    label:
+                        '${change >= 0 ? '▲ +' : '▼ −'}'
+                        '${change.abs().toStringAsFixed(2)} kg/week',
+                  ),
+                if (target != null)
+                  InfoChip(
+                    label: '${(target - avg).toStringAsFixed(1)} kg to go',
+                    icon: Icons.flag_outlined,
+                  ),
+                InfoChip(label: '${entries.length} weigh-ins'),
+              ],
+            ),
             Gap.m,
-            if (avg == null)
-              Text(
-                'No weigh-ins yet. Morning, after the toilet, before food, '
-                'most days — the rolling average is what decides '
-                'anything, and it needs feeding.',
-                style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-              )
-            else ...[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    avg.toStringAsFixed(1),
-                    style: t.displaySmall?.copyWith(
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'kg',
-                    style: t.titleMedium?.copyWith(color: AppTheme.textDim),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    '7-day average',
-                    style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                  ),
-                ],
+            SizedBox(
+              height: 150,
+              child: TrendChart(
+                points: trend.points(entries),
+                targetKg: target,
               ),
-              Gap.s,
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  if (change != null)
-                    InfoChip(
-                      label:
-                          '${change >= 0 ? '+' : ''}'
-                          '${change.toStringAsFixed(2)} kg/week',
-                      emphasis: change > 0.15,
-                    ),
-                  if (target != null)
-                    InfoChip(
-                      label: '${(target - avg).toStringAsFixed(1)} kg to go',
-                    ),
-                  InfoChip(label: '${entries.length} weigh-ins'),
-                ],
-              ),
-              Gap.m,
-              SizedBox(
-                height: 150,
-                child: TrendChart(points: points, targetKg: target),
-              ),
-              Gap.s,
-              Text(
-                'The line is the rolling average. The dots are what the scale '
-                'actually said — they bounce a kilo on water and gut '
-                'content, which is exactly why nothing is decided on one.',
-                style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-              ),
-            ],
+            ),
+            Gap.s,
+            Text(
+              'The line is the rolling average. The dots are what the scale '
+              'said — they bounce a kilo on water and food, which is why '
+              'nothing is decided on one.',
+              style: t.bodySmall?.copyWith(color: AppTheme.textDim),
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
 
-  Future<void> _enter(BuildContext context, WidgetRef ref) async {
-    final controller = TextEditingController();
-    final kg = await showDialog<double>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        title: const Text('This morning'),
-        content: TextField(
-          controller: controller,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          autofocus: true,
-          decoration: const InputDecoration(suffixText: 'kg'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () =>
-                Navigator.pop(context, double.tryParse(controller.text)),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+  Future<void> _weighIn(
+    BuildContext context,
+    WidgetRef ref,
+    Athlete? athlete,
+  ) async {
+    final today = ref.read(todayProvider);
+    final todays = entries.where((e) => _sameDay(e.date, today)).firstOrNull;
+    // Start from the last weigh-in: a morning is within a kilo of the one
+    // before, a few taps away.
+    final start =
+        todays?.kg ?? entries.lastOrNull?.kg ?? athlete?.startWeightKg ?? 50.0;
+    final kg = await showStepperSheet(
+      context,
+      title: todays == null ? 'This morning' : 'This morning, corrected',
+      subtitle: 'After the toilet, before food.',
+      initial: start,
+      step: 0.1,
+      bigStep: 1,
+      min: 30,
+      max: 150,
+      decimals: 1,
+      unit: 'kg',
+      saveLabel: 'Save weigh-in',
     );
     if (kg == null) return;
-    await ref
-        .read(databaseProvider)
-        .upsertBodyweight(ref.read(todayProvider), kg);
-    ref.invalidate(weightEntriesProvider);
-    ref.invalidate(nutritionAdviceProvider);
+    await ref.read(databaseProvider).upsertBodyweight(today, kg);
   }
 }
 
@@ -247,41 +207,103 @@ class _AdviceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
-    final (colour, icon) = switch (advice.verdict) {
-      NutritionVerdict.onTrack => (AppTheme.good, Icons.check_circle_outline),
-      NutritionVerdict.flat => (AppTheme.warn, Icons.trending_flat),
-      NutritionVerdict.losing => (AppTheme.warn, Icons.trending_down),
-      NutritionVerdict.tooFast => (AppTheme.warn, Icons.trending_up),
-      NutritionVerdict.tooEarly => (AppTheme.textDim, Icons.hourglass_empty),
-    };
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colour.withValues(alpha: 0.10),
-        border: Border.all(color: colour.withValues(alpha: 0.55)),
-        borderRadius: BorderRadius.circular(12),
+    final (tone, icon, word) = switch (advice.verdict) {
+      NutritionVerdict.onTrack => (
+        Tone.good,
+        Icons.check_circle_outline,
+        'On track',
       ),
-      child: Row(
+      NutritionVerdict.flat => (Tone.warn, Icons.trending_flat, 'Flat'),
+      NutritionVerdict.losing => (Tone.warn, Icons.trending_down, 'Losing'),
+      NutritionVerdict.tooFast => (Tone.warn, Icons.trending_up, 'Too fast'),
+      NutritionVerdict.tooEarly => (
+        Tone.info,
+        Icons.hourglass_empty,
+        'Too early to tell',
+      ),
+    };
+    return ToneBanner(
+      tone: tone,
+      icon: icon,
+      title: advice.needsAction
+          ? (advice.kcalDelta > 0
+                ? 'Add ${advice.kcalDelta} kcal'
+                : 'Cut ${advice.kcalDelta.abs()} kcal')
+          : word,
+      body: advice.message,
+    );
+  }
+}
+
+// --------------------------------------------------------------------- tape
+
+String siteLabel(MeasurementSite s) => switch (s) {
+  MeasurementSite.waist => 'Waist',
+  MeasurementSite.chest => 'Chest',
+  MeasurementSite.upperArm => 'Upper arm',
+  MeasurementSite.thigh => 'Thigh',
+  MeasurementSite.neck => 'Neck',
+  MeasurementSite.hips => 'Hips',
+  MeasurementSite.calf => 'Calf',
+};
+
+/// Where the stepper starts when a site has never been measured: close to
+/// a slim young man's numbers, so the first reading is a few taps, not
+/// forty. Only a starting point — nothing is saved until he saves.
+double _firstGuess(MeasurementSite s) => switch (s) {
+  MeasurementSite.waist => 68,
+  MeasurementSite.chest => 82,
+  MeasurementSite.upperArm => 25,
+  MeasurementSite.thigh => 48,
+  MeasurementSite.neck => 33,
+  MeasurementSite.hips => 82,
+  MeasurementSite.calf => 32,
+};
+
+/// The measurement sites, the programme's first, then the optional ones.
+class _TapeCard extends ConsumerWidget {
+  const _TapeCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Theme.of(context).textTheme;
+    final programme = ref.watch(bundleProvider).asData?.value.programme;
+    if (programme == null) return const SizedBox.shrink();
+    final rules = programme.nutritionRules;
+    final named = {for (final s in MeasurementSite.values) s.name: s};
+    final core = [for (final n in programme.measurementSites) ?named[n]];
+    final extra = [
+      for (final s in MeasurementSite.values)
+        if (!core.contains(s)) s,
+    ];
+
+    return AppCard(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: colour),
-          Gap.m,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (advice.needsAction)
-                  Text(
-                    advice.kcalDelta > 0
-                        ? 'Add ${advice.kcalDelta} kcal'
-                        : 'Cut ${advice.kcalDelta.abs()} kcal',
-                    style: t.titleMedium?.copyWith(color: colour),
-                  ),
-                Text(advice.message, style: t.bodyMedium),
-              ],
-            ),
+          Text('Tape measure', style: t.titleLarge),
+          Gap.xs,
+          Text(
+            'Same time of day, same tension, relaxed and breathed out. Tap a '
+            'site to measure it and see its history.',
+            style: t.bodySmall?.copyWith(color: AppTheme.textDim),
+          ),
+          Gap.s,
+          for (final s in core)
+            _SiteRow(site: s, waistLimitCm: rules.waistGrowthLimitCm),
+          if (extra.isNotEmpty) ...[
+            const Divider(height: 20),
+            Text('OPTIONAL', style: AppTheme.overline),
+            for (final s in extra)
+              _SiteRow(site: s, waistLimitCm: rules.waistGrowthLimitCm),
+          ],
+          Gap.s,
+          Text(
+            'The waist may grow a little — you are gaining. More than '
+            '${_cm(rules.waistGrowthLimitCm)} cm over the programme means '
+            'the surplus is too big, and the advice above cuts '
+            '${rules.kcalCutWhenWaistGrows} kcal.',
+            style: t.bodySmall?.copyWith(color: AppTheme.textDim),
           ),
         ],
       ),
@@ -289,118 +311,71 @@ class _AdviceCard extends StatelessWidget {
   }
 }
 
-class _FoodCard extends ConsumerWidget {
-  const _FoodCard({
-    required this.kcal,
-    required this.proteinG,
-    required this.carbsG,
-    required this.fatG,
-    required this.note,
-    required this.kcalDelta,
-  });
+String _cm(double v) =>
+    v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
 
-  final int kcal;
-  final int proteinG;
-  final int carbsG;
-  final int fatG;
-  final String? note;
-  final int kcalDelta;
+class _SiteRow extends ConsumerWidget {
+  const _SiteRow({required this.site, required this.waistLimitCm});
+
+  final MeasurementSite site;
+  final double waistLimitCm;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Theme.of(context).textTheme;
-    final today = ref.watch(todayFoodProvider).asData?.value;
-    final streak = ref.watch(foodStreakProvider).asData?.value ?? 0;
-    final effective = kcal + kcalDelta;
+    final rows = ref.watch(measurementsProvider(site));
+    final today = ref.watch(todayProvider);
+    final latest = rows.lastOrNull;
+    final delta = rows.length > 1 ? rows.last.cm - rows.first.cm : null;
+    final over =
+        site == MeasurementSite.waist && delta != null && delta > waistLimitCm;
+    final measuredToday = latest != null && _sameDay(latest.measuredOn, today);
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: () => _measure(context, ref, rows),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 56),
+        child: Row(
           children: [
-            Row(
-              children: [
-                Expanded(child: Text('Today’s target', style: t.titleLarge)),
-                if (streak > 0)
-                  InfoChip(
-                    label: '$streak day streak',
-                    icon: Icons.local_fire_department_outlined,
-                    emphasis: true,
-                  ),
-              ],
-            ),
-            Gap.m,
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(
-                  '$effective',
-                  style: t.displaySmall?.copyWith(
-                    color: kcalDelta != 0 ? AppTheme.warn : AppTheme.text,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'kcal',
-                  style: t.titleMedium?.copyWith(color: AppTheme.textDim),
-                ),
-                if (kcalDelta != 0) ...[
-                  const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(siteLabel(site), style: t.titleMedium),
                   Text(
-                    '(was $kcal)',
-                    style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+                    latest == null
+                        ? 'not measured'
+                        : 'last ${DateFormat('d MMM').format(latest.measuredOn)}'
+                              '${delta == null ? '' : ' · ${delta >= 0 ? '+' : '−'}${delta.abs().toStringAsFixed(1)} since the first'}',
+                    style: t.bodySmall?.copyWith(
+                      color: over ? AppTheme.warn : AppTheme.textDim,
+                    ),
                   ),
                 ],
-              ],
-            ),
-            Gap.s,
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                InfoChip(label: '$proteinG g protein', emphasis: true),
-                InfoChip(label: '$carbsG g carbs'),
-                InfoChip(label: '$fatG g fat'),
-              ],
-            ),
-            if (note != null) ...[
-              Gap.s,
-              Text(
-                note!,
-                style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
               ),
-            ],
-            const Divider(height: 28),
-            Text('Did you hit it?', style: t.titleMedium),
-            Gap.s,
-            Row(
-              children: [
-                Expanded(
-                  child: _TickButton(
-                    label: 'Hit it',
-                    selected: today?.hitTarget == true,
-                    colour: AppTheme.good,
-                    onTap: () => _tick(ref, true),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _TickButton(
-                    label: 'Fell short',
-                    selected: today != null && today.hitTarget == false,
-                    colour: AppTheme.warn,
-                    onTap: () => _tick(ref, false),
-                  ),
-                ),
-              ],
             ),
-            Gap.s,
-            Text(
-              'That is the whole food log. No database, no barcodes — '
-              'one tap, and a streak you will not want to break.',
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+            if (over) ...[
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: AppTheme.warn,
+                size: 18,
+                semanticLabel: 'over the waist limit',
+              ),
+              const SizedBox(width: 6),
+            ],
+            if (latest != null)
+              Text(
+                '${latest.cm.toStringAsFixed(1)} cm',
+                style: AppTheme.numeric(20),
+              ),
+            const SizedBox(width: 6),
+            Icon(
+              measuredToday ? Icons.check_circle : Icons.add_circle_outline,
+              color: measuredToday ? AppTheme.good : AppTheme.textDim,
+              size: 22,
+              semanticLabel: measuredToday ? 'measured today' : 'measure',
             ),
           ],
         ),
@@ -408,41 +383,70 @@ class _FoodCard extends ConsumerWidget {
     );
   }
 
-  Future<void> _tick(WidgetRef ref, bool hit) async {
-    await ref
-        .read(bodyServiceProvider)
-        .logFood(ref.read(todayProvider), hitTarget: hit);
-    ref.invalidate(todayFoodProvider);
-    ref.invalidate(foodStreakProvider);
-  }
-}
-
-class _TickButton extends StatelessWidget {
-  const _TickButton({
-    required this.label,
-    required this.selected,
-    required this.colour,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final Color colour;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 56,
-      child: selected
-          ? FilledButton(
-              onPressed: onTap,
-              style: FilledButton.styleFrom(backgroundColor: colour),
-              child: Text(label),
-            )
-          : OutlinedButton(onPressed: onTap, child: Text(label)),
+  Future<void> _measure(
+    BuildContext context,
+    WidgetRef ref,
+    List<Measurement> rows,
+  ) async {
+    final t = Theme.of(context).textTheme;
+    final today = ref.read(todayProvider);
+    final history = rows.reversed.take(8).toList();
+    final cm = await showStepperSheet(
+      context,
+      title: siteLabel(site),
+      subtitle: rows.isEmpty
+          ? 'The first reading. Later ones are compared with it.'
+          : 'Measuring again today replaces today’s reading.',
+      initial: rows.lastOrNull?.cm ?? _firstGuess(site),
+      step: 0.1,
+      bigStep: 1,
+      min: 10,
+      max: 200,
+      decimals: 1,
+      unit: 'cm',
+      footer: history.isEmpty
+          ? null
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('HISTORY', style: AppTheme.overline),
+                Gap.xs,
+                for (final (i, m) in history.indexed)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            DateFormat('EEE d MMM yyyy').format(m.measuredOn),
+                            style: t.bodyMedium,
+                          ),
+                        ),
+                        if (i + 1 < history.length)
+                          Text(
+                            _change(m.cm - history[i + 1].cm),
+                            style: t.bodySmall?.copyWith(
+                              color: AppTheme.textDim,
+                            ),
+                          ),
+                        const SizedBox(width: 12),
+                        Text(
+                          m.cm.toStringAsFixed(1),
+                          style: AppTheme.numeric(18),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
     );
+    if (cm == null) return;
+    await ref.read(databaseProvider).upsertMeasurement(today, site, cm);
   }
+
+  static String _change(double d) => d.abs() < 0.05
+      ? '='
+      : '${d > 0 ? '▲' : '▼'} ${d.abs().toStringAsFixed(1)}';
 }
 
 /// A compact bodyweight line for the dashboard.
@@ -460,6 +464,3 @@ class BodyweightSparkline extends ConsumerWidget {
     );
   }
 }
-
-/// Formats a date the way the rest of the app does.
-String formatDay(DateTime d) => DateFormat('d MMM').format(d);

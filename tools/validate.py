@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validation gates V1-V13 from docs/02-data-model.md, section 1.6, plus V14-V18
+"""Validation gates V1-V13 from docs/02-data-model.md, section 1.6, plus V14-V19
 added in v3 (docs/06-v3-plan.md).
 
 These are the same assertions Phase 1 ports to `flutter test`. Run this after any
@@ -577,6 +577,38 @@ else:
     print(f"V18 demos: {len(clips)} clips, {len(mapped)} of {len(LIB)} "
           f"exercises, all original work")
 
+# ============ V19 checkpoints that tick themselves point at real items =======
+# docs/06-v3-plan.md, Phase 6. autoTick maps a kind of evidence the app holds
+# (a full shoot, the tape, the scale, a log with no holes) to the item it
+# ticks. An index past the end, or two kinds on one item, would tick the
+# wrong line or none.
+AUTO_KINDS = {"photos", "measurements", "weighIn", "sessionsLogged"}
+SITES = {"waist", "chest", "upperArm", "thigh", "neck", "hips", "calf"}
+sites = prog.get("measurementSites") or []
+for s_ in sites:
+    if s_ not in SITES:
+        fail("V19", f"measurementSites: unknown site {s_}")
+auto_count = 0
+for c in prog.get("checkpoints", []):
+    auto = c.get("autoTick") or {}
+    seen = {}
+    for kind, idx in auto.items():
+        auto_count += 1
+        if kind not in AUTO_KINDS:
+            fail("V19", f"week {c['week']}: unknown autoTick kind {kind}")
+        if not (0 <= idx < len(c["items"])):
+            fail("V19", f"week {c['week']}: autoTick {kind} -> item {idx}, "
+                        f"but there are {len(c['items'])} items")
+        if idx in seen:
+            fail("V19", f"week {c['week']}: item {idx} ticked by both "
+                        f"{seen[idx]} and {kind}")
+        seen[idx] = kind
+    if "measurements" in auto and not sites:
+        fail("V19", f"week {c['week']} ticks measurements, but the programme "
+                    f"names no measurementSites")
+print(f"V19 checkpoints: {auto_count} items tick themselves, "
+      f"{len(sites)} measurement sites")
+
 # --------------------------------------------------------------- verdict ----
 print()
 print("=" * 74)
@@ -590,5 +622,5 @@ if failures:
     for f in failures:
         print(f"  X {f}")
     sys.exit(1)
-print("ALL GATES PASSED (V1-V18)")
+print("ALL GATES PASSED (V1-V19)")
 sys.exit(0)

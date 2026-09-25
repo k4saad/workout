@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:drift/drift.dart' show InsertMode, Value;
+import 'package:drift/drift.dart'
+    show BooleanExpressionOperators, InsertMode, Value;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
@@ -109,6 +110,19 @@ class MediaRepository {
     return _cached ??= await getApplicationDocumentsDirectory();
   }
 
+  /// The app-private directory everything here lives under.
+  Future<Directory> root() => _root();
+
+  /// A stored photo's file under [root], without an await: for image
+  /// widgets, once the root is known.
+  static File photoFile(Directory root, String relativePath) =>
+      File(p.join(root.path, relativePath));
+
+  /// A stored photo's thumbnail under [root]. May not exist (photos from
+  /// before thumbnails); see [thumbFor].
+  static File thumbFile(Directory root, String relativePath) =>
+      File(p.join(root.path, thumbsDir, relativePath.replaceAll('/', '_')));
+
   /// Resolves a stored relative path to a real file.
   ///
   /// Paths are stored RELATIVE so that restoring a backup onto a different
@@ -124,7 +138,9 @@ class MediaRepository {
 
   // ------------------------------------------------------------------ poses
 
-  /// Seeds the four default poses if none exist. Safe on every launch.
+  /// Seeds the four default poses if none exist. Safe on every launch, and
+  /// safe when two callers get here at once: a pose already there is left
+  /// alone rather than inserted twice.
   Future<void> ensurePosesSeeded() async {
     final existing = await db.select(db.photoPoses).get();
     if (existing.isNotEmpty) return;
@@ -139,6 +155,7 @@ class MediaRepository {
               orderIndex: i,
               guidance: Value(pose.guidance),
             ),
+            mode: InsertMode.insertOrIgnore,
           );
     }
   }
@@ -169,11 +186,17 @@ class MediaRepository {
   ///
   /// The path is `photos/<shootId>/<poseId>.jpg` under the app documents
   /// directory — invisible to the gallery, invisible to Google Photos, and
-  /// excluded from Android's cloud backup.
+  /// excluded from Android's cloud backup. [thumb], when given, goes to
+  /// `thumbs/`, just as private.
+  ///
+  /// A shoot holds one photo per pose: saving a pose again is a retake and
+  /// replaces it, file and row. v2 added a row per attempt, each pointing
+  /// at the same overwritten file.
   Future<ProgressPhoto> savePhoto({
     required String shootId,
     required String poseId,
     required Uint8List bytes,
+    Uint8List? thumb,
     int width = 0,
     int height = 0,
     DateTime? takenAt,
@@ -185,7 +208,24 @@ class MediaRepository {
     final root = await _root();
     final rel = p.relative(file.path, from: root.path).replaceAll(r'\', '/');
 
-    final id = _uuid.v4();
+    final thumbFile = await _thumbFile(rel);
+    if (thumb != null) {
+      await _dir(thumbsDir);
+      await thumbFile.writeAsBytes(thumb, flush: true);
+    } else if (thumbFile.existsSync()) {
+      // A stale thumbnail of the photo this one replaces.
+      await thumbFile.delete();
+    }
+
+    final existing = await (db.select(
+      db.progressPhotos,
+    )..where((x) => x.shootId.equals(shootId) & x.poseId.equals(poseId))).get();
+    final id = existing.isEmpty ? _uuid.v4() : existing.first.id;
+    for (final extra in existing.skip(1)) {
+      await (db.delete(
+        db.progressPhotos,
+      )..where((x) => x.id.equals(extra.id))).go();
+    }
     await db
         .into(db.progressPhotos)
         .insert(
@@ -205,6 +245,30 @@ class MediaRepository {
     return (await (db.select(
       db.progressPhotos,
     )..where((x) => x.id.equals(id))).getSingle());
+  }
+
+  /// The small copy for lists and grids; the photo itself when there is
+  /// none (photos taken before thumbnails existed).
+  Future<File> thumbFor(ProgressPhoto photo) async {
+    final thumb = await _thumbFile(photo.relativePath);
+    return thumb.existsSync() ? thumb : fileFor(photo.relativePath);
+  }
+
+  /// Removes shoots with no photos in them — a camera that failed to open,
+  /// an app killed before the first frame was kept — and returns how many.
+  /// A shoot is only created once a photo is kept, so this is the safety
+  /// net, and the sweep for shoots v2 left empty.
+  Future<int> tidyEmptyShoots() async {
+    final shoots = await db.select(db.photoShoots).get();
+    var removed = 0;
+    for (final s in shoots) {
+      if ((await db.photosForShoot(s.id)).isNotEmpty) continue;
+      final dir = Directory(p.join((await _root()).path, photosDir, s.id));
+      if (dir.existsSync()) await dir.delete(recursive: true);
+      await (db.delete(db.photoShoots)..where((x) => x.id.equals(s.id))).go();
+      removed++;
+    }
+    return removed;
   }
 
   /// The photo the next shot of this pose should align against.
@@ -256,11 +320,8 @@ class MediaRepository {
     await (db.delete(db.photoShoots)..where((s) => s.id.equals(shootId))).go();
   }
 
-  Future<File> _thumbFile(String relativePath) async {
-    final root = await _root();
-    final name = relativePath.replaceAll('/', '_');
-    return File(p.join(root.path, thumbsDir, name));
-  }
+  Future<File> _thumbFile(String relativePath) async =>
+      thumbFile(await _root(), relativePath);
 
   // ------------------------------------------------------------------ clips
 

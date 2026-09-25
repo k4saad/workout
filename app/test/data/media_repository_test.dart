@@ -41,6 +41,11 @@ void main() {
       expect(poses.map((p) => p.orderIndex).toList(), [0, 1, 2, 3]);
     });
 
+    test('seeding from two places at once does not collide', () async {
+      await Future.wait([media.ensurePosesSeeded(), media.ensurePosesSeeded()]);
+      expect(await db.enabledPoses(), hasLength(4));
+    });
+
     test('seeding twice does not duplicate', () async {
       await media.ensurePosesSeeded();
       await media.ensurePosesSeeded();
@@ -230,6 +235,69 @@ void main() {
         db.photoShoots,
       )..where((s) => s.id.equals(shoot.id))).go();
       expect(await db.select(db.progressPhotos).get(), isEmpty);
+    });
+  });
+
+  group('retakes, empty shoots and thumbnails', () {
+    test('retaking a pose leaves one row, and the new picture', () async {
+      final shoot = await media.startShoot(DateTime(2026, 11, 2));
+      final first = await media.savePhoto(
+        shootId: shoot.id,
+        poseId: 'back',
+        bytes: jpeg(100),
+      );
+      final second = await media.savePhoto(
+        shootId: shoot.id,
+        poseId: 'back',
+        bytes: jpeg(200),
+      );
+      final rows = await db.photosForShoot(shoot.id);
+      expect(rows, hasLength(1), reason: 'v2 kept a row per attempt');
+      expect(rows.single.bytes, 200);
+      expect(second.id, first.id, reason: 'the same photo, taken again');
+      expect((await media.fileFor(second.relativePath)).lengthSync(), 200);
+    });
+
+    test('a shoot with no photos in it is tidied away', () async {
+      final empty = await media.startShoot(DateTime(2026, 11, 2));
+      final kept = await media.startShoot(DateTime(2026, 11, 3));
+      await media.savePhoto(shootId: kept.id, poseId: 'back', bytes: jpeg());
+
+      expect(await media.tidyEmptyShoots(), 1);
+      final ids = [for (final s in await db.shoots()) s.id];
+      expect(ids, [kept.id]);
+      expect(ids, isNot(contains(empty.id)));
+    });
+
+    test('a thumbnail is written app-private, and deleted with it', () async {
+      final shoot = await media.startShoot(DateTime(2026, 11, 2));
+      final photo = await media.savePhoto(
+        shootId: shoot.id,
+        poseId: 'back',
+        bytes: jpeg(),
+        thumb: jpeg(50),
+      );
+      final thumb = await media.thumbFor(photo);
+      final full = await media.fileFor(photo.relativePath);
+      expect(thumb.path, isNot(full.path));
+      expect(p.isWithin(docs.path, thumb.path), isTrue);
+      expect(thumb.lengthSync(), 50);
+
+      await media.deletePhoto(photo.id);
+      expect(thumb.existsSync(), isFalse);
+    });
+
+    test('with no thumbnail, the photo itself stands in', () async {
+      final shoot = await media.startShoot(DateTime(2026, 11, 2));
+      final photo = await media.savePhoto(
+        shootId: shoot.id,
+        poseId: 'back',
+        bytes: jpeg(),
+      );
+      expect(
+        (await media.thumbFor(photo)).path,
+        (await media.fileFor(photo.relativePath)).path,
+      );
     });
   });
 

@@ -1098,7 +1098,11 @@ PROGRAMME = {
          "note": "5K time trial replaces the Sunday run. Target 28-32 min."},
     ],
     "checkpoints": [
-        {"week": 1, "expectedWeightKg": [50.0, 50.5], "items": [
+        # autoTick: which item the app ticks itself, from what it already
+        # holds (a full shoot, every site measured, a weigh-in, no holes in
+        # the log). Indices into items; validate.py V19 checks them.
+        {"week": 1, "expectedWeightKg": [50.0, 50.5],
+         "autoTick": {"photos": 0, "measurements": 1, "weighIn": 4}, "items": [
             "Baseline photos -- all four poses, in the app's capture screen. It keeps them "
             "private; the phone's camera app would put them in the gallery",
             "All five measurements: waist, chest, upper arm, thigh, neck",
@@ -1106,22 +1110,27 @@ PROGRAMME = {
             "plates as listed in Settings → Your equipment",
             "Measure ceiling clearance for overhead press and for skipping",
             "First bodyweight entry"]},
-        {"week": 4, "expectedWeightKg": [51.0, 52.0], "items": [
+        {"week": 4, "expectedWeightKg": [51.0, 52.0],
+         "autoTick": {"photos": 0, "measurements": 1, "sessionsLogged": 3}, "items": [
             "Photos", "Measurements",
             "Squat and bench moving with real plates on",
             "Every session logged -- check for holes before Build starts"]},
-        {"week": 8, "expectedWeightKg": [53.0, 54.0], "items": [
+        {"week": 8, "expectedWeightKg": [53.0, 54.0],
+         "autoTick": {"photos": 0, "measurements": 1}, "items": [
             "Photos", "Measurements",
             "DELOAD WEEK -- do it properly, you will want to skip it",
             "Waist vs the 3 cm rule -- if it is growing faster than the lifts, cut 200 kcal",
             "Clothes should fit differently across the shoulders"]},
-        {"week": 12, "expectedWeightKg": [55.0, 56.5], "items": [
+        {"week": 12, "expectedWeightKg": [55.0, 56.5],
+         "autoTick": {"photos": 0, "measurements": 1}, "items": [
             "Photos", "Measurements",
             "5-rep tests: squat, bench, row, deadlift, overhead press",
             "Max strict pull-ups", "5K time trial",
             "Seed cycle 2 from the test numbers"]},
     ],
     "strengthTargets": [],   # derived below from PROJECTION
+    # The five a checkpoint asks for; hips and calf stay optional extras.
+    "measurementSites": ["waist", "chest", "upperArm", "thigh", "neck"],
     "blocks": [
         {"id": "foundation", "name": "Foundation", "weeks": [1, 2, 3, 4], "blockKind": "intro",
          # 3, not 4: rirMet needs the logged RIR >= target, so a 4 blocked every

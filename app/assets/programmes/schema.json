@@ -104,9 +104,27 @@
         "properties": {
           "week": { "type": "integer", "minimum": 1 },
           "expectedWeightKg": { "type": ["array", "null"], "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
-          "items": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+          "items": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "autoTick": {
+            "type": "object",
+            "description": "Which item the app ticks itself, by index into items.",
+            "additionalProperties": false,
+            "properties": {
+              "photos": { "type": "integer", "minimum": 0 },
+              "measurements": { "type": "integer", "minimum": 0 },
+              "weighIn": { "type": "integer", "minimum": 0 },
+              "sessionsLogged": { "type": "integer", "minimum": 0 }
+            }
+          }
         }
       }
+    },
+
+    "measurementSites": {
+      "type": "array",
+      "description": "The tape-measure sites a checkpoint asks for.",
+      "items": { "enum": ["waist", "chest", "upperArm", "thigh", "neck", "hips", "calf"] },
+      "uniqueItems": true
     },
 
     "strengthTargets": {

@@ -120,7 +120,8 @@ void main() {
   });
 
   testWidgets('Week renders seven day cards', (tester) async {
-    phoneSized(tester, const Size(400, 1600));
+    // Tall: the page is a lazy list, and week 1 opens with its checkpoint.
+    phoneSized(tester, const Size(400, 2800));
     await draw(tester, const WeekScreen());
     expect(find.textContaining('Week 1 of 12'), findsOneWidget);
     expect(find.text('Full Body A'), findsOneWidget);

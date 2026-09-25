@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_theme.dart';
+import '../../../core/ui/ui.dart';
 
 /// Two photos stacked with a draggable divider.
 ///
@@ -139,15 +139,29 @@ class _Tag extends StatelessWidget {
   }
 }
 
-/// Every photo of one pose, played in order.
+/// Every photo of one pose, played in order: a time-lapse.
 ///
 /// Sixteen weekly frames of the same pose is the single most motivating thing
 /// this app will do — a mirror shows you today, this shows you the slope.
+/// Each frame fades into the next, so the change reads as movement rather
+/// than as a slideshow of different pictures.
 class Flipbook extends StatefulWidget {
-  const Flipbook({super.key, required this.frames, this.captions = const []});
+  const Flipbook({
+    super.key,
+    required this.frames,
+    this.captions = const [],
+    this.aspectRatio = 9 / 16,
+    this.frameTime = const Duration(milliseconds: 1100),
+  });
 
   final List<File> frames;
   final List<String> captions;
+
+  /// Width over height of the photos.
+  final double aspectRatio;
+
+  /// How long each frame holds while playing.
+  final Duration frameTime;
 
   @override
   State<Flipbook> createState() => _FlipbookState();
@@ -170,7 +184,7 @@ class _FlipbookState extends State<Flipbook> {
       return;
     }
     setState(() {
-      _player = Timer.periodic(const Duration(milliseconds: 400), (_) {
+      _player = Timer.periodic(widget.frameTime, (_) {
         if (!mounted) return;
         setState(() => _index = (_index + 1) % widget.frames.length);
       });
@@ -194,13 +208,30 @@ class _FlipbookState extends State<Flipbook> {
         ? widget.captions[_index]
         : '';
 
+    final fade = AppMotion.reduced(context)
+        ? Duration.zero
+        : const Duration(milliseconds: 500);
     return Column(
       children: [
         AspectRatio(
-          aspectRatio: 3 / 4,
+          aspectRatio: widget.aspectRatio,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.file(widget.frames[_index], fit: BoxFit.cover),
+            child: AnimatedSwitcher(
+              duration: fade,
+              // Both frames fill the box, so the old one fades out exactly
+              // under the new one.
+              layoutBuilder: (current, previous) => Stack(
+                fit: StackFit.expand,
+                children: [...previous, ?current],
+              ),
+              child: Image.file(
+                widget.frames[_index],
+                key: ValueKey(_index),
+                fit: BoxFit.cover,
+                gaplessPlayback: true,
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 8),
@@ -254,12 +285,14 @@ class SideBySide extends StatelessWidget {
     required this.after,
     required this.beforeCaption,
     required this.afterCaption,
+    this.aspectRatio = 9 / 16,
   });
 
   final File before;
   final File after;
   final String beforeCaption;
   final String afterCaption;
+  final double aspectRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -267,11 +300,19 @@ class SideBySide extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: _Pane(file: before, caption: beforeCaption),
+          child: _Pane(
+            file: before,
+            caption: beforeCaption,
+            aspectRatio: aspectRatio,
+          ),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _Pane(file: after, caption: afterCaption),
+          child: _Pane(
+            file: after,
+            caption: afterCaption,
+            aspectRatio: aspectRatio,
+          ),
         ),
       ],
     );
@@ -279,10 +320,15 @@ class SideBySide extends StatelessWidget {
 }
 
 class _Pane extends StatelessWidget {
-  const _Pane({required this.file, required this.caption});
+  const _Pane({
+    required this.file,
+    required this.caption,
+    required this.aspectRatio,
+  });
 
   final File file;
   final String caption;
+  final double aspectRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -290,7 +336,7 @@ class _Pane extends StatelessWidget {
     return Column(
       children: [
         AspectRatio(
-          aspectRatio: 3 / 4,
+          aspectRatio: aspectRatio,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image.file(file, fit: BoxFit.cover),

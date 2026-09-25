@@ -11,6 +11,7 @@ import '../../domain/models/block.dart';
 import '../../domain/models/enums.dart';
 import '../../domain/models/programme.dart';
 import '../common/widgets.dart';
+import '../progress/checkpoint_checklist.dart';
 import 'day_sheet.dart';
 
 /// The month, swiped.
@@ -503,29 +504,17 @@ Future<void> showCheckpointSheet(BuildContext context, Checkpoint c) =>
               children: [
                 const Icon(Icons.flag_rounded, color: AppTheme.crimson),
                 Gap.s,
-                Text('Week ${c.week} checkpoint', style: t.headlineSmall),
+                Expanded(
+                  child: Text(
+                    'Week ${c.week} checkpoint',
+                    style: t.headlineSmall,
+                  ),
+                ),
+                CheckpointCount(week: c.week),
               ],
             ),
             Gap.m,
-            for (final item in c.items)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 3),
-                      child: Icon(
-                        Icons.radio_button_unchecked,
-                        size: 16,
-                        color: AppTheme.textDim,
-                      ),
-                    ),
-                    Gap.s,
-                    Expanded(child: Text(item, style: t.bodyLarge)),
-                  ],
-                ),
-              ),
+            CheckpointChecklist(checkpoint: c),
           ],
         );
       },

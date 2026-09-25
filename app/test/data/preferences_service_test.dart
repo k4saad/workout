@@ -140,4 +140,33 @@ void main() {
       expect(full.recentQuoteIds.first, 'q${Preferences.quoteMemory + 9}');
     });
   });
+
+  group('capture and checkpoints', () {
+    test('front camera and a ten-second timer by default', () {
+      const p = Preferences();
+      expect(p.captureFront, isTrue);
+      expect(p.captureTimerSec, 10);
+    });
+
+    test('a hand tick toggles, and belongs to its week only', () {
+      var p = const Preferences().withTickToggled(4, 2);
+      expect(p.ticksFor(4), {2});
+      expect(p.ticksFor(8), isEmpty);
+      p = p.withTickToggled(8, 2).withTickToggled(4, 2);
+      expect(p.ticksFor(4), isEmpty);
+      expect(p.ticksFor(8), {2});
+    });
+
+    test('survives a round trip, and a bad timer falls back', () {
+      final p = const Preferences(
+        captureFront: false,
+        captureTimerSec: 5,
+      ).withTickToggled(1, 3);
+      final back = Preferences.fromJson(p.toJson());
+      expect(back.captureFront, isFalse);
+      expect(back.captureTimerSec, 5);
+      expect(back.ticksFor(1), {3});
+      expect(Preferences.fromJson({'captureTimerSec': 7}).captureTimerSec, 10);
+    });
+  });
 }

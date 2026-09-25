@@ -11,6 +11,7 @@ import '../../domain/models/enums.dart';
 import '../../domain/models/programme.dart';
 import '../../core/ui/ui.dart';
 import '../common/widgets.dart';
+import '../progress/checkpoint_checklist.dart';
 import 'widgets/backup_nag.dart';
 import 'widgets/dashboard_strip.dart';
 import 'widgets/next_meal_card.dart';
@@ -338,7 +339,7 @@ class _ActiveBody extends StatelessWidget {
 
         if (checkpoint != null) ...[
           Gap.l,
-          _CheckpointCard(week: week, items: checkpoint.items),
+          _CheckpointCard(checkpoint: checkpoint),
         ],
 
         if (cardio != null && cardio.longRunLabel != null) ...[
@@ -374,55 +375,33 @@ class _ActiveBody extends StatelessWidget {
 }
 
 class _CheckpointCard extends StatelessWidget {
-  const _CheckpointCard({required this.week, required this.items});
+  const _CheckpointCard({required this.checkpoint});
 
-  final int week;
-  final List<String> items;
+  final Checkpoint checkpoint;
 
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.good.withValues(alpha: 0.10),
-        border: Border.all(color: AppTheme.good.withValues(alpha: 0.5)),
-        borderRadius: BorderRadius.circular(14),
-      ),
+    return AppCard(
+      accent: AppTheme.crimson,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.flag_outlined, color: AppTheme.good),
+              const Icon(Icons.flag_rounded, color: AppTheme.crimson),
               Gap.s,
               Expanded(
                 child: Text(
-                  'Week $week checkpoint',
-                  style: t.titleLarge?.copyWith(color: AppTheme.good),
+                  'Week ${checkpoint.week} checkpoint',
+                  style: t.titleLarge,
                 ),
               ),
+              CheckpointCount(week: checkpoint.week),
             ],
           ),
           Gap.s,
-          for (final i in items)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 2, right: 8),
-                    child: Icon(
-                      Icons.check_box_outline_blank,
-                      size: 18,
-                      color: AppTheme.textDim,
-                    ),
-                  ),
-                  Expanded(child: Text(i, style: t.bodyMedium)),
-                ],
-              ),
-            ),
+          CheckpointChecklist(checkpoint: checkpoint),
         ],
       ),
     );
@@ -481,7 +460,7 @@ class _BeforeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    final firstWeek = programme.checkpointForWeek(1)?.items ?? const [];
+    final firstWeek = programme.checkpointForWeek(1);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -502,31 +481,21 @@ class _BeforeCard extends StatelessWidget {
             ),
             // What to do before then is the programme's own week-1
             // checkpoint, not copy typed here.
-            if (firstWeek.isNotEmpty) ...[
+            if (firstWeek != null) ...[
               Gap.m,
-              Text(
-                'Before then',
-                style: t.titleSmall?.copyWith(color: AppTheme.textDim),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Before then',
+                      style: t.titleSmall?.copyWith(color: AppTheme.textDim),
+                    ),
+                  ),
+                  CheckpointCount(week: firstWeek.week),
+                ],
               ),
               Gap.xs,
-              for (final item in firstWeek)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 3),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(top: 2, right: 8),
-                        child: Icon(
-                          Icons.check_box_outline_blank,
-                          size: 18,
-                          color: AppTheme.textDim,
-                        ),
-                      ),
-                      Expanded(child: Text(item, style: t.bodyMedium)),
-                    ],
-                  ),
-                ),
+              CheckpointChecklist(checkpoint: firstWeek),
             ],
           ],
         ),
