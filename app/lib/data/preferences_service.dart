@@ -19,16 +19,14 @@ class Preferences {
     this.athleteName = defaultAthleteName,
     this.launchQuote = true,
     this.recentQuoteIds = const [],
+    this.quoteDay,
+    this.quoteId,
     this.captureFront = true,
     this.captureTimerSec = 10,
     this.checkpointTicks = const [],
   });
 
   static const defaultAthleteName = 'Saad';
-
-  /// How many recent quotes are remembered so the launch screen does not
-  /// repeat itself.
-  static const quoteMemory = 40;
 
   /// Off by default. An app that starts by nagging gets uninstalled.
   final bool eveningReminder;
@@ -45,8 +43,13 @@ class Preferences {
   /// Whether a quote greets you on a cold start.
   final bool launchQuote;
 
-  /// Quote ids shown recently, newest first, at most [quoteMemory].
+  /// The quotes shown in the current round, newest first. None comes back
+  /// until every quote has had its day.
   final List<String> recentQuoteIds;
+
+  /// The date [quoteId] was chosen for: the quote of that day.
+  final DateTime? quoteDay;
+  final String? quoteId;
 
   /// Progress photos on the front camera: he trains alone, and only the
   /// screen side lets him see the ghost he is lining up with. Remembered,
@@ -108,6 +111,8 @@ class Preferences {
     String? athleteName,
     bool? launchQuote,
     List<String>? recentQuoteIds,
+    DateTime? quoteDay,
+    String? quoteId,
     bool? captureFront,
     int? captureTimerSec,
     List<String>? checkpointTicks,
@@ -119,17 +124,22 @@ class Preferences {
     athleteName: athleteName ?? this.athleteName,
     launchQuote: launchQuote ?? this.launchQuote,
     recentQuoteIds: recentQuoteIds ?? this.recentQuoteIds,
+    quoteDay: quoteDay ?? this.quoteDay,
+    quoteId: quoteId ?? this.quoteId,
     captureFront: captureFront ?? this.captureFront,
     captureTimerSec: captureTimerSec ?? this.captureTimerSec,
     checkpointTicks: checkpointTicks ?? this.checkpointTicks,
   );
 
-  /// Remembers [id] as just shown, newest first, capped at [quoteMemory].
-  Preferences withQuoteShown(String id) => copyWith(
-    recentQuoteIds: [
-      id,
-      ...recentQuoteIds.where((q) => q != id),
-    ].take(quoteMemory).toList(),
+  /// Remembers [id] as the quote of [day], and the round it belongs to.
+  Preferences withQuoteOfDay({
+    required DateTime day,
+    required String id,
+    required List<String> cycle,
+  }) => copyWith(
+    quoteDay: DateTime(day.year, day.month, day.day),
+    quoteId: id,
+    recentQuoteIds: cycle,
   );
 
   factory Preferences.fromJson(Map<String, dynamic> j) => Preferences(
@@ -148,6 +158,11 @@ class Preferences {
       for (final q in (j['recentQuoteIds'] as List?) ?? const [])
         if (q is String) q,
     ],
+    quoteDay: switch (j['quoteDay']) {
+      final String s => DateTime.tryParse(s),
+      _ => null,
+    },
+    quoteId: j['quoteId'] as String?,
     captureFront: j['captureFront'] as bool? ?? true,
     captureTimerSec: switch (j['captureTimerSec']) {
       final num n when captureTimers.contains(n.toInt()) => n.toInt(),
@@ -167,6 +182,8 @@ class Preferences {
     'athleteName': athleteName,
     'launchQuote': launchQuote,
     'recentQuoteIds': recentQuoteIds,
+    'quoteDay': quoteDay?.toIso8601String(),
+    'quoteId': quoteId,
     'captureFront': captureFront,
     'captureTimerSec': captureTimerSec,
     'checkpointTicks': checkpointTicks,

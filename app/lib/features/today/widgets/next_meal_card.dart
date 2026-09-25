@@ -20,10 +20,21 @@ class NextMealCard extends ConsumerWidget {
   final DateTime now;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context, WidgetRef ref) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      // The header lives with the card, so neither shows without the other.
+      const SectionHeader('Next to eat'),
+      _card(context, ref),
+    ],
+  );
+
+  Widget _card(BuildContext context, WidgetRef ref) {
     final today = ref.watch(todayProvider);
-    final day = ref.watch(fuelDayProvider(today)).asData?.value;
-    if (day == null) return const SizedBox.shrink();
+    final async = ref.watch(fuelDayProvider(today));
+    if (async.hasError) return const SizedBox.shrink();
+    final day = async.asData?.value;
+    if (day == null) return const Skeleton(height: 112);
 
     final clock =
         '${now.hour.toString().padLeft(2, '0')}:'

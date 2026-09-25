@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../app/providers.dart';
 import '../../app/session_providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../data/db/database.dart';
 import '../../data/db/tables.dart';
 import '../common/widgets.dart';
@@ -23,7 +23,7 @@ class HistoryScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('History')),
       body: async.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SkeletonPage(),
         error: (e, _) => AsyncScaffoldBody(
           loading: false,
           error: e,
@@ -91,82 +91,77 @@ class SessionCard extends ConsumerWidget {
       (byExercise[s.exerciseId] ??= []).add(s);
     }
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    showDate
-                        ? DateFormat('EEE d MMM')
-                              .format(session.scheduledDate)
-                              .toUpperCase()
-                        : 'WEEK ${session.weekNo}',
-                    style: t.labelLarge?.copyWith(color: AppTheme.textDim),
-                  ),
+    return AppCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  showDate
+                      ? DateFormat('EEE d MMM')
+                            .format(session.scheduledDate)
+                            .toUpperCase()
+                      : 'WEEK ${session.weekNo}',
+                  style: t.labelLarge?.copyWith(color: AppTheme.textDim),
                 ),
-                _StatusGlyph(status: session.status),
-              ],
-            ),
-            Gap.xs,
-            Text(
-              showDate ? 'Week ${session.weekNo} · $title' : title,
-              style: t.titleMedium,
-            ),
-            Gap.s,
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                InfoChip(label: '${working.length} sets'),
-                if (duration != null)
-                  InfoChip(
-                    label: '$duration min',
-                    icon: Icons.schedule_outlined,
-                  ),
-                if (session.bodyweightKg != null)
-                  InfoChip(label: '${session.bodyweightKg} kg BW'),
-                if (session.loggedRetroactively)
-                  const InfoChip(label: 'from memory'),
-                if (session.wasShortened) const InfoChip(label: 'short'),
-              ],
-            ),
-            if (byExercise.isNotEmpty) ...[
-              const Divider(height: 22),
-              for (final entry in byExercise.entries)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 3),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          library?.resolve(entry.key).name ?? entry.key,
-                          style: t.bodyMedium,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          _summarise(entry.value),
-                          textAlign: TextAlign.end,
-                          style: t.bodyMedium?.copyWith(
-                            color: AppTheme.textDim,
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              ),
+              _StatusGlyph(status: session.status),
             ],
+          ),
+          Gap.xs,
+          Text(
+            showDate ? 'Week ${session.weekNo} · $title' : title,
+            style: t.titleMedium,
+          ),
+          Gap.s,
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              InfoChip(label: '${working.length} sets'),
+              if (duration != null)
+                InfoChip(label: '$duration min', icon: Icons.schedule_outlined),
+              if (session.bodyweightKg != null)
+                InfoChip(label: '${session.bodyweightKg} kg BW'),
+              if (session.loggedRetroactively)
+                const InfoChip(label: 'from memory'),
+              if (session.wasShortened) const InfoChip(label: 'short'),
+            ],
+          ),
+          if (byExercise.isNotEmpty) ...[
+            const Divider(height: 22),
+            for (final entry in byExercise.entries)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        library?.resolve(entry.key).name ?? entry.key,
+                        style: t.bodyMedium,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        _summarise(entry.value),
+                        textAlign: TextAlign.end,
+                        style: t.bodyMedium?.copyWith(
+                          color: AppTheme.textDim,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
-        ),
+        ],
       ),
     );
   }

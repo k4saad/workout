@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/body_providers.dart';
 import '../../app/providers.dart';
 import '../../app/session_providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../data/db/database.dart' show CardioLog;
 import '../../data/db/tables.dart';
 import '../../domain/intervals/interval_engine.dart';
@@ -296,45 +296,43 @@ class _WeekTargets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Week $week', style: t.titleLarge),
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Week $week', style: t.titleLarge),
+          Gap.s,
+          if (cardio.longRunLabel != null)
+            _Line(
+              icon: Icons.directions_run,
+              label: 'Sunday run',
+              value: cardio.longRunLabel!,
+            ),
+          if (cardio.secondRunMin != null)
+            _Line(
+              icon: Icons.directions_walk,
+              label: 'Second run',
+              value:
+                  '${cardio.secondRunMin!.first}–'
+                  '${cardio.secondRunMin!.last} min',
+            ),
+          if (cardio.skipping != null)
+            _Line(
+              icon: Icons.cable,
+              label: 'Skipping',
+              value: cardio.skipping!,
+            ),
+          if (cardio.bag != null)
+            _Line(icon: Icons.sports_mma, label: 'Bag', value: cardio.bag!),
+          if (cardio.note != null) ...[
             Gap.s,
-            if (cardio.longRunLabel != null)
-              _Line(
-                icon: Icons.directions_run,
-                label: 'Sunday run',
-                value: cardio.longRunLabel!,
-              ),
-            if (cardio.secondRunMin != null)
-              _Line(
-                icon: Icons.directions_walk,
-                label: 'Second run',
-                value:
-                    '${cardio.secondRunMin!.first}–'
-                    '${cardio.secondRunMin!.last} min',
-              ),
-            if (cardio.skipping != null)
-              _Line(
-                icon: Icons.cable,
-                label: 'Skipping',
-                value: cardio.skipping!,
-              ),
-            if (cardio.bag != null)
-              _Line(icon: Icons.sports_mma, label: 'Bag', value: cardio.bag!),
-            if (cardio.note != null) ...[
-              Gap.s,
-              Text(
-                cardio.note!,
-                style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-              ),
-            ],
+            Text(
+              cardio.note!,
+              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+            ),
           ],
-        ),
+        ],
       ),
     );
   }

@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/exercise_providers.dart';
 import '../../app/progress_providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../data/db/database.dart';
 import '../../domain/models/exercise.dart';
 import '../common/widgets.dart';
@@ -29,7 +29,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final library = ref.watch(libraryProvider).asData?.value;
     if (library == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: SkeletonPage());
     }
     final ex = library.resolve(exerciseId);
     final clips = ref.watch(clipsProvider(exerciseId)).asData?.value ?? [];
@@ -185,10 +185,14 @@ class _DemoHeroState extends State<_DemoHero> {
           child: Stack(
             children: [
               Positioned.fill(
-                child: ExerciseDemo(
-                  exerciseId: widget.exerciseId,
-                  paused: _paused,
-                  padding: 14,
+                // The same figure as the library row it was tapped in.
+                child: Hero(
+                  tag: 'demo-${widget.exerciseId}',
+                  child: ExerciseDemo(
+                    exerciseId: widget.exerciseId,
+                    paused: _paused,
+                    padding: 14,
+                  ),
                 ),
               ),
               Positioned(
@@ -352,17 +356,15 @@ class _Note extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: t.titleMedium),
-            Gap.xs,
-            Text(body, style: t.bodyMedium?.copyWith(color: AppTheme.textDim)),
-          ],
-        ),
+    return AppCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: t.titleMedium),
+          Gap.xs,
+          Text(body, style: t.bodyMedium?.copyWith(color: AppTheme.textDim)),
+        ],
       ),
     );
   }

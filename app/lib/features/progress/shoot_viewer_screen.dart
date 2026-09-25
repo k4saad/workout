@@ -7,27 +7,32 @@ import '../../app/progress_providers.dart';
 import '../../core/ui/ui.dart';
 import '../../data/db/database.dart';
 import '../../data/media_repository.dart';
+import 'progress_screen.dart' show photoHero;
 
 /// One shoot, full size, a pose per page.
 ///
 /// Deleting here deletes the files, not just the rows: these are the only
 /// copies, on this phone only.
 class ShootViewerScreen extends ConsumerStatefulWidget {
-  const ShootViewerScreen({super.key, required this.shootId});
+  const ShootViewerScreen({super.key, required this.shootId, this.poseId});
 
   final String shootId;
+
+  /// The pose to open on: the thumbnail that was tapped.
+  final String? poseId;
 
   @override
   ConsumerState<ShootViewerScreen> createState() => _ShootViewerState();
 }
 
 class _ShootViewerState extends ConsumerState<ShootViewerScreen> {
-  final _pages = PageController();
+  /// Made once the photos are known, so it can open on the tapped pose.
+  PageController? _pages;
   int _page = 0;
 
   @override
   void dispose() {
-    _pages.dispose();
+    _pages?.dispose();
     super.dispose();
   }
 
@@ -96,6 +101,11 @@ class _ShootViewerState extends ConsumerState<ShootViewerScreen> {
     if (shoot == null || root == null) {
       return const Scaffold(body: SkeletonPage(cards: 1));
     }
+    if (_pages == null && photos.isNotEmpty) {
+      final at = photos.indexWhere((p) => p.poseId == widget.poseId);
+      _page = at < 0 ? 0 : at;
+      _pages = PageController(initialPage: _page);
+    }
     final page = _page.clamp(0, photos.isEmpty ? 0 : photos.length - 1);
 
     // Neighbouring shoots, oldest to newest, for stepping through time.
@@ -138,16 +148,19 @@ class _ShootViewerState extends ConsumerState<ShootViewerScreen> {
                     itemBuilder: (_, i) => InteractiveViewer(
                       maxScale: 4,
                       child: Center(
-                        child: Image.file(
-                          MediaRepository.photoFile(
-                            root,
-                            photos[i].relativePath,
-                          ),
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, _, _) => const Icon(
-                            Icons.broken_image_outlined,
-                            color: AppTheme.textDim,
-                            size: 48,
+                        child: photoHero(
+                          photos[i].id,
+                          Image.file(
+                            MediaRepository.photoFile(
+                              root,
+                              photos[i].relativePath,
+                            ),
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, _, _) => const Icon(
+                              Icons.broken_image_outlined,
+                              color: AppTheme.textDim,
+                              size: 48,
+                            ),
                           ),
                         ),
                       ),

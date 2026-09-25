@@ -120,6 +120,7 @@ GoRouter buildRouter() {
                         path: ':shootId',
                         builder: (_, state) => ShootViewerScreen(
                           shootId: state.pathParameters['shootId']!,
+                          poseId: state.uri.queryParameters['pose'],
                         ),
                       ),
                     ],

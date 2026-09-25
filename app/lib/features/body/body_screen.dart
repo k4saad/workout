@@ -11,7 +11,6 @@ import '../../core/ui/ui.dart';
 import '../../data/db/database.dart';
 import '../../data/db/tables.dart';
 import '../../domain/metrics/bodyweight_trend.dart';
-import '../../domain/models/programme.dart';
 import '../common/widgets.dart';
 import 'widgets/trend_chart.dart';
 
@@ -90,7 +89,7 @@ class _WeightCard extends ConsumerWidget {
               // full-width, which in a Row is infinite.
               if (todays == null)
                 FilledButton.icon(
-                  onPressed: () => _weighIn(context, ref, athlete),
+                  onPressed: () => showWeighIn(context, ref),
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(120, 48),
                   ),
@@ -99,7 +98,7 @@ class _WeightCard extends ConsumerWidget {
                 )
               else
                 OutlinedButton.icon(
-                  onPressed: () => _weighIn(context, ref, athlete),
+                  onPressed: () => showWeighIn(context, ref),
                   icon: const Icon(Icons.check, color: AppTheme.good),
                   label: Text('${todays.kg.toStringAsFixed(1)} kg today'),
                 ),
@@ -170,34 +169,33 @@ class _WeightCard extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Future<void> _weighIn(
-    BuildContext context,
-    WidgetRef ref,
-    Athlete? athlete,
-  ) async {
-    final today = ref.read(todayProvider);
-    final todays = entries.where((e) => _sameDay(e.date, today)).firstOrNull;
-    // Start from the last weigh-in: a morning is within a kilo of the one
-    // before, a few taps away.
-    final start =
-        todays?.kg ?? entries.lastOrNull?.kg ?? athlete?.startWeightKg ?? 50.0;
-    final kg = await showStepperSheet(
-      context,
-      title: todays == null ? 'This morning' : 'This morning, corrected',
-      subtitle: 'After the toilet, before food.',
-      initial: start,
-      step: 0.1,
-      bigStep: 1,
-      min: 30,
-      max: 150,
-      decimals: 1,
-      unit: 'kg',
-      saveLabel: 'Save weigh-in',
-    );
-    if (kg == null) return;
-    await ref.read(databaseProvider).upsertBodyweight(today, kg);
-  }
+/// The morning weigh-in, on a stepper that starts from the last reading: a
+/// morning is within a kilo of the one before, a few taps away. Shared by
+/// Body and Today.
+Future<void> showWeighIn(BuildContext context, WidgetRef ref) async {
+  final today = ref.read(todayProvider);
+  final entries = ref.read(weightEntriesProvider).asData?.value ?? const [];
+  final athlete = ref.read(bundleProvider).asData?.value.programme.athlete;
+  final todays = entries.where((e) => _sameDay(e.date, today)).firstOrNull;
+  final start =
+      todays?.kg ?? entries.lastOrNull?.kg ?? athlete?.startWeightKg ?? 50.0;
+  final kg = await showStepperSheet(
+    context,
+    title: todays == null ? 'This morning' : 'This morning, corrected',
+    subtitle: 'After the toilet, before food.',
+    initial: start,
+    step: 0.1,
+    bigStep: 1,
+    min: 30,
+    max: 150,
+    decimals: 1,
+    unit: 'kg',
+    saveLabel: 'Save weigh-in',
+  );
+  if (kg == null) return;
+  await ref.read(databaseProvider).upsertBodyweight(today, kg);
 }
 
 class _AdviceCard extends StatelessWidget {

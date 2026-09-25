@@ -10,6 +10,7 @@ import '../domain/fuel/fuel_plan.dart';
 import '../domain/motion/motion.dart';
 import '../domain/models/inventory.dart';
 import '../domain/models/programme.dart';
+import '../domain/content/quotes.dart';
 
 /// Reads a bundled asset as a string. [rootBundle] on a phone; a disk read or
 /// a patched copy in tests.
@@ -173,6 +174,7 @@ class ProgrammeRepository {
   static const assetInventory = 'assets/programmes/inventory.json';
   static const assetFuel = 'assets/nutrition/fuel.json';
   static const assetMotions = 'assets/exercises/motions.json';
+  static const assetQuotes = 'assets/content/quotes.json';
 
   static const _programmeFile = 'programme.json';
   static const _inventoryFile = 'inventory.json';
@@ -192,6 +194,7 @@ class ProgrammeRepository {
   ExerciseLibrary? _library;
   FuelPlan? _fuel;
   MotionLibrary? _motions;
+  QuoteBook? _quotes;
   Inventory? _inventory;
 
   ProgrammeUpgrade? _lastUpgrade;
@@ -463,6 +466,16 @@ class ProgrammeRepository {
     if (_motions != null && !force) return _motions!;
     final raw = await _loadAsset(assetMotions);
     return _motions = MotionLibrary.fromJson(
+      jsonDecode(raw) as Map<String, dynamic>,
+    );
+  }
+
+  /// The quotes. Always the asset: authored in data/quotes.json, every line
+  /// checked against its source, and mirrored by tools/gen.py.
+  Future<QuoteBook> loadQuotes({bool force = false}) async {
+    if (_quotes != null && !force) return _quotes!;
+    final raw = await _loadAsset(assetQuotes);
+    return _quotes = QuoteBook.fromJson(
       jsonDecode(raw) as Map<String, dynamic>,
     );
   }

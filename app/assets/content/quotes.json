@@ -1,4 +1,445 @@
 {
-  "_comment": "Placeholder. The quotes feature fills this from data/quotes.json.",
-  "quotes": []
+  "_comment": "Authored, not generated: every line checked against its source by a script, and mirrored to app/assets/content by tools/gen.py. Qur'an in Pickthall (1930); hadith from Sahih al-Bukhari and Sahih Muslim by their standard numbers, the meaning given plainly; Greek and Roman in public-domain translations. verifiedAt is where each was checked.",
+  "quotes": [
+    {
+      "id": "q-94-5",
+      "tradition": "quran",
+      "text": "But lo! with hardship goeth ease,\nLo! with hardship goeth ease;",
+      "attribution": "Qur’an 94:5–6",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-2-286",
+      "tradition": "quran",
+      "text": "Allah tasketh not a soul beyond its scope.",
+      "attribution": "Qur’an 2:286",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-13-11",
+      "tradition": "quran",
+      "text": "Lo! Allah changeth not the condition of a folk until they (first) change that which is in their hearts;",
+      "attribution": "Qur’an 13:11",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-53-39",
+      "tradition": "quran",
+      "text": "And that man hath only that for which he maketh effort,\nAnd that his effort will be seen.",
+      "attribution": "Qur’an 53:39–40",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-2-153",
+      "tradition": "quran",
+      "text": "O ye who believe! Seek help in steadfastness and prayer. Lo! Allah is with the steadfast.",
+      "attribution": "Qur’an 2:153",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-3-200",
+      "tradition": "quran",
+      "text": "O ye who believe! Endure, outdo all others in endurance, be ready, and observe your duty to Allah, in order that ye may succeed.",
+      "attribution": "Qur’an 3:200",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-29-69",
+      "tradition": "quran",
+      "text": "As for those who strive in Us, We surely guide them to Our paths, and lo! Allah is with the good.",
+      "attribution": "Qur’an 29:69",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-3-139",
+      "tradition": "quran",
+      "text": "Faint not nor grieve, for ye will overcome them if ye are (indeed) believers.",
+      "attribution": "Qur’an 3:139",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-65-3",
+      "tradition": "quran",
+      "text": "And whosoever putteth his trust in Allah, He will suffice him.",
+      "attribution": "Qur’an 65:3",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-14-7",
+      "tradition": "quran",
+      "text": "If ye give thanks, I will give you more;",
+      "attribution": "Qur’an 14:7",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-2-45",
+      "tradition": "quran",
+      "text": "Seek help in patience and prayer; and truly it is hard save for the humble-minded,",
+      "attribution": "Qur’an 2:45",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-16-127",
+      "tradition": "quran",
+      "text": "Thine endurance is only by (the help of) Allah.",
+      "attribution": "Qur’an 16:127",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-39-10",
+      "tradition": "quran",
+      "text": "Verily the steadfast will be paid their wages without stint.",
+      "attribution": "Qur’an 39:10",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-7-31",
+      "tradition": "quran",
+      "text": "O Children of Adam! Look to your adornment at every place of worship, and eat and drink, but be not prodigal.",
+      "attribution": "Qur’an 7:31",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-2-168",
+      "tradition": "quran",
+      "text": "O mankind! Eat of that which is lawful and wholesome in the earth,",
+      "attribution": "Qur’an 2:168",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-3-159",
+      "tradition": "quran",
+      "text": "And when thou art resolved, then put thy trust in Allah.",
+      "attribution": "Qur’an 3:159",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-8-46",
+      "tradition": "quran",
+      "text": "but be steadfast! Lo! Allah is with the steadfast.",
+      "attribution": "Qur’an 8:46",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "q-2-249",
+      "tradition": "quran",
+      "text": "How many a little company hath overcome a mighty host by Allah's leave! Allah is with the steadfast.",
+      "attribution": "Qur’an 2:249",
+      "translator": "Marmaduke Pickthall (1930)",
+      "verifiedAt": "https://tanzil.net/trans/en.pickthall"
+    },
+    {
+      "id": "h-bukhari-1",
+      "tradition": "hadith",
+      "text": "Deeds are judged by their intentions, and every person will have what he intended.",
+      "attribution": "Sahih al-Bukhari 1",
+      "translator": "The meaning, in plain English",
+      "verifiedAt": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/1.json"
+    },
+    {
+      "id": "h-muslim-2664",
+      "tradition": "hadith",
+      "text": "The strong believer is better and more beloved to Allah than the weak believer, and there is good in both. Hold fast to what benefits you, seek Allah’s help, and do not lose heart.",
+      "attribution": "Sahih Muslim 2664",
+      "translator": "The meaning, in plain English",
+      "verifiedAt": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-muslim/6774.json"
+    },
+    {
+      "id": "h-bukhari-6464",
+      "tradition": "hadith",
+      "text": "The deed most beloved to Allah is the one done regularly, even if it is small.",
+      "attribution": "Sahih al-Bukhari 6464",
+      "translator": "The meaning, in plain English",
+      "verifiedAt": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/6464.json"
+    },
+    {
+      "id": "h-bukhari-6114",
+      "tradition": "hadith",
+      "text": "The strong one is not the one who overpowers people. The strong one is the one who masters himself when he is angry.",
+      "attribution": "Sahih al-Bukhari 6114",
+      "translator": "The meaning, in plain English",
+      "verifiedAt": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/6114.json"
+    },
+    {
+      "id": "h-bukhari-1975",
+      "tradition": "hadith",
+      "text": "Fast and also eat; pray at night and also sleep. Your body has a right over you.",
+      "attribution": "Sahih al-Bukhari 1975",
+      "translator": "The meaning, in plain English",
+      "verifiedAt": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/1975.json"
+    },
+    {
+      "id": "h-bukhari-6412",
+      "tradition": "hadith",
+      "text": "There are two blessings that many people lose out on: health and free time.",
+      "attribution": "Sahih al-Bukhari 6412",
+      "translator": "The meaning, in plain English",
+      "verifiedAt": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/6412.json"
+    },
+    {
+      "id": "h-bukhari-39",
+      "tradition": "hadith",
+      "text": "The religion is easy, and whoever overburdens himself in it will not be able to keep it up. So do not go to extremes: aim for what is right, come as close to it as you can, and take heart.",
+      "attribution": "Sahih al-Bukhari 39",
+      "translator": "The meaning, in plain English",
+      "verifiedAt": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/39.json"
+    },
+    {
+      "id": "h-bukhari-2072",
+      "tradition": "hadith",
+      "text": "No one has ever eaten better food than what he earned by the work of his own hands.",
+      "attribution": "Sahih al-Bukhari 2072",
+      "translator": "The meaning, in plain English",
+      "verifiedAt": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/2072.json"
+    },
+    {
+      "id": "h-muslim-2564",
+      "tradition": "hadith",
+      "text": "Allah does not look at your bodies or your faces; He looks at your hearts.",
+      "attribution": "Sahih Muslim 2564",
+      "translator": "The meaning, in plain English",
+      "verifiedAt": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-muslim/6542.json"
+    },
+    {
+      "id": "h-bukhari-5376",
+      "tradition": "hadith",
+      "text": "Say Allah’s name, eat with your right hand, and eat from what is in front of you.",
+      "attribution": "Sahih al-Bukhari 5376",
+      "translator": "The meaning, in plain English",
+      "verifiedAt": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/5376.json"
+    },
+    {
+      "id": "h-bukhari-1469",
+      "tradition": "hadith",
+      "text": "Whoever tries to be patient, Allah will make him patient, and no one is given a gift better or greater than patience.",
+      "attribution": "Sahih al-Bukhari 1469",
+      "translator": "The meaning, in plain English",
+      "verifiedAt": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/1469.json"
+    },
+    {
+      "id": "g-epictetus-habit",
+      "tradition": "greek",
+      "text": "Every habit and faculty is maintained and increased by the corresponding actions: the habit of walking by walking, the habit of running by running.",
+      "attribution": "Epictetus, Discourses 2.18",
+      "translator": "George Long (1877)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/10661"
+    },
+    {
+      "id": "g-epictetus-fig",
+      "tradition": "greek",
+      "text": "Nothing great, said Epictetus, is produced suddenly, since not even the grape or the fig is. If you say to me now that you want a fig, I will answer to you that it requires time: let it flower first, then put forth fruit, and then ripen.",
+      "attribution": "Epictetus, Discourses 1.15",
+      "translator": "George Long (1877)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/10661"
+    },
+    {
+      "id": "g-epictetus-circumstances",
+      "tradition": "greek",
+      "text": "It is circumstances (difficulties) which show what men are. Therefore when a difficulty falls upon you, remember that God, like a trainer of wrestlers, has matched you with a rough young man.",
+      "attribution": "Epictetus, Discourses 1.24",
+      "translator": "George Long (1877)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/10661"
+    },
+    {
+      "id": "g-epictetus-act",
+      "tradition": "greek",
+      "text": "In every act observe the things which come first, and those which follow it; and so proceed to the act.",
+      "attribution": "Epictetus, Enchiridion 29",
+      "translator": "George Long (1877)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/10661"
+    },
+    {
+      "id": "g-hesiod-sweat",
+      "tradition": "greek",
+      "text": "But between us and Goodness the gods have placed the sweat of our brows: long and steep is the path that leads to her, and it is rough at the first; but when a man has reached the top, then is she easy to reach, though before that she was hard.",
+      "attribution": "Hesiod, Works and Days 289–292",
+      "translator": "Hugh G. Evelyn-White (1914)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/348"
+    },
+    {
+      "id": "g-hesiod-work",
+      "tradition": "greek",
+      "text": "Work is no disgrace: it is idleness which is a disgrace.",
+      "attribution": "Hesiod, Works and Days 311",
+      "translator": "Hugh G. Evelyn-White (1914)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/348"
+    },
+    {
+      "id": "g-xenophon-neglect",
+      "tradition": "greek",
+      "text": "It is a base thing for a man to wax old in careless self-neglect before he has lifted up his eyes and seen what manner of man he was made to be, in the full perfection of bodily strength and beauty.",
+      "attribution": "Xenophon, Memorabilia III.12",
+      "translator": "H. G. Dakyns (1897)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/1177"
+    },
+    {
+      "id": "g-xenophon-body",
+      "tradition": "greek",
+      "text": "For be you assured that there is no contest of any sort, nor any transaction, in which you will be the worse off for being well prepared in body; and in fact there is nothing which men do for which the body is not a help.",
+      "attribution": "Xenophon, Memorabilia III.12",
+      "translator": "H. G. Dakyns (1897)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/1177"
+    },
+    {
+      "id": "g-aristotle-swallow",
+      "tradition": "greek",
+      "text": "For as it is not one swallow or one fine day that makes a spring, so it is not one day or a short time that makes a man blessed and happy.",
+      "attribution": "Aristotle, Nicomachean Ethics I.7",
+      "translator": "D. P. Chase (1847)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/8438"
+    },
+    {
+      "id": "g-aristotle-doing",
+      "tradition": "greek",
+      "text": "Men come to be builders, for instance, by building; harp-players, by playing on the harp: exactly so, by doing just actions we come to be just; by doing the actions of self-mastery we come to be perfected in self-mastery; and by doing brave actions brave.",
+      "attribution": "Aristotle, Nicomachean Ethics II.1",
+      "translator": "D. P. Chase (1847)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/8438"
+    },
+    {
+      "id": "g-aristotle-childhood",
+      "tradition": "greek",
+      "text": "So then, whether we are accustomed this way or that straight from childhood, makes not a small but an important difference, or rather I would say it makes all the difference.",
+      "attribution": "Aristotle, Nicomachean Ethics II.1",
+      "translator": "D. P. Chase (1847)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/8438"
+    },
+    {
+      "id": "g-plato-beginning",
+      "tradition": "greek",
+      "text": "You know also that the beginning is the most important part of any work,",
+      "attribution": "Plato, Republic II",
+      "translator": "Benjamin Jowett (1871)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/1497"
+    },
+    {
+      "id": "r-marcus-5-1",
+      "tradition": "roman",
+      "text": "In the morning when thou risest unwillingly, let this thought be present,--I am rising to the work of a human being.",
+      "attribution": "Marcus Aurelius, Meditations 5.1",
+      "translator": "George Long (1862)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/15877"
+    },
+    {
+      "id": "r-marcus-4-49",
+      "tradition": "roman",
+      "text": "Be like the promontory against which the waves continually break, but it stands firm and tames the fury of the water around it.",
+      "attribution": "Marcus Aurelius, Meditations 4.49",
+      "translator": "George Long (1862)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/15877"
+    },
+    {
+      "id": "r-marcus-10-16",
+      "tradition": "roman",
+      "text": "No longer talk at all about the kind of man that a good man ought to be, but be such.",
+      "attribution": "Marcus Aurelius, Meditations 10.16",
+      "translator": "George Long (1862)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/15877"
+    },
+    {
+      "id": "r-marcus-6-19",
+      "tradition": "roman",
+      "text": "If a thing is difficult to be accomplished by thyself, do not think that it is impossible for man: but if anything is possible for man and conformable to his nature, think that this can be attained by thyself too.",
+      "attribution": "Marcus Aurelius, Meditations 6.19",
+      "translator": "George Long (1862)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/15877"
+    },
+    {
+      "id": "r-marcus-8-47",
+      "tradition": "roman",
+      "text": "If thou art pained by any external thing, it is not this thing that disturbs thee, but thy own judgment about it. And it is in thy power to wipe out this judgment now.",
+      "attribution": "Marcus Aurelius, Meditations 8.47",
+      "translator": "George Long (1862)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/15877"
+    },
+    {
+      "id": "r-marcus-5-16",
+      "tradition": "roman",
+      "text": "Such as are thy habitual thoughts, such also will be the character of thy mind; for the soul is dyed by the thoughts.",
+      "attribution": "Marcus Aurelius, Meditations 5.16",
+      "translator": "George Long (1862)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/15877"
+    },
+    {
+      "id": "r-marcus-6-2",
+      "tradition": "roman",
+      "text": "Let it make no difference to thee whether thou art cold or warm, if thou art doing thy duty;",
+      "attribution": "Marcus Aurelius, Meditations 6.2",
+      "translator": "George Long (1862)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/15877"
+    },
+    {
+      "id": "r-marcus-4-17",
+      "tradition": "roman",
+      "text": "Do not act as if thou wert going to live ten thousand years. Death hangs over thee. While thou livest, while it is in thy power, be good.",
+      "attribution": "Marcus Aurelius, Meditations 4.17",
+      "translator": "George Long (1862)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/15877"
+    },
+    {
+      "id": "r-marcus-7-59",
+      "tradition": "roman",
+      "text": "Look within. Within is the fountain of good, and it will ever bubble up, if thou wilt ever dig.",
+      "attribution": "Marcus Aurelius, Meditations 7.59",
+      "translator": "George Long (1862)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/15877"
+    },
+    {
+      "id": "r-seneca-fire",
+      "tradition": "roman",
+      "text": "Fire tries gold, misfortune tries brave men.",
+      "attribution": "Seneca, On Providence 5",
+      "translator": "Aubrey Stewart (1889)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/64576"
+    },
+    {
+      "id": "r-seneca-short",
+      "tradition": "roman",
+      "text": "We do not have a very short time assigned to us, but we lose a great deal of it:",
+      "attribution": "Seneca, On the Shortness of Life 1",
+      "translator": "Aubrey Stewart (1889)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/64576"
+    },
+    {
+      "id": "r-seneca-wasteful",
+      "tradition": "roman",
+      "text": "We do not receive a short life, but we make it a short one, and we are not poor in days, but wasteful of them.",
+      "attribution": "Seneca, On the Shortness of Life 1",
+      "translator": "Aubrey Stewart (1889)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/64576"
+    },
+    {
+      "id": "r-cicero-health",
+      "tradition": "roman",
+      "text": "We must look after our health, use moderate exercise, take just enough food and drink to recruit, but not to overload, our strength.",
+      "attribution": "Cicero, On Old Age 36",
+      "translator": "Evelyn S. Shuckburgh (1900)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/2808"
+    },
+    {
+      "id": "r-horace-begun",
+      "tradition": "roman",
+      "text": "He has half the deed done, who has made a beginning.",
+      "attribution": "Horace, Epistles I.2",
+      "translator": "C. Smart (1756)",
+      "verifiedAt": "https://www.gutenberg.org/ebooks/14020"
+    }
+  ]
 }

@@ -8,7 +8,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../app/calendar_providers.dart';
 import '../../app/providers.dart';
 import '../../app/session_providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../data/db/tables.dart';
 import '../../data/run_repository.dart';
 import '../../domain/models/day.dart';
@@ -23,6 +23,8 @@ import 'session_controller.dart';
 import 'widgets/rest_timer_bar.dart';
 import 'widgets/set_input.dart';
 import 'widgets/suggestion_card.dart';
+import '../../domain/metrics/session_summary.dart';
+import 'widgets/finish_moment.dart';
 
 /// The session runner: press start, walk through the work, log every set.
 ///
@@ -301,6 +303,29 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
 
     await ref.read(runnerControllerProvider).finish(s);
     await ref.read(notificationServiceProvider).cancelRest();
+    if (mounted) {
+      await showFinishMoment(
+        context,
+        title: s.day.title,
+        doneSets: s.doneSets,
+        plannedSets: s.plannedSets,
+        summary: SessionSummary.of(
+          sets: [
+            for (final item in s.items)
+              for (final l in item.logged)
+                (
+                  exerciseId: l.exerciseId,
+                  loadKg: l.loadKg,
+                  reps: l.reps,
+                  durationSec: l.durationSec,
+                  warmup: l.isWarmup,
+                ),
+          ],
+          startedAt: s.session.startedAt,
+          finishedAt: DateTime.now(),
+        ),
+      );
+    }
     ref.invalidate(historyProvider);
     ref.invalidate(resumableSessionProvider);
     // The screen underneath (calendar, week, Today) is still alive and must
@@ -385,7 +410,7 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
 
     final s = _state;
     if (s == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: SkeletonPage());
     }
 
     final bundle = ref.watch(bundleProvider).asData?.value;
@@ -458,7 +483,7 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
             ),
           Expanded(
             child: library == null
-                ? const Center(child: CircularProgressIndicator())
+                ? const SkeletonPage(cards: 2)
                 : _RunnerBody(
                     state: s,
                     library: library,
@@ -793,230 +818,226 @@ class _FocusCard extends ConsumerWidget {
             .asData
             ?.value;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                // The movement, moving, right beside its name: between sets
-                // this is the reminder. One tap opens the full demo and
-                // cues -- a pushed route, so back returns to the exact set.
-                Tooltip(
-                  message: 'How do I do this?',
-                  child: Material(
-                    color: AppTheme.surfaceHigh,
-                    borderRadius: BorderRadius.circular(12),
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) =>
-                              ExerciseDetailScreen(exerciseId: p.exerciseId),
-                        ),
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              // The movement, moving, right beside its name: between sets
+              // this is the reminder. One tap opens the full demo and
+              // cues -- a pushed route, so back returns to the exact set.
+              Tooltip(
+                message: 'How do I do this?',
+                child: Material(
+                  color: AppTheme.surfaceHigh,
+                  borderRadius: BorderRadius.circular(12),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) =>
+                            ExerciseDetailScreen(exerciseId: p.exerciseId),
                       ),
-                      child: SizedBox(
-                        width: 88,
-                        height: 88,
-                        child: ExerciseDemo(
-                          exerciseId: p.exerciseId,
-                          padding: 4,
-                          tight: true,
-                        ),
+                    ),
+                    child: SizedBox(
+                      width: 88,
+                      height: 88,
+                      child: ExerciseDemo(
+                        exerciseId: p.exerciseId,
+                        padding: 4,
+                        tight: true,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 14),
-                Expanded(child: Text(exercise.name, style: t.headlineSmall)),
-              ],
-            ),
-            Gap.s,
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
+              ),
+              const SizedBox(width: 14),
+              Expanded(child: Text(exercise.name, style: t.headlineSmall)),
+            ],
+          ),
+          Gap.s,
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              InfoChip(
+                label: p.unit == RepUnit.reps
+                    ? '${p.sets} × ${p.repRangeLabel}'
+                          '${p.perSide ? ' / side' : ''}'
+                    : '${p.sets} × ${p.unit.rangeLabel(p.repsMin, p.repsMax)}'
+                          '${p.perSide ? ' / side' : ''}',
+                emphasis: true,
+              ),
+              if (p.restSec > 0)
                 InfoChip(
-                  label: p.unit == RepUnit.reps
-                      ? '${p.sets} × ${p.repRangeLabel}'
-                            '${p.perSide ? ' / side' : ''}'
-                      : '${p.sets} × ${p.unit.rangeLabel(p.repsMin, p.repsMax)}'
-                            '${p.perSide ? ' / side' : ''}',
-                  emphasis: true,
+                  label: '${p.restSec}s rest',
+                  icon: Icons.timer_outlined,
                 ),
-                if (p.restSec > 0)
-                  InfoChip(
-                    label: '${p.restSec}s rest',
-                    icon: Icons.timer_outlined,
+              // Reps in reserve means something for a set of reps; for a
+              // run or a hold it is noise.
+              if (p.targetRir != null && p.unit == RepUnit.reps)
+                InfoChip(label: 'RIR ${p.targetRir}'),
+              if (p.tempo != null) InfoChip(label: p.tempo!),
+              if (p.warmupRamp) const InfoChip(label: 'ramp first'),
+            ],
+          ),
+          Gap.m,
+          LastTimeLine(
+            sets: lastTime
+                .map(
+                  (l) => (
+                    reps: l.reps,
+                    loadKg: l.loadKg,
+                    durationSec: l.durationSec,
                   ),
-                // Reps in reserve means something for a set of reps; for a
-                // run or a hold it is noise.
-                if (p.targetRir != null && p.unit == RepUnit.reps)
-                  InfoChip(label: 'RIR ${p.targetRir}'),
-                if (p.tempo != null) InfoChip(label: p.tempo!),
-                if (p.warmupRamp) const InfoChip(label: 'ramp first'),
+                )
+                .toList(),
+            unit: p.unit,
+          ),
+
+          if (suggestion != null) ...[
+            Gap.m,
+            SuggestionCard(suggestion: suggestion, unit: p.unit),
+          ],
+
+          if (p.coachNote != null) ...[
+            Gap.m,
+            Text(
+              p.coachNote!,
+              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+            ),
+          ],
+
+          // A run on the plan can be recorded on the map; the time and
+          // distance then log themselves as this set. The steppers below
+          // stay for a treadmill, or a phone left at home.
+          if (exercise.gpsTracked && next != null && onRunWithGps != null) ...[
+            Gap.m,
+            FilledButton.icon(
+              onPressed: () => onRunWithGps!(item, exercise),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(56),
+              ),
+              icon: const Icon(Icons.route_rounded),
+              label: const Text('Run it with GPS'),
+            ),
+            Gap.xs,
+            Text(
+              'Records the route and logs the time and distance as this '
+              'set. No phone with you? Log it by hand below.',
+              style: t.bodySmall?.copyWith(color: AppTheme.textDim),
+            ),
+          ],
+
+          const Divider(height: 28),
+
+          if (next == null) ...[
+            Row(
+              children: [
+                const Icon(Icons.check_circle, color: AppTheme.good),
+                Gap.s,
+                Expanded(
+                  child: Text(
+                    'All ${item.totalCount} sets logged.',
+                    style: t.titleMedium?.copyWith(color: AppTheme.good),
+                  ),
+                ),
               ],
             ),
             Gap.m,
-            LastTimeLine(
-              sets: lastTime
-                  .map(
-                    (l) => (
-                      reps: l.reps,
-                      loadKg: l.loadKg,
-                      durationSec: l.durationSec,
-                    ),
-                  )
-                  .toList(),
-              unit: p.unit,
+            OutlinedButton.icon(
+              onPressed: onUndo,
+              icon: const Icon(Icons.undo),
+              label: const Text('Undo last set'),
             ),
-
-            if (suggestion != null) ...[
-              Gap.m,
-              SuggestionCard(suggestion: suggestion, unit: p.unit),
-            ],
-
-            if (p.coachNote != null) ...[
-              Gap.m,
-              Text(
-                p.coachNote!,
-                style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-              ),
-            ],
-
-            // A run on the plan can be recorded on the map; the time and
-            // distance then log themselves as this set. The steppers below
-            // stay for a treadmill, or a phone left at home.
-            if (exercise.gpsTracked &&
-                next != null &&
-                onRunWithGps != null) ...[
-              Gap.m,
-              FilledButton.icon(
-                onPressed: () => onRunWithGps!(item, exercise),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(56),
-                ),
-                icon: const Icon(Icons.route_rounded),
-                label: const Text('Run it with GPS'),
-              ),
-              Gap.xs,
-              Text(
-                'Records the route and logs the time and distance as this '
-                'set. No phone with you? Log it by hand below.',
-                style: t.bodySmall?.copyWith(color: AppTheme.textDim),
-              ),
-            ],
-
-            const Divider(height: 28),
-
-            if (next == null) ...[
-              Row(
-                children: [
-                  const Icon(Icons.check_circle, color: AppTheme.good),
-                  Gap.s,
-                  Expanded(
-                    child: Text(
-                      'All ${item.totalCount} sets logged.',
-                      style: t.titleMedium?.copyWith(color: AppTheme.good),
-                    ),
+          ] else ...[
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Set ${next.setIndex} of ${p.sets}'
+                    '${next.side != null ? '  ·  ${next.side == 'L' ? 'left' : 'right'}' : ''}',
+                    style: t.titleMedium,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '${item.doneCount}/${item.totalCount} done',
+                  style: t.labelLarge?.copyWith(color: AppTheme.textDim),
+                ),
+              ],
+            ),
+            Gap.m,
+            SetInput(
+              prescription: p,
+              value: _withPrefill(item, pending),
+              latticeStep: latticeStep,
+              onChanged: onPendingChanged,
+            ),
+            Gap.l,
+            FilledButton(
+              onPressed: () => onLog(item, exercise),
+              child: Text(
+                'Log set ${next.setIndex}'
+                '${next.side != null ? ' (${next.side})' : ''}',
               ),
-              Gap.m,
-              OutlinedButton.icon(
+            ),
+            if (p.warmupRamp && item.doneCount == 0) ...[
+              Gap.s,
+              OutlinedButton(
+                onPressed: () => onLog(item, exercise, warmup: true),
+                child: const Text('Log as a ramp set'),
+              ),
+            ],
+            if (item.doneCount > 0) ...[
+              Gap.s,
+              TextButton.icon(
                 onPressed: onUndo,
-                icon: const Icon(Icons.undo),
+                icon: const Icon(Icons.undo, size: 18),
                 label: const Text('Undo last set'),
-              ),
-            ] else ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Set ${next.setIndex} of ${p.sets}'
-                      '${next.side != null ? '  ·  ${next.side == 'L' ? 'left' : 'right'}' : ''}',
-                      style: t.titleMedium,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${item.doneCount}/${item.totalCount} done',
-                    style: t.labelLarge?.copyWith(color: AppTheme.textDim),
-                  ),
-                ],
-              ),
-              Gap.m,
-              SetInput(
-                prescription: p,
-                value: _withPrefill(item, pending),
-                latticeStep: latticeStep,
-                onChanged: onPendingChanged,
-              ),
-              Gap.l,
-              FilledButton(
-                onPressed: () => onLog(item, exercise),
-                child: Text(
-                  'Log set ${next.setIndex}'
-                  '${next.side != null ? ' (${next.side})' : ''}',
-                ),
-              ),
-              if (p.warmupRamp && item.doneCount == 0) ...[
-                Gap.s,
-                OutlinedButton(
-                  onPressed: () => onLog(item, exercise, warmup: true),
-                  child: const Text('Log as a ramp set'),
-                ),
-              ],
-              if (item.doneCount > 0) ...[
-                Gap.s,
-                TextButton.icon(
-                  onPressed: onUndo,
-                  icon: const Icon(Icons.undo, size: 18),
-                  label: const Text('Undo last set'),
-                ),
-              ],
-            ],
-
-            if (exercise.cues.isNotEmpty) ...[
-              const Divider(height: 28),
-              ExpansionTile(
-                tilePadding: EdgeInsets.zero,
-                title: Text('Cues', style: t.titleMedium),
-                children: [
-                  for (final c in exercise.cues)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('·  '),
-                          Expanded(child: Text(c, style: t.bodyMedium)),
-                        ],
-                      ),
-                    ),
-                  if (exercise.soloSafety != null) ...[
-                    Gap.s,
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppTheme.warn.withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        exercise.soloSafety!,
-                        style: t.bodyMedium?.copyWith(color: AppTheme.warn),
-                      ),
-                    ),
-                  ],
-                ],
               ),
             ],
           ],
-        ),
+
+          if (exercise.cues.isNotEmpty) ...[
+            const Divider(height: 28),
+            ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              title: Text('Cues', style: t.titleMedium),
+              children: [
+                for (final c in exercise.cues)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('·  '),
+                        Expanded(child: Text(c, style: t.bodyMedium)),
+                      ],
+                    ),
+                  ),
+                if (exercise.soloSafety != null) ...[
+                  Gap.s,
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.warn.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      exercise.soloSafety!,
+                      style: t.bodyMedium?.copyWith(color: AppTheme.warn),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }

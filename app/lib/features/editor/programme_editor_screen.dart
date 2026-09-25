@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart' hide Block;
 
 import '../../app/editor_providers.dart';
 import '../../app/providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../domain/models/block.dart';
 import '../../domain/models/day.dart';
 import '../../domain/models/enums.dart';
@@ -39,7 +39,7 @@ class ProgrammeEditorScreen extends ConsumerWidget {
         ],
       ),
       body: async.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SkeletonPage(),
         error: (e, _) => AsyncScaffoldBody(
           loading: false,
           error: e,
@@ -134,48 +134,45 @@ class _BlockCard extends ConsumerWidget {
         ? 'no weeks'
         : 'weeks ${block.firstWeek}–${block.lastWeek}';
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 8, 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(block.name, style: t.titleMedium),
-                      Gap.xs,
-                      Text(
-                        '$weeks · ${block.blockKind.name}',
-                        style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                      ),
-                    ],
-                  ),
-                ),
-                if (block.inherits)
-                  const Icon(Icons.link, size: 18, color: AppTheme.textDim),
-              ],
-            ),
-            if (block.inherits) ...[
-              Gap.s,
-              _InheritedNote(block: block),
-            ] else ...[
-              for (final day in block.days)
-                _DayRow(blockId: block.id, day: day),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  onPressed: () => _addDay(context, ref, block),
-                  icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Add a day'),
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(14, 12, 8, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(block.name, style: t.titleMedium),
+                    Gap.xs,
+                    Text(
+                      '$weeks · ${block.blockKind.name}',
+                      style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+                    ),
+                  ],
                 ),
               ),
+              if (block.inherits)
+                const Icon(Icons.link, size: 18, color: AppTheme.textDim),
             ],
+          ),
+          if (block.inherits) ...[
+            Gap.s,
+            _InheritedNote(block: block),
+          ] else ...[
+            for (final day in block.days) _DayRow(blockId: block.id, day: day),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () => _addDay(context, ref, block),
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Add a day'),
+              ),
+            ),
           ],
-        ),
+        ],
       ),
     );
   }

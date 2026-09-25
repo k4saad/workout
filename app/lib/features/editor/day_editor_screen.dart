@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/editor_providers.dart';
 import '../../app/providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../domain/models/day.dart';
 import '../../domain/models/enums.dart';
 import '../../domain/models/exercise.dart';
@@ -32,8 +32,7 @@ class DayEditorScreen extends ConsumerWidget {
         .toList();
 
     return async.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => const Scaffold(body: SkeletonPage()),
       error: (e, _) => Scaffold(
         body: AsyncScaffoldBody(
           loading: false,
@@ -188,72 +187,70 @@ class _GroupCard extends ConsumerWidget {
     final isSuperset = group.length > 1;
     final controller = ref.read(programmeEditControllerProvider.notifier);
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (isSuperset)
-              Row(
-                children: [
-                  const Icon(Icons.repeat, size: 16, color: AppTheme.dusk),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Superset — alternate, rest once at the end',
-                      style: t.bodySmall?.copyWith(color: AppTheme.textDim),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => controller.apply(
-                      (p) => programmeEditor.ungroupSuperset(
-                        p,
-                        group.first.groupId!,
-                      ),
-                    ),
-                    child: const Text('Unpair'),
-                  ),
-                ],
-              ),
-            for (final p in group)
-              _MovementRow(
-                prescription: p,
-                exercise: library.resolve(p.exerciseId),
-              ),
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (isSuperset)
             Row(
               children: [
-                IconButton(
-                  tooltip: 'Move up',
-                  icon: const Icon(Icons.arrow_upward, size: 20),
-                  onPressed: isFirst
-                      ? null
-                      : () => controller.apply(
-                          (p) => programmeEditor.movePrescription(
-                            p,
-                            group.first.id,
-                            up: true,
-                          ),
-                        ),
+                const Icon(Icons.repeat, size: 16, color: AppTheme.dusk),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Superset — alternate, rest once at the end',
+                    style: t.bodySmall?.copyWith(color: AppTheme.textDim),
+                  ),
                 ),
-                IconButton(
-                  tooltip: 'Move down',
-                  icon: const Icon(Icons.arrow_downward, size: 20),
-                  onPressed: isLast
-                      ? null
-                      : () => controller.apply(
-                          (p) => programmeEditor.movePrescription(
-                            p,
-                            group.first.id,
-                            up: false,
-                          ),
-                        ),
+                TextButton(
+                  onPressed: () => controller.apply(
+                    (p) => programmeEditor.ungroupSuperset(
+                      p,
+                      group.first.groupId!,
+                    ),
+                  ),
+                  child: const Text('Unpair'),
                 ),
-                const Spacer(),
               ],
             ),
-          ],
-        ),
+          for (final p in group)
+            _MovementRow(
+              prescription: p,
+              exercise: library.resolve(p.exerciseId),
+            ),
+          Row(
+            children: [
+              IconButton(
+                tooltip: 'Move up',
+                icon: const Icon(Icons.arrow_upward, size: 20),
+                onPressed: isFirst
+                    ? null
+                    : () => controller.apply(
+                        (p) => programmeEditor.movePrescription(
+                          p,
+                          group.first.id,
+                          up: true,
+                        ),
+                      ),
+              ),
+              IconButton(
+                tooltip: 'Move down',
+                icon: const Icon(Icons.arrow_downward, size: 20),
+                onPressed: isLast
+                    ? null
+                    : () => controller.apply(
+                        (p) => programmeEditor.movePrescription(
+                          p,
+                          group.first.id,
+                          up: false,
+                        ),
+                      ),
+              ),
+              const Spacer(),
+            ],
+          ),
+        ],
       ),
     );
   }

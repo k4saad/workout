@@ -50,6 +50,10 @@ class ProgressScreen extends ConsumerWidget {
   }
 }
 
+/// The photo flies from its thumbnail into the viewer and back.
+Widget photoHero(String photoId, Widget child) =>
+    Hero(tag: 'photo-$photoId', child: child);
+
 /// Width over height for a photo, from what was stored; 9:16 when unknown.
 double photoAspect(ProgressPhoto? p) =>
     p == null || p.width <= 0 || p.height <= 0 ? 9 / 16 : p.width / p.height;
@@ -260,12 +264,19 @@ class _ShootCard extends ConsumerWidget {
               for (final (i, pose) in poses.indexed) ...[
                 if (i > 0) const SizedBox(width: 6),
                 Expanded(
-                  child: AspectRatio(
-                    aspectRatio: photoAspect(byPose[pose.id]),
-                    child: _Thumb(
-                      photo: byPose[pose.id],
-                      root: root,
-                      label: pose.name,
+                  child: GestureDetector(
+                    onTap: byPose[pose.id] == null
+                        ? null
+                        : () => context.push(
+                            '/progress/photos/${shoot.id}?pose=${pose.id}',
+                          ),
+                    child: AspectRatio(
+                      aspectRatio: photoAspect(byPose[pose.id]),
+                      child: _Thumb(
+                        photo: byPose[pose.id],
+                        root: root,
+                        label: pose.name,
+                      ),
                     ),
                   ),
                 ),
@@ -305,15 +316,18 @@ class _Thumb extends StatelessWidget {
       );
     } else {
       final thumb = MediaRepository.thumbFile(r, p.relativePath);
-      child = Image.file(
-        thumb.existsSync()
-            ? thumb
-            : MediaRepository.photoFile(r, p.relativePath),
-        fit: BoxFit.cover,
-        cacheWidth: 360,
-        errorBuilder: (_, _, _) => const ColoredBox(
-          color: AppTheme.surfaceHigh,
-          child: Icon(Icons.broken_image_outlined, color: AppTheme.textDim),
+      child = photoHero(
+        p.id,
+        Image.file(
+          thumb.existsSync()
+              ? thumb
+              : MediaRepository.photoFile(r, p.relativePath),
+          fit: BoxFit.cover,
+          cacheWidth: 360,
+          errorBuilder: (_, _, _) => const ColoredBox(
+            color: AppTheme.surfaceHigh,
+            child: Icon(Icons.broken_image_outlined, color: AppTheme.textDim),
+          ),
         ),
       );
     }

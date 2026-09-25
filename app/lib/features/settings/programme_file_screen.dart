@@ -11,7 +11,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../app/editor_providers.dart';
 import '../../app/settings_providers.dart';
 import '../../app/session_providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../data/backup_service.dart';
 import '../../data/programme_editor_service.dart';
 import '../../domain/programme/programme_diff.dart';
@@ -324,33 +324,28 @@ class _Action extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     final colour = destructive ? AppTheme.oxblood : AppTheme.text;
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, color: colour),
-              Gap.m,
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: t.titleMedium?.copyWith(color: colour)),
-                    Gap.xs,
-                    Text(
-                      body,
-                      style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                    ),
-                  ],
+    return AppCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: colour),
+          Gap.m,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: t.titleMedium?.copyWith(color: colour)),
+                Gap.xs,
+                Text(
+                  body,
+                  style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/settings_providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../data/preferences_service.dart';
 
 /// The few things worth switching on or off.
@@ -30,7 +30,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
           Gap.m,
           if (prefs == null)
-            const Center(child: CircularProgressIndicator())
+            const Skeleton(height: 56)
           else ...[
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
@@ -53,6 +53,18 @@ class SettingsScreen extends ConsumerWidget {
                 trailing: const Icon(Icons.schedule),
                 onTap: () => _pickTime(context, ref, prefs),
               ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: prefs.launchQuote,
+              title: const Text('A quote to open the day'),
+              subtitle: const Text(
+                'On the first open of each day, then out of the way. A tap '
+                'moves it on sooner.',
+              ),
+              onChanged: (on) => ref
+                  .read(preferencesProvider.notifier)
+                  .set(prefs.copyWith(launchQuote: on)),
+            ),
           ],
 
           Gap.xl,
@@ -130,33 +142,28 @@ class _Link extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              Icon(icon, color: AppTheme.textDim),
-              Gap.m,
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: t.titleMedium),
-                    Gap.xs,
-                    Text(
-                      body,
-                      style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                    ),
-                  ],
+    return AppCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          Icon(icon, color: AppTheme.textDim),
+          Gap.m,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: t.titleMedium),
+                Gap.xs,
+                Text(
+                  body,
+                  style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
                 ),
-              ),
-              const Icon(Icons.chevron_right, color: AppTheme.textDim),
-            ],
+              ],
+            ),
           ),
-        ),
+          const Icon(Icons.chevron_right, color: AppTheme.textDim),
+        ],
       ),
     );
   }

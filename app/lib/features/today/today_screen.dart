@@ -1,23 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' show DateFormat;
 
+import '../../app/body_providers.dart';
+import '../../app/calendar_providers.dart';
 import '../../app/providers.dart';
+import '../../app/quote_providers.dart';
 import '../../app/run_providers.dart';
 import '../../app/session_providers.dart';
+import '../../app/settings_providers.dart';
+import '../../core/ui/ui.dart';
+import '../../domain/calendar/adherence.dart';
 import '../../domain/calendar/programme_calendar.dart';
+import '../../domain/content/quotes.dart';
+import '../../domain/models/day.dart';
 import '../../domain/models/enums.dart';
 import '../../domain/models/programme.dart';
-import '../../core/ui/ui.dart';
+import '../body/body_screen.dart';
+import '../calendar/calendar_screen.dart';
+import '../calendar/day_sheet.dart';
 import '../common/widgets.dart';
 import '../progress/checkpoint_checklist.dart';
 import 'widgets/backup_nag.dart';
-import 'widgets/dashboard_strip.dart';
 import 'widgets/next_meal_card.dart';
 import 'widgets/upgrade_notice.dart';
 
-/// The home screen: what am I doing today, and is the rest of it on track.
+/// The day, in the order it is lived: what to train, a line to take into
+/// it, what to eat next, the scale, and where the week stands.
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
 
@@ -38,11 +48,7 @@ class TodayScreen extends ConsumerWidget {
         ],
       ),
       body: async.when(
-        loading: () => const AsyncScaffoldBody(
-          loading: true,
-          error: null,
-          child: SizedBox(),
-        ),
+        loading: () => const SkeletonPage(),
         error: (e, _) => AsyncScaffoldBody(
           loading: false,
           error: e,
@@ -50,10 +56,17 @@ class TodayScreen extends ConsumerWidget {
         ),
         data: (b) {
           final planned = b.calendar.forDate(today);
+          final active = planned.status == ProgrammeStatus.active;
+          final week = planned.weekNo;
+          final checkpoint = week == null
+              ? null
+              : b.programme.checkpointForWeek(week);
+          final cardio = week == null ? null : b.programme.cardioForWeek(week);
+
           return ListView(
             padding: Gap.pagePadding,
             children: [
-              _DateHeader(
+              _Greeting(
                 date: today,
                 planned: planned,
                 totalWeeks: b.programme.totalWeeks,
@@ -67,37 +80,103 @@ class TodayScreen extends ConsumerWidget {
                     0,
               ),
               const UpgradeNotice(),
-              if (planned.status == ProgrammeStatus.active &&
-                  planned.weekNo != null) ...[
-                Gap.m,
-                DashboardStrip(programme: b.programme, weekNo: planned.weekNo!),
-              ],
               Gap.l,
-              switch (planned.status) {
-                ProgrammeStatus.before => _BeforeCard(
-                  programme: b.programme,
-                  calendar: b.calendar,
-                ),
-                ProgrammeStatus.complete => _CompleteCard(
-                  programme: b.programme,
-                ),
-                ProgrammeStatus.active => _ActiveBody(
-                  planned: planned,
-                  bundle: b,
-                  ref: ref,
-                ),
-              },
-              if (planned.status == ProgrammeStatus.active) ...[
-                Gap.l,
-                const SectionHeader('Next to eat'),
+              FadeSlideIn(
+                child: switch (planned.status) {
+                  ProgrammeStatus.before => _BeforeCard(programme: b.programme),
+                  ProgrammeStatus.complete => _CompleteCard(
+                    programme: b.programme,
+                  ),
+                  ProgrammeStatus.active => _DayCard(
+                    planned: planned,
+                    programme: b.programme,
+                  ),
+                },
+              ),
+              const _QuoteCard(),
+              if (active)
                 // The plan he has to go and look for is the plan he stops
                 // following in week three.
                 NextMealCard(now: DateTime.now()),
+              Gap.m,
+              const _WeighInCard(),
+              if (active && week != null) ...[
+                Gap.m,
+                _WeekStrip(week: week, today: today),
+              ],
+              if (active && checkpoint != null) ...[
+                Gap.m,
+                _CheckpointCard(checkpoint: checkpoint),
+              ],
+              if (active && cardio != null && cardio.longRunLabel != null) ...[
+                Gap.m,
+                _MiniCard(
+                  icon: Icons.directions_run,
+                  title: 'Cardio this week',
+                  lines: [
+                    if (cardio.longRunLabel != null)
+                      'Sunday run · ${cardio.longRunLabel}',
+                    if (cardio.skipping != null)
+                      'Skipping · ${cardio.skipping}',
+                    if (cardio.bag != null) 'Bag · ${cardio.bag}',
+                    if (cardio.note != null) cardio.note!,
+                  ],
+                ),
               ],
             ],
           );
         },
       ),
+    );
+  }
+}
+
+bool _sameDay(DateTime a, DateTime b) =>
+    a.year == b.year && a.month == b.month && a.day == b.day;
+
+/// Good morning, by name, and where the day sits in the programme.
+class _Greeting extends ConsumerWidget {
+  const _Greeting({
+    required this.date,
+    required this.planned,
+    required this.totalWeeks,
+  });
+
+  final DateTime date;
+  final PlannedDay planned;
+
+  /// From the programme. Twelve weeks is this cycle's length, not a fact
+  /// about the app — cycle 2 is eight.
+  final int totalWeeks;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Theme.of(context).textTheme;
+    final name =
+        ref.watch(preferencesProvider).asData?.value.athleteName ?? 'Saad';
+    final hour = DateTime.now().hour;
+    final part = hour < 12
+        ? 'Good morning'
+        : hour < 17
+        ? 'Good afternoon'
+        : 'Good evening';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$part, $name.', style: t.headlineSmall),
+        Gap.xs,
+        Text(
+          DateFormat('EEEE d MMMM').format(date).toUpperCase(),
+          style: AppTheme.overline,
+        ),
+        if (planned.weekNo != null && planned.block != null) ...[
+          Gap.xs,
+          Text(
+            'Week ${planned.weekNo} of $totalWeeks · ${planned.block!.name}',
+            style: t.titleMedium?.copyWith(color: AppTheme.textDim),
+          ),
+        ],
+      ],
     );
   }
 }
@@ -111,40 +190,15 @@ class _ResumeBanner extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final resumable = ref.watch(resumableSessionProvider).asData?.value;
     if (resumable == null) return const SizedBox.shrink();
-    final t = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.only(top: 16),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.oxblood.withValues(alpha: 0.15),
-          border: Border.all(color: AppTheme.oxblood),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.play_circle_outline, color: AppTheme.oxblood),
-            Gap.m,
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Session in progress', style: t.titleMedium),
-                  Text(
-                    'Week ${resumable.weekNo} · ${resumable.dayId}',
-                    style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                  ),
-                ],
-              ),
-            ),
-            FilledButton(
-              onPressed: () =>
-                  context.push('/run/${resumable.weekNo}/${resumable.dayId}'),
-              style: FilledButton.styleFrom(minimumSize: const Size(96, 48)),
-              child: const Text('Resume'),
-            ),
-          ],
-        ),
+      child: ToneBanner(
+        tone: Tone.accent,
+        icon: Icons.play_circle_outline,
+        title: 'Session in progress',
+        body: 'Week ${resumable.weekNo}. Pick it up where you left it.',
+        onTap: () =>
+            context.push('/run/${resumable.weekNo}/${resumable.dayId}'),
       ),
     );
   }
@@ -159,216 +213,408 @@ class _OpenRunBanner extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final open = ref.watch(openRunProvider).asData?.value;
     if (open == null) return const SizedBox.shrink();
-    final t = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.only(top: 16),
-      child: AppCard(
-        accent: AppTheme.crimson,
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          children: [
-            const Icon(Icons.route_rounded, color: AppTheme.crimson),
-            Gap.m,
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Run still open', style: t.titleMedium),
-                  Text(
-                    'Pick it up where the trail stopped, or finish it.',
-                    style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                  ),
-                ],
-              ),
-            ),
-            FilledButton(
-              onPressed: () async {
-                await context.push<bool>('/track');
-                ref.invalidate(openRunProvider);
-              },
-              style: FilledButton.styleFrom(minimumSize: const Size(96, 48)),
-              child: const Text('Open'),
-            ),
-          ],
-        ),
+      child: ToneBanner(
+        tone: Tone.accent,
+        icon: Icons.route_rounded,
+        title: 'Run still open',
+        body: 'Pick it up where the trail stopped, or finish it.',
+        onTap: () async {
+          await context.push<bool>('/track');
+          ref.invalidate(openRunProvider);
+        },
       ),
     );
   }
 }
 
-class _DateHeader extends StatelessWidget {
-  const _DateHeader({
-    required this.date,
-    required this.planned,
-    required this.totalWeeks,
-  });
-
-  final DateTime date;
-  final PlannedDay planned;
-
-  /// From the programme. Twelve weeks is this cycle's length, not a fact
-  /// about the app — cycle 2 is eight.
-  final int totalWeeks;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          DateFormat('EEEE d MMMM').format(date).toUpperCase(),
-          style: t.labelLarge?.copyWith(
-            color: AppTheme.textDim,
-            letterSpacing: 1.1,
-          ),
-        ),
-        if (planned.weekNo != null && planned.block != null) ...[
-          Gap.xs,
-          Text(
-            'Week ${planned.weekNo} of $totalWeeks · ${planned.block!.name}',
-            style: t.titleMedium?.copyWith(color: AppTheme.textDim),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-class _ActiveBody extends StatelessWidget {
-  const _ActiveBody({
-    required this.planned,
-    required this.bundle,
-    required this.ref,
-  });
+/// Today's session: the one thing on the screen, until it is done.
+class _DayCard extends ConsumerWidget {
+  const _DayCard({required this.planned, required this.programme});
 
   final PlannedDay planned;
-  final ProgrammeBundle bundle;
-  final WidgetRef ref;
+  final Programme programme;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = Theme.of(context).textTheme;
     final day = planned.day;
+    final today = ref.watch(todayProvider);
+    final week = planned.weekNo!;
 
     if (day == null) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Text(
-            'Nothing scheduled today. The programme starts '
-            '${DateFormat('EEEE d MMMM').format(bundle.programme.startDate)}.',
-            style: t.bodyLarge,
-          ),
+      return AppCard(
+        child: Text(
+          'Nothing scheduled today. The programme starts '
+          '${DateFormat('EEEE d MMMM').format(programme.startDate)}.',
+          style: t.bodyLarge,
         ),
       );
     }
 
-    final week = planned.weekNo!;
-    final checkpoint = bundle.programme.checkpointForWeek(week);
-    final nutrition = bundle.programme.nutritionForWeek(week);
-    final cardio = bundle.programme.cardioForWeek(week);
+    final entries = ref.watch(weekEntriesProvider(week)).asData?.value;
+    final entry =
+        entries?.where((e) => _sameDay(e.date, today)).firstOrNull ??
+        CalendarEntry(planned: planned);
+    final state = entry.state(today);
+    void sheet() => showDaySheet(context, ref, entry);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Card(
-          child: InkWell(
-            borderRadius: BorderRadius.circular(14),
-            onTap: () => context.go('/week/$week/day/${day.id}'),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
+    if (!day.isTrainingDay) {
+      return AppCard(
+        onTap: sheet,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            KindRail(kind: day.kind, optional: day.optional, height: 4),
+            Gap.m,
+            Text(day.title, style: t.headlineMedium),
+            if (day.note != null) ...[
+              Gap.s,
+              Text(
+                day.note!,
+                style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+              ),
+            ],
+            for (final r in entry.movedHere) ...[
+              Gap.m,
+              Text(
+                '${EntryState.movedHere.glyph}  '
+                '${DateFormat('EEEE').format(r.plannedDate)}’s session is '
+                'here today',
+                style: t.titleSmall,
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+
+    // Done, skipped or moved: say so, quietly. The hero is for what is
+    // still to do.
+    if (state != EntryState.none && state != EntryState.inProgress) {
+      final moved = entry.movedAway.firstOrNull;
+      return AppCard(
+        onTap: sheet,
+        accent: stateColour(state),
+        child: Row(
+          children: [
+            Text(
+              state.glyph,
+              style: TextStyle(fontSize: 30, color: stateColour(state)),
+            ),
+            Gap.m,
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  KindRail(kind: day.kind, optional: day.optional, height: 4),
-                  Gap.m,
-                  Text(day.title, style: t.displaySmall),
-                  Gap.s,
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      InfoChip(
-                        label:
-                            '${AppTheme.glyphForKind(day.kind)} ${day.kind.name}',
-                      ),
-                      if (day.estMinutes > 0)
-                        InfoChip(
-                          label: '~${day.estMinutes} min',
-                          icon: Icons.schedule_outlined,
-                        ),
-                      if (day.totalWorkingSets > 0)
-                        InfoChip(label: setsLabel(day.totalWorkingSets)),
-                      if (day.optional) const InfoChip(label: 'optional'),
-                    ],
-                  ),
-                  if (day.note != null) ...[
-                    Gap.m,
-                    Text(
-                      day.note!,
-                      style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                    ),
-                  ],
-                  if (day.isTrainingDay) ...[
-                    Gap.m,
-                    FilledButton.icon(
-                      onPressed: () => context.push('/run/$week/${day.id}'),
-                      icon: const Icon(Icons.play_arrow_rounded),
-                      label: const Text('Start session'),
-                    ),
-                    Gap.s,
-                    if (day.kind == DayKind.cardio)
-                      OutlinedButton.icon(
-                        onPressed: () => context.go('/more/cardio'),
-                        icon: const Icon(Icons.timer_outlined),
-                        label: const Text('Interval timers'),
-                      )
-                    else
-                      OutlinedButton(
-                        onPressed: () =>
-                            context.go('/week/$week/day/${day.id}'),
-                        child: const Text('Just show me the plan'),
-                      ),
-                  ],
+                  Text(day.title, style: t.titleLarge),
+                  Text(switch (state) {
+                    EntryState.movedAway when moved != null =>
+                      'Moved to '
+                          '${DateFormat('EEEE d MMM').format(moved.scheduledDate)}',
+                    EntryState.done => 'Done today. Eat, and sleep.',
+                    EntryState.partial => 'Part done — it still counts.',
+                    EntryState.skipped => 'Skipped today.',
+                    _ => stateWord(state),
+                  }, style: t.bodyMedium?.copyWith(color: AppTheme.textDim)),
                 ],
               ),
             ),
+            const Icon(Icons.chevron_right, color: AppTheme.textDim),
+          ],
+        ),
+      );
+    }
+
+    return _SessionHero(
+      day: day,
+      week: week,
+      resuming: state == EntryState.inProgress,
+    );
+  }
+}
+
+/// The session still to do, in the crimson hero.
+class _SessionHero extends StatelessWidget {
+  const _SessionHero({
+    required this.day,
+    required this.week,
+    required this.resuming,
+  });
+
+  final Day day;
+  final int week;
+  final bool resuming;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    const white = Colors.white;
+    final dim = white.withValues(alpha: 0.78);
+    final facts = [
+      '${AppTheme.glyphForKind(day.kind)} ${day.kind.name}',
+      if (day.estMinutes > 0) '~${day.estMinutes} min',
+      if (day.totalWorkingSets > 0) setsLabel(day.totalWorkingSets),
+      if (day.optional) 'optional',
+    ];
+    return AppCard(
+      hero: true,
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            resuming ? 'IN PROGRESS' : 'TODAY',
+            style: AppTheme.overline.copyWith(color: dim),
+          ),
+          Gap.xs,
+          Text(day.title, style: t.displaySmall!.copyWith(color: white)),
+          Gap.s,
+          Text(facts.join('  ·  '), style: t.titleSmall!.copyWith(color: dim)),
+          if (day.note != null) ...[
+            Gap.s,
+            Text(day.note!, style: t.bodyMedium!.copyWith(color: dim)),
+          ],
+          Gap.l,
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: white,
+                foregroundColor: AppTheme.crimsonDeep,
+              ),
+              onPressed: () => context.push('/run/$week/${day.id}'),
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: Text(resuming ? 'Resume session' : 'Start session'),
+            ),
+          ),
+          Gap.xs,
+          Center(
+            child: TextButton(
+              style: TextButton.styleFrom(foregroundColor: white),
+              onPressed: day.kind == DayKind.cardio
+                  ? () => context.go('/more/cardio')
+                  : () => context.go('/week/$week/day/${day.id}'),
+              child: Text(
+                day.kind == DayKind.cardio
+                    ? 'Interval timers'
+                    : 'Just show me the plan',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The quote of the day, for a second look after the launch screen.
+class _QuoteCard extends ConsumerWidget {
+  const _QuoteCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final quote = ref.watch(quoteOfDayProvider).asData?.value?.quote;
+    if (quote == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: QuoteCard(quote: quote),
+    );
+  }
+}
+
+/// A quote, set in the serif, with exactly where it is from.
+class QuoteCard extends StatelessWidget {
+  const QuoteCard({super.key, required this.quote});
+
+  final Quote quote;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(quote.text, style: AppTheme.serif(18, height: 1.45)),
+          Gap.m,
+          Row(
+            children: [
+              Container(width: 22, height: 2, color: AppTheme.crimson),
+              Gap.s,
+              Expanded(
+                child: Text(
+                  quote.attribution,
+                  style: t.labelLarge!.copyWith(color: AppTheme.textDim),
+                ),
+              ),
+            ],
+          ),
+          if (quote.translator != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 30, top: 2),
+              child: Text(
+                quote.translator!,
+                style: t.bodySmall!.copyWith(color: AppTheme.textFaint),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The scale, one tap from the home screen.
+class _WeighInCard extends ConsumerWidget {
+  const _WeighInCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Theme.of(context).textTheme;
+    final entries = ref.watch(weightEntriesProvider).asData?.value;
+    if (entries == null) return const SizedBox.shrink();
+    final today = ref.watch(todayProvider);
+    final todays = entries.where((e) => _sameDay(e.date, today)).firstOrNull;
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+      onTap: () => context.go('/progress/body'),
+      child: Row(
+        children: [
+          Icon(
+            todays == null ? Icons.monitor_weight_outlined : Icons.check_circle,
+            color: todays == null ? AppTheme.textDim : AppTheme.good,
+          ),
+          Gap.m,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  todays == null
+                      ? 'Not weighed in yet'
+                      : '${todays.kg.toStringAsFixed(1)} kg this morning',
+                  style: t.titleMedium,
+                ),
+                if (entries.length >= 2)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 6, right: 8),
+                    child: BodyweightSparkline(),
+                  ),
+              ],
+            ),
+          ),
+          if (todays == null)
+            FilledButton(
+              onPressed: () => showWeighIn(context, ref),
+              style: FilledButton.styleFrom(minimumSize: const Size(96, 48)),
+              child: const Text('Weigh in'),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The week in seven marks: what is done, what is left, and today.
+class _WeekStrip extends ConsumerWidget {
+  const _WeekStrip({required this.week, required this.today});
+
+  final int week;
+  final DateTime today;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Theme.of(context).textTheme;
+    final entries = ref.watch(weekEntriesProvider(week)).asData?.value;
+    if (entries == null) return const Skeleton(height: 96);
+    final tally = SessionTally.of(entries, today);
+    final streak = ref.watch(programmeAdherenceProvider).asData?.value;
+
+    return AppCard(
+      onTap: () => context.go('/week'),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text('THIS WEEK', style: AppTheme.overline),
+              const Spacer(),
+              Text(
+                '${tally.done} of ${tally.required} done',
+                style: t.labelLarge!.copyWith(color: AppTheme.textDim),
+              ),
+              if (streak != null && streak.currentStreak > 1) ...[
+                Gap.s,
+                Text(
+                  '· ${streak.currentStreak} in a row',
+                  style: t.labelLarge!.copyWith(color: AppTheme.textDim),
+                ),
+              ],
+            ],
+          ),
+          Gap.m,
+          Row(
+            children: [
+              for (final e in entries)
+                Expanded(
+                  child: _DayMark(entry: e, today: today),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DayMark extends StatelessWidget {
+  const _DayMark({required this.entry, required this.today});
+
+  final CalendarEntry entry;
+  final DateTime today;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final isToday = _sameDay(entry.date, today);
+    final state = entry.state(today);
+    final day = entry.planned.day;
+    final glyph = state.glyph.isNotEmpty
+        ? state.glyph
+        : day == null
+        ? ''
+        : AppTheme.glyphForKind(day.kind);
+    final colour = state.glyph.isNotEmpty
+        ? stateColour(state)
+        : day == null
+        ? AppTheme.textFaint
+        : AppTheme.forKind(day.kind).withValues(alpha: 0.7);
+    return Column(
+      children: [
+        Text(
+          DateFormat('EEEEE').format(entry.date),
+          style: t.labelMedium!.copyWith(
+            color: isToday ? AppTheme.crimson : AppTheme.textDim,
           ),
         ),
-
-        if (checkpoint != null) ...[
-          Gap.l,
-          _CheckpointCard(checkpoint: checkpoint),
-        ],
-
-        if (cardio != null && cardio.longRunLabel != null) ...[
-          Gap.l,
-          _MiniCard(
-            icon: Icons.directions_run,
-            title: 'Cardio this week',
-            lines: [
-              if (cardio.longRunLabel != null)
-                'Sunday run · ${cardio.longRunLabel}',
-              if (cardio.skipping != null) 'Skipping · ${cardio.skipping}',
-              if (cardio.bag != null) 'Bag · ${cardio.bag}',
-              if (cardio.note != null) cardio.note!,
-            ],
+        const SizedBox(height: 6),
+        Container(
+          width: 34,
+          height: 34,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppTheme.surfaceHigh,
+            border: Border.all(
+              color: isToday ? AppTheme.crimson : AppTheme.outlineSoft,
+              width: isToday ? 2 : 1,
+            ),
           ),
-        ],
-
-        if (nutrition != null) ...[
-          Gap.l,
-          _MiniCard(
-            icon: Icons.restaurant,
-            title: 'Eat today',
-            lines: [
-              '${nutrition.kcal} kcal · ${nutrition.proteinG} g protein',
-              '${nutrition.carbsG} g carbs · ${nutrition.fatG} g fat',
-              if (nutrition.note != null) nutrition.note!,
-            ],
-          ),
-        ],
+          child: Text(glyph, style: TextStyle(fontSize: 14, color: colour)),
+        ),
       ],
     );
   }
@@ -422,83 +668,77 @@ class _MiniCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, size: 20, color: AppTheme.textDim),
-                Gap.s,
-                Expanded(child: Text(title, style: t.titleMedium)),
-              ],
-            ),
-            Gap.s,
-            for (final l in lines)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Text(
-                  l,
-                  style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                ),
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 20, color: AppTheme.textDim),
+              Gap.s,
+              Expanded(child: Text(title, style: t.titleMedium)),
+            ],
+          ),
+          Gap.s,
+          for (final l in lines)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Text(
+                l,
+                style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
 }
 
 class _BeforeCard extends StatelessWidget {
-  const _BeforeCard({required this.programme, required this.calendar});
+  const _BeforeCard({required this.programme});
 
   final Programme programme;
-  final ProgrammeCalendar calendar;
 
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     final firstWeek = programme.checkpointForWeek(1);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Week 1 starts',
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Week 1 starts',
+            style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+          ),
+          Gap.xs,
+          // The date, not a countdown. "In six days" is a number you have to
+          // do arithmetic on to use; a date is one you can look at a
+          // calendar and act on.
+          Text(
+            DateFormat('EEEE d MMMM').format(programme.startDate),
+            style: t.headlineSmall,
+          ),
+          // What to do before then is the programme's own week-1
+          // checkpoint, not copy typed here.
+          if (firstWeek != null) ...[
+            Gap.m,
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Before then',
+                    style: t.titleSmall?.copyWith(color: AppTheme.textDim),
+                  ),
+                ),
+                CheckpointCount(week: firstWeek.week),
+              ],
             ),
             Gap.xs,
-            // The date, not a countdown. "In six days" is a number you have
-            // to do arithmetic on to use; a date is one you can look at a
-            // calendar and act on.
-            Text(
-              DateFormat('EEEE d MMMM').format(programme.startDate),
-              style: t.headlineSmall,
-            ),
-            // What to do before then is the programme's own week-1
-            // checkpoint, not copy typed here.
-            if (firstWeek != null) ...[
-              Gap.m,
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Before then',
-                      style: t.titleSmall?.copyWith(color: AppTheme.textDim),
-                    ),
-                  ),
-                  CheckpointCount(week: firstWeek.week),
-                ],
-              ),
-              Gap.xs,
-              CheckpointChecklist(checkpoint: firstWeek),
-            ],
+            CheckpointChecklist(checkpoint: firstWeek),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -512,31 +752,29 @@ class _CompleteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Twelve weeks, done.', style: t.headlineSmall),
-            Gap.s,
-            Text(
-              'Your week-12 test numbers seed the next cycle. Foundation is '
-              'skipped — you are not a beginner at these patterns any more.',
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+    return AppCard(
+      accent: AppTheme.crimson,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Twelve weeks, done.', style: t.headlineSmall),
+          Gap.s,
+          Text(
+            'Your week-12 test numbers seed the next cycle. Foundation is '
+            'skipped — you are not a beginner at these patterns any more.',
+            style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+          ),
+          Gap.m,
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: FilledButton.icon(
+              onPressed: () => context.go('/more/settings/next-cycle'),
+              icon: const Icon(Icons.auto_graph),
+              label: const Text('Build the next cycle'),
             ),
-            Gap.m,
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: FilledButton.icon(
-                onPressed: () => context.go('/more/settings/next-cycle'),
-                icon: const Icon(Icons.auto_graph),
-                label: const Text('Build the next cycle'),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

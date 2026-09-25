@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validation gates V1-V13 from docs/02-data-model.md, section 1.6, plus V14-V19
+"""Validation gates V1-V13 from docs/02-data-model.md, section 1.6, plus V14-V20
 added in v3 (docs/06-v3-plan.md).
 
 These are the same assertions Phase 1 ports to `flutter test`. Run this after any
@@ -609,6 +609,51 @@ for c in prog.get("checkpoints", []):
 print(f"V19 checkpoints: {auto_count} items tick themselves, "
       f"{len(sites)} measurement sites")
 
+# ============ V20 every quote says exactly where it is from ================
+# docs/06-v3-plan.md, Phase 7. Qur'an by surah:ayah, hadith only from the two
+# sahih collections with a number, Greek and Roman only with a named
+# translator. Every one records where it was checked. No quote is a stranger.
+import re as _re
+try:
+    qdoc = load("quotes.json")
+except FileNotFoundError:
+    qdoc = {"quotes": []}
+qs = qdoc.get("quotes", [])
+if len(qs) < 50:
+    fail("V20", f"only {len(qs)} quotes; a quote a day needs at least 50 "
+                f"before one comes round again")
+seen_q = set()
+for q in qs:
+    qid = q.get("id", "?")
+    if qid in seen_q:
+        fail("V20", f"quote id {qid} used twice")
+    seen_q.add(qid)
+    trad = q.get("tradition")
+    att = q.get("attribution", "")
+    text = q.get("text", "")
+    if trad not in {"quran", "hadith", "greek", "roman"}:
+        fail("V20", f"{qid}: unknown tradition {trad}")
+    if not text.strip() or len(text) > 360:
+        fail("V20", f"{qid}: text must be 1-360 characters, is {len(text)}")
+    if not q.get("verifiedAt", "").startswith("https://"):
+        fail("V20", f"{qid}: no verifiedAt link")
+    if not q.get("translator"):
+        fail("V20", f"{qid}: whose English is this? no translator")
+    if trad == "quran" and not _re.fullmatch(
+            r"Qur’an \d{1,3}:\d{1,3}(–\d{1,3})?", att):
+        fail("V20", f"{qid}: Qur'an attribution must be surah:ayah, is {att!r}")
+    if trad == "hadith" and not _re.fullmatch(
+            r"(Sahih al-Bukhari|Sahih Muslim) \d{1,4}", att):
+        fail("V20", f"{qid}: hadith must name Bukhari or Muslim and a number, "
+                    f"is {att!r}")
+    if trad in {"greek", "roman"} and "," not in att:
+        fail("V20", f"{qid}: name the author and the work, is {att!r}")
+kinds = collections.Counter(q.get("tradition") for q in qs)
+for k in ("quran", "hadith", "greek", "roman"):
+    if kinds[k] == 0:
+        fail("V20", f"no {k} quotes")
+print(f"V20 quotes: {len(qs)} ({', '.join(f'{k} {v}' for k, v in sorted(kinds.items()))})")
+
 # --------------------------------------------------------------- verdict ----
 print()
 print("=" * 74)
@@ -622,5 +667,5 @@ if failures:
     for f in failures:
         print(f"  X {f}")
     sys.exit(1)
-print("ALL GATES PASSED (V1-V19)")
+print("ALL GATES PASSED (V1-V20)")
 sys.exit(0)

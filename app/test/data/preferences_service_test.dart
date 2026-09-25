@@ -127,17 +127,29 @@ void main() {
       expect(p.recentQuoteIds, ['q2', 'q1']);
     });
 
-    test('a shown quote goes to the front, once, and history is capped', () {
-      var p = const Preferences(recentQuoteIds: ['a', 'b', 'c']);
-      p = p.withQuoteShown('b');
-      expect(p.recentQuoteIds, ['b', 'a', 'c']);
+    test('remembers the quote of the day and its round', () {
+      final p = const Preferences().withQuoteOfDay(
+        day: DateTime(2026, 10, 19, 7, 30),
+        id: 'q2',
+        cycle: const ['q2', 'q1'],
+      );
+      expect(p.quoteDay, DateTime(2026, 10, 19));
+      expect(p.quoteId, 'q2');
+      expect(p.recentQuoteIds, ['q2', 'q1']);
+      final back = Preferences.fromJson(p.toJson());
+      expect(back.quoteDay, DateTime(2026, 10, 19));
+      expect(back.quoteId, 'q2');
+      expect(back.recentQuoteIds, ['q2', 'q1']);
+    });
 
-      var full = const Preferences();
-      for (var i = 0; i < Preferences.quoteMemory + 10; i++) {
-        full = full.withQuoteShown('q$i');
-      }
-      expect(full.recentQuoteIds, hasLength(Preferences.quoteMemory));
-      expect(full.recentQuoteIds.first, 'q${Preferences.quoteMemory + 9}');
+    test('a round is not cut short: every quote shown stays in it', () {
+      final cycle = [for (var i = 0; i < 80; i++) 'q$i'];
+      final p = const Preferences().withQuoteOfDay(
+        day: DateTime(2026, 12, 1),
+        id: 'q0',
+        cycle: cycle,
+      );
+      expect(Preferences.fromJson(p.toJson()).recentQuoteIds, hasLength(80));
     });
   });
 

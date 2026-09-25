@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/exercise_providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../domain/models/exercise.dart';
 import 'exercise_detail_screen.dart';
 import 'widgets/motion_demo.dart';
@@ -33,7 +33,7 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
     final library = ref.watch(libraryProvider).asData?.value;
 
     if (library == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: SkeletonPage());
     }
 
     var results = library.search(_search.text).toList();
@@ -203,11 +203,14 @@ class _Thumb extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       clipBehavior: Clip.antiAlias,
-      child: ExerciseDemo(
-        exerciseId: exerciseId,
-        animate: false,
-        padding: 3,
-        tight: true,
+      child: Hero(
+        tag: 'demo-$exerciseId',
+        child: ExerciseDemo(
+          exerciseId: exerciseId,
+          animate: false,
+          padding: 3,
+          tight: true,
+        ),
       ),
     );
   }

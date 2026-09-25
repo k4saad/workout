@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/editor_providers.dart';
 import '../../app/providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../domain/models/exercise.dart';
 import '../../domain/models/prescription.dart';
 import '../../domain/models/programme.dart';
@@ -39,9 +39,9 @@ class _PrescriptionEditorSheetState
   Widget build(BuildContext context) {
     final bundle = ref.watch(bundleProvider).asData?.value;
     if (bundle == null) {
-      return const SizedBox(
-        height: 220,
-        child: Center(child: CircularProgressIndicator()),
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: Skeleton(height: 220),
       );
     }
 

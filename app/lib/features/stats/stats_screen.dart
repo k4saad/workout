@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../app/providers.dart';
 import '../../app/stats_providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../data/db/database.dart';
 import '../../data/stats_service.dart';
 import '../../domain/metrics/plate_gap.dart';
@@ -28,7 +28,7 @@ class StatsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Numbers')),
       body: async.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SkeletonPage(),
         error: (e, _) => AsyncScaffoldBody(
           loading: false,
           error: e,
@@ -85,7 +85,7 @@ class _WeekVolume extends ConsumerWidget {
         ),
         Gap.m,
         if (volumes == null)
-          const Center(child: CircularProgressIndicator())
+          const Skeleton(height: 160)
         else if (volumes.isEmpty)
           Text(
             'Nothing logged this week yet.',
@@ -170,48 +170,46 @@ class _DurationCard extends ConsumerWidget {
     final stats = ref.watch(sessionStatsProvider).asData?.value;
     if (stats == null) return const SizedBox.shrink();
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return AppCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                stats.ceilingIsFiction
+                    ? Icons.running_with_errors
+                    : Icons.timer_outlined,
+                size: 20,
+                color: stats.ceilingIsFiction
+                    ? AppTheme.warn
+                    : AppTheme.textDim,
+              ),
+              const SizedBox(width: 8),
+              Text('The hour', style: t.titleMedium),
+            ],
+          ),
+          Gap.s,
+          Text(stats.verdict, style: t.bodyMedium),
+          if (!stats.isEmpty) ...[
+            Gap.s,
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                Icon(
-                  stats.ceilingIsFiction
-                      ? Icons.running_with_errors
-                      : Icons.timer_outlined,
-                  size: 20,
-                  color: stats.ceilingIsFiction
-                      ? AppTheme.warn
-                      : AppTheme.textDim,
-                ),
-                const SizedBox(width: 8),
-                Text('The hour', style: t.titleMedium),
+                InfoChip(label: 'median ${stats.medianMinutes} min'),
+                InfoChip(label: 'longest ${stats.longestMinutes} min'),
+                if (stats.medianOverrunMinutes != 0)
+                  InfoChip(
+                    label:
+                        '${stats.medianOverrunMinutes > 0 ? '+' : ''}'
+                        '${stats.medianOverrunMinutes} vs estimate',
+                  ),
               ],
             ),
-            Gap.s,
-            Text(stats.verdict, style: t.bodyMedium),
-            if (!stats.isEmpty) ...[
-              Gap.s,
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  InfoChip(label: 'median ${stats.medianMinutes} min'),
-                  InfoChip(label: 'longest ${stats.longestMinutes} min'),
-                  if (stats.medianOverrunMinutes != 0)
-                    InfoChip(
-                      label:
-                          '${stats.medianOverrunMinutes > 0 ? '+' : ''}'
-                          '${stats.medianOverrunMinutes} vs estimate',
-                    ),
-                ],
-              ),
-            ],
           ],
-        ),
+        ],
       ),
     );
   }
@@ -229,74 +227,70 @@ class _PlateGapCard extends ConsumerWidget {
     final report = ref.watch(plateGapProvider).asData?.value;
     if (report == null || report.gaps.isEmpty) return const SizedBox.shrink();
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Plate gaps', style: t.titleMedium),
-            Gap.xs,
-            Text(
-              report.isClean
-                  ? 'Every lift can take its next jump without a jolt.'
-                  : 'On these lifts the smallest jump your plates can make is '
-                        'more than ${(PlateGapReport.coarseThreshold * 100).round()}% '
-                        'of the bar. That is not a stall; it is arithmetic.',
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-            ),
-            Gap.m,
-            for (final g in report.gaps.take(5))
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 16,
-                      child: Text(
-                        g.isCoarse ? '!' : '✓',
-                        style: t.bodyMedium?.copyWith(
-                          color: g.isCoarse ? AppTheme.warn : AppTheme.good,
-                        ),
+    return AppCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Plate gaps', style: t.titleMedium),
+          Gap.xs,
+          Text(
+            report.isClean
+                ? 'Every lift can take its next jump without a jolt.'
+                : 'On these lifts the smallest jump your plates can make is '
+                      'more than ${(PlateGapReport.coarseThreshold * 100).round()}% '
+                      'of the bar. That is not a stall; it is arithmetic.',
+            style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+          ),
+          Gap.m,
+          for (final g in report.gaps.take(5))
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 16,
+                    child: Text(
+                      g.isCoarse ? '!' : '✓',
+                      style: t.bodyMedium?.copyWith(
+                        color: g.isCoarse ? AppTheme.warn : AppTheme.good,
                       ),
                     ),
-                    Expanded(
-                      child: Text(
-                        library.resolve(g.exerciseId).name,
-                        style: t.bodyLarge,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Text(
-                      '${g.percent}%',
-                      style: t.bodyLarge?.copyWith(
-                        color: g.isCoarse ? AppTheme.warn : AppTheme.textDim,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            if (report.suggestedPlateKg != null) ...[
-              Gap.m,
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppTheme.warn.withValues(alpha: 0.12),
-                  border: Border.all(
-                    color: AppTheme.warn.withValues(alpha: 0.5),
                   ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  'Buy a pair of ${_plate(report.suggestedPlateKg!)} kg '
-                  'microplates. They are the cheapest training upgrade '
-                  'available to you, and they unblock every lift above.',
-                  style: t.bodyMedium,
-                ),
+                  Expanded(
+                    child: Text(
+                      library.resolve(g.exerciseId).name,
+                      style: t.bodyLarge,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    '${g.percent}%',
+                    style: t.bodyLarge?.copyWith(
+                      color: g.isCoarse ? AppTheme.warn : AppTheme.textDim,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
+          if (report.suggestedPlateKg != null) ...[
+            Gap.m,
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.warn.withValues(alpha: 0.12),
+                border: Border.all(color: AppTheme.warn.withValues(alpha: 0.5)),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                'Buy a pair of ${_plate(report.suggestedPlateKg!)} kg '
+                'microplates. They are the cheapest training upgrade '
+                'available to you, and they unblock every lift above.',
+                style: t.bodyMedium,
+              ),
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -532,7 +526,7 @@ class _LiftList extends ConsumerWidget {
         Text('Every lift', style: t.titleLarge),
         Gap.s,
         if (summaries == null)
-          const Center(child: CircularProgressIndicator())
+          const Skeleton(height: 220)
         else if (summaries.isEmpty)
           Text(
             'Log a session and this fills up.',

@@ -5,6 +5,7 @@ import 'app/router.dart';
 import 'app/session_providers.dart';
 import 'app/settings_providers.dart';
 import 'core/theme/app_theme.dart';
+import 'features/launch/launch_gate.dart';
 
 class KellerTwelveApp extends ConsumerStatefulWidget {
   const KellerTwelveApp({super.key});
@@ -43,6 +44,9 @@ class _KellerTwelveAppState extends ConsumerState<KellerTwelveApp> {
       // Dark-first and dark-only: this app is used in a basement.
       themeMode: ThemeMode.dark,
       routerConfig: appRouter,
+      // Over the router, not a route: deep links and a resumed session land
+      // where they would have without it.
+      builder: (context, child) => LaunchGate(child: child!),
     );
   }
 }

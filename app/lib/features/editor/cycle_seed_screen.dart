@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../app/editor_providers.dart';
 import '../../app/providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../domain/progression/cycle_seeder.dart';
 import '../common/widgets.dart';
 
@@ -25,7 +25,7 @@ class CycleSeedScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Next cycle')),
       body: async.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SkeletonPage(),
         error: (e, _) => AsyncScaffoldBody(
           loading: false,
           error: e,
@@ -81,26 +81,24 @@ class _Headline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(seed.programme.name, style: t.headlineSmall),
-            Gap.s,
-            Text(
-              '${seed.programme.totalWeeks} weeks, starting '
-              '${DateFormat('EEEE d MMMM').format(seed.programme.startDate)}.',
-              style: t.bodyLarge,
-            ),
-            Gap.xs,
-            Text(
-              seed.headline,
-              style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-            ),
-          ],
-        ),
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(seed.programme.name, style: t.headlineSmall),
+          Gap.s,
+          Text(
+            '${seed.programme.totalWeeks} weeks, starting '
+            '${DateFormat('EEEE d MMMM').format(seed.programme.startDate)}.',
+            style: t.bodyLarge,
+          ),
+          Gap.xs,
+          Text(
+            seed.headline,
+            style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
+          ),
+        ],
       ),
     );
   }

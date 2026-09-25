@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../domain/models/day.dart';
 import '../../domain/models/enums.dart';
 import '../../domain/models/exercise.dart';
@@ -313,7 +313,7 @@ class AsyncScaffoldBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const SkeletonPage();
     }
     if (error != null) {
       return Padding(

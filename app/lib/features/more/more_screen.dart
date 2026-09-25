@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 
 /// Everything that is not today, this week, the numbers or your body.
 ///
@@ -73,33 +73,28 @@ class _Row extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Card(
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Icon(icon, color: AppTheme.crimson),
-                Gap.m,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: t.titleMedium),
-                      Gap.xs,
-                      Text(
-                        body,
-                        style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                      ),
-                    ],
+      child: AppCard(
+        onTap: onTap,
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(icon, color: AppTheme.crimson),
+            Gap.m,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: t.titleMedium),
+                  Gap.xs,
+                  Text(
+                    body,
+                    style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
                   ),
-                ),
-                const Icon(Icons.chevron_right, color: AppTheme.textDim),
-              ],
+                ],
+              ),
             ),
-          ),
+            const Icon(Icons.chevron_right, color: AppTheme.textDim),
+          ],
         ),
       ),
     );

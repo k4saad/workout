@@ -38,7 +38,7 @@ supermarket staples.
 | 4 — GPS runs on OpenStreetMap | **Done** — see below |
 | 5 — Calendar and Week | **Done** — see below |
 | 6 — Progress photos and Body | **Done** — see below |
-| 7 — Launch quote and premium polish | |
+| 7 — Launch quote and premium polish | **Done** — see below |
 | 8 — Hardening and release | |
 
 Phase 1's review found 24 issues and its fixer was interrupted partway,
@@ -64,7 +64,7 @@ The gate, unchanged and non-negotiable:
 1. `flutter analyze` clean.
 2. `flutter test` green.
 3. `python tools/gen.py && python tools/gen_fuel.py && python tools/gen_motions.py &&
-   python tools/validate.py` — all gates (V1–V19).
+   python tools/validate.py` — all gates (V1–V20).
 4. Screens the phase touched have been **looked at**, not just asserted on.
 5. `dart format .`, one conventional commit.
 
@@ -376,6 +376,60 @@ Original figures, drawn from keyframes. No GIFs, no scraping, nothing copyrighte
   wait to continue, skipped when resuming a session. Quote of the day on Today.
 - Today rebuilt around the day; the runner gets a finish moment; every remaining screen
   moved onto the kit; hero transitions where they carry meaning.
+
+### What Phase 7 shipped
+
+- **55 quotes, every one checked against its source** (`data/quotes.json`,
+  gate **V20**; `python tools/verify_quotes.py` re-checks them, network
+  needed):
+  - **18 from the Qur'an** in Pickthall (1930), by surah:ayah. Each excerpt
+    was matched word for word against Tanzil's text of Pickthall.
+  - **11 hadith** from Sahih al-Bukhari and Sahih Muslim, by their standard
+    numbers. Each number was checked in an open hadith dataset. For Muslim
+    that meant the Abdul-Baqi numbering, since the dataset's own index
+    differs. The English is the meaning in plain words, so no modern
+    copyrighted translation is copied.
+  - **12 Greek and 14 Roman**, only in public-domain translations: George
+    Long's Marcus Aurelius and Epictetus, Evelyn-White's Hesiod, Dakyns's
+    Xenophon, Chase's Aristotle, Jowett's Plato, Stewart's Seneca,
+    Shuckburgh's Cicero and Smart's Horace. Each was matched against the
+    Project Gutenberg text, and the Meditations book numbers were read from
+    the translation's own markers.
+  - Left out rather than risked: Surah 103. Every digital Pickthall reads
+    "man is a state of loss", which looks like a transcription slip, and
+    there was no printed copy to settle it.
+- **A quote a day, never the same one twice until all 55 have had their
+  day** (`lib/domain/content/quotes.dart`, test-first). A new round never
+  opens with the quote that closed the last.
+- **The launch screen** sits over the router, not in it, so deep links and
+  resumes land where they would have. It greets him by name ("Good
+  morning, Saad."), sets the day's quote with its source and translator,
+  and leaves on a tap or after enough time to read it. It shows on the
+  first open of the day only, never when a session or run is waiting, and
+  it can be switched off in Settings.
+- **Today, rebuilt around the day:**
+  - The session still to do is the one crimson card. Once done, skipped or
+    moved, it says so quietly and is not offered again.
+  - Below it: the quote of the day, what to eat next, a one-tap weigh-in
+    with the trend, the week as seven marks, the checkpoint, and cardio.
+  - The phase-level "Eat today" card that disagreed with Fuel's per-day plan
+    is gone.
+- **The end of a session:** the ring fills, then sets, movements, kilos on
+  the bar and minutes count up (`SessionSummary`, test-first; no time for a
+  session logged from memory or left open overnight).
+- **Hero transitions where they mean something:** a photo grows from its
+  thumbnail into the viewer, which now opens on the pose that was tapped,
+  and an exercise's figure flies from the library into its page.
+- **The rest onto the kit:** 15 plain Cards became AppCards; every page
+  load is a skeleton instead of a bare spinner.
+- **Cut, said out loud:**
+  - The serif for quotes is Android's system serif (Noto Serif), which the
+    test renderer does not have, so the screenshots show it in the sans. It
+    goes on the on-device checklist.
+  - Hero flights into the session runner were not added: the runner is on
+    the root navigator, and a hero cannot cross navigators.
+  - The video player keeps its buffering spinner; it is media loading, not
+    a page.
 
 ## Phase 8 — Hardening and release
 

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/ui/ui.dart';
 import '../../domain/models/day.dart';
 import '../../domain/models/enums.dart';
 import '../../domain/models/exercise.dart';
@@ -133,26 +133,24 @@ class _DayBody extends StatelessWidget {
 
         if (day.kind == DayKind.rest) ...[
           Gap.l,
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.bedtime_outlined,
-                    color: AppTheme.slate,
-                    size: 28,
+          AppCard(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.bedtime_outlined,
+                  color: AppTheme.slate,
+                  size: 28,
+                ),
+                Gap.m,
+                Expanded(
+                  child: Text(
+                    'Muscle is built on the days you don’t train. '
+                    'The session only sends the signal.',
+                    style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
                   ),
-                  Gap.m,
-                  Expanded(
-                    child: Text(
-                      'Muscle is built on the days you don’t train. '
-                      'The session only sends the signal.',
-                      style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -180,96 +178,94 @@ class _SectionCard extends StatelessWidget {
       }
     }
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(child: Text(section.title, style: t.titleLarge)),
-                if (section.estMinutes > 0)
-                  Text(
-                    '${section.estMinutes} min',
-                    style: t.labelLarge?.copyWith(color: AppTheme.textDim),
-                  ),
-              ],
-            ),
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(section.title, style: t.titleLarge)),
+              if (section.estMinutes > 0)
+                Text(
+                  '${section.estMinutes} min',
+                  style: t.labelLarge?.copyWith(color: AppTheme.textDim),
+                ),
+            ],
+          ),
 
-            // Warm-up and cool-down drills: ticked, not logged.
-            if (section.drills.isNotEmpty) ...[
-              Gap.s,
-              for (final d in section.drills)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(top: 3, right: 10),
-                        child: Icon(
-                          Icons.check_box_outline_blank,
-                          size: 20,
-                          color: AppTheme.textDim,
-                        ),
+          // Warm-up and cool-down drills: ticked, not logged.
+          if (section.drills.isNotEmpty) ...[
+            Gap.s,
+            for (final d in section.drills)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 3, right: 10),
+                      child: Icon(
+                        Icons.check_box_outline_blank,
+                        size: 20,
+                        color: AppTheme.textDim,
                       ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: library.resolve(d.exerciseId).name,
-                                    style: t.bodyLarge,
-                                  ),
-                                  TextSpan(
-                                    text: '  ${d.text}',
-                                    style: t.bodyMedium?.copyWith(
-                                      color: AppTheme.textDim,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (d.note != null)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 2),
-                                child: Text(
-                                  d.note!,
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: library.resolve(d.exerciseId).name,
+                                  style: t.bodyLarge,
+                                ),
+                                TextSpan(
+                                  text: '  ${d.text}',
                                   style: t.bodyMedium?.copyWith(
                                     color: AppTheme.textDim,
-                                    fontStyle: FontStyle.italic,
                                   ),
                                 ),
+                              ],
+                            ),
+                          ),
+                          if (d.note != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Text(
+                                d.note!,
+                                style: t.bodyMedium?.copyWith(
+                                  color: AppTheme.textDim,
+                                  fontStyle: FontStyle.italic,
+                                ),
                               ),
-                          ],
-                        ),
+                            ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-            ],
-
-            // Prescriptions, with supersets kept visually together.
-            for (var i = 0; i < groups.length; i++) ...[
-              if (i > 0 || section.drills.isNotEmpty) const Divider(height: 20),
-              if (groups[i].length > 1)
-                _SupersetGroup(
-                  members: groups[i],
-                  label: 'SS${ssIndex[groups[i].first.groupId!]}',
-                  library: library,
-                )
-              else
-                PrescriptionRow(
-                  prescription: groups[i].first,
-                  exercise: library.resolve(groups[i].first.exerciseId),
-                ),
-            ],
+              ),
           ],
-        ),
+
+          // Prescriptions, with supersets kept visually together.
+          for (var i = 0; i < groups.length; i++) ...[
+            if (i > 0 || section.drills.isNotEmpty) const Divider(height: 20),
+            if (groups[i].length > 1)
+              _SupersetGroup(
+                members: groups[i],
+                label: 'SS${ssIndex[groups[i].first.groupId!]}',
+                library: library,
+              )
+            else
+              PrescriptionRow(
+                prescription: groups[i].first,
+                exercise: library.resolve(groups[i].first.exerciseId),
+              ),
+          ],
+        ],
       ),
     );
   }
