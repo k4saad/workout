@@ -54,6 +54,58 @@ void main() {
     });
   });
 
+  group('a stretch of the route', () {
+    test('between two distances, ending exactly on them', () {
+      final part = RoutePath(straight).between(100, 300);
+      expect(part, hasLength(1));
+      expect(haversineM(origin, part.single.first), closeTo(100, 1));
+      expect(haversineM(origin, part.single.last), closeTo(300, 1));
+    });
+
+    test('a pause inside it stays a break', () {
+      final paused = [
+        [for (var s = 0; s <= 50; s++) at(s, s * 3.0)], // 0-150 m
+        [for (var s = 100; s <= 150; s++) at(s, 500 + (s - 100) * 3.0)],
+      ];
+      // 150 m in the first stretch, 150 m in the second.
+      final part = RoutePath(paused).between(100, 250);
+      expect(part, hasLength(2));
+      expect(haversineM(origin, part.first.first), closeTo(100, 1));
+      expect(haversineM(origin, part.last.last), closeTo(600, 1));
+    });
+
+    test('nothing, when the stretch is empty', () {
+      expect(RoutePath(straight).between(300, 100), isEmpty);
+      expect(RoutePath(const []).between(0, 100), isEmpty);
+    });
+  });
+
+  group('a route that does not give away where it starts', () {
+    /// 1.2 km due north.
+    final long = [
+      for (var s = 0; s <= 400; s++) [at(s, s * 3.0)],
+    ].expand((x) => x).toList();
+
+    test('the first and last 200 m are cut', () {
+      final shown = privateRoute([long]);
+      expect(shown, hasLength(1));
+      expect(haversineM(origin, shown.single.first), closeTo(200, 1));
+      expect(haversineM(north(1200), shown.single.last), closeTo(200, 1));
+    });
+
+    test('a run too short to hide both ends shows nothing at all', () {
+      // 400 m: cutting 200 m from each end leaves no route, and what is
+      // left of a short loop is all near the door anyway.
+      expect(privateRoute(straight), isEmpty);
+    });
+
+    test('with nothing hidden, the whole route', () {
+      final shown = privateRoute([long], hideM: 0);
+      expect(haversineM(origin, shown.single.first), closeTo(0, 0.5));
+      expect(haversineM(north(1200), shown.single.last), closeTo(0, 0.5));
+    });
+  });
+
   group('the replay dot', () {
     test('half way along, half the distance and half the time', () {
       final path = RoutePath(straight);

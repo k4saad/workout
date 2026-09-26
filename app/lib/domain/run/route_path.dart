@@ -71,6 +71,43 @@ class RoutePath {
     return out;
   }
 
+  /// The route from [fromM] to [toM] metres along it, ending exactly on
+  /// both, still broken where it was paused. Empty when there is nothing
+  /// between them.
+  List<List<GeoPoint>> between(double fromM, double toM) {
+    final a = math.max(0.0, fromM);
+    final b = math.min(lengthM, toM);
+    if (_segs.isEmpty || b <= a) return const [];
+    final out = <List<GeoPoint>>[];
+    for (var i = 0; i < _segs.length; i++) {
+      final s = _segs[i];
+      final ds = _dist[i];
+      if (ds.last <= a) continue;
+      if (ds.first >= b) break;
+      GeoPoint cut(int j, double target) {
+        final span = ds[j] - ds[j - 1];
+        final t = span == 0 ? 0.0 : (target - ds[j - 1]) / span;
+        return _lerp(s[j - 1].point, s[j].point, t);
+      }
+
+      final pts = <GeoPoint>[];
+      for (var j = 0; j < s.length; j++) {
+        final d = ds[j];
+        if (j > 0) {
+          final d0 = ds[j - 1];
+          if (d0 < a && d > a) pts.add(cut(j, a));
+          if (d0 < b && d > b) {
+            pts.add(cut(j, b));
+            break;
+          }
+        }
+        if (d >= a && d <= b) pts.add(s[j].point);
+      }
+      if (pts.length > 1) out.add(pts);
+    }
+    return out;
+  }
+
   /// Where the replay dot is at [fraction]: the point, the distance run and
   /// the time taken to get there.
   ({GeoPoint point, double distanceM, int elapsedMs}) at(double fraction) {
@@ -96,6 +133,20 @@ class RoutePath {
     final last = _segs.last;
     return (point: last.last.point, distanceM: lengthM, elapsedMs: durationMs);
   }
+}
+
+/// The route as it may leave the phone on a shared card: [hideM] cut from
+/// each end, so neither the start nor the finish — for most runs, the
+/// front door — is on it. Empty when too little would be left to be worth
+/// drawing (a short loop is all near the door anyway).
+List<List<GeoPoint>> privateRoute(
+  List<List<RunFix>> segments, {
+  double hideM = 200,
+}) {
+  final path = RoutePath(segments);
+  if (hideM <= 0) return path.between(0, path.lengthM);
+  if (path.lengthM - 2 * hideM < 50) return const [];
+  return path.between(hideM, path.lengthM - hideM);
 }
 
 /// A stretch of the route and how fast it was run: the unit the route is

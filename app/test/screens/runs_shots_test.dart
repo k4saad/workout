@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
+import 'package:flutter/widgets.dart' show RepaintBoundary;
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:keller_twelve/app/run_providers.dart';
@@ -10,6 +12,7 @@ import 'package:keller_twelve/data/programme_repository.dart';
 import 'package:keller_twelve/data/run_repository.dart';
 import 'package:keller_twelve/data/run_tracker.dart';
 import 'package:keller_twelve/domain/run/run.dart';
+import 'package:keller_twelve/features/runs/run_share_card.dart';
 
 import '../support/screenshot.dart';
 
@@ -144,6 +147,68 @@ void main() {
     await tester.pump(const Duration(seconds: 5));
     await Screenshot.settle(tester);
     await Screenshot.capture(tester, 'run_replay');
+  });
+
+  testWidgets('full screen, and the card it shares', skip: !_enabled, (
+    tester,
+  ) async {
+    final id = (await tester.runAsync(seed))!;
+    Screenshot.phone(tester);
+    final router = await Screenshot.pumpApp(
+      tester,
+      db: db,
+      repo: repo,
+      location: '/progress/runs',
+      overrides: overrides(),
+    );
+    router.go('/progress/runs/$id');
+    await Screenshot.settle(tester, rounds: 24);
+    await tester.pump(const Duration(seconds: 2));
+    await Screenshot.settle(tester);
+
+    await tester.tap(find.byTooltip('Full screen'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1200)); // mid draw-in
+    await Screenshot.capture(tester, 'run_fullscreen_drawing');
+    await tester.pump(const Duration(seconds: 2));
+    await Screenshot.settle(tester);
+    await Screenshot.capture(tester, 'run_fullscreen');
+    await tester.tap(find.byTooltip('Colour the route by pace'));
+    await tester.tap(find.byTooltip('Replay'));
+    await tester.pump(const Duration(seconds: 6));
+    await Screenshot.settle(tester);
+    await Screenshot.capture(tester, 'run_fullscreen_replay');
+    await tester.tap(find.byTooltip('Stop the replay'));
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pump(const Duration(seconds: 1));
+    await Screenshot.settle(tester);
+
+    await tester.tap(find.byTooltip('Share as an image').first);
+    await tester.pump(const Duration(seconds: 1));
+    await Screenshot.settle(tester);
+    await Screenshot.capture(tester, 'run_share_sheet');
+
+    Future<void> saveCard(String name) async {
+      final boundary = tester.renderObject<RenderRepaintBoundary>(
+        find
+            .ancestor(
+              of: find.byType(RunShareCard),
+              matching: find.byType(RepaintBoundary),
+            )
+            .first,
+      );
+      await tester.runAsync(() async {
+        final png = await renderShareCard(boundary);
+        File('build/screens/$name.png')
+          ..parent.createSync(recursive: true)
+          ..writeAsBytesSync(png);
+      });
+    }
+
+    await saveCard('run_card');
+    await tester.tap(find.text('Show the route'));
+    await Screenshot.settle(tester);
+    await saveCard('run_card_numbers');
   });
 
   testWidgets('the run, live', skip: !_enabled, (tester) async {

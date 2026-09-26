@@ -12,6 +12,7 @@ import '../../data/run_repository.dart';
 import '../../data/run_tracker.dart';
 import '../../domain/run/run.dart';
 import 'run_map.dart';
+import 'run_share_card.dart';
 import 'run_summary.dart';
 
 /// What the live screen was opened for: a programme day's run, or a free
@@ -372,9 +373,31 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: const Text('Run saved'),
+          actions: [
+            IconButton(
+              tooltip: 'Share as an image',
+              icon: const Icon(Icons.ios_share),
+              onPressed: () => showRunShareSheet(
+                context,
+                run: run,
+                track: _savedTrack ?? RunTrack(),
+                exerciseName: run.setLogId == null
+                    ? null
+                    : widget.launch.exerciseName,
+              ),
+            ),
+          ],
         ),
         body: RunSummaryView(
           run: run,
+          onShare: () => showRunShareSheet(
+            context,
+            run: run,
+            track: _savedTrack ?? RunTrack(),
+            exerciseName: run.setLogId == null
+                ? null
+                : widget.launch.exerciseName,
+          ),
           track: _savedTrack ?? RunTrack(),
           exerciseName: run.setLogId == null
               ? null

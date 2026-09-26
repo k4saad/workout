@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +9,7 @@ import '../../app/run_providers.dart';
 import '../../core/ui/ui.dart';
 import '../../data/db/database.dart';
 import '../../domain/run/run.dart';
+import 'run_share_card.dart';
 import 'run_summary.dart';
 
 /// Every run, newest first, and the way to start a free one.
@@ -244,7 +243,12 @@ class _RunTile extends ConsumerWidget {
             ),
             child: track == null
                 ? null
-                : CustomPaint(painter: TrailThumbPainter(track.segments)),
+                : CustomPaint(
+                    painter: RouteLinePainter([
+                      for (final s in track.segments)
+                        [for (final f in s) f.point],
+                    ]),
+                  ),
           ),
         ],
       ),
@@ -270,10 +274,24 @@ class RunDetailScreen extends ConsumerWidget {
       );
     }
     final repo = ref.read(runRepositoryProvider);
+    final exerciseName = run.exerciseId == null
+        ? null
+        : library?.resolve(run.exerciseId!).name;
+    void share() => showRunShareSheet(
+      context,
+      run: run,
+      track: track,
+      exerciseName: exerciseName,
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text(DateFormat('d MMMM').format(run.runOn)),
         actions: [
+          IconButton(
+            tooltip: 'Share as an image',
+            icon: const Icon(Icons.ios_share),
+            onPressed: share,
+          ),
           IconButton(
             tooltip: 'Delete this run',
             icon: const Icon(Icons.delete_outline),
@@ -310,9 +328,8 @@ class RunDetailScreen extends ConsumerWidget {
       body: RunSummaryView(
         run: run,
         track: track,
-        exerciseName: run.exerciseId == null
-            ? null
-            : library?.resolve(run.exerciseId!).name,
+        onShare: share,
+        exerciseName: exerciseName,
         onEffort: (e) async {
           await repo.setEffort(runId, e);
           ref.invalidate(runProvider(runId));
@@ -320,66 +337,4 @@ class RunDetailScreen extends ConsumerWidget {
       ),
     );
   }
-}
-
-/// A run's shape, drawn without a map: good enough to tell one route from
-/// another in a list, and no tile fetched for it.
-class TrailThumbPainter extends CustomPainter {
-  TrailThumbPainter(this.segments);
-
-  final List<List<RunFix>> segments;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final pts = [for (final s in segments) ...s];
-    if (pts.length < 2) return;
-    var minLat = pts.first.lat, maxLat = minLat;
-    var minLng = pts.first.lng, maxLng = minLng;
-    for (final p in pts) {
-      minLat = math.min(minLat, p.lat);
-      maxLat = math.max(maxLat, p.lat);
-      minLng = math.min(minLng, p.lng);
-      maxLng = math.max(maxLng, p.lng);
-    }
-    // Longitude degrees shrink with latitude; scale so the shape is true.
-    final k = math.cos((minLat + maxLat) / 2 * math.pi / 180);
-    final w = math.max(1e-9, (maxLng - minLng) * k);
-    final h = math.max(1e-9, maxLat - minLat);
-    final pad = size.height > 100 ? 18.0 : 8.0;
-    final s = math.min((size.width - pad * 2) / w, (size.height - pad * 2) / h);
-    final ox = (size.width - w * s) / 2;
-    final oy = (size.height - h * s) / 2;
-    Offset o(RunFix p) =>
-        Offset(ox + (p.lng - minLng) * k * s, oy + (maxLat - p.lat) * s);
-
-    // The same trail as on the map: a soft glow, then the line.
-    final glow = Paint()
-      ..color = AppTheme.crimson.withValues(alpha: 0.35)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.height > 100 ? 9 : 5
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
-    final line = Paint()
-      ..color = AppTheme.crimson
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.height > 100 ? 3.5 : 2
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    for (final seg in segments) {
-      if (seg.length < 2) continue;
-      final path = Path()..moveTo(o(seg.first).dx, o(seg.first).dy);
-      for (final p in seg.skip(1)) {
-        path.lineTo(o(p).dx, o(p).dy);
-      }
-      canvas
-        ..drawPath(path, glow)
-        ..drawPath(path, line);
-    }
-    canvas.drawCircle(o(pts.first), 4, Paint()..color = AppTheme.text);
-    canvas.drawCircle(o(pts.last), 4, Paint()..color = AppTheme.crimsonBright);
-  }
-
-  @override
-  bool shouldRepaint(TrailThumbPainter old) => old.segments != segments;
 }

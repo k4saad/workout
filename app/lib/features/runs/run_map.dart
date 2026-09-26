@@ -58,6 +58,7 @@ class RunMap extends ConsumerStatefulWidget {
     this.interactive = true,
     this.shaded,
     this.dot,
+    this.fitPadding = const EdgeInsets.all(40),
   });
 
   /// The trail as it is drawn now — the whole of it, or the part revealed
@@ -84,6 +85,10 @@ class RunMap extends ConsumerStatefulWidget {
 
   /// The replay dot.
   final GeoPoint? dot;
+
+  /// Room left around the route when the camera frames it: full screen
+  /// keeps it clear of the title and the buttons over the map.
+  final EdgeInsets fitPadding;
 
   @override
   ConsumerState<RunMap> createState() => _RunMapState();
@@ -140,7 +145,7 @@ class _RunMapState extends ConsumerState<RunMap> {
                   bounds: LatLngBounds.fromPoints([
                     for (final p in frame) _ll(p),
                   ]),
-                  padding: const EdgeInsets.all(40),
+                  padding: widget.fitPadding,
                   maxZoom: 17,
                 )
               : null,

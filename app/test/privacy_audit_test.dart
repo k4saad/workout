@@ -309,6 +309,32 @@ void main() {
       }
     });
 
+    test('a shared run card carries a line, never a map or a place', () {
+      // A GPS trail is a home address. The share card is the one way it
+      // leaves the phone outside a backup: drawn as a line from the route
+      // with its ends cut (privateRoute), never a map tile, never a
+      // coordinate, never the location plugin.
+      final card = dartFiles.singleWhere(
+        (f) => f.path.endsWith('/features/runs/run_share_card.dart'),
+      );
+      for (final banned in [
+        'package:flutter_map/',
+        'package:geolocator/',
+        'package:url_launcher/',
+        'startLat',
+        'startLng',
+        'endLat',
+        'endLng',
+      ]) {
+        expect(
+          card.source.contains(banned),
+          isFalse,
+          reason: 'the share card reaches for $banned',
+        );
+      }
+      expect(card.source, contains('privateRoute('));
+    });
+
     test('url_launcher stays the way demo links open', () {
       final pubspec = read('pubspec.yaml');
       expect(pubspec, contains('url_launcher'));

@@ -57,7 +57,9 @@ Follow the phases in order; do not skip ahead.
   records with the screen off, started from a tap. Never ACCESS_BACKGROUND_LOCATION.
   Only `lib/features/runs/`, `lib/data/run*` and `lib/app/run*` may import geolocator or
   flutter_map. A GPS trail is a home address: it never leaves the phone except inside a
-  backup Saad makes himself.
+  backup Saad makes himself, or on a run card he shares himself — a PNG with the route
+  as a line (no map, no coordinates), its first and last 200 m cut unless he turns that
+  off (`run_share_card.dart`, `privateRoute`; the privacy audit holds it there).
 - **`set_logs` store their own `exercise_id`.** Never resolve history through the live
   programme JSON — exercises get swapped and history must survive.
 - **Never scrape or bundle copyrighted exercise images or GIFs.** Unlicense/CC sources

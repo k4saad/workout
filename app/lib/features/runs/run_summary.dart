@@ -33,6 +33,7 @@ class RunSummaryView extends StatelessWidget {
     this.exerciseName,
     this.onEffort,
     this.footer,
+    this.onShare,
   });
 
   final Run run;
@@ -44,6 +45,9 @@ class RunSummaryView extends StatelessWidget {
   /// Rate the effort; null when the rating cannot be changed here.
   final ValueChanged<int>? onEffort;
   final Widget? footer;
+
+  /// Opens the share card; offered on the full-screen route too.
+  final VoidCallback? onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +80,20 @@ class RunSummaryView extends StatelessWidget {
         ],
         Gap.m,
         if (hasTrail)
-          RouteHero(track: track)
+          RouteHero(
+            track: track,
+            onShare: onShare,
+            onExpand: () => RouteFullScreen.open(
+              context,
+              track: track,
+              title: runTitle(started),
+              subtitle:
+                  '${DateFormat('EEE d MMM').format(started)} · '
+                  '${formatKm(run.distanceM.toDouble())} km · '
+                  '${formatClock(run.movingMs)}',
+              onShare: onShare,
+            ),
+          )
         else
           ClipRRect(
             borderRadius: BorderRadius.circular(AppRadius.l),
