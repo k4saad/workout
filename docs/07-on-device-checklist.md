@@ -1,7 +1,7 @@
-# On-device checklist — v0.13.1+14
+# On-device checklist — v0.14.0+15
 
 What the tests cannot prove, because it needs the phone, the camera, the GPS
-or a night passing. Everything else is covered by `flutter test` (1,568
+or a night passing. Everything else is covered by `flutter test` (1,580
 tests) and the data gates V1–V21.
 
 v0.13 is the fix-up after the first week on the phone (docs/08-v3.1-plan.md):
@@ -17,7 +17,7 @@ Tick these in order. The first two protect everything else.
       Settings → Backup and files → Export full backup). Nothing in this
       update touches the database, but a backup you hold yourself is the one
       that cannot be lost with the phone.
-- [ ] Install **`apk/keller-twelve-0.13.1+14-arm64.apk`** over the old app —
+- [ ] Install **`apk/keller-twelve-0.14.0+15-arm64.apk`** over the old app —
       do **not** uninstall first. (`-arm32` is only for a phone older than
       about 2017.) It is signed with the same key as v0.11 and v0.12
       (`389b93bc…b7b5`), so Android installs it as an update and keeps the data.
@@ -80,6 +80,18 @@ Tick these in order. The first two protect everything else.
       list starts clean.
 - [ ] Compare the week's total with a real receipt once. The prices are
       estimates; tell me if they are far out and the generator gets fixed.
+
+## A run to look at, a run to send (v0.14, docs/10-v3.2-plan.md)
+
+- [ ] On a run's page, tap the route (or ⤢): it opens **full screen**
+      over the tab bar, draws itself in, pans and pinches; **Draw it
+      again**, pace colours and replay work; ✕ and back both close it.
+- [ ] **Share** (the share icon in the run's bar, or in full screen):
+      the card preview shows the route with a gap at the start and finish.
+      Share it to yourself (e.g. WhatsApp "Message yourself"): the picture
+      is sharp, 1080 × 1350, with no map on it.
+- [ ] Turn **Hide the start and finish** off: the line closes. Turn **Show
+      the route** off: the card becomes the numbers.
 
 ## After the QA pass (docs/09-qa-pass.md)
 
@@ -153,5 +165,5 @@ Tick these in order. The first two protect everything else.
 When this list is ticked, tag the build so it can always be returned to:
 
 ```bash
-git tag v0.13.1-qa
+git tag v0.14-v3.2
 ```
