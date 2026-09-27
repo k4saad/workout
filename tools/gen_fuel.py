@@ -15,8 +15,10 @@ day, which is the only way a small appetite hits that number five days a week.
 Rules the food list obeys:
   - **Halal.** No pork, no gelatine of unstated origin, no alcohol, no vanilla
     extract. Meat is the halal butcher's or the supermarket's halal line.
-  - **German supermarket.** Aldi, Lidl and Rewe own-brand staples, with the
-    German shelf name, because that is what is on the shelf he stands in front of.
+  - **German supermarket.** Aldi, Lidl and Rewe own-brand staples, named in
+    English (v0.14.1: the app is in English; the German shelf names read as
+    noise to him). Only the halal guide keeps a German label word, in
+    brackets, where the point is to find that word on the packet.
   - **Cheap per gram of protein.** Magerquark and eggs do the heavy lifting.
 """
 import json, os, io, itertools
@@ -38,8 +40,8 @@ def warn(msg):
 
 
 # ---------------------------------------------------------------- the food ---
-# Per 100 g as the LABEL states it (Nährwerte je 100 g), because that is what
-# he can check against the packet in his hand. `pack` is the shelf size, which
+# Per 100 g as the LABEL states it, because that is what he can check
+# against the packet in his hand. `pack` is the shelf size, which
 # is what the grocery list has to round up to.
 #
 # kcal, protein, carbohydrate, fat.
@@ -50,82 +52,83 @@ F = lambda kcal, p, c, f, name, cat, pack, note=None: {
 
 FOODS = {
     # --- dairy and eggs: the cheapest protein in a German supermarket -------
-    "magerquark": F(67, 12.0, 4.0, 0.3, "Magerquark", "dairy", 500,
+    "magerquark": F(67, 12.0, 4.0, 0.3, "Low-fat quark", "dairy", 500,
                     "The backbone of this plan. 500 g is 60 g of protein for about a euro."),
-    "skyr": F(63, 11.0, 4.0, 0.2, "Skyr natur", "dairy", 450),
-    "huettenkaese": F(98, 12.5, 3.0, 4.2, "Hüttenkäse", "dairy", 200),
-    "vollmilch": F(64, 3.4, 4.8, 3.5, "Vollmilch 3,5 %", "dairy", 1000,
+    "skyr": F(63, 11.0, 4.0, 0.2, "Skyr, plain", "dairy", 450),
+    "huettenkaese": F(98, 12.5, 3.0, 4.2, "Cottage cheese", "dairy", 200),
+    "vollmilch": F(64, 3.4, 4.8, 3.5, "Whole milk 3.5 %", "dairy", 1000,
                    "Whole milk, not skimmed. You are trying to gain weight."),
-    "griech_joghurt": F(133, 4.0, 4.0, 10.0, "Griechischer Joghurt 10 %", "dairy", 500),
-    "gouda": F(356, 25.0, 0.0, 28.0, "Gouda jung, am Stück", "dairy", 400,
-               "Check the label says mikrobielles Lab — animal rennet is not halal."),
-    "eier": F(137, 12.6, 0.6, 9.5, "Eier Größe M", "dairy", 580,
+    "griech_joghurt": F(133, 4.0, 4.0, 10.0, "Greek yoghurt 10 %", "dairy", 500),
+    "gouda": F(356, 25.0, 0.0, 28.0, "Young Gouda, in a block", "dairy", 400,
+               "Check the rennet is microbial (the label says mikrobielles Lab) — "
+               "animal rennet is not halal."),
+    "eier": F(137, 12.6, 0.6, 9.5, "Eggs, size M", "dairy", 580,
               "One egg is about 58 g. A 10-pack is 580 g."),
-    "whey": F(380, 78.0, 6.0, 5.0, "Whey Protein neutral", "supplement", 1000,
+    "whey": F(380, 78.0, 6.0, 5.0, "Whey protein, unflavoured", "supplement", 1000,
               "Neutral, not flavoured: flavoured tubs often carry undeclared alcohol carriers."),
 
     # --- meat and fish, halal ----------------------------------------------
-    "haehnchenbrust": F(106, 23.0, 0.0, 1.5, "Hähnchenbrustfilet (halal)", "meat", 500),
-    "haehnchenschenkel": F(172, 18.0, 0.0, 11.0, "Hähnchenschenkel (halal)", "meat", 600,
+    "haehnchenbrust": F(106, 23.0, 0.0, 1.5, "Chicken breast fillet (halal)", "meat", 500),
+    "haehnchenschenkel": F(172, 18.0, 0.0, 11.0, "Chicken legs (halal)", "meat", 600,
                            "Cheaper and far more forgiving in a pan than breast."),
-    "haehnchen_ok": F(125, 19.5, 0.0, 5.0, "Hähnchenoberschenkel ohne Knochen (halal)",
+    "haehnchen_ok": F(125, 19.5, 0.0, 5.0, "Boneless chicken thighs (halal)",
                       "meat", 600,
                       "Boneless thigh: cheaper than breast, and it stays juicy "
                       "when it is cooked on Sunday and eaten on Tuesday."),
-    "rinderhack": F(212, 19.0, 0.0, 15.0, "Rinderhackfleisch 15 % (halal)", "meat", 500),
-    "thunfisch": F(108, 24.0, 0.0, 1.0, "Thunfisch im eigenen Saft", "fish", 150,
+    "rinderhack": F(212, 19.0, 0.0, 15.0, "Beef mince 15 % (halal)", "meat", 500),
+    "thunfisch": F(108, 24.0, 0.0, 1.0, "Tuna in its own juice", "fish", 150,
                    "Drained weight. A tin is about 150 g in, 110 g out."),
-    "lachs": F(208, 20.0, 0.0, 14.0, "Lachsfilet TK", "fish", 400),
+    "lachs": F(208, 20.0, 0.0, 14.0, "Salmon fillet, frozen", "fish", 400),
 
     # --- legumes and plant protein -----------------------------------------
-    "linsen_rot": F(347, 24.0, 52.0, 1.5, "Rote Linsen, trocken", "legume", 500),
-    "kichererbsen": F(122, 6.5, 16.0, 2.6, "Kichererbsen (Dose, abgetropft)", "legume", 265),
-    "kidneybohnen": F(116, 7.0, 15.0, 0.6, "Kidneybohnen (Dose, abgetropft)", "legume", 265),
-    "tofu": F(144, 15.0, 1.0, 8.5, "Tofu natur", "legume", 400),
+    "linsen_rot": F(347, 24.0, 52.0, 1.5, "Red lentils, dry", "legume", 500),
+    "kichererbsen": F(122, 6.5, 16.0, 2.6, "Chickpeas (tin, drained)", "legume", 265),
+    "kidneybohnen": F(116, 7.0, 15.0, 0.6, "Kidney beans (tin, drained)", "legume", 265),
+    "tofu": F(144, 15.0, 1.0, 8.5, "Tofu, plain", "legume", 400),
 
     # --- starches -----------------------------------------------------------
-    "haferflocken": F(372, 13.0, 59.0, 7.0, "Haferflocken zart", "grain", 500,
+    "haferflocken": F(372, 13.0, 59.0, 7.0, "Rolled oats", "grain", 500,
                       "Weigh them dry. Cooked oats are mostly water."),
-    "reis": F(350, 7.5, 77.0, 0.9, "Basmatireis, roh", "grain", 1000,
+    "reis": F(350, 7.5, 77.0, 0.9, "Basmati rice, dry", "grain", 1000,
               "Dry weight. 100 g dry is roughly 260 g cooked."),
-    "nudeln": F(340, 13.0, 62.0, 2.5, "Vollkornnudeln, roh", "grain", 500),
-    "couscous": F(358, 12.0, 72.0, 1.0, "Couscous, roh", "grain", 500),
-    "bulgur": F(342, 12.0, 69.0, 1.3, "Bulgur, roh", "grain", 500),
-    "kartoffeln": F(70, 2.0, 15.0, 0.1, "Kartoffeln", "veg", 2500),
-    "suesskartoffel": F(86, 1.6, 20.0, 0.1, "Süßkartoffel", "veg", 1000),
-    "vollkornbrot": F(210, 7.0, 36.0, 1.5, "Vollkornbrot", "grain", 500,
+    "nudeln": F(340, 13.0, 62.0, 2.5, "Wholemeal pasta, dry", "grain", 500),
+    "couscous": F(358, 12.0, 72.0, 1.0, "Couscous, dry", "grain", 500),
+    "bulgur": F(342, 12.0, 69.0, 1.3, "Bulgur, dry", "grain", 500),
+    "kartoffeln": F(70, 2.0, 15.0, 0.1, "Potatoes", "veg", 2500),
+    "suesskartoffel": F(86, 1.6, 20.0, 0.1, "Sweet potato", "veg", 1000),
+    "vollkornbrot": F(210, 7.0, 36.0, 1.5, "Wholemeal bread", "grain", 500,
                       "A slice is about 45 g."),
 
     # --- fruit and fast sugar ----------------------------------------------
-    "banane": F(89, 1.1, 21.0, 0.3, "Banane", "fruit", 120,
+    "banane": F(89, 1.1, 21.0, 0.3, "Banana", "fruit", 120,
                 "A medium banana is about 120 g peeled."),
-    "datteln": F(282, 2.5, 65.0, 0.4, "Datteln, getrocknet", "fruit", 200,
+    "datteln": F(282, 2.5, 65.0, 0.4, "Dates, dried", "fruit", 200,
                  "Sunnah, and the densest carbohydrate on the shelf."),
-    "rosinen": F(299, 3.1, 71.0, 0.5, "Rosinen", "fruit", 200),
-    "honig": F(304, 0.3, 75.0, 0.0, "Honig", "fruit", 500),
-    "apfel": F(52, 0.3, 12.0, 0.2, "Apfel", "fruit", 180),
+    "rosinen": F(299, 3.1, 71.0, 0.5, "Raisins", "fruit", 200),
+    "honig": F(304, 0.3, 75.0, 0.0, "Honey", "fruit", 500),
+    "apfel": F(52, 0.3, 12.0, 0.2, "Apple", "fruit", 180),
     "orange": F(47, 0.9, 9.4, 0.1, "Orange", "fruit", 200),
 
     # --- fats ---------------------------------------------------------------
-    "erdnussmus": F(588, 25.0, 12.0, 50.0, "Erdnussmus (100 % Erdnüsse)", "fat", 350,
+    "erdnussmus": F(588, 25.0, 12.0, 50.0, "Peanut butter (100 % peanuts)", "fat", 350,
                     "Ingredients should read: peanuts. Maybe salt."),
-    "mandeln": F(579, 21.0, 9.0, 50.0, "Mandeln", "fat", 200),
-    "walnuesse": F(654, 15.0, 7.0, 65.0, "Walnüsse", "fat", 200),
-    "olivenoel": F(884, 0.0, 0.0, 100.0, "Olivenöl", "fat", 500),
-    "rapsoel": F(884, 0.0, 0.0, 100.0, "Rapsöl", "fat", 1000),
-    "tahin": F(595, 17.0, 10.0, 54.0, "Sesammus (Tahin)", "fat", 300),
+    "mandeln": F(579, 21.0, 9.0, 50.0, "Almonds", "fat", 200),
+    "walnuesse": F(654, 15.0, 7.0, 65.0, "Walnuts", "fat", 200),
+    "olivenoel": F(884, 0.0, 0.0, 100.0, "Olive oil", "fat", 500),
+    "rapsoel": F(884, 0.0, 0.0, 100.0, "Rapeseed oil", "fat", 1000),
+    "tahin": F(595, 17.0, 10.0, 54.0, "Tahini (sesame paste)", "fat", 300),
     "avocado": F(160, 2.0, 2.0, 15.0, "Avocado", "fat", 200),
 
     # --- vegetables ---------------------------------------------------------
-    "spinat_tk": F(24, 2.9, 1.0, 0.4, "Blattspinat TK", "veg", 450),
-    "brokkoli": F(34, 2.8, 4.0, 0.4, "Brokkoli", "veg", 500),
-    "tomaten": F(18, 0.9, 3.0, 0.2, "Tomaten", "veg", 500),
-    "gurke": F(15, 0.7, 2.0, 0.1, "Gurke", "veg", 400),
-    "paprika": F(31, 1.0, 6.0, 0.3, "Paprika", "veg", 400),
-    "zwiebel": F(40, 1.1, 7.0, 0.1, "Zwiebel", "veg", 1000),
-    "karotten": F(41, 0.9, 8.0, 0.2, "Karotten", "veg", 1000),
-    "passata": F(35, 1.5, 6.0, 0.2, "Passierte Tomaten", "veg", 500),
-    "gemuese_tk": F(45, 2.5, 6.0, 0.5, "Gemüsemischung TK", "veg", 750,
+    "spinat_tk": F(24, 2.9, 1.0, 0.4, "Leaf spinach, frozen", "veg", 450),
+    "brokkoli": F(34, 2.8, 4.0, 0.4, "Broccoli", "veg", 500),
+    "tomaten": F(18, 0.9, 3.0, 0.2, "Tomatoes", "veg", 500),
+    "gurke": F(15, 0.7, 2.0, 0.1, "Cucumber", "veg", 400),
+    "paprika": F(31, 1.0, 6.0, 0.3, "Bell pepper", "veg", 400),
+    "zwiebel": F(40, 1.1, 7.0, 0.1, "Onion", "veg", 1000),
+    "karotten": F(41, 0.9, 8.0, 0.2, "Carrots", "veg", 1000),
+    "passata": F(35, 1.5, 6.0, 0.2, "Passata", "veg", 500),
+    "gemuese_tk": F(45, 2.5, 6.0, 0.5, "Mixed vegetables, frozen", "veg", 750,
                     "Frozen mixed vegetables: cheaper than fresh, already cut, "
                     "and nothing goes off in the drawer."),
 }
@@ -174,6 +177,7 @@ for fid in KEEPS:
 # Nothing on this list may contain these. The gate checks the names too, so a
 # future edit that adds "Schinken" fails rather than quietly shipping.
 HARAM = ["schwein", "schinken", "speck", "bacon", "pork", "ham ", "lard",
+         "gammon", "salami", "chorizo",
          "wein", "wine", "bier", "beer", "rum", "likör", "alkohol",
          "gelatine", "gelatin"]
 
@@ -468,17 +472,18 @@ GUIDE = [
     ("Meat", "The halal butcher, or the supermarket's halal line. Lidl and "
              "Rewe both stock halal chicken in most Münster branches; the "
              "Turkish grocers on Wolbecker Straße are cheaper and better."),
-    ("Cheese", "Look for mikrobielles Lab or vegetarisches Lab on the label. "
-               "Animal rennet is the default in a lot of German cheese and it "
-               "is usually calf."),
+    ("Cheese", "Look for microbial or vegetarian rennet — on a German label, "
+               "mikrobielles Lab or vegetarisches Lab. Animal rennet is the "
+               "default in a lot of German cheese and it is usually calf."),
     ("Gelatine", "In yoghurts, gummy sweets, some protein bars and a lot of "
-                 "desserts. If the label says Gelatine without saying Rind, "
-                 "assume pork."),
+                 "desserts. If the label says gelatine without saying beef "
+                 "(Rind), assume pork."),
     ("Flavourings", "Vanilla extract and some flavoured whey carry alcohol as "
                     "a carrier. Neutral whey avoids the question entirely."),
-    ("Reading a label", "Nährwerte je 100 g is what this plan is built on. "
-                        "Compare per 100 g, never per portion — the portion on "
-                        "the packet is whatever flatters the number."),
+    ("Reading a label", "The nutrition per 100 g (Nährwerte je 100 g) is what "
+                        "this plan is built on. Compare per 100 g, never per "
+                        "portion — the portion on the packet is whatever "
+                        "flatters the number."),
 ]
 
 

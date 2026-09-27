@@ -97,7 +97,7 @@ void main() {
       await Screenshot.capture(tester, 'fuel_plan_day');
 
       await toTop(find.text('SHOPPING LIST'));
-      for (final food in ['Zwiebel', 'Gemüsemischung TK']) {
+      for (final food in ['Onion', 'Mixed vegetables, frozen']) {
         await tester.tap(find.text(food));
         await Screenshot.settle(tester, rounds: 4);
       }

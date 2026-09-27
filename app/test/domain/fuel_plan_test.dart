@@ -518,6 +518,11 @@ void main() {
         'bier',
         'alkohol',
         'gelatine',
+        'gelatin',
+        'ham ',
+        'wine',
+        'beer',
+        'alcohol',
       ];
       for (final f in plan.foods) {
         for (final b in banned) {

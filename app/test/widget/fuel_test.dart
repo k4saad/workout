@@ -100,7 +100,7 @@ void main() {
     await pump(tester);
     // "Porridge" is a serving suggestion; 65 g of oats is a meal.
     expect(find.textContaining(' g'), findsWidgets);
-    expect(find.textContaining('Haferflocken'), findsWidgets);
+    expect(find.textContaining('Rolled oats'), findsWidgets);
   });
 
   testWidgets('a training day says the session meals are timed', (
@@ -316,7 +316,7 @@ void main() {
     expect(find.text('CUPBOARD, WHEN IT RUNS OUT'), findsOneWidget);
     expect(find.textContaining('lasts'), findsWidgets);
 
-    final quark = find.text('Magerquark');
+    final quark = find.text('Low-fat quark');
     await tester.ensureVisible(quark);
     await tester.pump();
     await tester.tap(quark);

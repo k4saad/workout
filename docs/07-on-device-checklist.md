@@ -1,4 +1,4 @@
-# On-device checklist — v0.14.0+15
+# On-device checklist — v0.14.1+16
 
 What the tests cannot prove, because it needs the phone, the camera, the GPS
 or a night passing. Everything else is covered by `flutter test` (1,580
@@ -17,7 +17,7 @@ Tick these in order. The first two protect everything else.
       Settings → Backup and files → Export full backup). Nothing in this
       update touches the database, but a backup you hold yourself is the one
       that cannot be lost with the phone.
-- [ ] Install **`apk/keller-twelve-0.14.0+15-arm64.apk`** over the old app —
+- [ ] Install **`apk/keller-twelve-0.14.1+16-arm64.apk`** over the old app —
       do **not** uninstall first. (`-arm32` is only for a phone older than
       about 2017.) It is signed with the same key as v0.11 and v0.12
       (`389b93bc…b7b5`), so Android installs it as an update and keeps the data.
