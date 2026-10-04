@@ -1,23 +1,25 @@
-# On-device checklist — v0.14.1+16
+# On-device checklist — v0.15.0+17
 
 What the tests cannot prove, because it needs the phone, the camera, the GPS
-or a night passing. Everything else is covered by `flutter test` (1,580
-tests) and the data gates V1–V21.
+or a night passing. Everything else is covered by `flutter test` (1,600-odd
+tests), the QA robots and the data gates V1–V21.
 
-v0.13 is the fix-up after the first week on the phone (docs/08-v3.1-plan.md):
-GPS that locks, runs that look like a running app, Fuel planned by the week
-on a student's money, and swiping between tabs. The database schema is
-unchanged, so this update runs no migration.
+v0.15 is v4 (docs/11-v4-plan.md): a working student's week — three half-hour
+sessions (Tue, Thu evening, Saturday morning) from **Monday 12 October** —
+four meals at about 2,300 kcal, and hikes, drawn in 3D on the hills they
+crossed. **This update migrates the database** (schema 3 → 4: runs learn
+whether they were a hike). The app copies the database before it migrates;
+a backup you hold yourself is still the first step.
 
 Tick these in order. The first two protect everything else.
 
 ## Before installing
 
-- [ ] **Export a backup on v0.12**, and copy the zip off the phone (More →
-      Settings → Backup and files → Export full backup). Nothing in this
-      update touches the database, but a backup you hold yourself is the one
-      that cannot be lost with the phone.
-- [ ] Install **`apk/keller-twelve-0.14.1+16-arm64.apk`** over the old app —
+- [ ] **Export a backup on v0.14**, and copy the zip off the phone (More →
+      Settings → Backup and files → Export full backup). This update
+      migrates the database; a backup you hold yourself is the one that
+      cannot be lost with the phone.
+- [ ] Install **`apk/keller-twelve-0.15.0+17-arm64.apk`** over the old app —
       do **not** uninstall first. (`-arm32` is only for a phone older than
       about 2017.) It is signed with the same key as v0.11 and v0.12
       (`389b93bc…b7b5`), so Android installs it as an update and keeps the data.
@@ -28,8 +30,57 @@ Tick these in order. The first two protect everything else.
       the same sessions as before, with the same sets.
 - [ ] The progress photos are still there and open.
 - [ ] Bodyweight history and measurements are unchanged.
-- [ ] Android asks for no new permission: v0.13 has exactly the
-      permissions v0.12 had.
+- [ ] Android asks for no new permission: v0.15 has exactly the
+      permissions v0.14 had (the elevation tiles use the internet
+      permission the map already has).
+- [ ] Every run is still in Progress → Runs, with its trail; Hikes is empty.
+- [ ] Today shows **"Programme updated to revision 3 — a new plan, starting
+      Monday 12 October"** once; dismissed, it stays gone. The sessions you
+      logged on the old plan are in History as **"Earlier plan"**, sets
+      intact.
+
+## The new week (v4 Phase G)
+
+- [ ] Until 12 October, Today says **Week 1 starts Monday 12 October**.
+- [ ] Week shows Mon rest · **Tue Full Body A** · Wed rest · **Thu Full
+      Body B** · Fri rest · **Sat Full Body C** · Sun *Run or hike*
+      (optional). Each session says under half an hour.
+- [ ] A rest day on Today names the next session ("Next: Full Body A,
+      tomorrow").
+- [ ] Time one real session start to finish: under 30 minutes, warm-up
+      included. If it runs over, tell me which part; the cure is less
+      volume, never a longer estimate.
+- [ ] Past the estimate plus ten minutes, the runner offers to cut the last
+      superset.
+
+## Four meals (v4 Phase H)
+
+- [ ] Fuel shows **Breakfast 06:45 · Lunch 13:30 · Evening snack 17:15 ·
+      Dinner 20:00** every day, about 2,300 kcal and 90 g protein or more.
+- [ ] On a training day the snack is marked as the session's fuel.
+- [ ] The portions are food you would actually eat at those times; tell me
+      any that are not, and the generator changes.
+
+## Hikes, in 3D (v4 Phase I)
+
+- [ ] Progress → **Hikes** → **Start a hike**: the tracker says HIKE and
+      shows **▲ Climb** and **Height** instead of pace. Walk up something.
+- [ ] A slow, steep climb keeps counting time (no "Auto-paused" while you
+      are still moving).
+- [ ] **Hike saved**: the 3D card says **Fetching the terrain**, then shows
+      the land with the trail on it, drawing itself in, turning slowly.
+      A sideways drag turns it; the page still scrolls up and down.
+- [ ] **Full screen 3D**: one finger turns and tilts, two zoom, a double
+      tap starts it again. Contour lines sit on the hills; the trail behind
+      a hill goes faint.
+- [ ] Ascent, descent and the highest point look right for the walk
+      ("from the terrain under the trail").
+- [ ] **Offline** (flight mode), open a hike you have not opened before: it
+      says **GPS heights · offline** and stands the trail on the phone's
+      own heights. Open one you have: its terrain is kept on the phone.
+- [ ] From Sunday's session, **Hike it with GPS** records a hike and logs
+      its time as Sunday's set.
+- [ ] Share a hike: the card says "Morning hike" and shows the climb.
 
 ## GPS runs (v3.1 Phase A)
 
@@ -95,7 +146,7 @@ Tick these in order. The first two protect everything else.
 
 ## After the QA pass (docs/09-qa-pass.md)
 
-- [ ] Body, with the scale flat for two weeks: **Add 250 kcal a day** adds
+- [ ] Body, with the scale flat for three weeks: **Add 150 kcal a day** adds
       it; Fuel's target rises and shows it as food; **Take it off** on Body
       removes it.
 - [ ] Cardio: start a skipping timer, press **Stop**, lock the phone and
@@ -165,5 +216,5 @@ Tick these in order. The first two protect everything else.
 When this list is ticked, tag the build so it can always be returned to:
 
 ```bash
-git tag v0.14-v3.2
+git tag v0.15-v4
 ```
