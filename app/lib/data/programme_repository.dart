@@ -30,6 +30,7 @@ class ProgrammeUpgrade {
     this.programmeUnreadable = false,
     this.programmeWasEdited = false,
     this.keptStartDate,
+    this.newStartDate,
     this.inventoryFrom,
     this.inventoryTo,
     this.inventoryBackup,
@@ -55,6 +56,10 @@ class ProgrammeUpgrade {
   /// The start date carried over from the old copy.
   final DateTime? keptStartDate;
 
+  /// A new plan's own start date, taken instead of the old copy's: the
+  /// shipped revision `startsFresh` (v4, Monday 12 October).
+  final DateTime? newStartDate;
+
   final int? inventoryFrom;
   final int? inventoryTo;
   final String? inventoryBackup;
@@ -73,6 +78,9 @@ class ProgrammeUpgrade {
     keptStartDate: j['keptStartDate'] == null
         ? null
         : DateTime.parse(j['keptStartDate'] as String),
+    newStartDate: j['newStartDate'] == null
+        ? null
+        : DateTime.parse(j['newStartDate'] as String),
     inventoryFrom: (j['inventoryFrom'] as num?)?.toInt(),
     inventoryTo: (j['inventoryTo'] as num?)?.toInt(),
     inventoryBackup: j['inventoryBackup'] as String?,
@@ -87,6 +95,7 @@ class ProgrammeUpgrade {
     'programmeUnreadable': programmeUnreadable,
     'programmeWasEdited': programmeWasEdited,
     'keptStartDate': keptStartDate?.toIso8601String(),
+    'newStartDate': newStartDate?.toIso8601String(),
     'inventoryFrom': inventoryFrom,
     'inventoryTo': inventoryTo,
     'inventoryBackup': inventoryBackup,
@@ -306,8 +315,13 @@ class ProgrammeRepository {
         // Copy the shipped JSON, not a model round-trip: toJson would drop
         // any field the running build's model does not know yet.
         final next = Map<String, dynamic>.of(shippedProgramme);
+        // A corrected plan keeps the athlete's start date; a new plan
+        // (`startsFresh`) starts on its own.
+        final fresh = shippedProgramme['startsFresh'] == true;
         final startDate = stored['startDate'];
-        if (startDate is String && DateTime.tryParse(startDate) != null) {
+        if (!fresh &&
+            startDate is String &&
+            DateTime.tryParse(startDate) != null) {
           next['startDate'] = startDate;
         }
         final out = _pretty.convert(next);
@@ -318,7 +332,12 @@ class ProgrammeRepository {
           programmeTo: shippedProgrammeRev,
           programmeBackup: backup,
           programmeWasEdited: edited,
-          keptStartDate: DateTime.tryParse('${next['startDate']}'),
+          keptStartDate: fresh
+              ? null
+              : DateTime.tryParse('${next['startDate']}'),
+          newStartDate: fresh
+              ? DateTime.tryParse('${next['startDate']}')
+              : null,
         );
         programmeRev = shippedProgrammeRev;
         programmeHash = _hash(out);
@@ -399,6 +418,7 @@ class ProgrammeRepository {
     programmeUnreadable: n?.programmeUnreadable ?? false,
     programmeWasEdited: n?.programmeWasEdited ?? false,
     keptStartDate: n?.keptStartDate,
+    newStartDate: n?.newStartDate,
     inventoryFrom: from,
     inventoryTo: to,
     inventoryBackup: backup,

@@ -766,6 +766,9 @@ PROGRAMME = {
     # runs. An installed copy with a lower revision is upgraded by the app.
     # 3 = v4: three 30-minute sessions for a working student's week.
     "revision": 3,
+    # v4 is a new plan, chosen to start with the semester: the phone takes
+    # this start date on upgrade instead of keeping its old one.
+    "startsFresh": True,
     "startDate": "2026-10-12",
     "totalWeeks": 12,
     "notes": ("A fitness block for a working student: 167 cm / 50 kg, training alone in a "

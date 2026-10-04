@@ -3,6 +3,7 @@
   "name": "The Keller Twelve",
   "schemaVersion": 2,
   "revision": 3,
+  "startsFresh": true,
   "startDate": "2026-10-12",
   "totalWeeks": 12,
   "notes": "A fitness block for a working student: 167 cm / 50 kg, training alone in a basement gym three times a week -- Tuesday and Thursday evening, Saturday morning -- for about half an hour, with an optional run or hike on Sunday. Every load in this file is snapped to the plate lattice described in inventory.json -- change the inventory and regenerate with tools/gen.py rather than editing loads by hand.",

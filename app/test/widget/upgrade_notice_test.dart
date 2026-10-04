@@ -40,6 +40,22 @@ void main() {
       expect(body, contains('definitive'));
     });
 
+    test('a new plan says when it starts, not that a date was kept', () {
+      final (_, title, body) = UpgradeNotice.describe(
+        ProgrammeUpgrade(
+          at: at,
+          programmeFrom: 2,
+          programmeTo: 3,
+          programmeBackup: 'programme.rev2.x.json',
+          newStartDate: DateTime(2026, 10, 12),
+        ),
+      );
+      expect(title, 'Programme updated to revision 3');
+      expect(body, contains('A new plan, starting Monday 12 October'));
+      expect(body, isNot(contains('kept:')));
+      expect(body, contains('Every logged set is untouched'));
+    });
+
     test('an unreadable programme is a warning', () {
       final (tone, title, body) = UpgradeNotice.describe(
         ProgrammeUpgrade(

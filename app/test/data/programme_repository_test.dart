@@ -10,12 +10,18 @@ import '../support/fixtures.dart';
 /// The shipped assets, read straight off disk: what the APK's bundle serves.
 Future<String> diskAsset(String key) => File(key).readAsString();
 
-/// A later release: the same files with a revision bumped.
+/// A later release: the same files with a revision bumped. A corrected
+/// plan, unless [startsFresh]: the shipped v4 file starts fresh, and the
+/// rule for every other revision is to keep the athlete's start date.
 AssetLoader shippedAt({
   int? programmeRevision,
   int? inventoryRevision,
+  bool startsFresh = false,
 }) => (key) async {
   final j = jsonDecode(await diskAsset(key)) as Map<String, dynamic>;
+  if (key == ProgrammeRepository.assetProgramme && !startsFresh) {
+    j.remove('startsFresh');
+  }
   if (key == ProgrammeRepository.assetProgramme && programmeRevision != null) {
     j['revision'] = programmeRevision;
   }
@@ -123,7 +129,7 @@ void main() {
       () async {
         final oldRaw = installV011();
 
-        final programme = await repo().loadProgramme();
+        final programme = await repo(loader: shippedAt()).loadProgramme();
 
         expect(programme.revision, shippedRevision);
         expect(programme.name, shippedName);
@@ -172,7 +178,7 @@ void main() {
 
     test('raises a notice that says where the old copies are', () async {
       installV011();
-      final r = repo();
+      final r = repo(loader: shippedAt());
       await r.loadProgramme();
 
       final up = r.lastUpgrade!;
@@ -395,7 +401,7 @@ void main() {
       installV011();
       file('seeded.json').writeAsStringSync('not json');
 
-      final programme = await repo().loadProgramme();
+      final programme = await repo(loader: shippedAt()).loadProgramme();
 
       expect(programme.revision, shippedRevision);
       expect(programme.startDate, DateTime(2026, 10, 5));
@@ -409,6 +415,52 @@ void main() {
 
       expect(programme.name, 'The Keller Twelve (v0.11)');
       expect(r.lastUpgrade, isNull);
+    });
+  });
+
+  group('a new plan (startsFresh, v4)', () {
+    test('the shipped v4 file is a new plan starting 12 October', () async {
+      final shipped = jsonDecode(
+        await diskAsset(ProgrammeRepository.assetProgramme),
+      ) as Map<String, dynamic>;
+      expect(shipped['startsFresh'], isTrue);
+      expect(shipped['startDate'], '2026-10-12');
+    });
+
+    test('takes its own start date over the old one, and says so', () async {
+      final oldRaw = installV011(startDate: '2026-09-28', revision: 2);
+
+      final r = repo();
+      final programme = await r.loadProgramme();
+
+      expect(programme.revision, shippedRevision);
+      expect(programme.startDate, DateTime(2026, 10, 12));
+      expect(json('programme.json')['startDate'], '2026-10-12');
+      final up = r.lastUpgrade!;
+      expect(up.newStartDate, DateTime(2026, 10, 12));
+      expect(up.keptStartDate, isNull);
+      // The old plan, with its old date, is kept beside it.
+      expect(file(up.programmeBackup!).readAsStringSync(), oldRaw);
+    });
+
+    test('the notice survives a restart', () async {
+      installV011(startDate: '2026-09-28', revision: 2);
+      await repo().loadProgramme();
+      final again = repo();
+      await again.loadProgramme();
+      expect(again.lastUpgrade?.newStartDate, DateTime(2026, 10, 12));
+    });
+
+    test('a later corrected revision keeps the date again', () async {
+      final first = repo();
+      final shipped = await first.loadProgramme();
+      await first.saveProgramme(
+        shipped.copyWith(startDate: DateTime(2026, 10, 19)),
+      );
+      final programme = await repo(
+        loader: shippedAt(programmeRevision: shippedRevision + 1),
+      ).loadProgramme();
+      expect(programme.startDate, DateTime(2026, 10, 19));
     });
   });
 

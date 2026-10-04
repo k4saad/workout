@@ -11,6 +11,10 @@
     "name": { "type": "string", "minLength": 1 },
     "schemaVersion": { "type": "integer", "minimum": 2 },
     "revision": { "type": "integer", "minimum": 1 },
+    "startsFresh": {
+      "type": "boolean",
+      "description": "A new plan rather than a corrected one: upgrading into this revision moves the start to this file's startDate instead of keeping the phone's."
+    },
     "startDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
     "totalWeeks": { "type": "integer", "minimum": 1, "maximum": 104 },
     "notes": { "type": ["string", "null"] },

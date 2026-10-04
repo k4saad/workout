@@ -75,12 +75,13 @@ class SessionCard extends ConsumerWidget {
     final working = sets.where((s) => !s.isWarmup).toList();
     final bundle = ref.watch(bundleProvider).asData?.value;
     final library = bundle?.library;
-    // The day's name as the programme had it on the date it was planned for;
-    // the stored id if the programme has since changed.
+    // The day's name as the programme had it on the date it was planned for.
+    // A session from a plan since replaced (v3's Monday, before v4) is named
+    // as that, not by an id; its sets below still say what was done.
     final planned = bundle?.calendar.forDate(session.plannedDate).day;
     final title = planned != null && planned.id == session.dayId
         ? planned.title
-        : session.dayId;
+        : 'Earlier plan';
 
     final duration = session.startedAt != null && session.finishedAt != null
         ? session.finishedAt!.difference(session.startedAt!).inMinutes

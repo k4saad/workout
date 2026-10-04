@@ -22,7 +22,10 @@ class UpgradeNotice extends ConsumerWidget {
       );
     }
     if (up.replacedProgramme) {
-      final kept = up.keptStartDate == null
+      final kept = up.newStartDate != null
+          ? 'A new plan, starting '
+                '${DateFormat('EEEE d MMMM').format(up.newStartDate!)}.'
+          : up.keptStartDate == null
           ? 'Your start date is kept.'
           : 'Start date kept: '
                 '${DateFormat('EEEE d MMMM').format(up.keptStartDate!)}.';
