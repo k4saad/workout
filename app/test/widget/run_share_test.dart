@@ -38,6 +38,7 @@ void main() {
 
   final run = Run(
     id: 7,
+    kind: RunKind.run,
     runOn: DateTime(2026, 10, 4),
     startedAtMs: t0,
     movingMs: 400 * 1000,

@@ -81,21 +81,24 @@ void main() {
     expect(await db.select(db.progressPhotos).get(), hasLength(4));
   });
 
-  test('after the upgrade it is v3, and the v3 tables take rows', () async {
-    final db = AppDatabase(NativeDatabase(await prepareDatabaseFile(dir)));
-    await db
-        .into(db.runs)
-        .insert(
-          RunsCompanion.insert(
-            runOn: DateTime(2026, 10, 18),
-            startedAtMs: DateTime(2026, 10, 18, 9).millisecondsSinceEpoch,
-          ),
-        );
-    expect(await db.select(db.runs).get(), hasLength(1));
-    expect(await db.select(db.mealLogs).get(), isEmpty);
-    await db.close();
-    expect(schemaVersionOf(live()), 3);
-  });
+  test(
+    'after the upgrade it is current, and the v3 tables take rows',
+    () async {
+      final db = AppDatabase(NativeDatabase(await prepareDatabaseFile(dir)));
+      await db
+          .into(db.runs)
+          .insert(
+            RunsCompanion.insert(
+              runOn: DateTime(2026, 10, 18),
+              startedAtMs: DateTime(2026, 10, 18, 9).millisecondsSinceEpoch,
+            ),
+          );
+      expect(await db.select(db.runs).get(), hasLength(1));
+      expect(await db.select(db.mealLogs).get(), isEmpty);
+      await db.close();
+      expect(schemaVersionOf(live()), AppDatabase.currentSchema);
+    },
+  );
 
   test('the session the app died during can still be resumed', () async {
     final db = AppDatabase(NativeDatabase(await prepareDatabaseFile(dir)));
@@ -147,7 +150,7 @@ void main() {
       appVersion: '0.12.0+12',
       documentsDir: Directory(p.join(dir.path, 'restored'))..createSync(),
     ).restore(zip);
-    expect(manifest.schemaVersion, 3);
+    expect(manifest.schemaVersion, AppDatabase.currentSchema);
     expect(await fresh.select(fresh.setLogs).get(), hasLength(sets));
     expect(await fresh.select(fresh.sessions).get(), isNotEmpty);
   });

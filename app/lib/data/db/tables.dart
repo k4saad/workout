@@ -244,7 +244,11 @@ class FormClips extends Table {
 /// Where a GPS run is in its life.
 enum RunStatus { recording, paused, finished, discarded }
 
-/// One GPS-tracked run.
+/// What a GPS recording is: a run, or a hike (v4). Same trail, same table;
+/// a hike is counted for its climb rather than its pace.
+enum RunKind { run, hike }
+
+/// One GPS-tracked run, or hike.
 ///
 /// The link columns mirror `set_logs`: a run started from a programme day
 /// stores the day, week and prescription it belonged to, DENORMALISED, so the
@@ -255,6 +259,10 @@ enum RunStatus { recording, paused, finished, discarded }
 /// whole seconds, which is too coarse for a pace.
 class Runs extends Table {
   IntColumn get id => integer().autoIncrement()();
+
+  /// Run or hike. v4; every run before it was a run.
+  TextColumn get kind =>
+      textEnum<RunKind>().withDefault(const Constant('run'))();
   IntColumn get sessionId => integer().nullable().references(
     Sessions,
     #id,
@@ -278,6 +286,10 @@ class Runs extends Table {
   RealColumn get distanceM => real().withDefault(const Constant(0))();
   RealColumn get maxSpeedMps => real().nullable()();
   RealColumn get elevGainM => real().nullable()();
+
+  /// Metres descended and the highest point, by the phone's altimeter. v4.
+  RealColumn get elevLossM => real().nullable()();
+  RealColumn get maxAltM => real().nullable()();
   RealColumn get startLat => real().nullable()();
   RealColumn get startLng => real().nullable()();
   RealColumn get endLat => real().nullable()();

@@ -11,6 +11,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../core/ui/ui.dart';
 import '../../data/db/database.dart' show Run;
+import '../../data/db/tables.dart' show RunKind;
 import '../../domain/run/run.dart';
 import 'run_summary.dart' show runTitle;
 
@@ -52,6 +53,11 @@ class RunShareCard extends StatelessWidget {
         ? null
         : (run.movingMs / 1000) / (run.distanceM / 1000);
     final km = formatKm(run.distanceM.toDouble());
+    final hike = run.kind == RunKind.hike;
+    final climb = '${(run.elevGainM ?? 0).round()}';
+    final speed = run.movingMs <= 0
+        ? '–'
+        : (run.distanceM / (run.movingMs / 1000) * 3.6).toStringAsFixed(1);
     final showRoute = route.any((s) => s.length > 1);
     const white = AppTheme.text;
     const dim = AppTheme.textDim;
@@ -107,7 +113,7 @@ class RunShareCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  runTitle(started),
+                  runTitle(started, kind: run.kind),
                   style: const TextStyle(
                     color: white,
                     fontSize: 28,
@@ -155,15 +161,15 @@ class RunShareCard extends StatelessWidget {
                     if (showRoute)
                       Expanded(child: _Figure('Distance', km, 'km'))
                     else
-                      Expanded(
-                        child: _Figure(
-                          'Climb',
-                          '${(run.elevGainM ?? 0).round()}',
-                          'm',
-                        ),
-                      ),
+                      Expanded(child: _Figure('Climb', climb, 'm')),
                     Expanded(child: _Figure('Time', formatClock(run.movingMs))),
-                    Expanded(child: _Figure('Pace', formatPace(pace), '/km')),
+                    // A hike is counted by its climb; a run by its pace.
+                    if (hike && showRoute)
+                      Expanded(child: _Figure('Climb', climb, 'm'))
+                    else if (hike)
+                      Expanded(child: _Figure('Speed', speed, 'km/h'))
+                    else
+                      Expanded(child: _Figure('Pace', formatPace(pace), '/km')),
                   ],
                 ),
               ],
@@ -362,12 +368,14 @@ class _ShareSheetState extends State<_ShareSheet> {
         p.join((await getTemporaryDirectory()).path, 'share'),
       );
       await dir.create(recursive: true);
-      final file = File(p.join(dir.path, 'keller-run-${widget.run.id}.png'));
+      final file = File(
+        p.join(dir.path, 'keller-${widget.run.kind.name}-${widget.run.id}.png'),
+      );
       await file.writeAsBytes(png, flush: true);
       final started = DateTime.fromMillisecondsSinceEpoch(
         widget.run.startedAtMs,
       );
-      await widget.share(file, runTitle(started));
+      await widget.share(file, runTitle(started, kind: widget.run.kind));
     } catch (e) {
       messenger?.showSnackBar(SnackBar(content: Text('Could not share: $e')));
     } finally {

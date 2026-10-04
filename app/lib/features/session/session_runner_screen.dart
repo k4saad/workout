@@ -173,9 +173,14 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
     }
   }
 
-  /// Opens the live run tracker for a run on today's plan. It logs its own
-  /// set when finished; coming back, the runner reloads to show it.
-  Future<void> _runWithGps(RunnerItem item, Exercise exercise) async {
+  /// Opens the live run tracker for a run on today's plan — or a hike in
+  /// its place. It logs its own set when finished; coming back, the runner
+  /// reloads to show it.
+  Future<void> _runWithGps(
+    RunnerItem item,
+    Exercise exercise, {
+    bool hike = false,
+  }) async {
     final s = _state;
     if (s == null) return;
     final p = item.prescription;
@@ -190,22 +195,28 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
       RepUnit.m => '${formatKm(amount.toDouble())} km',
       RepUnit.reps => '',
     };
+    RunLink link({RunTarget? target}) => RunLink(
+      sessionId: s.session.id,
+      weekNo: widget.weekNo,
+      dayId: widget.dayId,
+      prescriptionId: p.id,
+      exerciseId: p.exerciseId,
+      target: target,
+      targetRepsMin: item.targetRepsMin,
+      targetRepsMax: item.targetRepsMax,
+    );
     final saved = await context.push<bool>(
       '/track',
-      extra: RunLaunch(
-        title: label.isEmpty ? exercise.name : '${exercise.name} · $label',
-        exerciseName: exercise.name,
-        link: RunLink(
-          sessionId: s.session.id,
-          weekNo: widget.weekNo,
-          dayId: widget.dayId,
-          prescriptionId: p.id,
-          exerciseId: p.exerciseId,
-          target: target,
-          targetRepsMin: item.targetRepsMin,
-          targetRepsMax: item.targetRepsMax,
-        ),
-      ),
+      // A hike has no minutes to hit: it is as long as the hill.
+      extra: hike
+          ? RunLaunch.hike(exerciseName: exercise.name, link: link())
+          : RunLaunch(
+              title: label.isEmpty
+                  ? exercise.name
+                  : '${exercise.name} · $label',
+              exerciseName: exercise.name,
+              link: link(target: target),
+            ),
     );
     if (saved == true) await _reload();
   }
@@ -694,7 +705,7 @@ class _RunnerBody extends StatelessWidget {
   final ValueChanged<int> onFocus;
   final void Function(RunnerItem, Exercise, {bool warmup}) onLog;
   final VoidCallback onUndo;
-  final void Function(RunnerItem, Exercise)? onRunWithGps;
+  final void Function(RunnerItem, Exercise, {bool hike})? onRunWithGps;
 
   @override
   Widget build(BuildContext context) {
@@ -823,7 +834,7 @@ class _FocusCard extends ConsumerWidget {
   final ValueChanged<PendingSet> onPendingChanged;
   final void Function(RunnerItem, Exercise, {bool warmup}) onLog;
   final VoidCallback onUndo;
-  final void Function(RunnerItem, Exercise)? onRunWithGps;
+  final void Function(RunnerItem, Exercise, {bool hike})? onRunWithGps;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -955,6 +966,19 @@ class _FocusCard extends ConsumerWidget {
               icon: const Icon(Icons.route_rounded),
               label: const Text('Run it with GPS'),
             ),
+            // A timed run can be a hike instead: the same minutes, counted
+            // for the climb, and the hills drawn in 3D afterwards.
+            if (p.unit == RepUnit.sec) ...[
+              Gap.s,
+              OutlinedButton.icon(
+                onPressed: () => onRunWithGps!(item, exercise, hike: true),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(56),
+                ),
+                icon: const Icon(Icons.hiking_rounded),
+                label: const Text('Hike it with GPS'),
+              ),
+            ],
             Gap.xs,
             Text(
               'Records the route and logs the time and distance as this '

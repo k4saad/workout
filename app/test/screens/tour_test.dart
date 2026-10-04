@@ -33,6 +33,7 @@ const routes = <(String, String)>[
   ('runner', '/run/1/f-tue'),
   ('runner-run', '/run/5/b-sun'),
   ('runs', '/progress/runs'),
+  ('hikes', '/progress/hikes'),
   ('cardio', '/more/cardio'),
   ('settings', '/more/settings'),
   ('settings-gym', '/more/settings/gym'),

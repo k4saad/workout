@@ -49,13 +49,14 @@ class RunRepository {
   final AppDatabase db;
   final DateTime Function() _clock;
 
-  /// Opens a run, recording from now.
-  Future<int> start({RunLink? link}) {
+  /// Opens a run, or a hike, recording from now.
+  Future<int> start({RunLink? link, RunKind kind = RunKind.run}) {
     final now = _clock();
     return db
         .into(db.runs)
         .insert(
           RunsCompanion.insert(
+            kind: Value(kind),
             sessionId: Value(link?.sessionId),
             weekNo: Value(link?.weekNo),
             dayId: Value(link?.dayId),
@@ -124,9 +125,11 @@ class RunRepository {
             ..orderBy([(p) => OrderingTerm.asc(p.seq)]))
           .get();
 
-  /// The run's numbers, replayed from its stored points.
+  /// The run's numbers, replayed from its stored points: counted as a hike
+  /// when it was one.
   Future<RunTrack> track(int runId) async {
-    final t = RunTrack();
+    final run = await byId(runId);
+    final t = run?.kind == RunKind.hike ? RunTrack.hike() : RunTrack();
     for (final p in await points(runId)) {
       t.add(
         RunFix(
@@ -161,6 +164,8 @@ class RunRepository {
       movingMs: Value(t.movingMs),
       maxSpeedMps: Value(t.maxSpeedMps == 0 ? null : t.maxSpeedMps),
       elevGainM: Value(t.elevGainM == 0 ? null : t.elevGainM),
+      elevLossM: Value(t.elevLossM == 0 ? null : t.elevLossM),
+      maxAltM: Value(t.maxAltM),
       startLat: Value(first?.lat),
       startLng: Value(first?.lng),
       endLat: Value(last?.lat),
@@ -202,7 +207,7 @@ class RunRepository {
             distanceM: t.distanceM.round(),
             targetRepsMin: link?.targetRepsMin,
             targetRepsMax: link?.targetRepsMax,
-            note: 'GPS run',
+            note: run.kind == RunKind.hike ? 'GPS hike' : 'GPS run',
           ),
         );
       }
@@ -268,9 +273,16 @@ class RunRepository {
             ..orderBy([(r) => OrderingTerm.desc(r.startedAtMs)]))
           .get();
 
-  Stream<List<Run>> watchFinished() =>
+  /// Finished recordings of [kind] (every kind when null), newest first.
+  Stream<List<Run>> watchFinished({RunKind? kind}) =>
       (db.select(db.runs)
-            ..where((r) => r.status.equalsValue(RunStatus.finished))
+            ..where(
+              (r) =>
+                  r.status.equalsValue(RunStatus.finished) &
+                  (kind == null
+                      ? const Constant(true)
+                      : r.kind.equalsValue(kind)),
+            )
             ..orderBy([(r) => OrderingTerm.desc(r.startedAtMs)]))
           .watch();
 
@@ -282,6 +294,7 @@ class RunRepository {
               ..where(
                 (r) =>
                     r.status.equalsValue(RunStatus.finished) &
+                    r.kind.equalsValue(RunKind.run) &
                     (exerciseId == null
                         ? r.exerciseId.isNull()
                         : r.exerciseId.equals(exerciseId)) &

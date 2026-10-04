@@ -32,6 +32,14 @@ class PaceBucket {
   final double paceSecPerKm;
 }
 
+/// The height of the trail at one distance along it, for the profile.
+class ElevationSample {
+  const ElevationSample(this.distanceM, this.altitudeM);
+
+  final double distanceM;
+  final double altitudeM;
+}
+
 /// Everything a run's numbers come from, fed one accepted fix at a time.
 ///
 /// Distance is counted between fixes at least [stepM] apart (or half the
@@ -48,6 +56,10 @@ class RunTrack {
     this.windowMs = 10000,
     this.elevStepM = 2,
   });
+
+  /// A hike: a steep climb walks slower than a run ever stops, so moving
+  /// time only stops under a shuffle, over a longer window.
+  RunTrack.hike() : this(stopSpeedMps: 0.25, goSpeedMps: 0.45, windowMs: 15000);
 
   final double stepM;
   final double stopSpeedMps;
@@ -76,6 +88,10 @@ class RunTrack {
   double? _altSmooth;
   double? _altRef;
   double _gain = 0;
+  double _loss = 0;
+  double? _maxAlt;
+  double? _minAlt;
+  final List<ElevationSample> _altSamples = [];
 
   /// The accepted fixes, in the stretches recorded between pauses.
   List<List<RunFix>> get segments => _segments;
@@ -87,6 +103,13 @@ class RunTrack {
   bool get autoPaused => _autoPaused;
   double get maxSpeedMps => _maxSpeed;
   double get elevGainM => _gain;
+
+  /// Metres descended, counted the way [elevGainM] counts the climb.
+  double get elevLossM => _loss;
+
+  /// The highest and lowest smoothed altitude; null without an altimeter.
+  double? get maxAltM => _maxAlt;
+  double? get minAltM => _minAlt;
 
   /// Moving time over distance; null until there is some of both.
   double? get avgPaceSecPerKm => _distance < 10 || _moving <= 0
@@ -166,6 +189,11 @@ class RunTrack {
         ? alt
         : _altSmooth! + 0.3 * (alt - _altSmooth!);
     _altSmooth = s;
+    _maxAlt = _maxAlt == null ? s : math.max(_maxAlt!, s);
+    _minAlt = _minAlt == null ? s : math.min(_minAlt!, s);
+    if (_altSamples.isEmpty || _distance - _altSamples.last.distanceM >= 5) {
+      _altSamples.add(ElevationSample(_distance, s));
+    }
     final ref = _altRef;
     if (ref == null) {
       _altRef = s;
@@ -173,8 +201,40 @@ class RunTrack {
       _gain += s - ref;
       _altRef = s;
     } else if (s < ref - elevStepM) {
+      _loss += ref - s;
       _altRef = s;
     }
+  }
+
+  /// The trail's height every [bucketM] along it (the mean of what fell in
+  /// each stretch), for the profile chart. Empty without an altimeter.
+  List<ElevationSample> elevationProfile({double bucketM = 50}) {
+    if (_altSamples.isEmpty) return const [];
+    final out = <ElevationSample>[];
+    var sum = 0.0;
+    var count = 0;
+    var edge = bucketM;
+    for (final e in _altSamples) {
+      while (e.distanceM > edge && count == 0) {
+        edge += bucketM;
+      }
+      if (e.distanceM > edge) {
+        out.add(ElevationSample(edge - bucketM / 2, sum / count));
+        sum = 0;
+        count = 0;
+        while (e.distanceM > edge) {
+          edge += bucketM;
+        }
+      }
+      sum += e.altitudeM;
+      count++;
+    }
+    if (count > 0) {
+      out.add(
+        ElevationSample(math.min(edge - bucketM / 2, _distance), sum / count),
+      );
+    }
+    return out;
   }
 
   void _splitsCrossed(double distBefore, int movingBefore) {

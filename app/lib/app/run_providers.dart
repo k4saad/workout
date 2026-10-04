@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/db/database.dart';
+import '../data/db/tables.dart';
 import '../data/run_location.dart';
 import '../data/run_repository.dart';
+import '../data/run_terrain.dart';
 import '../data/run_tracker.dart';
 import '../domain/run/run.dart';
 import 'session_providers.dart';
@@ -21,9 +23,14 @@ final locationSourceProvider = Provider<LocationSource>(
 /// have no network, and the trail is drawn either way.
 final mapTilesEnabledProvider = Provider<bool>((ref) => true);
 
-/// Every finished run, newest first.
+/// Every finished run, newest first. Hikes have their own list.
 final finishedRunsProvider = StreamProvider<List<Run>>(
-  (ref) => ref.watch(runRepositoryProvider).watchFinished(),
+  (ref) => ref.watch(runRepositoryProvider).watchFinished(kind: RunKind.run),
+);
+
+/// Every finished hike, newest first.
+final finishedHikesProvider = StreamProvider<List<Run>>(
+  (ref) => ref.watch(runRepositoryProvider).watchFinished(kind: RunKind.hike),
 );
 
 final runProvider = FutureProvider.family<Run?, int>(
@@ -62,3 +69,18 @@ final runsBetweenProvider =
           .watch(runRepositoryProvider)
           .finishedBetween(range.from, range.to);
     });
+
+/// Where elevation tiles come from. Tests override it: no network there.
+final terrainSourceProvider = Provider<TerrainTileSource>(
+  (ref) => AwsTerrainTiles(),
+);
+
+/// The country around hike [id], with its terrain when it can be had.
+final hikeGroundProvider = FutureProvider.family<HikeGround?, int>((
+  ref,
+  id,
+) async {
+  final track = await ref.watch(runTrackProvider(id).future);
+  if (track.segments.isEmpty) return null;
+  return loadHikeGround(ref.watch(terrainSourceProvider), track.segments);
+});

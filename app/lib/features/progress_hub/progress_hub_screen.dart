@@ -24,6 +24,7 @@ class ProgressHubScreen extends ConsumerWidget {
     final shoots = ref.watch(shootsProvider).asData?.value ?? const [];
     final week = ref.watch(currentWeekProvider);
     final runs = ref.watch(finishedRunsProvider).asData?.value ?? const [];
+    final hikes = ref.watch(finishedHikesProvider).asData?.value ?? const [];
 
     // The same 7-day average and weekly rate the Body screen and Today use.
     // A single scale reading swings a kilo on water; the hub must not
@@ -70,6 +71,18 @@ class ProgressHubScreen extends ConsumerWidget {
             : '${runs.length} run${runs.length == 1 ? '' : 's'} · '
                   'last ${formatKm(runs.first.distanceM)} km',
         onTap: () => context.go('/progress/runs'),
+      ),
+      _HubCard(
+        icon: Icons.terrain_outlined,
+        title: 'Hikes',
+        value: hikes.isEmpty
+            ? '—'
+            : '▲ ${hikes.fold<double>(0, (a, r) => a + (r.elevGainM ?? 0)).round()} m',
+        caption: hikes.isEmpty
+            ? 'The trail in 3D on the hills it crossed'
+            : '${hikes.length} hike${hikes.length == 1 ? '' : 's'} · '
+                  '${formatKm(hikes.fold<double>(0, (a, r) => a + r.distanceM))} km',
+        onTap: () => context.go('/progress/hikes'),
       ),
       _HubCard(
         icon: Icons.fitness_center,

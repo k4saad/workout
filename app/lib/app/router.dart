@@ -16,6 +16,7 @@ import '../features/progress/capture_screen.dart';
 import '../features/progress/progress_screen.dart';
 import '../features/progress/shoot_viewer_screen.dart';
 import '../features/progress_hub/progress_hub_screen.dart';
+import '../features/runs/hikes_screen.dart';
 import '../features/runs/live_run_screen.dart';
 import '../features/runs/runs_screen.dart';
 import '../features/session/session_runner_screen.dart';
@@ -131,6 +132,18 @@ GoRouter buildRouter() {
                   GoRoute(
                     path: 'runs',
                     builder: (_, _) => const RunsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        builder: (_, state) => RunDetailScreen(
+                          runId: int.parse(state.pathParameters['id']!),
+                        ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'hikes',
+                    builder: (_, _) => const HikesScreen(),
                     routes: [
                       GoRoute(
                         path: ':id',

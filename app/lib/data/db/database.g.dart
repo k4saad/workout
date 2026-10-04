@@ -5945,6 +5945,16 @@ class $RunsTable extends Runs with TableInfo<$RunsTable, Run> {
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
+  @override
+  late final GeneratedColumnWithTypeConverter<RunKind, String> kind =
+      GeneratedColumn<String>(
+        'kind',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('run'),
+      ).withConverter<RunKind>($RunsTable.$converterkind);
   static const VerificationMeta _sessionIdMeta = const VerificationMeta(
     'sessionId',
   );
@@ -6087,6 +6097,28 @@ class $RunsTable extends Runs with TableInfo<$RunsTable, Run> {
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _elevLossMMeta = const VerificationMeta(
+    'elevLossM',
+  );
+  @override
+  late final GeneratedColumn<double> elevLossM = GeneratedColumn<double>(
+    'elev_loss_m',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _maxAltMMeta = const VerificationMeta(
+    'maxAltM',
+  );
+  @override
+  late final GeneratedColumn<double> maxAltM = GeneratedColumn<double>(
+    'max_alt_m',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _startLatMeta = const VerificationMeta(
     'startLat',
   );
@@ -6158,6 +6190,7 @@ class $RunsTable extends Runs with TableInfo<$RunsTable, Run> {
   @override
   List<GeneratedColumn> get $columns => [
     id,
+    kind,
     sessionId,
     weekNo,
     dayId,
@@ -6171,6 +6204,8 @@ class $RunsTable extends Runs with TableInfo<$RunsTable, Run> {
     distanceM,
     maxSpeedMps,
     elevGainM,
+    elevLossM,
+    maxAltM,
     startLat,
     startLng,
     endLat,
@@ -6285,6 +6320,18 @@ class $RunsTable extends Runs with TableInfo<$RunsTable, Run> {
         elevGainM.isAcceptableOrUnknown(data['elev_gain_m']!, _elevGainMMeta),
       );
     }
+    if (data.containsKey('elev_loss_m')) {
+      context.handle(
+        _elevLossMMeta,
+        elevLossM.isAcceptableOrUnknown(data['elev_loss_m']!, _elevLossMMeta),
+      );
+    }
+    if (data.containsKey('max_alt_m')) {
+      context.handle(
+        _maxAltMMeta,
+        maxAltM.isAcceptableOrUnknown(data['max_alt_m']!, _maxAltMMeta),
+      );
+    }
     if (data.containsKey('start_lat')) {
       context.handle(
         _startLatMeta,
@@ -6334,6 +6381,12 @@ class $RunsTable extends Runs with TableInfo<$RunsTable, Run> {
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
+      kind: $RunsTable.$converterkind.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}kind'],
+        )!,
+      ),
       sessionId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}session_id'],
@@ -6386,6 +6439,14 @@ class $RunsTable extends Runs with TableInfo<$RunsTable, Run> {
         DriftSqlType.double,
         data['${effectivePrefix}elev_gain_m'],
       ),
+      elevLossM: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}elev_loss_m'],
+      ),
+      maxAltM: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}max_alt_m'],
+      ),
       startLat: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}start_lat'],
@@ -6424,12 +6485,17 @@ class $RunsTable extends Runs with TableInfo<$RunsTable, Run> {
     return $RunsTable(attachedDatabase, alias);
   }
 
+  static JsonTypeConverter2<RunKind, String, String> $converterkind =
+      const EnumNameConverter<RunKind>(RunKind.values);
   static JsonTypeConverter2<RunStatus, String, String> $converterstatus =
       const EnumNameConverter<RunStatus>(RunStatus.values);
 }
 
 class Run extends DataClass implements Insertable<Run> {
   final int id;
+
+  /// Run or hike. v4; every run before it was a run.
+  final RunKind kind;
   final int? sessionId;
   final int? weekNo;
   final String? dayId;
@@ -6449,6 +6515,10 @@ class Run extends DataClass implements Insertable<Run> {
   final double distanceM;
   final double? maxSpeedMps;
   final double? elevGainM;
+
+  /// Metres descended and the highest point, by the phone's altimeter. v4.
+  final double? elevLossM;
+  final double? maxAltM;
   final double? startLat;
   final double? startLng;
   final double? endLat;
@@ -6460,6 +6530,7 @@ class Run extends DataClass implements Insertable<Run> {
   final String? note;
   const Run({
     required this.id,
+    required this.kind,
     this.sessionId,
     this.weekNo,
     this.dayId,
@@ -6473,6 +6544,8 @@ class Run extends DataClass implements Insertable<Run> {
     required this.distanceM,
     this.maxSpeedMps,
     this.elevGainM,
+    this.elevLossM,
+    this.maxAltM,
     this.startLat,
     this.startLng,
     this.endLat,
@@ -6485,6 +6558,9 @@ class Run extends DataClass implements Insertable<Run> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    {
+      map['kind'] = Variable<String>($RunsTable.$converterkind.toSql(kind));
+    }
     if (!nullToAbsent || sessionId != null) {
       map['session_id'] = Variable<int>(sessionId);
     }
@@ -6516,6 +6592,12 @@ class Run extends DataClass implements Insertable<Run> {
     if (!nullToAbsent || elevGainM != null) {
       map['elev_gain_m'] = Variable<double>(elevGainM);
     }
+    if (!nullToAbsent || elevLossM != null) {
+      map['elev_loss_m'] = Variable<double>(elevLossM);
+    }
+    if (!nullToAbsent || maxAltM != null) {
+      map['max_alt_m'] = Variable<double>(maxAltM);
+    }
     if (!nullToAbsent || startLat != null) {
       map['start_lat'] = Variable<double>(startLat);
     }
@@ -6545,6 +6627,7 @@ class Run extends DataClass implements Insertable<Run> {
   RunsCompanion toCompanion(bool nullToAbsent) {
     return RunsCompanion(
       id: Value(id),
+      kind: Value(kind),
       sessionId: sessionId == null && nullToAbsent
           ? const Value.absent()
           : Value(sessionId),
@@ -6576,6 +6659,12 @@ class Run extends DataClass implements Insertable<Run> {
       elevGainM: elevGainM == null && nullToAbsent
           ? const Value.absent()
           : Value(elevGainM),
+      elevLossM: elevLossM == null && nullToAbsent
+          ? const Value.absent()
+          : Value(elevLossM),
+      maxAltM: maxAltM == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maxAltM),
       startLat: startLat == null && nullToAbsent
           ? const Value.absent()
           : Value(startLat),
@@ -6603,6 +6692,9 @@ class Run extends DataClass implements Insertable<Run> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Run(
       id: serializer.fromJson<int>(json['id']),
+      kind: $RunsTable.$converterkind.fromJson(
+        serializer.fromJson<String>(json['kind']),
+      ),
       sessionId: serializer.fromJson<int?>(json['sessionId']),
       weekNo: serializer.fromJson<int?>(json['weekNo']),
       dayId: serializer.fromJson<String?>(json['dayId']),
@@ -6616,6 +6708,8 @@ class Run extends DataClass implements Insertable<Run> {
       distanceM: serializer.fromJson<double>(json['distanceM']),
       maxSpeedMps: serializer.fromJson<double?>(json['maxSpeedMps']),
       elevGainM: serializer.fromJson<double?>(json['elevGainM']),
+      elevLossM: serializer.fromJson<double?>(json['elevLossM']),
+      maxAltM: serializer.fromJson<double?>(json['maxAltM']),
       startLat: serializer.fromJson<double?>(json['startLat']),
       startLng: serializer.fromJson<double?>(json['startLng']),
       endLat: serializer.fromJson<double?>(json['endLat']),
@@ -6632,6 +6726,7 @@ class Run extends DataClass implements Insertable<Run> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'kind': serializer.toJson<String>($RunsTable.$converterkind.toJson(kind)),
       'sessionId': serializer.toJson<int?>(sessionId),
       'weekNo': serializer.toJson<int?>(weekNo),
       'dayId': serializer.toJson<String?>(dayId),
@@ -6645,6 +6740,8 @@ class Run extends DataClass implements Insertable<Run> {
       'distanceM': serializer.toJson<double>(distanceM),
       'maxSpeedMps': serializer.toJson<double?>(maxSpeedMps),
       'elevGainM': serializer.toJson<double?>(elevGainM),
+      'elevLossM': serializer.toJson<double?>(elevLossM),
+      'maxAltM': serializer.toJson<double?>(maxAltM),
       'startLat': serializer.toJson<double?>(startLat),
       'startLng': serializer.toJson<double?>(startLng),
       'endLat': serializer.toJson<double?>(endLat),
@@ -6659,6 +6756,7 @@ class Run extends DataClass implements Insertable<Run> {
 
   Run copyWith({
     int? id,
+    RunKind? kind,
     Value<int?> sessionId = const Value.absent(),
     Value<int?> weekNo = const Value.absent(),
     Value<String?> dayId = const Value.absent(),
@@ -6672,6 +6770,8 @@ class Run extends DataClass implements Insertable<Run> {
     double? distanceM,
     Value<double?> maxSpeedMps = const Value.absent(),
     Value<double?> elevGainM = const Value.absent(),
+    Value<double?> elevLossM = const Value.absent(),
+    Value<double?> maxAltM = const Value.absent(),
     Value<double?> startLat = const Value.absent(),
     Value<double?> startLng = const Value.absent(),
     Value<double?> endLat = const Value.absent(),
@@ -6681,6 +6781,7 @@ class Run extends DataClass implements Insertable<Run> {
     Value<String?> note = const Value.absent(),
   }) => Run(
     id: id ?? this.id,
+    kind: kind ?? this.kind,
     sessionId: sessionId.present ? sessionId.value : this.sessionId,
     weekNo: weekNo.present ? weekNo.value : this.weekNo,
     dayId: dayId.present ? dayId.value : this.dayId,
@@ -6696,6 +6797,8 @@ class Run extends DataClass implements Insertable<Run> {
     distanceM: distanceM ?? this.distanceM,
     maxSpeedMps: maxSpeedMps.present ? maxSpeedMps.value : this.maxSpeedMps,
     elevGainM: elevGainM.present ? elevGainM.value : this.elevGainM,
+    elevLossM: elevLossM.present ? elevLossM.value : this.elevLossM,
+    maxAltM: maxAltM.present ? maxAltM.value : this.maxAltM,
     startLat: startLat.present ? startLat.value : this.startLat,
     startLng: startLng.present ? startLng.value : this.startLng,
     endLat: endLat.present ? endLat.value : this.endLat,
@@ -6707,6 +6810,7 @@ class Run extends DataClass implements Insertable<Run> {
   Run copyWithCompanion(RunsCompanion data) {
     return Run(
       id: data.id.present ? data.id.value : this.id,
+      kind: data.kind.present ? data.kind.value : this.kind,
       sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
       weekNo: data.weekNo.present ? data.weekNo.value : this.weekNo,
       dayId: data.dayId.present ? data.dayId.value : this.dayId,
@@ -6728,6 +6832,8 @@ class Run extends DataClass implements Insertable<Run> {
           ? data.maxSpeedMps.value
           : this.maxSpeedMps,
       elevGainM: data.elevGainM.present ? data.elevGainM.value : this.elevGainM,
+      elevLossM: data.elevLossM.present ? data.elevLossM.value : this.elevLossM,
+      maxAltM: data.maxAltM.present ? data.maxAltM.value : this.maxAltM,
       startLat: data.startLat.present ? data.startLat.value : this.startLat,
       startLng: data.startLng.present ? data.startLng.value : this.startLng,
       endLat: data.endLat.present ? data.endLat.value : this.endLat,
@@ -6742,6 +6848,7 @@ class Run extends DataClass implements Insertable<Run> {
   String toString() {
     return (StringBuffer('Run(')
           ..write('id: $id, ')
+          ..write('kind: $kind, ')
           ..write('sessionId: $sessionId, ')
           ..write('weekNo: $weekNo, ')
           ..write('dayId: $dayId, ')
@@ -6755,6 +6862,8 @@ class Run extends DataClass implements Insertable<Run> {
           ..write('distanceM: $distanceM, ')
           ..write('maxSpeedMps: $maxSpeedMps, ')
           ..write('elevGainM: $elevGainM, ')
+          ..write('elevLossM: $elevLossM, ')
+          ..write('maxAltM: $maxAltM, ')
           ..write('startLat: $startLat, ')
           ..write('startLng: $startLng, ')
           ..write('endLat: $endLat, ')
@@ -6769,6 +6878,7 @@ class Run extends DataClass implements Insertable<Run> {
   @override
   int get hashCode => Object.hashAll([
     id,
+    kind,
     sessionId,
     weekNo,
     dayId,
@@ -6782,6 +6892,8 @@ class Run extends DataClass implements Insertable<Run> {
     distanceM,
     maxSpeedMps,
     elevGainM,
+    elevLossM,
+    maxAltM,
     startLat,
     startLng,
     endLat,
@@ -6795,6 +6907,7 @@ class Run extends DataClass implements Insertable<Run> {
       identical(this, other) ||
       (other is Run &&
           other.id == this.id &&
+          other.kind == this.kind &&
           other.sessionId == this.sessionId &&
           other.weekNo == this.weekNo &&
           other.dayId == this.dayId &&
@@ -6808,6 +6921,8 @@ class Run extends DataClass implements Insertable<Run> {
           other.distanceM == this.distanceM &&
           other.maxSpeedMps == this.maxSpeedMps &&
           other.elevGainM == this.elevGainM &&
+          other.elevLossM == this.elevLossM &&
+          other.maxAltM == this.maxAltM &&
           other.startLat == this.startLat &&
           other.startLng == this.startLng &&
           other.endLat == this.endLat &&
@@ -6819,6 +6934,7 @@ class Run extends DataClass implements Insertable<Run> {
 
 class RunsCompanion extends UpdateCompanion<Run> {
   final Value<int> id;
+  final Value<RunKind> kind;
   final Value<int?> sessionId;
   final Value<int?> weekNo;
   final Value<String?> dayId;
@@ -6832,6 +6948,8 @@ class RunsCompanion extends UpdateCompanion<Run> {
   final Value<double> distanceM;
   final Value<double?> maxSpeedMps;
   final Value<double?> elevGainM;
+  final Value<double?> elevLossM;
+  final Value<double?> maxAltM;
   final Value<double?> startLat;
   final Value<double?> startLng;
   final Value<double?> endLat;
@@ -6841,6 +6959,7 @@ class RunsCompanion extends UpdateCompanion<Run> {
   final Value<String?> note;
   const RunsCompanion({
     this.id = const Value.absent(),
+    this.kind = const Value.absent(),
     this.sessionId = const Value.absent(),
     this.weekNo = const Value.absent(),
     this.dayId = const Value.absent(),
@@ -6854,6 +6973,8 @@ class RunsCompanion extends UpdateCompanion<Run> {
     this.distanceM = const Value.absent(),
     this.maxSpeedMps = const Value.absent(),
     this.elevGainM = const Value.absent(),
+    this.elevLossM = const Value.absent(),
+    this.maxAltM = const Value.absent(),
     this.startLat = const Value.absent(),
     this.startLng = const Value.absent(),
     this.endLat = const Value.absent(),
@@ -6864,6 +6985,7 @@ class RunsCompanion extends UpdateCompanion<Run> {
   });
   RunsCompanion.insert({
     this.id = const Value.absent(),
+    this.kind = const Value.absent(),
     this.sessionId = const Value.absent(),
     this.weekNo = const Value.absent(),
     this.dayId = const Value.absent(),
@@ -6877,6 +6999,8 @@ class RunsCompanion extends UpdateCompanion<Run> {
     this.distanceM = const Value.absent(),
     this.maxSpeedMps = const Value.absent(),
     this.elevGainM = const Value.absent(),
+    this.elevLossM = const Value.absent(),
+    this.maxAltM = const Value.absent(),
     this.startLat = const Value.absent(),
     this.startLng = const Value.absent(),
     this.endLat = const Value.absent(),
@@ -6888,6 +7012,7 @@ class RunsCompanion extends UpdateCompanion<Run> {
        startedAtMs = Value(startedAtMs);
   static Insertable<Run> custom({
     Expression<int>? id,
+    Expression<String>? kind,
     Expression<int>? sessionId,
     Expression<int>? weekNo,
     Expression<String>? dayId,
@@ -6901,6 +7026,8 @@ class RunsCompanion extends UpdateCompanion<Run> {
     Expression<double>? distanceM,
     Expression<double>? maxSpeedMps,
     Expression<double>? elevGainM,
+    Expression<double>? elevLossM,
+    Expression<double>? maxAltM,
     Expression<double>? startLat,
     Expression<double>? startLng,
     Expression<double>? endLat,
@@ -6911,6 +7038,7 @@ class RunsCompanion extends UpdateCompanion<Run> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (kind != null) 'kind': kind,
       if (sessionId != null) 'session_id': sessionId,
       if (weekNo != null) 'week_no': weekNo,
       if (dayId != null) 'day_id': dayId,
@@ -6924,6 +7052,8 @@ class RunsCompanion extends UpdateCompanion<Run> {
       if (distanceM != null) 'distance_m': distanceM,
       if (maxSpeedMps != null) 'max_speed_mps': maxSpeedMps,
       if (elevGainM != null) 'elev_gain_m': elevGainM,
+      if (elevLossM != null) 'elev_loss_m': elevLossM,
+      if (maxAltM != null) 'max_alt_m': maxAltM,
       if (startLat != null) 'start_lat': startLat,
       if (startLng != null) 'start_lng': startLng,
       if (endLat != null) 'end_lat': endLat,
@@ -6936,6 +7066,7 @@ class RunsCompanion extends UpdateCompanion<Run> {
 
   RunsCompanion copyWith({
     Value<int>? id,
+    Value<RunKind>? kind,
     Value<int?>? sessionId,
     Value<int?>? weekNo,
     Value<String?>? dayId,
@@ -6949,6 +7080,8 @@ class RunsCompanion extends UpdateCompanion<Run> {
     Value<double>? distanceM,
     Value<double?>? maxSpeedMps,
     Value<double?>? elevGainM,
+    Value<double?>? elevLossM,
+    Value<double?>? maxAltM,
     Value<double?>? startLat,
     Value<double?>? startLng,
     Value<double?>? endLat,
@@ -6959,6 +7092,7 @@ class RunsCompanion extends UpdateCompanion<Run> {
   }) {
     return RunsCompanion(
       id: id ?? this.id,
+      kind: kind ?? this.kind,
       sessionId: sessionId ?? this.sessionId,
       weekNo: weekNo ?? this.weekNo,
       dayId: dayId ?? this.dayId,
@@ -6972,6 +7106,8 @@ class RunsCompanion extends UpdateCompanion<Run> {
       distanceM: distanceM ?? this.distanceM,
       maxSpeedMps: maxSpeedMps ?? this.maxSpeedMps,
       elevGainM: elevGainM ?? this.elevGainM,
+      elevLossM: elevLossM ?? this.elevLossM,
+      maxAltM: maxAltM ?? this.maxAltM,
       startLat: startLat ?? this.startLat,
       startLng: startLng ?? this.startLng,
       endLat: endLat ?? this.endLat,
@@ -6987,6 +7123,11 @@ class RunsCompanion extends UpdateCompanion<Run> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(
+        $RunsTable.$converterkind.toSql(kind.value),
+      );
     }
     if (sessionId.present) {
       map['session_id'] = Variable<int>(sessionId.value);
@@ -7027,6 +7168,12 @@ class RunsCompanion extends UpdateCompanion<Run> {
     if (elevGainM.present) {
       map['elev_gain_m'] = Variable<double>(elevGainM.value);
     }
+    if (elevLossM.present) {
+      map['elev_loss_m'] = Variable<double>(elevLossM.value);
+    }
+    if (maxAltM.present) {
+      map['max_alt_m'] = Variable<double>(maxAltM.value);
+    }
     if (startLat.present) {
       map['start_lat'] = Variable<double>(startLat.value);
     }
@@ -7057,6 +7204,7 @@ class RunsCompanion extends UpdateCompanion<Run> {
   String toString() {
     return (StringBuffer('RunsCompanion(')
           ..write('id: $id, ')
+          ..write('kind: $kind, ')
           ..write('sessionId: $sessionId, ')
           ..write('weekNo: $weekNo, ')
           ..write('dayId: $dayId, ')
@@ -7070,6 +7218,8 @@ class RunsCompanion extends UpdateCompanion<Run> {
           ..write('distanceM: $distanceM, ')
           ..write('maxSpeedMps: $maxSpeedMps, ')
           ..write('elevGainM: $elevGainM, ')
+          ..write('elevLossM: $elevLossM, ')
+          ..write('maxAltM: $maxAltM, ')
           ..write('startLat: $startLat, ')
           ..write('startLng: $startLng, ')
           ..write('endLat: $endLat, ')
@@ -12817,6 +12967,7 @@ typedef $$FormClipsTableProcessedTableManager =
     >;
 typedef $$RunsTableCreateCompanionBuilder = RunsCompanion Function({
   Value<int> id,
+  Value<RunKind> kind,
   Value<int?> sessionId,
   Value<int?> weekNo,
   Value<String?> dayId,
@@ -12830,6 +12981,8 @@ typedef $$RunsTableCreateCompanionBuilder = RunsCompanion Function({
   Value<double> distanceM,
   Value<double?> maxSpeedMps,
   Value<double?> elevGainM,
+  Value<double?> elevLossM,
+  Value<double?> maxAltM,
   Value<double?> startLat,
   Value<double?> startLng,
   Value<double?> endLat,
@@ -12840,6 +12993,7 @@ typedef $$RunsTableCreateCompanionBuilder = RunsCompanion Function({
 });
 typedef $$RunsTableUpdateCompanionBuilder = RunsCompanion Function({
   Value<int> id,
+  Value<RunKind> kind,
   Value<int?> sessionId,
   Value<int?> weekNo,
   Value<String?> dayId,
@@ -12853,6 +13007,8 @@ typedef $$RunsTableUpdateCompanionBuilder = RunsCompanion Function({
   Value<double> distanceM,
   Value<double?> maxSpeedMps,
   Value<double?> elevGainM,
+  Value<double?> elevLossM,
+  Value<double?> maxAltM,
   Value<double?> startLat,
   Value<double?> startLng,
   Value<double?> endLat,
@@ -12915,6 +13071,12 @@ class $$RunsTableFilterComposer extends Composer<_$AppDatabase, $RunsTable> {
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnWithTypeConverterFilters<RunKind, RunKind, String> get kind =>
+      $composableBuilder(
+        column: $table.kind,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
   ColumnFilters<int> get weekNo => $composableBuilder(
     column: $table.weekNo,
     builder: (column) => ColumnFilters(column),
@@ -12972,6 +13134,16 @@ class $$RunsTableFilterComposer extends Composer<_$AppDatabase, $RunsTable> {
 
   ColumnFilters<double> get elevGainM => $composableBuilder(
     column: $table.elevGainM,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get elevLossM => $composableBuilder(
+    column: $table.elevLossM,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get maxAltM => $composableBuilder(
+    column: $table.maxAltM,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -13073,6 +13245,11 @@ class $$RunsTableOrderingComposer extends Composer<_$AppDatabase, $RunsTable> {
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get weekNo => $composableBuilder(
     column: $table.weekNo,
     builder: (column) => ColumnOrderings(column),
@@ -13130,6 +13307,16 @@ class $$RunsTableOrderingComposer extends Composer<_$AppDatabase, $RunsTable> {
 
   ColumnOrderings<double> get elevGainM => $composableBuilder(
     column: $table.elevGainM,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get elevLossM => $composableBuilder(
+    column: $table.elevLossM,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get maxAltM => $composableBuilder(
+    column: $table.maxAltM,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -13204,6 +13391,9 @@ class $$RunsTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
+  GeneratedColumnWithTypeConverter<RunKind, String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
   GeneratedColumn<int> get weekNo =>
       $composableBuilder(column: $table.weekNo, builder: (column) => column);
 
@@ -13247,6 +13437,12 @@ class $$RunsTableAnnotationComposer
 
   GeneratedColumn<double> get elevGainM =>
       $composableBuilder(column: $table.elevGainM, builder: (column) => column);
+
+  GeneratedColumn<double> get elevLossM =>
+      $composableBuilder(column: $table.elevLossM, builder: (column) => column);
+
+  GeneratedColumn<double> get maxAltM =>
+      $composableBuilder(column: $table.maxAltM, builder: (column) => column);
 
   GeneratedColumn<double> get startLat =>
       $composableBuilder(column: $table.startLat, builder: (column) => column);
@@ -13347,6 +13543,7 @@ class $$RunsTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<RunKind> kind = const Value.absent(),
                 Value<int?> sessionId = const Value.absent(),
                 Value<int?> weekNo = const Value.absent(),
                 Value<String?> dayId = const Value.absent(),
@@ -13360,6 +13557,8 @@ class $$RunsTableTableManager
                 Value<double> distanceM = const Value.absent(),
                 Value<double?> maxSpeedMps = const Value.absent(),
                 Value<double?> elevGainM = const Value.absent(),
+                Value<double?> elevLossM = const Value.absent(),
+                Value<double?> maxAltM = const Value.absent(),
                 Value<double?> startLat = const Value.absent(),
                 Value<double?> startLng = const Value.absent(),
                 Value<double?> endLat = const Value.absent(),
@@ -13369,6 +13568,7 @@ class $$RunsTableTableManager
                 Value<String?> note = const Value.absent(),
               }) => RunsCompanion(
                 id: id,
+                kind: kind,
                 sessionId: sessionId,
                 weekNo: weekNo,
                 dayId: dayId,
@@ -13382,6 +13582,8 @@ class $$RunsTableTableManager
                 distanceM: distanceM,
                 maxSpeedMps: maxSpeedMps,
                 elevGainM: elevGainM,
+                elevLossM: elevLossM,
+                maxAltM: maxAltM,
                 startLat: startLat,
                 startLng: startLng,
                 endLat: endLat,
@@ -13393,6 +13595,7 @@ class $$RunsTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<RunKind> kind = const Value.absent(),
                 Value<int?> sessionId = const Value.absent(),
                 Value<int?> weekNo = const Value.absent(),
                 Value<String?> dayId = const Value.absent(),
@@ -13406,6 +13609,8 @@ class $$RunsTableTableManager
                 Value<double> distanceM = const Value.absent(),
                 Value<double?> maxSpeedMps = const Value.absent(),
                 Value<double?> elevGainM = const Value.absent(),
+                Value<double?> elevLossM = const Value.absent(),
+                Value<double?> maxAltM = const Value.absent(),
                 Value<double?> startLat = const Value.absent(),
                 Value<double?> startLng = const Value.absent(),
                 Value<double?> endLat = const Value.absent(),
@@ -13415,6 +13620,7 @@ class $$RunsTableTableManager
                 Value<String?> note = const Value.absent(),
               }) => RunsCompanion.insert(
                 id: id,
+                kind: kind,
                 sessionId: sessionId,
                 weekNo: weekNo,
                 dayId: dayId,
@@ -13428,6 +13634,8 @@ class $$RunsTableTableManager
                 distanceM: distanceM,
                 maxSpeedMps: maxSpeedMps,
                 elevGainM: elevGainM,
+                elevLossM: elevLossM,
+                maxAltM: maxAltM,
                 startLat: startLat,
                 startLng: startLng,
                 endLat: endLat,

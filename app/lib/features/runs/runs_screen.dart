@@ -8,7 +8,10 @@ import '../../app/providers.dart';
 import '../../app/run_providers.dart';
 import '../../core/ui/ui.dart';
 import '../../data/db/database.dart';
+import '../../data/db/tables.dart';
 import '../../domain/run/run.dart';
+import 'hike_summary.dart';
+import 'live_run_screen.dart';
 import 'run_share_card.dart';
 import 'run_summary.dart';
 
@@ -29,7 +32,7 @@ class RunsScreen extends ConsumerWidget {
         data: (list) => ListView(
           padding: Gap.pagePadding,
           children: [
-            if (open != null) ...[
+            if (open != null && open.kind == RunKind.run) ...[
               AppCard(
                 accent: AppTheme.crimson,
                 onTap: () => _startRun(context, ref),
@@ -91,7 +94,7 @@ class RunsScreen extends ConsumerWidget {
   }
 
   Future<void> _startRun(BuildContext context, WidgetRef ref) async {
-    await context.push<bool>('/track');
+    await context.push<bool>('/track', extra: const RunLaunch());
     ref
       ..invalidate(openRunProvider)
       ..invalidate(finishedRunsProvider);
@@ -193,7 +196,7 @@ class _RunTile extends ConsumerWidget {
       padding: EdgeInsets.zero,
       onTap: () => context.go('/progress/runs/${run.id}'),
       semanticLabel:
-          '${runTitle(started)} on ${DateFormat('d MMMM').format(run.runOn)}, '
+          '${runTitle(started, kind: run.kind)} on ${DateFormat('d MMMM').format(run.runOn)}, '
           '${formatKm(run.distanceM)} kilometres',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -206,7 +209,10 @@ class _RunTile extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(runTitle(started), style: t.titleMedium),
+                      Text(
+                        runTitle(started, kind: run.kind),
+                        style: t.titleMedium,
+                      ),
                       Text(
                         '${DateFormat('EEE d MMM · HH:mm').format(started)}'
                         ' · $kind',
@@ -256,7 +262,7 @@ class _RunTile extends ConsumerWidget {
   }
 }
 
-/// One run, read back.
+/// One run, or one hike, read back.
 class RunDetailScreen extends ConsumerWidget {
   const RunDetailScreen({super.key, required this.runId});
 
@@ -269,10 +275,12 @@ class RunDetailScreen extends ConsumerWidget {
     final library = ref.watch(libraryProvider).asData?.value;
     if (run == null || track == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Run')),
+        appBar: AppBar(title: const SizedBox.shrink()),
         body: const SkeletonPage(),
       );
     }
+    final hike = run.kind == RunKind.hike;
+    final noun = hike ? 'hike' : 'run';
     final repo = ref.read(runRepositoryProvider);
     final exerciseName = run.exerciseId == null
         ? null
@@ -293,14 +301,14 @@ class RunDetailScreen extends ConsumerWidget {
             onPressed: share,
           ),
           IconButton(
-            tooltip: 'Delete this run',
+            tooltip: 'Delete this $noun',
             icon: const Icon(Icons.delete_outline),
             onPressed: () async {
               final sure = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
                   backgroundColor: AppTheme.surface,
-                  title: const Text('Delete this run?'),
+                  title: Text('Delete this $noun?'),
                   content: const Text(
                     'The trail and its numbers go for good. A set it was '
                     'logged as stays in the session.',
@@ -319,22 +327,35 @@ class RunDetailScreen extends ConsumerWidget {
               );
               if (sure != true) return;
               await repo.discard(runId);
-              ref.invalidate(finishedRunsProvider);
+              ref
+                ..invalidate(finishedRunsProvider)
+                ..invalidate(finishedHikesProvider);
               if (context.mounted) context.pop();
             },
           ),
         ],
       ),
-      body: RunSummaryView(
-        run: run,
-        track: track,
-        onShare: share,
-        exerciseName: exerciseName,
-        onEffort: (e) async {
-          await repo.setEffort(runId, e);
-          ref.invalidate(runProvider(runId));
-        },
-      ),
+      body: hike
+          ? HikeSummaryView(
+              run: run,
+              track: track,
+              onShare: share,
+              exerciseName: exerciseName,
+              onEffort: (e) async {
+                await repo.setEffort(runId, e);
+                ref.invalidate(runProvider(runId));
+              },
+            )
+          : RunSummaryView(
+              run: run,
+              track: track,
+              onShare: share,
+              exerciseName: exerciseName,
+              onEffort: (e) async {
+                await repo.setEffort(runId, e);
+                ref.invalidate(runProvider(runId));
+              },
+            ),
     );
   }
 }

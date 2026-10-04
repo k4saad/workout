@@ -56,11 +56,12 @@ void main() {
       );
     });
 
-    test('the network is there for map tiles, and nothing else', () {
+    test('the network is there for open map data, and nothing else', () {
       // v3 added INTERNET for the run map's OpenStreetMap tiles — approved
-      // by Saad on 2026-09-23. What keeps that honest is the "no code path
-      // uploads anything" group below: tile.openstreetmap.org is the only
-      // host lib/ may name.
+      // by Saad on 2026-09-23 — and v4 the hike's elevation tiles, approved
+      // 2026-10-04. What keeps that honest is the "no code path uploads
+      // anything" group below: the open-data hosts are the only ones lib/
+      // may name, and the one download is a GET.
       expect(manifest, contains('android.permission.INTERNET'));
       expect(
         manifest.contains('ACCESS_NETWORK_STATE'),
@@ -182,6 +183,10 @@ void main() {
       expect(dartFiles, isNotEmpty);
     });
 
+    /// The one file that may open a connection: elevation tiles for the
+    /// hike's 3D view.
+    const downloader = 'lib/data/run_terrain.dart';
+
     test('nothing imports an HTTP client', () {
       for (final f in dartFiles) {
         for (final banned in [
@@ -192,6 +197,7 @@ void main() {
           'HttpClient(',
           'package:firebase',
         ]) {
+          if (banned == 'HttpClient(' && f.path.endsWith(downloader)) continue;
           expect(
             f.source.contains(banned),
             isFalse,
@@ -199,6 +205,35 @@ void main() {
           );
         }
       }
+    });
+
+    test('the one download is a GET of open elevation tiles', () {
+      final file = dartFiles.singleWhere((f) => f.path.endsWith(downloader));
+      expect(file.source, contains('getUrl('));
+      for (final banned in [
+        'postUrl',
+        'putUrl',
+        'patchUrl',
+        'deleteUrl',
+        'openUrl',
+        'request.add',
+        'request.write',
+        'headers.set',
+        'headers.add',
+        'package:geolocator/',
+        'package:flutter_map/',
+      ]) {
+        expect(
+          file.source.contains(banned),
+          isFalse,
+          reason: 'the terrain download reaches for $banned',
+        );
+      }
+      final hosts = RegExp(r"https?://([a-zA-Z0-9.\-{}]+)")
+          .allMatches(file.source)
+          .map((m) => m.group(1))
+          .toSet();
+      expect(hosts, {'s3.amazonaws.com'});
     });
 
     test('nothing writes to a public media directory', () {
@@ -242,6 +277,7 @@ void main() {
       // call, and that is a decision to discuss, not a fix.
       const allowed = {
         'tile.openstreetmap.org',
+        's3.amazonaws.com',
         'www.openstreetmap.org',
         'www.youtube.com',
         'youtube.com',
@@ -257,6 +293,13 @@ void main() {
             isTrue,
             reason: '${f.path} names $host',
           );
+          if (host == 's3.amazonaws.com') {
+            expect(
+              f.path.endsWith(downloader),
+              isTrue,
+              reason: 'elevation tiles are fetched in one place only',
+            );
+          }
         }
       }
     });
@@ -276,6 +319,7 @@ void main() {
           'package:geolocator/',
           'package:url_launcher/',
           'package:share_plus/',
+          'run_terrain.dart',
         ]) {
           if (banned == 'package:share_plus/' &&
               f.path.endsWith('/data/backup_service.dart')) {

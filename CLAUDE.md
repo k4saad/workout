@@ -1,10 +1,11 @@
 # CLAUDE.md — Keller Twelve
 
 Single-user offline-first Android training app. Flutter + Riverpod + Drift.
-One user, one programme, no backend, no accounts, no network except
-OpenStreetMap tiles for the run map.
+One user, one programme, no backend, no accounts, no network except open
+map and elevation data (OpenStreetMap tiles, AWS Terrain Tiles).
 
-**Plan:** `docs/03-build-plan.md` (v1/v2, done) and `docs/06-v3-plan.md` (v3, current).
+**Plan:** `docs/03-build-plan.md` (v1/v2), `docs/06-v3-plan.md` (v3), and
+`docs/11-v4-plan.md` (v4, current).
 Follow the phases in order; do not skip ahead.
 **Programme:** `docs/01-programme.md`. **Specs:** `docs/02-data-model.md`.
 **Why things are the way they are:** `docs/00-audit.md`.
@@ -47,7 +48,7 @@ Follow the phases in order; do not skip ahead.
   `original work` on every clip (gate V18). No GIF, no video frame, no traced photo.
 - **A superset must not force a re-plate.** Members of the same `groupId` either share a
   load or pair a loaded movement with a bodyweight / cable / banded one. Otherwise the
-  superset saves no time and the 60-minute ceiling breaks.
+  superset saves no time and the half-hour ceiling breaks.
 - **The network fetches open map data, and nothing else goes out.** INTERNET exists
   (approved by Saad, 2026-09-23) for OpenStreetMap tiles (`tile.openstreetmap.org`); on
   2026-10-04 he widened it to free, open map and elevation data as needed — the hike 3D
@@ -104,8 +105,8 @@ Follow the phases in order; do not skip ahead.
 - **Five tabs in a bottom `NavigationBar`**: Today · Week · Fuel · Progress ·
   More. The top of a phone is the furthest point from the thumb of the hand
   holding it; anything reached between sets belongs at the bottom.
-  (v3: Fuel got a tab because meals are logged six times a day; the old Numbers
-  and Body tabs became one Progress hub: body, photos, lifts, runs.)
+  (v3: Fuel got a tab because meals are logged every day; the old Numbers
+  and Body tabs became one Progress hub: body, photos, runs, hikes, lifts.)
 - **Every tab owns its navigator** (`StatefulShellRoute.indexedStack`).
   Drill-downs navigate to a NESTED route so the stack builds and back walks up
   it. `context.go` to a sibling top-level route REPLACES the stack — that is
@@ -137,7 +138,7 @@ Follow the phases in order; do not skip ahead.
 ## Device reality
 
 I train alone in a basement, in poor light, with chalky hands, between heavy sets, on a
-60-minute clock. The UI must be dark, high contrast, 48 dp minimum targets, one-handed,
+half-hour clock. The UI must be dark, high contrast, 48 dp minimum targets, one-handed,
 steppers and chips over keyboards, readable at arm's length. **Colour is never the only
 carrier of meaning** — pair it with a glyph.
 

@@ -54,7 +54,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this and add an `onUpgrade` branch. Never drop a column that holds
   /// logged sets.
-  static const currentSchema = 3;
+  static const currentSchema = 4;
 
   @override
   int get schemaVersion => currentSchema;
@@ -88,6 +88,14 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(waterLogs);
         await m.createTable(supplementLogs);
         await m.createTable(nutritionAdjustments);
+      }
+      // v4: hikes. Three columns on runs. Only a v3 database has a runs
+      // table without them: below v3 the branch above has just created it,
+      // whole, and ADD COLUMN would fail on a duplicate.
+      if (from == 3) {
+        await m.addColumn(runs, runs.kind);
+        await m.addColumn(runs, runs.elevLossM);
+        await m.addColumn(runs, runs.maxAltM);
       }
     },
     beforeOpen: (details) async {

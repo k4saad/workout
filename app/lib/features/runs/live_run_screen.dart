@@ -8,20 +8,34 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/run_providers.dart';
 import '../../core/ui/ui.dart';
 import '../../data/db/database.dart';
+import '../../data/db/tables.dart';
 import '../../data/run_repository.dart';
 import '../../data/run_tracker.dart';
 import '../../domain/run/run.dart';
+import 'hike_summary.dart';
 import 'run_map.dart';
 import 'run_share_card.dart';
 import 'run_summary.dart';
 
 /// What the live screen was opened for: a programme day's run, or a free
-/// one.
+/// one; or a hike.
 class RunLaunch {
-  const RunLaunch({this.link, this.title = 'Free run', this.exerciseName});
+  const RunLaunch({
+    this.link,
+    this.title = 'Free run',
+    this.exerciseName,
+    this.kind = RunKind.run,
+  });
+
+  /// A hike, free or from a programme day.
+  const RunLaunch.hike({this.link, this.title = 'Hike', this.exerciseName})
+    : kind = RunKind.hike;
 
   final RunLink? link;
   final String title;
+
+  /// Run or hike: a hike is counted for its climb, not its pace.
+  final RunKind kind;
 
   /// What a programme run is logged as, for the summary.
   final String? exerciseName;
@@ -47,6 +61,7 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
     repo: ref.read(runRepositoryProvider),
     source: ref.read(locationSourceProvider),
     link: widget.launch.link,
+    kind: widget.launch.kind,
   );
   Timer? _tick;
   bool _follow = true;
@@ -86,6 +101,9 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
     super.dispose();
   }
 
+  bool get _hike => _tracker.snapshot.kind == RunKind.hike;
+  String get _noun => _hike ? 'hike' : 'run';
+
   Future<void> _start() async {
     if (_busy) return;
     setState(() => _busy = true);
@@ -113,7 +131,7 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.surface,
-        title: const Text('Throw this run away?'),
+        title: Text('Throw this $_noun away?'),
         content: const Text(
           'The trail and every number go. Nothing is logged.',
         ),
@@ -145,7 +163,7 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.surface,
-        title: const Text('Your run is still recording'),
+        title: Text('Your $_noun is still recording'),
         content: const Text(
           'Finish it now to save it, or keep running. Leaving the screen '
           'without finishing keeps it open until you come back.',
@@ -157,7 +175,7 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, 'keep'),
-            child: const Text('Keep running'),
+            child: Text(_hike ? 'Keep hiking' : 'Keep running'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, 'finish'),
@@ -282,7 +300,9 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
           title: widget.launch.title,
           snapshot: s,
           target: target,
-          zone: band?.judge(s.currentPaceSecPerKm),
+          zone: s.kind == RunKind.hike
+              ? null
+              : band?.judge(s.currentPaceSecPerKm),
           controls: _controls(s, locatingFor),
         ),
       ],
@@ -328,10 +348,7 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
                 ),
               ],
             ),
-            TextButton(
-              onPressed: _discard,
-              child: const Text('Discard this run'),
-            ),
+            TextButton(onPressed: _discard, child: Text('Discard this $_noun')),
           ],
         );
       default:
@@ -364,6 +381,23 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
 
   Widget _savedView(Run run) {
     final repo = ref.read(runRepositoryProvider);
+    final track = _savedTrack ?? RunTrack();
+    final exerciseName = run.setLogId == null
+        ? null
+        : widget.launch.exerciseName;
+    void share() => showRunShareSheet(
+      context,
+      run: run,
+      track: track,
+      exerciseName: exerciseName,
+    );
+    Future<void> effort(int e) async {
+      await repo.setEffort(run.id, e);
+      if (mounted) {
+        setState(() => _saved = run.copyWith(effort: Value(e)));
+      }
+    }
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -372,43 +406,30 @@ class _LiveRunScreenState extends ConsumerState<LiveRunScreen> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text('Run saved'),
+          title: Text(run.kind == RunKind.hike ? 'Hike saved' : 'Run saved'),
           actions: [
             IconButton(
               tooltip: 'Share as an image',
               icon: const Icon(Icons.ios_share),
-              onPressed: () => showRunShareSheet(
-                context,
-                run: run,
-                track: _savedTrack ?? RunTrack(),
-                exerciseName: run.setLogId == null
-                    ? null
-                    : widget.launch.exerciseName,
-              ),
+              onPressed: share,
             ),
           ],
         ),
-        body: RunSummaryView(
-          run: run,
-          onShare: () => showRunShareSheet(
-            context,
-            run: run,
-            track: _savedTrack ?? RunTrack(),
-            exerciseName: run.setLogId == null
-                ? null
-                : widget.launch.exerciseName,
-          ),
-          track: _savedTrack ?? RunTrack(),
-          exerciseName: run.setLogId == null
-              ? null
-              : widget.launch.exerciseName,
-          onEffort: (e) async {
-            await repo.setEffort(run.id, e);
-            if (mounted) {
-              setState(() => _saved = run.copyWith(effort: Value(e)));
-            }
-          },
-        ),
+        body: run.kind == RunKind.hike
+            ? HikeSummaryView(
+                run: run,
+                track: track,
+                exerciseName: exerciseName,
+                onShare: share,
+                onEffort: effort,
+              )
+            : RunSummaryView(
+                run: run,
+                onShare: share,
+                track: track,
+                exerciseName: exerciseName,
+                onEffort: effort,
+              ),
         bottomNavigationBar: SafeArea(
           minimum: const EdgeInsets.fromLTRB(16, 8, 16, 12),
           child: FilledButton(
@@ -496,22 +517,42 @@ class _Panel extends StatelessWidget {
                 Expanded(
                   child: _Figure(label: 'Time', value: formatClock(s.movingMs)),
                 ),
-                Expanded(
-                  child: _Figure(
-                    label: 'Pace',
-                    value: formatPace(live ? s.currentPaceSecPerKm : null),
-                    unit: '/km',
+                // A hike is counted by its climb: how far up, and where now.
+                if (s.kind == RunKind.hike) ...[
+                  Expanded(
+                    child: _Figure(
+                      label: '▲ Climb',
+                      value: '${s.elevGainM.round()}',
+                      unit: 'm',
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: _Figure(
-                    label: 'Speed',
-                    value: s.speedKmh == null
-                        ? '–'
-                        : s.speedKmh!.toStringAsFixed(1),
-                    unit: 'km/h',
+                  Expanded(
+                    child: _Figure(
+                      label: 'Height',
+                      value: s.altitudeM == null
+                          ? '–'
+                          : '${s.altitudeM!.round()}',
+                      unit: 'm',
+                    ),
                   ),
-                ),
+                ] else ...[
+                  Expanded(
+                    child: _Figure(
+                      label: 'Pace',
+                      value: formatPace(live ? s.currentPaceSecPerKm : null),
+                      unit: '/km',
+                    ),
+                  ),
+                  Expanded(
+                    child: _Figure(
+                      label: 'Speed',
+                      value: s.speedKmh == null
+                          ? '–'
+                          : s.speedKmh!.toStringAsFixed(1),
+                      unit: 'km/h',
+                    ),
+                  ),
+                ],
               ],
             ),
             if (target != null) ...[
@@ -521,7 +562,10 @@ class _Panel extends StatelessWidget {
             if (live && zone != null && zone != PaceZone.none) ...[
               Gap.s,
               _PaceGuide(zone: zone!),
-            ] else if (live && zone == null && target is! DistanceTarget) ...[
+            ] else if (live &&
+                zone == null &&
+                target is! DistanceTarget &&
+                s.kind == RunKind.run) ...[
               Gap.s,
               Text(
                 'Easy means you could talk in sentences.',

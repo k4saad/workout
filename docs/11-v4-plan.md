@@ -65,3 +65,35 @@ Decided with him:
 
 0.15.0+17, same key, permissions unchanged, migration rehearsed, every
 gate, screens looked at.
+
+## As built
+
+- **G and H** as planned. Sessions are 26–31 minutes (test week 15, the
+  Sunday run up to 32); the four meals land at 2,290–2,315 kcal with
+  106–130 g protein, about €35 a week. Rest days got notes that fit the
+  timetable, and Today on a rest day names the next session
+  (`ProgrammeCalendar.nextSession`, tested first).
+- **A new plan starts on its own date.** An upgrade used to keep the phone's
+  start date; v4's programme carries `startsFresh`, so the phone moves to
+  Monday 12 October and the notice says so. Sessions logged on v3 stay in
+  History as "Earlier plan".
+- **Hikes** share the runs table (`runs.kind`, schema 4, plus descent and
+  highest point). The tracker counts a hike with walking thresholds (a 0.5
+  m/s climb is moving, not paused) and shows climb and height, not pace.
+- **The 3D view** is `lib/domain/terrain/` (pure Dart: tile maths,
+  terrarium decoding, a height grid, the scene) drawn by
+  `features/runs/terrain_view.dart` with `Canvas.drawVertices`:
+  - land lit from the north-west;
+  - contour lines at a round interval, drawn cell by cell with the land, so
+    a hill hides the lines and the trail behind it (the trail goes faint
+    there);
+  - the block's sides;
+  - heights exaggerated up to ×5 for flat country, and labelled.
+- **Tiles**: AWS Terrain Tiles, up to nine per hike at the sharpest zoom
+  that fits, kept in the cache folder. `lib/data/run_terrain.dart` is the one
+  file allowed to open a connection, and the privacy audit holds it to GET
+  requests on `s3.amazonaws.com`. A tile names an area some kilometres
+  across, never the trail.
+- **Offline**, or with any tile missing, the trail stands on the phone's own
+  GPS heights over a level floor, with a sheet hung under it, labelled.
+  Half a mountain is never drawn.

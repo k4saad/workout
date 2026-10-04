@@ -77,6 +77,9 @@ class RunSnapshot {
     this.position,
     this.segments = const [],
     this.splits = const [],
+    this.elevGainM = 0,
+    this.altitudeM,
+    this.kind = RunKind.run,
   });
 
   final TrackerStatus status;
@@ -98,6 +101,13 @@ class RunSnapshot {
   final List<List<GeoPoint>> segments;
   final List<RunSplit> splits;
 
+  /// Climbed so far, and the height now: what a hike shows instead of pace.
+  final double elevGainM;
+  final double? altitudeM;
+
+  /// What is being recorded: a picked-up recording keeps its own kind.
+  final RunKind kind;
+
   bool get isLive =>
       status == TrackerStatus.recording || status == TrackerStatus.paused;
 
@@ -116,6 +126,7 @@ class RunTracker {
     required this.repo,
     required this.source,
     this.link,
+    this.kind = RunKind.run,
     int Function()? nowMs,
     this.readyAccuracyM = 30,
   }) : _nowMs = nowMs ?? (() => DateTime.now().millisecondsSinceEpoch);
@@ -125,6 +136,14 @@ class RunTracker {
 
   /// The programme day this run belongs to; null for a free run.
   final RunLink? link;
+
+  /// What a new recording is: a run, or a hike.
+  final RunKind kind;
+
+  RunTrack _fresh() => kind == RunKind.hike ? RunTrack.hike() : RunTrack();
+
+  /// The kind of the recording in hand: [kind], or the open one's.
+  late RunKind _activeKind = kind;
   final int Function() _nowMs;
 
   /// A fix this sure means the GPS has found him. Start does not wait for
@@ -139,7 +158,7 @@ class RunTracker {
   RunSnapshot get snapshot => state.value;
 
   TrackerStatus _status = TrackerStatus.idle;
-  RunTrack _track = RunTrack();
+  late RunTrack _track = _fresh();
   FixFilter _filter = FixFilter();
   StreamSubscription<RunFix>? _sub;
   bool _subRecording = false;
@@ -195,6 +214,7 @@ class RunTracker {
     final open = await repo.active();
     if (open != null) {
       _runId = open.id;
+      _activeKind = open.kind;
       _track = await repo.track(open.id);
       _startedMs = open.startedAtMs;
       _filter = FixFilter();
@@ -266,9 +286,10 @@ class RunTracker {
   /// where he stands.
   Future<void> start() async {
     if (_runId != null || _disposed) return;
-    _runId = await repo.start(link: link);
+    _runId = await repo.start(link: link, kind: kind);
+    _activeKind = kind;
     _startedMs = _nowMs();
-    _track = RunTrack();
+    _track = _fresh();
     _filter = FixFilter();
     _nextSegment = true;
     _status = TrackerStatus.recording;
@@ -325,7 +346,7 @@ class RunTracker {
     final id = _runId;
     if (id != null) await repo.discard(id);
     _runId = null;
-    _track = RunTrack();
+    _track = _fresh();
     _startedMs = null;
     _status = TrackerStatus.idle;
     _emit();
@@ -366,6 +387,9 @@ class RunTracker {
         for (final s in _track.segments) [for (final f in s) f.point],
       ],
       splits: _track.splits,
+      elevGainM: _track.elevGainM,
+      altitudeM: raw?.altitudeM,
+      kind: _activeKind,
     );
   }
 

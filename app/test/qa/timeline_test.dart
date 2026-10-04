@@ -31,6 +31,7 @@ const places = <(String, String)>[
   ('body', '/progress/body'),
   ('lifts', '/progress/lifts'),
   ('runs', '/progress/runs'),
+  ('hikes', '/progress/hikes'),
   ('more', '/more'),
   ('cardio', '/more/cardio'),
   ('next-cycle', '/more/settings/next-cycle'),

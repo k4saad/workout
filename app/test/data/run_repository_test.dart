@@ -205,6 +205,88 @@ void main() {
     });
   });
 
+  group('hikes', () {
+    /// Up a 60 m hill and down 40 m of it, walking at 1.2 m/s.
+    RunFix hill(int s) => RunFix(
+      tMs: fix(s, 0).tMs,
+      lat: north(1.2 * s).lat,
+      lng: origin.lng,
+      accuracyM: 5,
+      altitudeM: s <= 200 ? 100 + s * 0.3 : 160 - (s - 200) * 0.2,
+    );
+
+    Future<int> walk({RunKind kind = RunKind.hike}) async {
+      final id = await repo.start(kind: kind);
+      final t = kind == RunKind.hike ? RunTrack.hike() : RunTrack();
+      for (var s = 0; s <= 400; s++) {
+        t.add(hill(s), segmentStart: s == 0);
+        await repo.addPoint(id, hill(s), segmentStart: s == 0);
+      }
+      await repo.finish(id, t);
+      return id;
+    }
+
+    test(
+      'a hike is kept as a hike, with its descent and highest point',
+      () async {
+        final hike = (await repo.byId(await walk()))!;
+        expect(hike.kind, RunKind.hike);
+        expect(hike.elevGainM, closeTo(60, 4));
+        expect(hike.elevLossM, closeTo(40, 4));
+        expect(hike.maxAltM, closeTo(160, 3));
+      },
+    );
+
+    test('a hike replays with walking thresholds', () async {
+      final id = await repo.start(kind: RunKind.hike);
+      // 0.5 m/s: a steep climb. A run would call that stopped.
+      for (var s = 0; s <= 120; s++) {
+        await repo.addPoint(
+          id,
+          RunFix(tMs: fix(s, 0).tMs, lat: north(0.5 * s).lat, lng: origin.lng),
+          segmentStart: s == 0,
+        );
+      }
+      expect((await repo.track(id)).movingMs, greaterThan(100000));
+    });
+
+    test('runs and hikes are listed apart', () async {
+      final hike = await walk();
+      final run = await walk(kind: RunKind.run);
+      final runs = await repo.watchFinished(kind: RunKind.run).first;
+      final hikes = await repo.watchFinished(kind: RunKind.hike).first;
+      expect(runs.map((r) => r.id), [run]);
+      expect(hikes.map((r) => r.id), [hike]);
+      expect(await repo.watchFinished().first, hasLength(2));
+    });
+
+    test('a hike on the programme logs as a hike', () async {
+      final sessionId = await session();
+      final id = await repo.start(
+        kind: RunKind.hike,
+        link: RunLink(
+          sessionId: sessionId,
+          prescriptionId: 'f-sun-1',
+          exerciseId: 'easy-run',
+        ),
+      );
+      final t = RunTrack.hike();
+      for (var s = 0; s <= 60; s++) {
+        t.add(hill(s), segmentStart: s == 0);
+        await repo.addPoint(id, hill(s), segmentStart: s == 0);
+      }
+      await repo.finish(id, t);
+      final set = (await db.select(db.setLogs).get()).single;
+      expect(set.note, 'GPS hike');
+      expect(set.durationSec, closeTo(60, 2));
+    });
+
+    test('pace bands are made of runs only', () async {
+      await walk();
+      expect(await repo.recentPaces(null), isEmpty);
+    });
+  });
+
   group('the tracker', () {
     late _FakeLocation gps;
     late int clockMs;
@@ -390,6 +472,44 @@ void main() {
       }
       expect(again.snapshot.distanceM, closeTo(270, 8));
       expect(again.snapshot.segments, hasLength(2));
+    });
+
+    test('a hike tracker opens a hike, and says so', () async {
+      final hiker = RunTracker(
+        repo: repo,
+        source: gps,
+        kind: RunKind.hike,
+        nowMs: () => clockMs,
+      );
+      addTearDown(hiker.dispose);
+      await hiker.prepare();
+      await hiker.start();
+      for (var s = 0; s <= 30; s++) {
+        clockMs = fix(s, 0).tMs;
+        gps.controller.add(
+          RunFix(
+            tMs: fix(s, 0).tMs,
+            lat: north(s * 1.2).lat,
+            lng: origin.lng,
+            accuracyM: 5,
+            altitudeM: 100 + s * 0.5,
+          ),
+        );
+        await hiker.settled();
+      }
+      expect(hiker.snapshot.kind, RunKind.hike);
+      expect(hiker.snapshot.elevGainM, greaterThan(5));
+      expect(hiker.snapshot.altitudeM, closeTo(115, 0.1));
+      final row = (await repo.byId(hiker.snapshot.runId!))!;
+      expect(row.kind, RunKind.hike);
+    });
+
+    test('an open hike picked up by any tracker stays a hike', () async {
+      final id = await repo.start(kind: RunKind.hike);
+      await repo.addPoint(id, fix(0, 0), segmentStart: true);
+      await tracker.prepare(); // a run tracker
+      expect(tracker.snapshot.runId, id);
+      expect(tracker.snapshot.kind, RunKind.hike);
     });
 
     test('discarding leaves nothing behind', () async {

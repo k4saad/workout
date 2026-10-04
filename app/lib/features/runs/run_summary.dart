@@ -5,11 +5,13 @@ import 'package:intl/intl.dart' show DateFormat;
 
 import '../../core/ui/ui.dart';
 import '../../data/db/database.dart';
+import '../../data/db/tables.dart';
 import '../../domain/run/run.dart';
 import 'route_hero.dart';
 
-/// A run's name, the way a running app names it: by the time of day.
-String runTitle(DateTime started) {
+/// A run's name, the way a running app names it: by the time of day. A
+/// hike is named the same way.
+String runTitle(DateTime started, {RunKind kind = RunKind.run}) {
   final h = started.hour;
   final part = h < 5
       ? 'Night'
@@ -20,7 +22,7 @@ String runTitle(DateTime started) {
       : h < 21
       ? 'Evening'
       : 'Night';
-  return '$part run';
+  return '$part ${kind == RunKind.hike ? 'hike' : 'run'}';
 }
 
 /// A finished run, read back: where it went, how far, how fast, and how it
@@ -97,7 +99,7 @@ class RunSummaryView extends StatelessWidget {
         else
           ClipRRect(
             borderRadius: BorderRadius.circular(AppRadius.l),
-            child: const SizedBox(height: 180, child: _NoTrail()),
+            child: const SizedBox(height: 180, child: NoTrail()),
           ),
         Gap.m,
         AppCard(
@@ -115,7 +117,7 @@ class RunSummaryView extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    child: _TextStat(
+                    child: SummaryStat(
                       label: 'Moving time',
                       value: formatClock(run.movingMs),
                     ),
@@ -126,14 +128,14 @@ class RunSummaryView extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _TextStat(
+                    child: SummaryStat(
                       label: 'Avg pace',
                       value: formatPace(pace),
                       unit: '/km',
                     ),
                   ),
                   Expanded(
-                    child: _TextStat(
+                    child: SummaryStat(
                       label: 'Climb',
                       value: '${(run.elevGainM ?? 0).round()}',
                       unit: 'm',
@@ -163,7 +165,7 @@ class RunSummaryView extends StatelessWidget {
         ],
         if (onEffort != null || run.effort != null) ...[
           const SectionHeader('How hard was it?'),
-          _Effort(value: run.effort, onChanged: onEffort),
+          EffortChips(value: run.effort, onChanged: onEffort),
         ],
         ?footer,
         Gap.xl,
@@ -172,8 +174,9 @@ class RunSummaryView extends StatelessWidget {
   }
 }
 
-class _NoTrail extends StatelessWidget {
-  const _NoTrail();
+/// Said where the trail would be, when the GPS never drew one.
+class NoTrail extends StatelessWidget {
+  const NoTrail({super.key});
 
   @override
   Widget build(BuildContext context) => const ColoredBox(
@@ -188,8 +191,14 @@ class _NoTrail extends StatelessWidget {
   );
 }
 
-class _TextStat extends StatelessWidget {
-  const _TextStat({required this.label, required this.value, this.unit});
+/// A labelled figure on a summary: the number big, its unit small.
+class SummaryStat extends StatelessWidget {
+  const SummaryStat({
+    super.key,
+    required this.label,
+    required this.value,
+    this.unit,
+  });
 
   final String label;
   final String value;
@@ -203,19 +212,26 @@ class _TextStat extends StatelessWidget {
       children: [
         Text(label.toUpperCase(), style: AppTheme.overline),
         Gap.xs,
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text(value, style: AppTheme.numeric(30)),
-            if (unit != null) ...[
-              const SizedBox(width: 3),
-              Text(
-                unit!,
-                style: t.labelLarge!.copyWith(color: AppTheme.textDim),
-              ),
+        // Shrinks rather than overflows: a three-hour hike's "2:41:07" in
+        // half a small phone.
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: AlignmentDirectional.centerStart,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(value, style: AppTheme.numeric(30)),
+              if (unit != null) ...[
+                const SizedBox(width: 3),
+                Text(
+                  unit!,
+                  style: t.labelLarge!.copyWith(color: AppTheme.textDim),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ],
     );
@@ -431,8 +447,8 @@ class _PaceChartPainter extends CustomPainter {
 }
 
 /// 1 to 10: how hard it felt. Chips, not a keyboard.
-class _Effort extends StatelessWidget {
-  const _Effort({required this.value, required this.onChanged});
+class EffortChips extends StatelessWidget {
+  const EffortChips({super.key, required this.value, required this.onChanged});
 
   final int? value;
   final ValueChanged<int>? onChanged;

@@ -19,6 +19,7 @@ const drillDowns = <(String, String, int)>[
   ('/progress/body', '/progress', 3),
   ('/progress/photos', '/progress', 3),
   ('/progress/runs', '/progress', 3),
+  ('/progress/hikes', '/progress', 3),
   ('/progress/lifts', '/progress', 3),
   ('/more/exercises', '/more', 4),
   ('/more/exercises/barbell-back-squat', '/more/exercises', 4),

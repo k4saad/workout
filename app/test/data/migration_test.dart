@@ -240,7 +240,7 @@ void main() {
       expect((await db.select(db.cardioLogs).get()).single.durationSec, 900);
       expect((await db.measurementsFor(MeasurementSite.waist)).single.cm, 70);
       await db.close();
-      expect(schemaVersionOf(dbFile), 3);
+      expect(schemaVersionOf(dbFile), AppDatabase.currentSchema);
     });
 
     test('the new tables exist and take rows', () async {
@@ -362,6 +362,104 @@ void main() {
           reason: 'a deleted run must not leave its trail behind',
         );
         await db.close();
+      },
+    );
+  });
+
+  /// A phone on v0.14 today: schema v3, with a finished GPS run and its
+  /// trail, and none of the columns v4 adds.
+  Future<void> makeV3Database() async {
+    final db = AppDatabase(NativeDatabase(dbFile));
+    final start = DateTime(2026, 10, 4, 9).millisecondsSinceEpoch;
+    final runId = await db
+        .into(db.runs)
+        .insert(
+          RunsCompanion.insert(
+            runOn: DateTime(2026, 10, 4),
+            startedAtMs: start,
+            distanceM: const Value(5120),
+            movingMs: const Value(1680000),
+            elevGainM: const Value(31),
+            status: const Value(RunStatus.finished),
+          ),
+        );
+    for (var i = 0; i < 3; i++) {
+      await db
+          .into(db.runPoints)
+          .insert(
+            RunPointsCompanion.insert(
+              runId: runId,
+              seq: i,
+              tMs: start + i * 1000,
+              lat: 51.9607 + i * 0.0001,
+              lng: 7.6261,
+            ),
+          );
+    }
+    for (final column in ['kind', 'elev_loss_m', 'max_alt_m']) {
+      await db.customStatement('ALTER TABLE runs DROP COLUMN $column');
+    }
+    await db.customStatement('PRAGMA user_version = 3');
+    await db.close();
+  }
+
+  group('v3 -> v4 (hikes)', () {
+    test('every run is kept, and every run is a run', () async {
+      await makeV3Database();
+      expect(schemaVersionOf(dbFile), 3);
+
+      final db = AppDatabase(NativeDatabase(dbFile));
+      final run = (await db.select(db.runs).get()).single;
+      expect(run.kind, RunKind.run);
+      expect(run.distanceM, 5120);
+      expect(run.movingMs, 1680000);
+      expect(run.elevGainM, 31);
+      expect(run.elevLossM, isNull);
+      expect(run.maxAltM, isNull);
+      expect(await db.select(db.runPoints).get(), hasLength(3));
+      await db.close();
+      expect(schemaVersionOf(dbFile), 4);
+    });
+
+    test('a hike can be recorded on the upgraded database', () async {
+      await makeV3Database();
+      final db = AppDatabase(NativeDatabase(dbFile));
+      await db
+          .into(db.runs)
+          .insert(
+            RunsCompanion.insert(
+              kind: const Value(RunKind.hike),
+              runOn: DateTime(2026, 10, 11),
+              startedAtMs: DateTime(2026, 10, 11, 9).millisecondsSinceEpoch,
+              elevLossM: const Value(412),
+              maxAltM: const Value(187),
+            ),
+          );
+      final hike = await (db.select(
+        db.runs,
+      )..where((r) => r.kind.equalsValue(RunKind.hike))).getSingle();
+      expect(hike.elevLossM, 412);
+      expect(hike.maxAltM, 187);
+      await db.close();
+    });
+
+    test(
+      'a v2 phone skips straight to v4 without a duplicate column',
+      () async {
+        await makeV2Database();
+        final db = AppDatabase(NativeDatabase(dbFile));
+        await db
+            .into(db.runs)
+            .insert(
+              RunsCompanion.insert(
+                kind: const Value(RunKind.hike),
+                runOn: DateTime(2026, 10, 11),
+                startedAtMs: 0,
+              ),
+            );
+        expect((await db.select(db.runs).get()).single.kind, RunKind.hike);
+        await db.close();
+        expect(schemaVersionOf(dbFile), 4);
       },
     );
   });

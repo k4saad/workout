@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:keller_twelve/data/db/database.dart';
 import 'package:keller_twelve/data/programme_repository.dart';
 
+import '../support/fake_terrain.dart';
 import '../support/screenshot.dart';
 import 'qa_harness.dart';
 
@@ -25,6 +26,8 @@ const routes = <(String, String)>[
   ('body', '/progress/body'),
   ('photos', '/progress/photos'),
   ('runs', '/progress/runs'),
+  ('hikes', '/progress/hikes'),
+  ('hike', '/progress/hikes/1'),
   ('lifts', '/progress/lifts'),
   ('more', '/more'),
   ('exercises', '/more/exercises'),
@@ -83,6 +86,7 @@ void main() {
         await tester.runAsync(
           () => Screenshot.seedHistory(db, repo: repo, today: today),
         );
+        if (name.startsWith('hike')) await tester.runAsync(() => seedHike(db));
         final app = QaApp(db: db, repo: repo, tmp: tmp);
         app.collect('$cfg $name');
         try {

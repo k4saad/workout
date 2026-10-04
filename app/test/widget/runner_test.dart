@@ -103,6 +103,8 @@ void main() {
     await open(tester, 'b-sun');
     expect(find.text('Easy run'), findsWidgets);
     expect(find.text('Run it with GPS'), findsOneWidget);
+    // Sunday is a run or a hike: either records the route.
+    expect(find.text('Hike it with GPS'), findsOneWidget);
     // The steppers stay, for a run with the phone left at home.
     expect(find.textContaining('Log it by hand'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -111,6 +113,7 @@ void main() {
   testWidgets('a lift has no GPS button', (tester) async {
     await open(tester, 'b-tue');
     expect(find.text('Run it with GPS'), findsNothing);
+    expect(find.text('Hike it with GPS'), findsNothing);
   });
 
   testWidgets('warnings block the work until acknowledged', (tester) async {

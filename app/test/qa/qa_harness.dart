@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:keller_twelve/app/run_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keller_twelve/app/providers.dart';
 import 'package:keller_twelve/app/router.dart';
@@ -16,6 +17,7 @@ import 'package:keller_twelve/data/notification_service.dart';
 import 'package:keller_twelve/data/preferences_service.dart';
 import 'package:keller_twelve/data/programme_repository.dart';
 
+import '../support/fake_terrain.dart';
 import '../support/screenshot.dart';
 
 /// The QA robot: the whole app, driven the way a thumb drives it, with
@@ -106,6 +108,9 @@ class QaApp {
               PreferencesService(documentsDir: tmp),
             ),
             notificationServiceProvider.overrideWithValue(QuietNotifications()),
+            // No network on a robot: the made-up hill, and no map tiles.
+            terrainSourceProvider.overrideWithValue(FakeTerrain()),
+            mapTilesEnabledProvider.overrideWithValue(false),
             ...overrides,
           ],
           child: MaterialApp.router(

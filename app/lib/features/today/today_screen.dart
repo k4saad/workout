@@ -11,6 +11,7 @@ import '../../app/run_providers.dart';
 import '../../app/session_providers.dart';
 import '../../app/settings_providers.dart';
 import '../../core/ui/ui.dart';
+import '../../data/db/tables.dart' show RunKind;
 import '../../domain/calendar/adherence.dart';
 import '../../domain/calendar/programme_calendar.dart';
 import '../../domain/content/quotes.dart';
@@ -22,6 +23,7 @@ import '../calendar/calendar_screen.dart';
 import '../calendar/day_sheet.dart';
 import '../common/widgets.dart';
 import '../progress/checkpoint_checklist.dart';
+import '../runs/live_run_screen.dart' show RunLaunch;
 import 'widgets/backup_nag.dart';
 import 'widgets/next_meal_card.dart';
 import 'widgets/upgrade_notice.dart';
@@ -215,15 +217,19 @@ class _OpenRunBanner extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final open = ref.watch(openRunProvider).asData?.value;
     if (open == null) return const SizedBox.shrink();
+    final hike = open.kind == RunKind.hike;
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: ToneBanner(
         tone: Tone.accent,
-        icon: Icons.route_rounded,
-        title: 'Run still open',
+        icon: hike ? Icons.hiking_rounded : Icons.route_rounded,
+        title: hike ? 'Hike still open' : 'Run still open',
         body: 'Pick it up where the trail stopped, or finish it.',
         onTap: () async {
-          await context.push<bool>('/track');
+          await context.push<bool>(
+            '/track',
+            extra: hike ? const RunLaunch.hike() : const RunLaunch(),
+          );
           ref.invalidate(openRunProvider);
         },
       ),

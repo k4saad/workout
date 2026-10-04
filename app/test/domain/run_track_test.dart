@@ -305,6 +305,60 @@ void main() {
       }
       expect(t.elevGainM, lessThan(1.5));
     });
+
+    /// Up 60 m over the first 200 s, then down 40 m over the next 200 s,
+    /// walking north at 1.2 m/s.
+    RunTrack hill() {
+      final t = RunTrack.hike();
+      for (var s = 0; s <= 400; s++) {
+        final alt = s <= 200 ? 100 + s * 0.3 : 160 - (s - 200) * 0.2;
+        t.add(fix(s * 1000, offset(origin, 1.2 * s, 0), altitude: alt));
+      }
+      return t;
+    }
+
+    test('the descent is counted like the climb', () {
+      final t = hill();
+      expect(t.elevGainM, closeTo(60, 4));
+      expect(t.elevLossM, closeTo(40, 4));
+    });
+
+    test('the highest and lowest points are kept', () {
+      final t = hill();
+      expect(t.maxAltM, closeTo(160, 3));
+      expect(t.minAltM, closeTo(100, 1));
+      expect(RunTrack().maxAltM, isNull, reason: 'no altimeter, no height');
+    });
+
+    test('the profile follows the hill, one point a bucket', () {
+      final t = hill();
+      final p = t.elevationProfile(bucketM: 50);
+      // 480 m walked: ten buckets.
+      expect(p.length, inInclusiveRange(9, 11));
+      for (var i = 1; i < p.length; i++) {
+        expect(p[i].distanceM, greaterThan(p[i - 1].distanceM));
+      }
+      final top = p.reduce((a, b) => a.altitudeM > b.altitudeM ? a : b);
+      expect(top.distanceM, closeTo(240, 60), reason: 'the summit at 200 s');
+      expect(p.first.altitudeM, lessThan(115));
+      expect(RunTrack().elevationProfile(), isEmpty);
+    });
+
+    test('a slow, steep climb is moving time, not an auto-pause', () {
+      // 0.5 m/s: a hard hill on foot. A run's tracker calls that stopped.
+      List<RunFix> slow() => [
+        for (var s = 0; s <= 120; s++)
+          fix(s * 1000, offset(origin, 0.5 * s, 0)),
+      ];
+      final hike = RunTrack.hike();
+      final run = RunTrack();
+      for (final f in slow()) {
+        hike.add(f);
+        run.add(f);
+      }
+      expect(hike.movingMs, greaterThan(100000));
+      expect(run.movingMs, lessThan(hike.movingMs));
+    });
   });
 
   group('the pace guide', () {
