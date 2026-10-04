@@ -397,203 +397,157 @@ WARN_COLLAR = {"title": "Collars on, checked mid-set",
 WARN_PAD = {"title": "Pad the hip thrust bar",
             "body": "Fold the green mat over the bar. A bare bar on the hip bones ends the set early."}
 
-f_mon = D("f-mon", "mon", "Full Body A", "lift", [
-    S("warmup", "Warm-up", drills=[
-        drill("rope-skipping", 1, "6 x 30 s on / 30 s off", "On the interlocking mats, never bare concrete."),
-        drill("broomstick-pass-through", 2, "x 10", "Wide grip, over the head and behind."),
-        drill("bodyweight-squat", 3, "x 15"),
-        drill("glute-bridge", 4, "x 15"),
-        drill("band-pull-apart", 5, "x 20", "Green band."),
-        drill("leg-swing", 6, "x 10 / side"),
-    ]),
+# ----------------------------------------------------------------------------
+# v4: a working student's week. Three full-body sessions of about half an
+# hour — Tuesday and Thursday evening, Saturday morning — and an optional
+# run or hike on Sunday. Monday (job, lectures and a German course from 07:00
+# to 19:45) and the days between are rest. docs/11-v4-plan.md.
+# ----------------------------------------------------------------------------
+def rest_day(did, weekday, note):
+    return D(did, weekday, "Rest", "rest", [], note=note)
+
+
+def sunday(did, *, optional=True, test=False):
+    """The Sunday: an easy run off the run table, or a hike, or nothing."""
+    if test:
+        main = [P(f"{did}-1", "five-k-time-trial", 1, 1, 5000, 5000, 0, "distance", None,
+                  unit="m", prog=NONE, subs=["easy-run"],
+                  note="If you feel like it: a flat measured 5K, even pacing. If not, a hike "
+                       "or a walk counts. Twelve weeks, logged either way.")]
+    else:
+        main = [P(f"{did}-1", "easy-run", 1, 1, *TABLE, 0, "timed", None, unit="sec",
+                  prog=CARD("long"), subs=["run-intervals"],
+                  note="Conversational pace — or swap it for a hike and record that instead. "
+                       "Optional: a week without it is still a good week.")]
+    return D(did, "sun", "5K, if you want it" if test else "Run or hike", "cardio", [
+        S("cardio", "Session", prescriptions=main),
+        S("cooldown", "Mobility", drills=[
+            drill("couch-stretch", 1, "45 s / side"),
+            drill("standing-hamstring-stretch", 2, "45 s / side"),
+        ]),
+    ], optional=optional, note="Outside, easy, for the heart and the head. Optional.")
+
+
+WARMUP_LOWER = [
+    drill("rope-skipping", 1, "2 min", "On the interlocking mats, never bare concrete."),
+    drill("leg-swing", 2, "x 10 / side"),
+    drill("bodyweight-squat", 3, "x 15"),
+    drill("glute-bridge", 4, "x 15"),
+]
+WARMUP_HINGE = [
+    drill("rope-skipping", 1, "2 min"),
+    drill("cat-cow", 2, "x 10"),
+    drill("bodyweight-good-morning", 3, "x 15"),
+    drill("band-pull-apart", 4, "x 20"),
+]
+WARMUP_UPPER = [
+    drill("rope-skipping", 1, "2 min"),
+    drill("band-pull-apart", 2, "x 20"),
+    drill("wall-slide", 3, "x 10"),
+    drill("dead-hang", 4, "2 x 20 s"),
+]
+
+# ============================================================================
+# FOUNDATION — weeks 1-4
+# ============================================================================
+f_mon = rest_day("f-mon", "mon", "Your long day: job, lectures, the German course. Nothing "
+                 "else. Eat your four meals.")
+
+f_tue = D("f-tue", "tue", "Full Body A", "lift", [
+    S("warmup", "Warm-up", drills=WARMUP_LOWER),
     S("main", "Main work", prescriptions=[
         # maxjump is wide in Foundation only: 10% of a 10 kg bar is 1 kg, which
         # would cap an empty-bar squat at +1 kg a week for all four weeks.
-        P("f-mon-1", "barbell-back-squat", 1, 3, 8, 8, 120, "barbell", BAR["barbell"], rir=None,
-          prog=DP(3.0, maxjump=0.35), subs=["goblet-squat", "dumbbell-squat"], ramp=True,
-          note="EMPTY BAR (10 kg) in week 1. No exceptions. Brace as if someone is about to "
-               "punch your stomach, then sit down and stand up."),
-        P("f-mon-2", "barbell-romanian-deadlift", 2, 3, 10, 10, 90, "barbell", 16.0, rir=None,
-          prog=DP(3.0, maxjump=0.30), subs=["dumbbell-romanian-deadlift", "barbell-good-morning"],
-          note="Same bar, add plates. The bar stays in contact with your legs the whole way down. "
-               "If it drifts forward, your lower back takes it."),
-        P("f-mon-3a", "push-up-handles", 3, 3, 8, 12, 0, "bodyweight", None, rir=3,
-          prog=REPS, subs=["incline-push-up", "dumbbell-floor-press", "dumbbell-bench-press"],
-          group="f-mon-ss1", creep=20,
-          note="Bodyweight on purpose, so the one dumbbell stays loaded through the whole "
-               "superset. If you can't get 8, put your hands on the bench and do them at an incline."),
-        P("f-mon-3b", "one-arm-dumbbell-row", 4, 3, 10, 10, 75, "dumbbellSingle", 7.0, rir=None,
-          prog=DP(1.0), subs=["chest-supported-dumbbell-row", "ring-row"], group="f-mon-ss1",
+        P("f-tue-1", "barbell-back-squat", 1, 3, 8, 8, 90, "barbell", BAR["barbell"], rir=None,
+          prog=DP(3.0, maxjump=0.35), subs=["goblet-squat", "dumbbell-squat",
+                                            "barbell-front-squat"], ramp=True,
+          note="EMPTY BAR (10 kg) in week 1. Brace as if someone is about to punch your stomach, "
+               "then sit down and stand up."),
+        P("f-tue-2a", "push-up-handles", 2, 3, 8, 12, 0, "bodyweight", None, rir=3,
+          prog=REPS, subs=["incline-push-up", "dumbbell-floor-press", "dumbbell-bench-press",
+                           "incline-dumbbell-press"], group="f-tue-ss1", creep=20,
+          note="If you can't get 8, put your hands on the bench and do them at an incline."),
+        P("f-tue-2b", "one-arm-dumbbell-row", 3, 3, 10, 10, 75, "dumbbellSingle", 7.0, rir=None,
+          prog=DP(1.0), subs=["chest-supported-dumbbell-row", "ring-row"], group="f-tue-ss1",
           uni=True, per_side=True,
           note="Pull to the hip pocket, not the armpit. One full second at the top."),
-        # The arms-and-delts superset (coach N1): low skill, RIR 3, nothing on
-        # it shares a plate with anything else, and the plank rides along so
-        # the day stays at ~45 minutes rather than 48.
-        P("f-mon-4", "plank", 5, 3, 30, 30, 0, "timed", None, unit="sec",
-          prog=TIME(5), subs=["dead-bug", "hollow-hold"], group="f-mon-ss2", creep=60,
-          note="The second your lower back sags, the set is over. Reset rather than holding a bad shape."),
-        P("f-mon-5a", "ez-bar-curl", 6, 3, 10, 12, 0, "ezBar", BAR["ezBar"], rir=3,
-          prog=DP(1.0), subs=["dumbbell-curl", "hammer-curl"], group="f-mon-ss2", creep=15,
-          note="The bare 7 kg EZ bar. Elbows pinned to the ribs, lower it over a slow count. "
-               "Easy on purpose: this is the habit, not the stimulus, for four weeks."),
-        P("f-mon-5b", "cable-face-pull", 7, 3, 15, 15, 60, "cable", None,
-          prog=BAND, subs=["band-face-pull", "band-pull-apart"], group="f-mon-ss2",
-          note="Wall cable, light. Elbows high and wide, hands rotating back at the end."),
+        P("f-tue-3", "plank", 4, 2, 30, 30, 30, "timed", None, unit="sec",
+          prog=TIME(5), subs=["dead-bug", "hollow-hold", "side-plank", "ab-wheel-knees",
+                              "hanging-knee-raise"], creep=60,
+          note="The second your lower back sags, the set is over."),
     ]),
     S("cooldown", "Cool-down", drills=[
         drill("couch-stretch", 1, "45 s / side"),
         drill("standing-hamstring-stretch", 2, "45 s / side"),
-        drill("doorway-chest-stretch", 3, "45 s / side"),
     ]),
-], note="Squat-led. Every load is deliberately light — you are rehearsing patterns, not testing "
-        "yourself. The four weeks you spend here are the four you don't lose to a tweaked back in week six.",
+], note="Squat-led, about half an hour. Light on purpose — you are learning the patterns.",
    warnings=[WARN_PINS_SQ, WARN_COLLAR])
 
-f_tue = D("f-tue", "tue", "Skip, Run & Core", "cardio", [
-    S("cardio", "Session", prescriptions=[
-        P("f-tue-1", "rope-skipping", 1, 6, 60, 60, 60, "timed", None, unit="sec", prog=TIME(15),
-          creep=180,
-          note="Skipping wrecks untrained calves and Achilles tendons, so we ramp it over four weeks."),
-        P("f-tue-2", "easy-run", 2, 1, *TABLE, 0, "timed", None, unit="sec", prog=CARD("second"),
-          subs=["run-intervals"],
-          note="Conversational pace. If you cannot speak a full sentence, you are going too fast."),
-        P("f-tue-3a", "dead-bug", 3, 3, 10, 10, 0, "bodyweight", None, prog=REPS,
-          group="f-tue-core", uni=True, per_side=True,
-          note="Three-round circuit with the side plank and hollow hold."),
-        P("f-tue-3b", "side-plank", 4, 3, 20, 20, 0, "timed", None, unit="sec", prog=TIME(5),
-          group="f-tue-core", uni=True, per_side=True, creep=45),
-        P("f-tue-3c", "hollow-hold", 5, 3, 20, 20, 45, "timed", None, unit="sec", prog=TIME(5),
-          group="f-tue-core", creep=45),
-    ]),
-], note="Easy means easy. This session exists for your heart and your calves, not to burn "
-        "calories — you need those.")
+f_wed = rest_day("f-wed", "wed", "Rest. A walk between lectures counts.")
 
-f_wed = D("f-wed", "wed", "Full Body B", "lift", [
-    S("warmup", "Warm-up", drills=[
-        drill("rope-skipping", 1, "2 min"),
-        drill("cat-cow", 2, "x 10"),
-        drill("glute-bridge", 3, "x 15"),
-        drill("bodyweight-good-morning", 4, "x 15"),
-        drill("band-pull-apart", 5, "x 20"),
-    ]),
+f_thu = D("f-thu", "thu", "Full Body B", "lift", [
+    S("warmup", "Warm-up", drills=WARMUP_HINGE),
     S("main", "Main work", prescriptions=[
         # +5 kg a week, not +10: the lift with the most spinal load, and no
         # coach watching. maxjump 0.50 lets the first jump off the bar happen.
-        P("f-wed-1", "barbell-deadlift", 1, 3, 5, 5, 150, "barbell", BAR["barbell"], rir=None,
-          prog=DP(5.0, maxjump=0.50), subs=["dumbbell-deadlift", "barbell-romanian-deadlift"],
+        P("f-thu-1", "barbell-deadlift", 1, 3, 5, 5, 105, "barbell", BAR["barbell"], rir=None,
+          prog=DP(5.0, maxjump=0.50), subs=["dumbbell-deadlift", "barbell-romanian-deadlift",
+                                            "single-leg-rdl", "barbell-hip-thrust"],
           ramp=True,
           note="EMPTY BAR (10 kg) from the blocks in week 1. Take the slack out of the bar "
                "before you pull — you should hear it click. Set it down and reset every rep."),
-        P("f-wed-2", "barbell-overhead-press", 2, 3, 8, 8, 105, "barbell", BAR["barbell"],
+        P("f-thu-2", "barbell-overhead-press", 2, 3, 8, 8, 90, "barbell", BAR["barbell"],
           rir=None, prog=DP(1.0, maxjump=0.15),
           subs=["dumbbell-overhead-press", "seated-dumbbell-press"],
-          note="Empty 10 kg bar in week 1. Ribs down, glutes and abs locked. Leaning back to "
-               "move the weight means it is too heavy."),
-        P("f-wed-3a", "ring-row", 3, 3, 8, 12, 0, "bodyweight", None, rir=3, prog=REPS,
-          subs=["one-arm-dumbbell-row", "chest-supported-dumbbell-row"], group="f-wed-ss1",
+          note="Empty 10 kg bar in week 1. Ribs down, glutes and abs locked."),
+        P("f-thu-3a", "ring-row", 3, 3, 8, 12, 0, "bodyweight", None, rir=3, prog=REPS,
+          subs=["one-arm-dumbbell-row", "chest-supported-dumbbell-row"], group="f-thu-ss1",
           creep=15,
-          note="The more horizontal your body, the harder it gets. Log your foot position so you "
-               "can repeat it."),
-        P("f-wed-3b", "goblet-squat", 4, 3, 10, 10, 75, "kettlebell", 8.0, prog=REPS,
-          subs=["dumbbell-squat", "barbell-back-squat"], group="f-wed-ss1", creep=15,
+          note="The more horizontal your body, the harder it gets. Log your foot position."),
+        P("f-thu-3b", "goblet-squat", 4, 3, 10, 10, 60, "kettlebell", 8.0, prog=REPS,
+          subs=["dumbbell-squat", "step-up", "walking-lunge"], group="f-thu-ss1", creep=15,
           tempo="3s eccentric",
-          note="One bell, so it progresses by reps: 10 up to 15, three seconds down every rep. "
-               "Depth is whatever you can hold without the lower back rounding."),
-        # The dead bug that was here is still trained on Tuesday.
-        P("f-wed-5a", "lateral-raise", 5, 3, 12, 15, 0, "dumbbellPair", BAR["dbHandle"], rir=3,
-          prog=DP(1.0), subs=["band-lateral-raise"], group="f-wed-ss2", tempo="3s eccentric",
-          creep=20,
-          note="The bare 2 kg handles. Lead with the elbows, stop at shoulder height. The "
-               "reps climb to 20 before the weight moves."),
-        P("f-wed-5b", "cable-triceps-pushdown", 6, 3, 12, 15, 60, "cable", None,
-          prog=BAND, subs=["ez-bar-skullcrusher", "overhead-dumbbell-extension"],
-          group="f-wed-ss2",
-          note="Wall cable, light. Elbows pinned to the ribs, squeeze at the bottom."),
+          note="One bell, so it progresses by reps: 10 up to 15, three seconds down every rep."),
     ]),
     S("cooldown", "Cool-down", drills=[
         drill("ninety-ninety-hip-switch", 1, "10 / side"),
-        drill("thoracic-rotation", 2, "10 / side"),
-        drill("standing-hamstring-stretch", 3, "45 s / side"),
+        drill("standing-hamstring-stretch", 2, "45 s / side"),
     ]),
-], note="Hinge-led, and the day that teaches you the deadlift and the overhead press — the two "
-        "lifts a beginner is most often thrown into cold.",
+], note="Hinge-led: the deadlift and the overhead press, then a quick pull-and-squat superset.",
    warnings=[WARN_BAR_HT, WARN_CEIL, WARN_COLLAR])
 
-f_thu = D("f-thu", "thu", "Rest", "rest", [],
-          note="A real rest day. Eat your full target, get eight hours, walk if you feel like "
-               "moving. Muscle is built on the days you don't train — the session only sends the signal.")
+f_fri = rest_day("f-fri", "fri", "Rest. Jumu'ah, the study project, home.")
 
-f_fri = D("f-fri", "fri", "Full Body C", "lift", [
-    S("warmup", "Warm-up", drills=[
-        drill("rope-skipping", 1, "2 min"),
-        drill("band-pull-apart", 2, "x 20"),
-        drill("wall-slide", 3, "x 10"),
-        drill("push-up-handles", 4, "x 10"),
-        drill("dead-hang", 5, "2 x 20 s"),
-    ]),
+f_sat = D("f-sat", "sat", "Full Body C", "lift", [
+    S("warmup", "Warm-up", drills=WARMUP_UPPER),
     S("main", "Main work", prescriptions=[
-        P("f-fri-1", "barbell-bench-press", 1, 3, 8, 8, 120, "barbell", BAR["barbell"], rir=None,
+        P("f-sat-1", "barbell-bench-press", 1, 3, 8, 8, 90, "barbell", BAR["barbell"], rir=None,
           prog=DP(2.0, maxjump=0.25), subs=["dumbbell-floor-press", "dumbbell-bench-press"],
           ramp=True,
           note="Empty 10 kg bar in week 1. Feet flat, shoulder blades pinched back and down, bar "
-               "to the lower chest, elbows at 45-60 degrees."),
-        P("f-fri-2", "barbell-bent-over-row", 2, 3, 8, 8, 105, "barbell", BAR["barbell"],
+               "to the lower chest."),
+        P("f-sat-2", "barbell-bent-over-row", 2, 3, 8, 8, 90, "barbell", BAR["barbell"],
           rir=None, prog=DP(2.0, maxjump=0.25),
           subs=["one-arm-dumbbell-row", "chest-supported-dumbbell-row"],
-          note="Same bar as the bench. Pull to the navel. If your torso rises with every rep, the "
-               "weight is winning."),
-        P("f-fri-3a", "pull-up-negative", 3, 3, 4, 4, 0, "bodyweight", None, prog=REPS,
-          subs=["pull-up-assisted", "ring-row"], group="f-fri-ss1", tempo="5s eccentric",
-          note="Step or jump to the top, then fight the way down for a full five seconds. This is "
-               "the fastest route to your first strict pull-up."),
-        P("f-fri-3b", "bulgarian-split-squat", 4, 3, 8, 8, 75, "bodyweight", None, rir=3,
-          prog=REPS, subs=["split-squat", "reverse-lunge"], group="f-fri-ss1",
+          note="Same bar as the bench. Pull to the navel."),
+        P("f-sat-3a", "pull-up-negative", 3, 3, 4, 4, 0, "bodyweight", None, prog=REPS,
+          subs=["pull-up-assisted", "ring-row", "pull-up"], group="f-sat-ss1",
+          tempo="5s eccentric",
+          note="Step to the top, then fight the way down for five seconds. The road to your "
+               "first pull-up."),
+        P("f-sat-3b", "bulgarian-split-squat", 4, 3, 8, 8, 75, "bodyweight", None, rir=3,
+          prog=REPS, subs=["split-squat", "reverse-lunge", "step-up"], group="f-sat-ss1",
           uni=True, per_side=True, creep=12,
-          note="Bodyweight only for four weeks. Brutal for a bodyweight movement — that is "
-               "normal, don't add load."),
-        P("f-fri-4", "ab-wheel-knees", 5, 2, 6, 6, 60, "bodyweight", None, prog=REPS,
-          subs=["plank", "hollow-hold"], creep=10,
-          note="Partial range. If your back arches at all, swap for a 3 x 40 s plank until week 3."),
-        P("f-fri-5a", "lateral-raise", 6, 3, 12, 15, 0, "dumbbellPair", BAR["dbHandle"], rir=3,
-          prog=DP(1.0), subs=["band-lateral-raise"], group="f-fri-ss2", tempo="3s eccentric",
-          creep=20,
-          note="The bare 2 kg handles again. Side delts are what make shoulders look wider on a "
-               "light frame, and pressing barely touches them. Only direct work grows them."),
-        P("f-fri-5b", "cable-triceps-pushdown", 7, 3, 12, 15, 60, "cable", None,
-          prog=BAND, subs=["ez-bar-skullcrusher", "overhead-dumbbell-extension"],
-          group="f-fri-ss2",
-          note="Wall cable — no plate change inside the superset. Elbows pinned to the ribs."),
+          note="Bodyweight only for four weeks. Harder than it looks."),
     ]),
     S("cooldown", "Cool-down", drills=[
         drill("doorway-chest-stretch", 1, "45 s / side"),
         drill("couch-stretch", 2, "45 s / side"),
     ]),
-], note="Press-led, plus the first work towards a pull-up. You will not get a pull-up by trying "
-        "pull-ups — you get it by lowering yourself slowly, over and over.",
+], note="Press-led, plus the first work towards a pull-up. Saturday morning, then the weekend.",
    warnings=[WARN_PINS_BN, WARN_COLLAR])
 
-f_sat = D("f-sat", "sat", "Rest", "rest", [],
-          note="Off. Cook something big — Saturday is the easiest day of the week to bank a "
-               "3,000 kcal day, and a good week of eating covers a mediocre week of training.")
-
-f_sun = D("f-sun", "sun", "Easy Run & Mobility", "cardio", [
-    S("cardio", "Session", prescriptions=[
-        P("f-sun-1", "easy-run", 1, 1, *TABLE, 0, "timed", None, unit="sec", prog=CARD("long"),
-          subs=["run-intervals"], note="The longer of your two runs. Same conversational pace."),
-        P("f-sun-2", "rope-skipping", 2, 3, 60, 60, 60, "timed", None, unit="sec", prog=TIME(15),
-          creep=180),
-        P("f-sun-3", "dead-hang", 3, 3, 20, 20, 45, "timed", None, unit="sec", prog=TIME(5), creep=60,
-          note="From the rings or the wall bar. Relax into it — this decompresses everything the "
-               "squats and rows compressed all week."),
-    ]),
-    S("cooldown", "Mobility", drills=[
-        drill("ninety-ninety-hip-switch", 1, "10 / side"),
-        drill("couch-stretch", 2, "45 s / side"),
-        drill("thoracic-rotation", 3, "10 / side"),
-        drill("standing-hamstring-stretch", 4, "45 s / side"),
-        drill("cat-cow", 5, "x 10"),
-    ]),
-])
+f_sun = sunday("f-sun")
 
 FOUNDATION_DAYS = [f_mon, f_tue, f_wed, f_thu, f_fri, f_sat, f_sun]
 
@@ -612,10 +566,7 @@ def pres(days, pid):
 # ============================================================================
 # The main lifts' week-5 loads are not typed: each is one earned session on
 # from its week-4 Foundation log, using the Build progression below.
-# maxjump 0.15 so a 2 kg jump on a ~20 kg bar is allowed; at 10% it was capped
-# to 0.5 kg steps and every barbell lift stalled near 17 kg by week 11.
 PROG_SQUAT = DP(2.0, maxjump=0.15)
-PROG_RDL = DP(2.0, maxjump=0.15)
 PROG_BENCH = DP(1.0)
 PROG_ROW = DP(2.0, maxjump=0.15)
 PROG_DEADLIFT = DP(5.0, maxjump=0.20)
@@ -624,250 +575,95 @@ PROG_OHP = DP(1.0)
 
 def from_week4(pid, prog, rmin, rmax, creep):
     return handoff(pres(FOUNDATION_DAYS, pid), prog, rmin, rmax, creep)
-b_mon = D("b-mon", "mon", "Lower A · Squat", "lift", [
-    S("warmup", "Warm-up", drills=[
-        drill("rope-skipping", 1, "3 min"),
-        drill("leg-swing", 2, "x 10 / side"),
-        drill("bodyweight-squat", 3, "x 15"),
-        drill("glute-bridge", 4, "x 15"),
-    ]),
+
+
+b_mon = rest_day("b-mon", "mon", "Rest. Your long day: work, lectures, the German "
+                 "course. Eat your four meals and sleep.")
+
+b_tue = D("b-tue", "tue", "Full Body A · Squat", "lift", [
+    S("warmup", "Warm-up", drills=WARMUP_LOWER),
     S("main", "Main work", prescriptions=[
-        P("b-mon-1", "barbell-back-squat", 1, 4, 5, 5, 150, "barbell",
-          from_week4("f-mon-1", PROG_SQUAT, 5, 5, 7), ramp=True,
-          prog=PROG_SQUAT, subs=["barbell-front-squat", "goblet-squat"], creep=7,
-          note="The most important set of your week. Drive the whole foot through the floor coming "
-               "up — don't let the hips shoot up first."),
-        P("b-mon-2", "barbell-romanian-deadlift", 2, 3, 8, 8, 120, "barbell",
-          from_week4("f-mon-2", PROG_RDL, 8, 8, 12), rir=None,
-          prog=PROG_RDL, subs=["dumbbell-romanian-deadlift", "barbell-good-morning",
-                               "single-leg-rdl"], creep=12,
-          note="Same bar: one plate change up to the RDL weight. Squeeze the glutes to stand up "
-               "rather than pulling with the lower back."),
-        P("b-mon-3a", "bulgarian-split-squat", 3, 3, 8, 8, 0, "dumbbellPair", 6.0, rir=None,
-          prog=DP(1.0), subs=["reverse-lunge", "split-squat", "step-up", "walking-lunge"],
-          group="b-mon-ss1", uni=True, per_side=True, creep=12,
-          note="Torso slightly forward loads the glute, upright loads the quad. Pick one and stay "
-               "consistent."),
-        P("b-mon-3b", "single-leg-calf-raise", 4, 3, 15, 15, 75, "bodyweight", None, rir=1,
-          prog=REPS, subs=["standing-calf-raise"], group="b-mon-ss1",
-          uni=True, per_side=True, creep=25,
-          note="On the edge of the step platform. Bodyweight on purpose — no plate change inside "
-               "the superset. Full stretch at the bottom, 2-second squeeze at the top."),
-        P("b-mon-4a", "hanging-knee-raise", 5, 3, 8, 12, 0, "bodyweight", None, rir=1,
-          prog=REPS, subs=["dead-bug", "hollow-hold"], group="b-mon-ss2", creep=18,
-          note="No swinging. Curl the pelvis up towards the ribs, don't just lift the thighs."),
-        P("b-mon-4b", "pull-up-negative", 6, 3, 3, 3, 0, "bodyweight", None,
-          prog=REPS, subs=["pull-up-assisted", "ring-row"], group="b-mon-ss2",
-          tempo="5s eccentric", creep=6,
-          note="You are already hanging on the bar, so this costs you almost nothing. A second "
-               "vertical-pull exposure in the week is what buys you your first strict pull-up."),
-        P("b-mon-4c", "lateral-raise", 7, 3, 12, 15, 60, "dumbbellPair", BAR["dbHandle"], rir=1,
-          prog=DP(1.0), subs=["band-lateral-raise"], group="b-mon-ss2", tempo="3s eccentric",
-          creep=20,
-          note="Bare 2 kg handles to start: strip the split-squat dumbbells once, before this "
-               "superset, never inside it. Lead with the elbows, stop at shoulder height."),
+        P("b-tue-1", "barbell-back-squat", 1, 3, 6, 6, 105, "barbell",
+          from_week4("f-tue-1", PROG_SQUAT, 6, 6, 8), ramp=True,
+          prog=PROG_SQUAT, subs=["barbell-front-squat", "goblet-squat"], creep=8,
+          note="Drive the whole foot through the floor coming up — don't let the hips shoot "
+               "up first."),
+        P("b-tue-2a", "incline-dumbbell-press", 2, 3, 10, 10, 0, "dumbbellPair", 7.0, rir=None,
+          prog=DP(1.0), subs=["push-up-handles", "dumbbell-bench-press"], group="b-tue-ss1",
+          creep=14, note="Bench at its lower incline notch, roughly 30 degrees."),
+        P("b-tue-2b", "chest-supported-dumbbell-row", 3, 3, 10, 10, 75, "dumbbellPair", 7.0,
+          rir=None, prog=DP(1.0), subs=["one-arm-dumbbell-row", "ring-row"],
+          group="b-tue-ss1", creep=14,
+          note="Same dumbbells as the press: no re-plate inside the superset."),
+        P("b-tue-3", "hanging-knee-raise", 4, 2, 8, 12, 45, "bodyweight", None, rir=1,
+          prog=REPS, subs=["dead-bug", "hollow-hold", "plank"], creep=18,
+          note="No swinging. Curl the pelvis up towards the ribs."),
     ]),
     S("cooldown", "Cool-down", drills=[
         drill("couch-stretch", 1, "45 s / side"),
         drill("ninety-ninety-hip-switch", 2, "10 / side"),
     ]),
-], note="Quads, glutes and the whole brace. If you only ever do one thing properly, make it this squat.",
+], note="Squat-led. The most important set of your week is the first one.",
    warnings=[WARN_PINS_SQ, WARN_COLLAR])
 
-b_tue = D("b-tue", "tue", "Upper A · Bench-led", "lift", [
-    S("warmup", "Warm-up", drills=[
-        drill("rope-skipping", 1, "3 min"),
-        drill("band-pull-apart", 2, "2 x 20"),
-        drill("wall-slide", 3, "x 10"),
-        drill("push-up-handles", 4, "x 10"),
-    ]),
-    S("main", "Main work", prescriptions=[
-        P("b-tue-1", "barbell-bench-press", 1, 4, 6, 6, 150, "barbell",
-          from_week4("f-fri-1", PROG_BENCH, 6, 6, 10), ramp=True,
-          prog=PROG_BENCH, subs=["dumbbell-bench-press", "dumbbell-floor-press"], creep=10,
-          note="Bar to the lower chest, elbows at 45-60 degrees, drive up and slightly towards "
-               "your face. Pins at chest height."),
-        P("b-tue-2", "barbell-bent-over-row", 2, 4, 8, 8, 120, "barbell",
-          from_week4("f-fri-2", PROG_ROW, 8, 8, 12), rir=None,
-          prog=PROG_ROW, subs=["one-arm-dumbbell-row", "chest-supported-dumbbell-row"], creep=12,
-          note="Same bar as the bench. This is the row v1 left out of push day — your shoulders "
-               "need it on the same day you press."),
-        P("b-tue-3a", "incline-dumbbell-press", 3, 3, 10, 10, 0, "dumbbellPair", 7.0, rir=None,
-          prog=DP(1.0), subs=["dumbbell-bench-press"], group="b-tue-ss1", creep=14,
-          note="Bench at its lower incline notch, roughly 30 degrees."),
-        P("b-tue-3b", "cable-face-pull", 4, 3, 15, 15, 60, "cable", None, rir=None,
-          prog=BAND, subs=["band-face-pull", "band-pull-apart"], group="b-tue-ss1",
-          note="Use the wall cable — no plate change inside the superset. Elbows high and wide, "
-               "rotating the hands back. The insurance policy on every press you do."),
-        P("b-tue-4a", "ez-bar-curl", 5, 3, 10, 10, 0, "ezBar", 8.0, rir=1,
-          prog=DP(1.0), subs=["dumbbell-curl", "hammer-curl"], group="b-tue-ss2",
-          tempo="3s eccentric", creep=14,
-          note="Elbows pinned to the ribs. Lower over 3 seconds — the negative is where the arm grows."),
-        P("b-tue-4b", "lateral-raise", 6, 3, 12, 15, 0, "dumbbellPair", BAR["dbHandle"], rir=1,
-          prog=DP(1.0), subs=["band-lateral-raise"], group="b-tue-ss2", tempo="3s eccentric",
-          creep=20,
-          note="Starts on the bare 2 kg handles; the reps climb to 20 before the weight moves. "
-               "Lead with the elbows. There is no such thing as a heavy lateral raise."),
-        P("b-tue-4c", "cable-triceps-pushdown", 7, 3, 12, 15, 45, "cable", None, rir=1,
-          prog=BAND, subs=["ez-bar-skullcrusher", "overhead-dumbbell-extension"],
-          group="b-tue-ss2",
-          note="Wall cable — no plate change inside the superset. Elbows pinned to the ribs; "
-               "the second triceps exposure of the week."),
-    ]),
-    S("cooldown", "Cool-down", drills=[
-        drill("doorway-chest-stretch", 1, "45 s / side"),
-        drill("thoracic-rotation", 2, "10 / side"),
-    ]),
-], note="Seven pressing sets and seven pulling sets on the compounds, then arms and side delts. "
-        "Every upper day in this programme pulls as much as it presses.",
-   warnings=[WARN_PINS_BN, WARN_COLLAR])
+b_wed = rest_day("b-wed", "wed", "Complete rest. A walk between lectures counts; "
+                 "nothing else is asked of you today.")
 
-b_wed = D("b-wed", "wed", "Easy Run or Nothing", "cardio", [
-    S("cardio", "Session", prescriptions=[
-        P("b-wed-1", "easy-run", 1, 1, *TABLE, 0, "timed", None, unit="sec", prog=CARD("second"),
-          note="Zone 2. If you cannot breathe through your nose, you are going too fast."),
-    ]),
-    S("cooldown", "Mobility", drills=[
-        drill("ninety-ninety-hip-switch", 1, "10 / side"),
-        drill("thoracic-rotation", 2, "10 / side"),
-        drill("couch-stretch", 3, "45 s / side"),
-    ]),
-], optional=True,
-   note="Genuinely optional. Take it if you slept well and ate enough; skip it without guilt if "
-        "you are sore, behind on food, or the week is heavy. At your bodyweight, extra cardio is "
-        "a cost, not a bonus.")
-
-b_thu = D("b-thu", "thu", "Lower B · Deadlift", "lift", [
-    S("warmup", "Warm-up", drills=[
-        drill("rope-skipping", 1, "3 min"),
-        drill("cat-cow", 2, "x 10"),
-        drill("glute-bridge", 3, "x 20"),
-        drill("bodyweight-good-morning", 4, "x 15"),
-    ]),
+b_thu = D("b-thu", "thu", "Full Body B · Deadlift", "lift", [
+    S("warmup", "Warm-up", drills=WARMUP_HINGE),
     S("main", "Main work", prescriptions=[
-        P("b-thu-1", "barbell-deadlift", 1, 3, 5, 5, 180, "barbell",
-          from_week4("f-wed-1", PROG_DEADLIFT, 5, 5, 6), ramp=True,
-          prog=PROG_DEADLIFT, subs=["barbell-romanian-deadlift", "dumbbell-deadlift"], creep=6,
-          note="Three sets, not four — this is the highest-fatigue lift you own. Set it down and "
-               "reset every rep. Never to failure."),
-        # No Foundation history: these two cold-start from their own loads.
-        P("b-thu-2", "barbell-front-squat", 2, 3, 8, 8, 120, "barbell", 16.0, rir=None,
-          prog=DP(2.0, maxjump=0.15), subs=["goblet-squat", "barbell-back-squat"], creep=12,
-          note="Your second squat exposure of the week. Elbows high, torso vertical. On a thin "
-               "30 mm bar a cross-arm grip is kinder to the wrists; swap to a goblet squat if they "
-               "still complain."),
-        P("b-thu-3a", "barbell-hip-thrust", 3, 3, 10, 10, 0, "barbell", 24.0, rir=None,
-          prog=DP(2.0, maxjump=0.15), subs=["dumbbell-hip-thrust", "glute-bridge"],
-          group="b-thu-ss1", tempo="1s pause top", creep=15,
-          note="Brace the bench against a wall first. Small plates sit the bar low, so lift it "
-               "over your thighs rather than rolling it. Squeeze hard at the top for a full "
-               "second; ribs stay down."),
-        P("b-thu-3b", "single-leg-calf-raise", 4, 3, 20, 20, 60, "bodyweight", None, rir=1,
-          prog=REPS, subs=["standing-calf-raise"], group="b-thu-ss1",
-          uni=True, per_side=True, creep=30,
-          note="Higher reps than Monday, same quality. No bouncing."),
-        # Knee-flexion hamstring work replaces the suitcase carry (coach M8):
-        # hamstrings were at 4.5 sets a week until week 9. The id b-thu-4 is
-        # kept on purpose; history is keyed on (prescription, exercise), so the
-        # old carry logs cannot leak into the curl. Push swaps in nordics.
-        P("b-thu-4", "ring-hamstring-curl", 5, 3, 8, 12, 75, "bodyweight", None,
-          prog=REPS, subs=["slider-hamstring-curl", "nordic-curl-negative"], creep=15,
-          tempo="3s eccentric",
-          note="Rings low, about 20 cm off the floor. Hips up and stay up; curl the heels in, "
-               "straighten slowly. No rings? The slider curl, heels on a towel on bare floor, "
-               "not the mats."),
+        P("b-thu-1", "barbell-deadlift", 1, 3, 5, 5, 120, "barbell",
+          from_week4("f-thu-1", PROG_DEADLIFT, 5, 5, 6), ramp=True,
+          prog=PROG_DEADLIFT, subs=["barbell-romanian-deadlift", "dumbbell-deadlift"],
+          creep=6,
+          note="Same setup every rep: bar over mid-foot, shins to the bar, chest up, pull."),
+        P("b-thu-2", "barbell-overhead-press", 2, 3, 6, 6, 90, "barbell",
+          from_week4("f-thu-2", PROG_OHP, 6, 6, 8), prog=PROG_OHP,
+          subs=["dumbbell-overhead-press", "seated-dumbbell-press"], creep=8,
+          note="Ribs down. If you lean back to move it, it is too heavy."),
+        P("b-thu-3a", "pull-up-negative", 3, 3, 4, 4, 0, "bodyweight", None, prog=REPS,
+          subs=["pull-up-assisted", "ring-row"], group="b-thu-ss1", tempo="5s eccentric",
+          creep=6, note="A second vertical pull in the week buys the first strict pull-up."),
+        P("b-thu-3b", "goblet-squat", 4, 3, 12, 12, 60, "kettlebell", 8.0, prog=REPS,
+          subs=["dumbbell-squat", "step-up"], group="b-thu-ss1", creep=15,
+          tempo="3s eccentric"),
     ]),
     S("cooldown", "Cool-down", drills=[
         drill("standing-hamstring-stretch", 1, "45 s / side"),
         drill("cat-cow", 2, "x 10"),
     ]),
-], note="Deadlift day. The heaviest thing you lift all week and the lift with the least margin "
-        "for sloppy technique. Five reps, never more, never to failure.",
-   warnings=[WARN_BAR_HT, WARN_PAD, WARN_COLLAR])
+], note="Hinge and press. Short, heavy-ish, done.",
+   warnings=[WARN_BAR_HT, WARN_CEIL, WARN_COLLAR])
 
-b_fri = D("b-fri", "fri", "Upper B · Press-led", "lift", [
-    S("warmup", "Warm-up", drills=[
-        drill("rope-skipping", 1, "3 min"),
-        drill("band-pull-apart", 2, "2 x 20"),
-        drill("wall-slide", 3, "x 10"),
-        drill("dead-hang", 4, "2 x 20 s"),
-    ]),
+b_fri = rest_day("b-fri", "fri", "Rest. Jumu'ah, the study project, home. Tomorrow "
+                 "morning is a session: get to bed.")
+
+b_sat = D("b-sat", "sat", "Full Body C · Bench", "lift", [
+    S("warmup", "Warm-up", drills=WARMUP_UPPER),
     S("main", "Main work", prescriptions=[
-        P("b-fri-1", "barbell-overhead-press", 1, 4, 6, 6, 150, "barbell",
-          from_week4("f-wed-2", PROG_OHP, 6, 6, 10), ramp=True,
-          prog=PROG_OHP, subs=["dumbbell-overhead-press", "seated-dumbbell-press"], creep=10,
-          note="Glutes and abs locked. Head moves back, then through, as the bar passes. Leaning "
-               "back to move it means it is too heavy."),
-        P("b-fri-2", "pull-up-assisted", 2, 4, 3, 8, 120, "banded", None, rir=1,
-          prog=BAND, subs=["pull-up", "pull-up-negative", "ring-row"],
-          note="Always stop one rep before failure. When you get 8 assisted, move to a thinner "
-               "band. Log the band colour in the set note."),
-        P("b-fri-3a", "dumbbell-bench-press", 3, 3, 10, 10, 0, "dumbbellPair", 8.0, rir=None,
-          prog=DP(1.0), subs=["dumbbell-floor-press", "incline-dumbbell-press"],
-          group="b-fri-ss1", creep=14),
-        P("b-fri-3b", "ring-row", 4, 3, 10, 12, 60, "bodyweight", None, prog=REPS,
-          subs=["chest-supported-dumbbell-row", "one-arm-dumbbell-row"], group="b-fri-ss1",
-          creep=16,
-          note="Bodyweight, so the dumbbells stay loaded through the whole superset. Walk your "
-               "feet forward to make it harder."),
-        P("b-fri-4a", "hammer-curl", 5, 3, 12, 12, 0, "dumbbellPair", 5.0, rir=1,
-          prog=DP(1.0), subs=["dumbbell-curl", "ez-bar-curl"], group="b-fri-ss2", creep=16,
-          note="Neutral grip, thumbs up. Hits the brachialis, which pushes the arm wider."),
-        P("b-fri-4b", "cable-triceps-pushdown", 6, 3, 12, 15, 45, "cable", None, rir=1,
-          prog=BAND, subs=["ez-bar-skullcrusher", "overhead-dumbbell-extension", "bench-dip", "ring-dip"],
-          group="b-fri-ss2",
-          note="Wall cable — no plate change inside the superset. Elbows pinned to the ribs."),
-    ]),
-    S("cooldown", "Cool-down", drills=[
-        drill("dead-hang", 1, "30 s"),
-        drill("doorway-chest-stretch", 2, "45 s / side"),
-    ]),
-], note="10 pressing sets and 10 pulling sets again. Back and biceps are what make a physique "
-        "read as trained, and they are what beginners skimp on.",
-   warnings=[WARN_CEIL, WARN_COLLAR])
-
-b_sat = D("b-sat", "sat", "Rest", "rest", [],
-          note="Complete rest after four lifting days. Cook, sleep in, meal-prep for the week. "
-               "If you are twitchy, a 30-minute walk is all you get.")
-
-# The long run grows from 24 to 35 minutes across weeks 5-11 (the cardio
-# table), and this day is costed at its longest week. To fit 60 minutes with
-# strides added, the Sunday fast-skipping intervals are gone: the strides are
-# the fast work now, and the calves already skip 3 minutes before every lift.
-b_sun = D("b-sun", "sun", "Run, Bag & Core", "cardio", [
-    S("cardio", "Run", prescriptions=[
-        P("b-sun-1", "easy-run", 1, 1, *TABLE, 0, "timed", None, unit="sec", prog=CARD("long"),
-          subs=["run-intervals"],
-          note="Your long run, 48 hours clear of Thursday's deadlifts and a full day before "
-               "Monday's squat. Easy pace, by time not distance. Straight after it, while you are "
-               "warm: four relaxed 15-second strides, walking back between them."),
-    ]),
-    S("cardio", "Strides, bag & core", drills=[
-        drill("running-strides", 1, "4 x 15 s, walk back",
-              "Quick and tall, about 80% effort, never a sprint. Skip them in the deload week."),
-    ], prescriptions=[
-        P("b-sun-3", "heavy-bag-rounds", 3, 3, 120, 120, 60, "timed", None, unit="sec", prog=NONE,
-          subs=["rope-skipping"],
-          note="Wraps or gloves on, always. Straight punches, move your feet, breathe out on every "
-               "shot. This lives on Sunday, not on lifting days — that is where v1's 77-minute "
-               "sessions came from."),
-        P("b-sun-4a", "ab-wheel-knees", 4, 3, 8, 8, 0, "bodyweight", None, rir=1, prog=REPS,
-          subs=["plank"], group="b-sun-core", creep=14),
-        P("b-sun-4b", "hollow-hold", 5, 3, 30, 30, 0, "timed", None, unit="sec", prog=TIME(5),
-          subs=["dead-bug"], group="b-sun-core", creep=60),
-        # suitcase-carry and farmers-walk stay reachable (V10) as anti-lean
-        # alternatives to the side plank now that Thursday's carry is gone.
-        P("b-sun-4c", "side-plank", 6, 3, 30, 30, 45, "timed", None, unit="sec", prog=TIME(5),
-          subs=["plank", "suitcase-carry", "farmers-walk"], group="b-sun-core",
+        P("b-sat-1", "barbell-bench-press", 1, 3, 6, 6, 105, "barbell",
+          from_week4("f-sat-1", PROG_BENCH, 6, 6, 10), ramp=True,
+          prog=PROG_BENCH, subs=["dumbbell-bench-press", "dumbbell-floor-press"], creep=10,
+          note="Bar to the lower chest, elbows at 45-60 degrees. Pins at chest height."),
+        P("b-sat-2", "barbell-bent-over-row", 2, 3, 8, 8, 90, "barbell",
+          from_week4("f-sat-2", PROG_ROW, 8, 8, 12), prog=PROG_ROW,
+          subs=["one-arm-dumbbell-row", "chest-supported-dumbbell-row"], creep=12,
+          note="Same bar as the bench. Your shoulders need the row on the day you press."),
+        P("b-sat-3a", "bulgarian-split-squat", 3, 3, 8, 8, 0, "dumbbellPair", 6.0, rir=None,
+          prog=DP(1.0), subs=["reverse-lunge", "split-squat", "step-up", "walking-lunge"],
+          group="b-sat-ss1", uni=True, per_side=True, creep=12),
+        P("b-sat-3b", "side-plank", 4, 3, 30, 30, 60, "timed", None, unit="sec",
+          prog=TIME(5), subs=["plank", "suitcase-carry", "farmers-walk"], group="b-sat-ss1",
           uni=True, per_side=True, creep=60),
     ]),
-    S("cooldown", "Stretch", drills=[
-        drill("couch-stretch", 1, "45 s / side"),
-        drill("ninety-ninety-hip-switch", 2, "10 / side"),
-        drill("standing-hamstring-stretch", 3, "45 s / side"),
-        drill("thoracic-rotation", 4, "10 / side"),
+    S("cooldown", "Cool-down", drills=[
+        drill("doorway-chest-stretch", 1, "45 s / side"),
+        drill("thoracic-rotation", 2, "10 / side"),
     ]),
-])
+], note="Press and pull, then legs and trunk. The weekend starts after it.",
+   warnings=[WARN_PINS_BN, WARN_COLLAR])
+
+b_sun = sunday("b-sun")
 
 BUILD_DAYS = [b_mon, b_tue, b_wed, b_thu, b_fri, b_sat, b_sun]
 
@@ -876,14 +672,11 @@ BUILD_DAYS = [b_mon, b_tue, b_wed, b_thu, b_fri, b_sat, b_sun]
 # test loads and strengthTargets come from here.
 # ----------------------------------------------------------------------------
 LIFTS = [  # exercise, Foundation id, Build id, 5RM-tested in week 12
-    ("barbell-back-squat",        "f-mon-1", "b-mon-1",  True),
-    ("barbell-deadlift",          "f-wed-1", "b-thu-1",  True),
-    ("barbell-bench-press",       "f-fri-1", "b-tue-1",  True),
-    ("barbell-overhead-press",    "f-wed-2", "b-fri-1",  True),
-    ("barbell-bent-over-row",     "f-fri-2", "b-tue-2",  True),
-    ("barbell-romanian-deadlift", "f-mon-2", "b-mon-2",  False),
-    ("barbell-front-squat",       None,      "b-thu-2",  False),
-    ("barbell-hip-thrust",        None,      "b-thu-3a", False),
+    ("barbell-back-squat",     "f-tue-1", "b-tue-1", True),
+    ("barbell-deadlift",       "f-thu-1", "b-thu-1", True),
+    ("barbell-bench-press",    "f-sat-1", "b-sat-1", True),
+    ("barbell-overhead-press", "f-thu-2", "b-thu-2", True),
+    ("barbell-bent-over-row",  "f-sat-2", "b-sat-2", True),
 ]
 PROJECTION = {}
 for _ex, _fp, _bp, _ in LIFTS:
@@ -901,104 +694,47 @@ TEST_NOTE = ("Work up in singles and doubles to one hard set of 5. HARD means th
              "but the bar still moves and the shape holds. NOT a failed rep, NOT a maximal single "
              "— you train alone. The number below is the target; beat it if it is there.")
 
-t_mon = D("t-mon", "mon", "Test · Squat", "lift", [
-    S("warmup", "Warm-up", drills=[
-        drill("rope-skipping", 1, "3 min"),
-        drill("leg-swing", 2, "x 10 / side"),
-        drill("bodyweight-squat", 3, "x 15"),
-        drill("glute-bridge", 4, "x 15"),
-    ]),
+t_mon = rest_day("t-mon", "mon", "Test week. Rest today.")
+
+t_tue = D("t-tue", "tue", "Test · Squat & Row", "lift", [
+    S("warmup", "Warm-up", drills=WARMUP_LOWER),
     S("main", "Test", prescriptions=[
-        P("t-mon-1", "barbell-back-squat", 1, 1, 5, 5, 300, "barbell",
-          TARGET_5RM["barbell-back-squat"], rir=0, ramp=True,
-          prog=NONE, note=TEST_NOTE),
-        P("t-mon-2a", "bulgarian-split-squat", 2, 2, 10, 10, 0, "dumbbellPair", 6.0, rir=3,
-          prog=NONE, subs=["step-up", "reverse-lunge"], group="t-mon-ss1", uni=True, per_side=True, note="Light. Just moving."),
-        P("t-mon-2b", "single-leg-calf-raise", 3, 2, 15, 15, 60, "bodyweight", None, rir=3,
-          prog=NONE, group="t-mon-ss1", uni=True, per_side=True),
+        P("t-tue-1", "barbell-back-squat", 1, 1, 5, 5, 240, "barbell",
+          TARGET_5RM["barbell-back-squat"], rir=0, ramp=True, prog=NONE, note=TEST_NOTE),
+        P("t-tue-2", "barbell-bent-over-row", 2, 1, 5, 5, 180, "barbell",
+          TARGET_5RM["barbell-bent-over-row"], rir=0, prog=NONE, note=TEST_NOTE),
     ]),
 ], note="Test week. Nothing to prove except what twelve weeks bought you.",
    warnings=[WARN_PINS_SQ, WARN_COLLAR])
 
-t_tue = D("t-tue", "tue", "Test · Bench & Row", "lift", [
-    S("warmup", "Warm-up", drills=[
-        drill("rope-skipping", 1, "3 min"),
-        drill("band-pull-apart", 2, "2 x 20"),
-        drill("wall-slide", 3, "x 10"),
-        drill("push-up-handles", 4, "x 10"),
-    ]),
-    S("main", "Test", prescriptions=[
-        P("t-tue-1", "barbell-bench-press", 1, 1, 5, 5, 300, "barbell",
-          TARGET_5RM["barbell-bench-press"], rir=0, ramp=True,
-          prog=NONE, note=TEST_NOTE),
-        P("t-tue-2", "barbell-bent-over-row", 2, 1, 5, 5, 240, "barbell",
-          TARGET_5RM["barbell-bent-over-row"], rir=0,
-          prog=NONE, note=TEST_NOTE),
-        P("t-tue-3a", "incline-dumbbell-press", 3, 2, 12, 12, 0, "dumbbellPair", 7.0, rir=3,
-          prog=NONE, group="t-tue-ss1"),
-        P("t-tue-3b", "cable-face-pull", 4, 2, 15, 15, 60, "cable", None, rir=3,
-          prog=NONE, group="t-tue-ss1"),
-    ]),
-], warnings=[WARN_PINS_BN, WARN_COLLAR])
+t_wed = rest_day("t-wed", "wed", "Rest. Thursday is the heavy one.")
 
-t_wed = D("t-wed", "wed", "Rest", "rest", [], note="Rest. Thursday is the heavy one.")
-
-t_thu = D("t-thu", "thu", "Test · Deadlift", "lift", [
-    S("warmup", "Warm-up", drills=[
-        drill("rope-skipping", 1, "3 min"),
-        drill("cat-cow", 2, "x 10"),
-        drill("glute-bridge", 3, "x 20"),
-        drill("bodyweight-good-morning", 4, "x 15"),
-    ]),
+t_thu = D("t-thu", "thu", "Test · Deadlift & Press", "lift", [
+    S("warmup", "Warm-up", drills=WARMUP_HINGE),
     S("main", "Test", prescriptions=[
-        P("t-thu-1", "barbell-deadlift", 1, 1, 5, 5, 300, "barbell",
-          TARGET_5RM["barbell-deadlift"], rir=0, ramp=True,
-          prog=NONE, note=TEST_NOTE + " Then stop. Nothing else today."),
+        P("t-thu-1", "barbell-deadlift", 1, 1, 5, 5, 240, "barbell",
+          TARGET_5RM["barbell-deadlift"], rir=0, ramp=True, prog=NONE, note=TEST_NOTE),
+        P("t-thu-2", "barbell-overhead-press", 2, 1, 5, 5, 180, "barbell",
+          TARGET_5RM["barbell-overhead-press"], rir=0, prog=NONE, note=TEST_NOTE),
     ]),
-    S("cooldown", "Cool-down", drills=[
-        drill("standing-hamstring-stretch", 1, "45 s / side"),
-        drill("cat-cow", 2, "x 10"),
-    ]),
-], note="One lift, then go home and eat.", warnings=[WARN_BAR_HT, WARN_COLLAR])
+], note="Two lifts, then go home and eat.", warnings=[WARN_BAR_HT, WARN_CEIL, WARN_COLLAR])
 
-t_fri = D("t-fri", "fri", "Test · Press & Pull-ups", "lift", [
-    S("warmup", "Warm-up", drills=[
-        drill("rope-skipping", 1, "3 min"),
-        drill("band-pull-apart", 2, "2 x 20"),
-        drill("wall-slide", 3, "x 10"),
-        drill("dead-hang", 4, "2 x 20 s"),
-    ]),
+t_fri = rest_day("t-fri", "fri", "Rest. Tomorrow is the bench test: sleep is part "
+                 "of it.")
+
+t_sat = D("t-sat", "sat", "Test · Bench & Pull-ups", "lift", [
+    S("warmup", "Warm-up", drills=WARMUP_UPPER),
     S("main", "Test", prescriptions=[
-        P("t-fri-1", "barbell-overhead-press", 1, 1, 5, 5, 300, "barbell",
-          TARGET_5RM["barbell-overhead-press"], rir=0, ramp=True,
-          prog=NONE, note=TEST_NOTE),
-        P("t-fri-2", "pull-up", 2, 1, 1, 12, 240, "bodyweight", None, rir=0, prog=NONE,
+        P("t-sat-1", "barbell-bench-press", 1, 1, 5, 5, 240, "barbell",
+          TARGET_5RM["barbell-bench-press"], rir=0, ramp=True, prog=NONE, note=TEST_NOTE),
+        P("t-sat-2", "pull-up", 2, 1, 1, 12, 180, "bodyweight", None, rir=0, prog=NONE,
           subs=["pull-up-assisted"],
-          note="MAX STRICT REPS. No kipping, no half reps — chin over the bar, full hang at the "
-               "bottom. This is the number you will remember."),
-        P("t-fri-3a", "hammer-curl", 3, 2, 12, 12, 0, "dumbbellPair", 5.0, rir=3, prog=NONE,
-          group="t-fri-ss1"),
-        P("t-fri-3b", "cable-triceps-pushdown", 4, 2, 15, 15, 60, "cable", None, rir=3,
-          prog=NONE, group="t-fri-ss1"),
+          note="MAX STRICT REPS. Chin over the bar, full hang at the bottom."),
     ]),
-], note="Last lifting session of the cycle. Take the week-12 photos afterwards, while you are "
-        "still pumped — same four poses, same spot, same light.",
-   warnings=[WARN_CEIL, WARN_COLLAR])
+], note="Last session of the cycle. Take the week-12 photos afterwards.",
+   warnings=[WARN_PINS_BN, WARN_CEIL, WARN_COLLAR])
 
-t_sat = D("t-sat", "sat", "Rest", "rest", [], note="Rest before the time trial.")
-
-t_sun = D("t-sun", "sun", "Test · 5K Time Trial", "cardio", [
-    S("cardio", "Test", prescriptions=[
-        P("t-sun-1", "five-k-time-trial", 1, 1, 5000, 5000, 0, "distance", None, unit="m",
-          prog=NONE, subs=["easy-run"],
-          note="Flat measured route. Even pacing beats a fast first kilometre. Target 28-32 min. "
-               "Then you are done — twelve weeks, logged."),
-    ]),
-    S("cooldown", "Cool-down", drills=[
-        drill("standing-hamstring-stretch", 1, "45 s / side"),
-        drill("couch-stretch", 2, "45 s / side"),
-    ]),
-])
+t_sun = sunday("t-sun", test=True)
 
 TEST_DAYS = [t_mon, t_tue, t_wed, t_thu, t_fri, t_sat, t_sun]
 
@@ -1017,12 +753,9 @@ def _sets(p, set_mult=1.0):
 # The cardio table's skipping and bag text is DERIVED from the days it
 # describes. v2 typed it, and it promised a Foundation bag and 10 x 30 s
 # skipping intervals that no session prescribed.
-_WARMUP_SKIP = next(dr["text"] for s in b_mon["sections"] for dr in s["drills"]
+_WARMUP_SKIP = next(dr["text"] for s in b_tue["sections"] for dr in s["drills"]
                     if dr["exerciseId"] == "rope-skipping")
-SKIP_FOUNDATION = (f"Tue {_sets(pres(FOUNDATION_DAYS, 'f-tue-1'))} · "
-                   f"Sun {_sets(pres(FOUNDATION_DAYS, 'f-sun-2'))}")
 SKIP_LIFT_WARMUP = f"Warm-up {_WARMUP_SKIP} on lift days"
-BAG = pres(BUILD_DAYS, "b-sun-3")
 DELOAD_SETS = 0.60
 
 PROGRAMME = {
@@ -1031,39 +764,36 @@ PROGRAMME = {
     "schemaVersion": 2,
     # 2 = v3: the definitive kit, the coach's programme changes, table-driven
     # runs. An installed copy with a lower revision is upgraded by the app.
-    "revision": 2,
-    "startDate": "2026-09-28",
+    # 3 = v4: three 30-minute sessions for a working student's week.
+    "revision": 3,
+    "startDate": "2026-10-12",
     "totalWeeks": 12,
-    "notes": ("Beginner hypertrophy block for a 167 cm / 50 kg lifter training alone five evenings "
-              "a week in a basement gym, on a 60-minute session ceiling. Every load in this file "
-              "is snapped to the plate lattice described in inventory.json -- change the inventory "
-              "and regenerate with tools/gen.py rather than editing loads by hand. Cardio is "
-              "deliberately capped so it does not eat the caloric surplus."),
-    "athlete": {"startWeightKg": 50.0, "heightCm": 167, "targetWeightKg": 55.0,
+    "notes": ("A fitness block for a working student: 167 cm / 50 kg, training alone in a "
+              "basement gym three times a week -- Tuesday and Thursday evening, Saturday morning -- "
+              "for about half an hour, with an optional run or hike on Sunday. Every load in this "
+              "file is snapped to the plate lattice described in inventory.json -- change the "
+              "inventory and regenerate with tools/gen.py rather than editing loads by hand."),
+    "athlete": {"startWeightKg": 50.0, "heightCm": 167, "targetWeightKg": 53.0,
                 "ageYears": 22, "sex": "male", "experience": "beginner", "trainsAlone": True},
     "nutritionPhases": [
-        {"weeks": [1, 2, 3, 4], "kcal": 2600, "proteinG": 110, "carbsG": 382, "fatG": 70,
-         "note": "Start here. ~52 kcal/kg -- two liquid meals a day make this easy."},
-        {"weeks": [5, 6, 7, 8], "kcal": 2750, "proteinG": 115, "carbsG": 410, "fatG": 72,
-         "note": "TDEE has risen with your bodyweight. So does the target."},
-        {"weeks": [9, 10, 11, 12], "kcal": 2900, "proteinG": 120, "carbsG": 440, "fatG": 75,
-         "note": "Final push. If the waist is growing faster than the lifts, cut 200."},
+        {"weeks": list(range(1, 13)), "kcal": 2300, "proteinG": 90, "carbsG": 327, "fatG": 70,
+         "note": "Four normal meals, a little more than you burn: fit, and slowly filling out."},
     ],
     "nutritionRules": {
-        "gainKgPerWeek": 0.3, "flatWeeksBeforeBump": 2, "kcalBumpWhenFlat": 250,
+        "gainKgPerWeek": 0.15, "flatWeeksBeforeBump": 3, "kcalBumpWhenFlat": 150,
         "useRollingAverage": True, "rollingAverageDays": 7,
         "waistGrowthLimitCm": 3.0, "kcalCutWhenWaistGrows": 200,
     },
     "onComplete": {"action": "seedNextCycle", "skipBlocks": ["foundation"],
-                   "seedFrom": "test", "bodyweightTargetKg": 60.0},
+                   "seedFrom": "test", "bodyweightTargetKg": 55.0},
     "rules": [
-        "Eat in surplus every single day. A missed meal is a missed session.",
+        "Eat your four meals. Skipping lunch on a long day is the easiest way to stall.",
         "Leave 2 reps in the tank -- 3 during weeks 1 to 4.",
         "Collars on. Check them mid-set. Spinlock collars work loose under load.",
         "Never fail alone under a bar. Set the catch pins, or press dumbbells.",
         "Add weight only when you earn it: top of the rep range on every set.",
         "Log every set. A session you didn't log is a session you can't beat next week.",
-        "Sixty minutes means sixty minutes. If you are over, cut the last superset -- not the "
+        "Half an hour means half an hour. If you are over, cut the last superset -- not the "
         "main lift, not the warm-up.",
         "If something hurts -- not burns, HURTS -- stop the set, log the niggle, use the substitute.",
     ],
@@ -1071,31 +801,30 @@ PROGRAMME = {
     # column ("long" -> longRunMin, "second" -> secondRunMin). A null column
     # means no such run that week (week 8 has no second run), not "fall back".
     "cardioProgression": [
-        {"weeks": [1, 2], "longRunMin": [15, 18], "secondRunMin": [12, 15],
-         "skipping": SKIP_FOUNDATION, "bag": None,
-         "note": "Calves and Achilles need four weeks to adapt. Don't rush this."},
-        {"weeks": [3, 4], "longRunMin": [20, 22], "secondRunMin": [15, 18],
-         "skipping": SKIP_FOUNDATION, "bag": None,
-         "note": "A little longer, same easy pace. The bag arrives with Build in week 5."},
-        {"weeks": [5, 6], "longRunMin": [24, 26], "secondRunMin": [20, 20],
-         "skipping": SKIP_LIFT_WARMUP, "bag": f"Sun {_sets(BAG)}",
-         "note": "Second run becomes the optional Wednesday -- skip it if you are behind on food. "
-                 "Strides after the Sunday run from now on. The bag appears: wraps or gloves."},
-        {"weeks": [7], "longRunMin": [28, 28], "secondRunMin": [20, 20],
-         "skipping": SKIP_LIFT_WARMUP, "bag": f"Sun {_sets(BAG)}",
-         "note": "Highest cardio week before the deload."},
+        {"weeks": [1, 2], "longRunMin": [15, 18], "secondRunMin": None,
+         "skipping": SKIP_LIFT_WARMUP, "bag": None,
+         "note": "Sunday is optional: an easy run, or a hike instead. Start short."},
+        {"weeks": [3, 4], "longRunMin": [20, 22], "secondRunMin": None,
+         "skipping": SKIP_LIFT_WARMUP, "bag": None,
+         "note": "A little longer, same easy pace."},
+        {"weeks": [5, 6], "longRunMin": [22, 25], "secondRunMin": None,
+         "skipping": SKIP_LIFT_WARMUP, "bag": None,
+         "note": "Easy means you could talk the whole way."},
+        {"weeks": [7], "longRunMin": [25, 25], "secondRunMin": None,
+         "skipping": SKIP_LIFT_WARMUP, "bag": None,
+         "note": "Longest before the deload."},
         {"weeks": [8], "longRunMin": [15, 15], "secondRunMin": None,
-         "skipping": SKIP_LIFT_WARMUP, "bag": f"Sun {_sets(BAG, DELOAD_SETS)}",
-         "note": "Deload. Everything comes down, including this. No Wednesday run, no strides."},
-        {"weeks": [9, 10], "longRunMin": [30, 33], "secondRunMin": [20, 25],
-         "skipping": SKIP_LIFT_WARMUP, "bag": f"Sun {_sets(BAG)}",
+         "skipping": SKIP_LIFT_WARMUP, "bag": None,
+         "note": "Deload. Everything comes down, including this."},
+        {"weeks": [9, 10], "longRunMin": [25, 28], "secondRunMin": None,
+         "skipping": SKIP_LIFT_WARMUP, "bag": None,
          "note": "Runs get longer, never faster."},
-        {"weeks": [11], "longRunMin": [35, 35], "secondRunMin": [25, 25],
-         "skipping": SKIP_LIFT_WARMUP, "bag": f"Sun {_sets(BAG)}",
-         "note": "Last easy long run -- the longest Sunday of the cycle, and it still fits the hour."},
+        {"weeks": [11], "longRunMin": [30, 30], "secondRunMin": None,
+         "skipping": SKIP_LIFT_WARMUP, "bag": None,
+         "note": "The longest Sunday of the cycle -- or the longest hike."},
         {"weeks": [12], "longRunMin": None, "secondRunMin": None,
          "skipping": SKIP_LIFT_WARMUP, "bag": None,
-         "note": "5K time trial replaces the Sunday run. Target 28-32 min."},
+         "note": "A 5K if you want to know your number. Optional."},
     ],
     "checkpoints": [
         # autoTick: which item the app ticks itself, from what it already
@@ -1110,22 +839,22 @@ PROGRAMME = {
             "plates as listed in Settings → Your equipment",
             "Measure ceiling clearance for overhead press and for skipping",
             "First bodyweight entry"]},
-        {"week": 4, "expectedWeightKg": [51.0, 52.0],
+        {"week": 4, "expectedWeightKg": [50.2, 51.0],
          "autoTick": {"photos": 0, "measurements": 1, "sessionsLogged": 3}, "items": [
             "Photos", "Measurements",
             "Squat and bench moving with real plates on",
             "Every session logged -- check for holes before Build starts"]},
-        {"week": 8, "expectedWeightKg": [53.0, 54.0],
+        {"week": 8, "expectedWeightKg": [50.6, 51.6],
          "autoTick": {"photos": 0, "measurements": 1}, "items": [
             "Photos", "Measurements",
             "DELOAD WEEK -- do it properly, you will want to skip it",
             "Waist vs the 3 cm rule -- if it is growing faster than the lifts, cut 200 kcal",
-            "Clothes should fit differently across the shoulders"]},
-        {"week": 12, "expectedWeightKg": [55.0, 56.5],
+            "Stairs and the walk to campus should feel easier than in week 1"]},
+        {"week": 12, "expectedWeightKg": [51.0, 52.5],
          "autoTick": {"photos": 0, "measurements": 1}, "items": [
             "Photos", "Measurements",
             "5-rep tests: squat, bench, row, deadlift, overhead press",
-            "Max strict pull-ups", "5K time trial",
+            "Max strict pull-ups", "5K time trial, if you want it",
             "Seed cycle 2 from the test numbers"]},
     ],
     "strengthTargets": [],   # derived below from PROJECTION
@@ -1137,59 +866,45 @@ PROGRAMME = {
          # jump the moment he logged the RIR 3 the doc allows.
          "defaultRir": 3, "loadMultiplier": 1.0, "setMultiplier": 1.0, "setRounding": "up",
          "includeSupersets": True, "includeFinishers": True,
-         "summary": "Full body three times a week. Light loads, perfect reps, every barbell lift "
-                    "introduced with the empty 10 kg bar, and a short arms-and-delts superset to "
-                    "finish. Build the eating habit here.",
+         "summary": "Full body three times a week, about half an hour each: Tuesday and "
+                    "Thursday evening, Saturday morning. Light loads, perfect reps, every barbell "
+                    "lift introduced with the empty 10 kg bar.",
          "inheritsDaysFrom": None, "dayOverrides": {}, "days": FOUNDATION_DAYS},
 
         {"id": "build", "name": "Build", "weeks": [5, 6, 7], "blockKind": "accumulation",
          "defaultRir": 2, "loadMultiplier": 1.0, "setMultiplier": 1.0, "setRounding": "up",
          "includeSupersets": True, "includeFinishers": True,
-         "summary": "Upper/Lower across four days. Every movement pattern gets two exposures a "
-                    "week, every upper day presses and pulls, and the accessories are supersetted "
-                    "so it all fits in 60 minutes.",
+         "summary": "The same three days, a little heavier: fewer reps on the main lift, and "
+                    "the accessories supersetted so each session still fits in half an hour.",
          "inheritsDaysFrom": None, "dayOverrides": {}, "days": BUILD_DAYS},
 
         {"id": "deload", "name": "Deload", "weeks": [8], "blockKind": "deload",
          "defaultRir": 4, "loadMultiplier": DELOAD_LOAD, "setMultiplier": DELOAD_SETS,
          "setRounding": "up",
          "includeSupersets": False, "includeFinishers": False,
-         "summary": "Same four days, 70% of the load, 60% of the sets, supersets unwound so "
-                    "nothing is rushed. Bar speed stays fast. You will want to skip this week -- "
-                    "it is the week the previous three turn into muscle.",
+         "summary": "Same three days, 70% of the load, 60% of the sets, supersets unwound so "
+                    "nothing is rushed. You will want to skip this week -- it is the week the "
+                    "previous three turn into muscle.",
          "inheritsDaysFrom": "build", "dayOverrides": {}, "days": []},
 
         {"id": "push", "name": "Push", "weeks": [9, 10, 11], "blockKind": "accumulation",
          "defaultRir": 2, "loadMultiplier": 1.0, "setMultiplier": 1.0, "setRounding": "up",
          "includeSupersets": True, "includeFinishers": True,
-         "summary": "Same split, one set added to the lead lift of each day, 1 rep in reserve on "
-                    "those sets. Nordic curl negatives replace the ring hamstring curl on Thursday.",
+         "summary": "Same three days, the lead lift of each one taken to 1 rep in reserve. "
+                    "Still half an hour.",
          "inheritsDaysFrom": "build",
          "dayOverrides": {
-             "b-mon": {"prescriptionOverrides": {"b-mon-1": {"sets": 5, "targetRir": 1}}},
-             "b-tue": {"prescriptionOverrides": {"b-tue-1": {"sets": 5, "targetRir": 1}}},
-             # Same id, new exercise: history is keyed on (prescription,
-             # exercise), so the nordic cold-starts rather than inheriting
-             # 12-rep ring-curl targets. 3 x (25 s + 90 s) = 345 s against the
-             # curl's 3 x (42 s + 75 s) = 351 s, so it costs the day nothing.
-             "b-thu": {"prescriptionOverrides": {
-                 "b-thu-1": {"sets": 4, "targetRir": 1},
-                 "b-thu-4": {"exerciseId": "nordic-curl-negative", "repsMin": 3, "repsMax": 5,
-                             "repsCreepMax": 8, "restSec": 90, "tempo": "max eccentric",
-                             "coachNote": "Weeks 9-11: nordic negatives replace the ring curl. "
-                                          "Kneel on the mat with your heels under a loaded "
-                                          "barbell on the floor, padded with the folded mat -- "
-                                          "never the squat stand, it can tip. Lower as slowly "
-                                          "as you can; expect to fall fast at first."}}},
-             "b-fri": {"prescriptionOverrides": {"b-fri-1": {"sets": 5, "targetRir": 1}}},
+             "b-tue": {"prescriptionOverrides": {"b-tue-1": {"targetRir": 1}}},
+             "b-thu": {"prescriptionOverrides": {"b-thu-1": {"targetRir": 1}}},
+             "b-sat": {"prescriptionOverrides": {"b-sat-1": {"targetRir": 1}}},
          },
          "days": []},
 
         {"id": "test", "name": "Test", "weeks": [12], "blockKind": "test",
          "defaultRir": 0, "loadMultiplier": 1.0, "setMultiplier": 1.0, "setRounding": "up",
          "includeSupersets": True, "includeFinishers": False,
-         "summary": "Five-rep tests on the five barbell lifts, max strict pull-ups, and the 5K. "
-                    "These numbers seed cycle 2.",
+         "summary": "Five-rep tests on the five barbell lifts across the three days, max "
+                    "strict pull-ups, and a 5K if you want it. These numbers seed cycle 2.",
          "inheritsDaysFrom": None, "dayOverrides": {}, "days": TEST_DAYS},
     ],
 }

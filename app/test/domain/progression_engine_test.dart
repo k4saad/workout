@@ -542,11 +542,11 @@ void main() {
       // At 10 kg a 10% cap is 1 kg; the data widens maxJumpPct in
       // Foundation so the empty-bar lifts can actually climb (item 1).
       for (final id in [
-        'f-mon-1',
-        'f-wed-1',
-        'f-wed-2',
-        'f-fri-1',
-        'f-fri-2',
+        'f-tue-1',
+        'f-thu-1',
+        'f-thu-2',
+        'f-sat-1',
+        'f-sat-2',
       ]) {
         final p = resolved('foundation', 1, id);
         expect(p.startLoadKg, 10, reason: id);
@@ -565,7 +565,7 @@ void main() {
     });
 
     test('logging RIR 3 in Foundation earns the jump (item 6)', () {
-      final p = resolved('foundation', 2, 'f-mon-1');
+      final p = resolved('foundation', 2, 'f-tue-1');
       expect(p.targetRir, 3);
       final s = shipped.suggest(
         prescription: p,
@@ -577,8 +577,8 @@ void main() {
 
     test('a deload cold start is scaled once, not 0.7 x 0.7 (minor)', () {
       // The resolver has already put the 70% into startLoadKg.
-      final p = resolved('deload', 8, 'b-mon-1');
-      final build = resolved('build', 5, 'b-mon-1');
+      final p = resolved('deload', 8, 'b-tue-1');
+      final build = resolved('build', 5, 'b-tue-1');
       expect(p.startLoadKg, closeTo(build.startLoadKg! * 0.7, 1e-9));
       final s = shipped.suggest(
         prescription: p,
@@ -597,7 +597,7 @@ void main() {
       // Foundation's split squat is bodyweight; Build's is loaded from 6 kg.
       // Twelve bodyweight reps say nothing about 6 kg dumbbells, so week 5
       // starts at the programme's 6, not one jump past a weight never lifted.
-      final p = resolved('build', 5, 'b-mon-3a');
+      final p = resolved('build', 5, 'b-sat-3a');
       expect(p.loadMode, LoadMode.dumbbellPair);
       final s = shipped.suggest(
         prescription: p,
@@ -625,7 +625,7 @@ void main() {
       expect(s.suggestedKg, isNull);
       expect(s.repTargetMin, p.repsMin);
       expect(s.repTargetMax, p.repsMax);
-      expect(s.reason, contains('35 min'));
+      expect(s.reason, contains('30 min'));
     });
   });
 
@@ -841,10 +841,10 @@ void main() {
     test('the overhead press is 70% of the earned load at 6 reps', () {
       // Earned 17; 70% is 11.9 -> 11, the same plates as 70% of 16. That
       // used to trip rule 8 and creep the DELOAD to 6-8.
-      final p = deload('b-fri-1');
+      final p = deload('b-thu-2');
       final s = shipped.suggest(
         prescription: p,
-        history: week7(4, 6, 16, 6, 6),
+        history: week7(3, 6, 16, 6, 6),
         blockLoadMultiplier: 0.7,
         now: now,
       );
@@ -857,18 +857,18 @@ void main() {
       expect(s.reason, contains('17 kg'));
     });
 
-    test('a light lateral raise holds its range in the deload', () {
-      // At 4 kg the step is 0.5 kg, 12.5%: in a normal week that is rep
-      // creep to 12-17. In the deload it is 70% of 4 kg at 12-15.
-      final p = deload('b-tue-4b');
+    test('light dumbbell work holds its range in the deload', () {
+      // 6 kg split-squat dumbbells, top of the range: in a normal week a
+      // coarse step means rep creep. In the deload it is 70% at 8 reps.
+      final p = deload('b-sat-3a');
       final s = shipped.suggest(
         prescription: p,
-        history: week7(3, 15, 4, 12, 15),
+        history: week7(3, 8, 6, 8, 8),
         blockLoadMultiplier: 0.7,
         now: now,
       );
-      expect(s.repTargetMax, 15, reason: s.reason);
-      expect(s.suggestedKg, 2);
+      expect(s.repTargetMax, p.repsMax, reason: s.reason);
+      expect(s.suggestedKg, lessThan(6));
       expect(s.isRepCreep, isFalse);
       expect(s.reason, contains('Deload'));
       expect(s.reason.toLowerCase(), isNot(contains('coarse')));

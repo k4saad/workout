@@ -54,7 +54,7 @@ void main() {
     });
 
     test('week 1 squat starts on the empty bar', () {
-      final squat = find(days, 'f-mon-1');
+      final squat = find(days, 'f-tue-1');
       expect(squat.exerciseId, 'barbell-back-squat');
       expect(emptyBar, 10.0, reason: 'the definitive kit: a 10 kg bar');
       expect(squat.startLoadKg, emptyBar);
@@ -69,53 +69,59 @@ void main() {
       expect(ids, contains('barbell-deadlift'));
       expect(ids, contains('barbell-overhead-press'));
       expect(ids, contains('barbell-bent-over-row'));
-      expect(find(days, 'f-wed-1').startLoadKg, emptyBar);
-      expect(find(days, 'f-wed-2').startLoadKg, emptyBar);
+      expect(find(days, 'f-thu-1').startLoadKg, emptyBar);
+      expect(find(days, 'f-thu-2').startLoadKg, emptyBar);
     });
 
     test('defaultRir 3 is inherited where targetRir is null', () {
       // 3, not 4: a logged RIR 3 must not block the jump (coach review M4).
-      expect(find(days, 'f-mon-1').targetRir, 3);
+      expect(find(days, 'f-tue-1').targetRir, 3);
     });
 
     test('the main lifts ramp from week 1', () {
-      for (final id in ['f-mon-1', 'f-wed-1', 'f-fri-1']) {
+      for (final id in ['f-tue-1', 'f-thu-1', 'f-sat-1']) {
         expect(find(days, id).warmupRamp, isTrue, reason: id);
       }
     });
 
     test('an explicit targetRir still wins over the block default', () {
-      expect(find(days, 'f-fri-3b').targetRir, 3);
+      expect(find(days, 'f-sat-3b').targetRir, 3);
     });
   });
 
   group('build — the source of the inherited blocks', () {
     final days = resolver.resolveDays(programme.blockById('build')!, 5);
 
+    test('three training days, half an hour each, and the rest is rest', () {
+      final training = days.where((d) => d.kind == DayKind.lift).toList();
+      expect(training.map((d) => d.weekday), [
+        Weekday.tue,
+        Weekday.thu,
+        Weekday.sat,
+      ]);
+      for (final d in training) {
+        expect(d.estMinutes, lessThanOrEqualTo(35), reason: d.id);
+      }
+      final sun = days.firstWhere((d) => d.weekday == Weekday.sun);
+      expect(sun.optional, isTrue, reason: 'the Sunday run or hike');
+    });
+
     test('defaultRir 2 is inherited by the main lifts', () {
-      expect(find(days, 'b-mon-1').targetRir, 2);
       expect(find(days, 'b-tue-1').targetRir, 2);
+      expect(find(days, 'b-sat-1').targetRir, 2);
     });
 
     test('supersets survive', () {
-      expect(find(days, 'b-mon-3a').groupId, isNotNull);
-      expect(find(days, 'b-mon-3a').groupId, find(days, 'b-mon-3b').groupId);
+      expect(find(days, 'b-tue-2a').groupId, isNotNull);
+      expect(find(days, 'b-tue-2a').groupId, find(days, 'b-tue-2b').groupId);
     });
 
-    test('Lower B curls the hamstrings with the ring curl', () {
-      // It replaced the suitcase carry, and kept its id (coach review M8).
-      final curl = find(days, 'b-thu-4');
-      expect(curl.exerciseId, 'ring-hamstring-curl');
-      expect(curl.optional, isFalse);
-      expect(curl.substitutes, contains('nordic-curl-negative'));
-    });
-
-    test('every upper day presses and pulls — the v1 B1 bug', () {
+    test('every training day presses and pulls — the v1 B1 bug', () {
       const push = {'horizontalPush', 'verticalPush', 'extension'};
       const pull = {'horizontalPull', 'verticalPull', 'curl'};
       final library = Fixtures.library;
 
-      for (final id in ['b-tue', 'b-fri']) {
+      for (final id in ['b-tue', 'b-thu', 'b-sat']) {
         final day = days.firstWhere((d) => d.id == id);
         var pushSets = 0, pullSets = 0;
         for (final p in day.loggedPrescriptions.where((p) => !p.optional)) {
@@ -125,8 +131,6 @@ void main() {
         }
         expect(pushSets, greaterThan(0), reason: '$id has no pressing');
         expect(pullSets, greaterThan(0), reason: '$id has no pulling');
-        // 3, not 2, since v3 gave Upper A direct triceps work (coach review
-        // M7): 13 v 10 counting pushdowns and laterals, 7 v 7 on compounds.
         expect(
           (pushSets - pullSets).abs(),
           lessThanOrEqualTo(3),
@@ -141,10 +145,10 @@ void main() {
     final days = resolver.resolveDays(block, 8);
 
     test('sets scale by 0.60, rounded UP, never below 1', () {
-      // 4 sets * 0.6 = 2.4 -> 3.  3 * 0.6 = 1.8 -> 2.
-      expect(find(days, 'b-mon-1').sets, 3);
-      expect(find(days, 'b-mon-2').sets, 2);
+      // 3 sets * 0.6 = 1.8 -> 2; 2 sets * 0.6 = 1.2 -> 2.
+      expect(find(days, 'b-tue-1').sets, 2);
       expect(find(days, 'b-thu-1').sets, 2);
+      expect(find(days, 'b-tue-3').sets, 2);
       for (final p in days.expand((d) => d.allPrescriptions)) {
         expect(p.sets, greaterThanOrEqualTo(1), reason: p.id);
       }
@@ -152,7 +156,7 @@ void main() {
 
     test('loads scale to 70%', () {
       final build = resolver.resolveDays(programme.blockById('build')!, 5);
-      for (final id in ['b-mon-1', 'b-thu-1']) {
+      for (final id in ['b-tue-1', 'b-thu-1']) {
         expect(
           find(days, id).startLoadKg,
           closeTo(find(build, id).startLoadKg! * 0.7, 1e-9),
@@ -176,22 +180,22 @@ void main() {
     test('defaultRir 4 reaches the main lifts — the audit C2 fix', () {
       // In build these leave targetRir null, so the deload actually softens
       // them. If every prescription restated its RIR, this would be 2.
-      expect(find(days, 'b-mon-1').targetRir, 4);
       expect(find(days, 'b-tue-1').targetRir, 4);
       expect(find(days, 'b-thu-1').targetRir, 4);
+      expect(find(days, 'b-sat-1').targetRir, 4);
     });
 
     test('an explicitly harder accessory is NOT softened', () {
-      // Lateral raises are RIR 1 by intent, not by default.
-      expect(find(days, 'b-tue-4b').targetRir, 1);
+      // Knee raises are RIR 1 by intent, not by default.
+      expect(find(days, 'b-tue-3').targetRir, 1);
     });
 
     test('the source block is not mutated', () {
       final build = programme.blockById('build')!;
       final again = resolver.resolveDays(build, 5);
-      expect(find(again, 'b-mon-1').sets, 4);
-      expect(find(again, 'b-mon-1').startLoadKg, 21.0);
-      expect(find(again, 'b-mon-1').targetRir, 2);
+      expect(find(again, 'b-tue-1').sets, 3);
+      expect(find(again, 'b-tue-1').startLoadKg, 21.0);
+      expect(find(again, 'b-tue-1').targetRir, 2);
     });
   });
 
@@ -199,39 +203,53 @@ void main() {
     final block = programme.blockById('push')!;
     final days = resolver.resolveDays(block, 9);
 
-    test('the lead lift of each day gains a set and drops to RIR 1', () {
-      expect(find(days, 'b-mon-1').sets, 5);
-      expect(find(days, 'b-mon-1').targetRir, 1);
-      expect(find(days, 'b-tue-1').sets, 5);
-      expect(find(days, 'b-tue-1').targetRir, 1);
-      expect(find(days, 'b-thu-1').sets, 4);
-      expect(find(days, 'b-fri-1').sets, 5);
+    test('the lead lift of each day drops to RIR 1, same sets', () {
+      // v4: no added set — the sessions stay half an hour.
+      for (final id in ['b-tue-1', 'b-thu-1', 'b-sat-1']) {
+        expect(find(days, id).sets, 3, reason: id);
+        expect(find(days, id).targetRir, 1, reason: id);
+      }
     });
 
-    test('loads are unchanged — push adds volume, not weight', () {
+    test('loads are unchanged — push adds effort, not weight', () {
       final build = resolver.resolveDays(programme.blockById('build')!, 5);
-      expect(find(days, 'b-mon-1').startLoadKg, 21.0);
+      expect(find(days, 'b-tue-1').startLoadKg, 21.0);
       expect(
         find(days, 'b-thu-1').startLoadKg,
         find(build, 'b-thu-1').startLoadKg,
       );
     });
 
-    test('nordic negatives replace the ring curl, same prescription id', () {
-      final nordic = find(days, 'b-thu-4');
-      expect(nordic.exerciseId, 'nordic-curl-negative');
-      expect(nordic.repsMin, 3);
-      expect(nordic.repsMax, 5);
-      expect(nordic.restSec, 90);
-      expect(nordic.optional, isFalse);
+    test('an override can swap the exercise and keep the prescription id', () {
+      // The mechanism v3's nordic curl used; v4 has no swap, so it is
+      // checked on a copy.
+      final json = Fixtures.programmeJson;
+      final push = (json['blocks'] as List)
+          .cast<Map<String, dynamic>>()
+          .firstWhere((b) => b['id'] == 'push');
+      push['dayOverrides'] = {
+        'b-thu': {
+          'prescriptionOverrides': {
+            'b-thu-3b': {'exerciseId': 'step-up', 'repsMin': 8, 'repsMax': 10},
+          },
+        },
+      };
+      final edited = Programme.fromJson(json);
+      final swapped = find(
+        BlockResolver(edited).resolveDays(edited.blockById('push')!, 9),
+        'b-thu-3b',
+      );
+      expect(swapped.exerciseId, 'step-up');
+      expect(swapped.repsMax, 10);
+      expect(swapped.groupId, isNotNull);
     });
 
     test('supersets are kept', () {
-      expect(find(days, 'b-mon-3a').groupId, isNotNull);
+      expect(find(days, 'b-tue-2a').groupId, isNotNull);
     });
 
     test('non-overridden accessories keep the block default RIR of 2', () {
-      expect(find(days, 'b-mon-2').targetRir, 2);
+      expect(find(days, 'b-tue-2b').targetRir, 2);
     });
   });
 
@@ -247,23 +265,32 @@ void main() {
       expect(p.repsMax, 5000);
     });
 
-    test('the four barbell lifts are each tested for a single set of 5', () {
-      for (final id in ['t-mon-1', 't-tue-1', 't-thu-1', 't-fri-1']) {
+    test('the five barbell lifts are each tested for a single set of 5', () {
+      for (final id in [
+        't-tue-1',
+        't-tue-2',
+        't-thu-1',
+        't-thu-2',
+        't-sat-1',
+      ]) {
         final p = find(days, id);
         expect(p.sets, 1, reason: id);
         expect(p.repsMax, 5, reason: id);
         expect(p.targetRir, 0, reason: id);
-        expect(p.warmupRamp, isTrue, reason: '$id needs a ramp');
+      }
+      // The first lift of each day ramps up to it.
+      for (final id in ['t-tue-1', 't-thu-1', 't-sat-1']) {
+        expect(find(days, id).warmupRamp, isTrue, reason: '$id needs a ramp');
       }
     });
 
-    test('deadlift day is one lift and nothing else', () {
+    test('Thursday is the deadlift and the press, nothing else', () {
       final thu = days.firstWhere((d) => d.weekday == Weekday.thu);
-      expect(thu.loggedPrescriptions, hasLength(1));
+      expect(thu.loggedPrescriptions, hasLength(2));
     });
 
     test('max strict pull-ups are tested as an open rep range', () {
-      final p = find(days, 't-fri-2');
+      final p = find(days, 't-sat-2');
       expect(p.exerciseId, 'pull-up');
       expect(p.repsMin, 1);
       expect(p.repsMax, greaterThan(8));
@@ -281,9 +308,9 @@ void main() {
       expect(detached.dayOverrides, isEmpty);
 
       // The overrides are baked in.
-      expect(find(detached.days, 'b-mon-1').sets, 5);
-      expect(find(detached.days, 'b-mon-1').targetRir, 1);
-      expect(find(detached.days, 'b-thu-4').exerciseId, 'nordic-curl-negative');
+      expect(find(detached.days, 'b-tue-1').sets, 3);
+      expect(find(detached.days, 'b-tue-1').targetRir, 1);
+      expect(find(detached.days, 'b-sat-1').targetRir, 1);
     });
 
     test('a detached block resolves to the same thing it came from', () {
@@ -340,58 +367,39 @@ void main() {
           checked++;
         }
       }
-      expect(checked, greaterThan(20));
+      // One run a week — the optional Sunday — in weeks 1-11.
+      expect(checked, 11);
     });
 
-    test('the week-11 long run is 35 minutes, not the week-5 24', () {
+    test('the week-11 run is 30 minutes, not the week-5 22', () {
       final days = resolver.resolveDays(programme.blockById('push')!, 11);
       final run = find(days, 'b-sun-1');
-      expect(run.repsMin, 35 * 60);
-      expect(run.repsMax, 35 * 60);
+      expect(run.repsMin, 30 * 60);
+      expect(run.repsMax, 30 * 60);
       // Build week 5 is still the start of the table.
       final w5 = resolver.resolveDays(programme.blockById('build')!, 5);
-      expect(find(w5, 'b-sun-1').repsMin, 24 * 60);
+      expect(find(w5, 'b-sun-1').repsMin, 22 * 60);
     });
 
     test('an empty column means NO run that week, and the day says so', () {
-      // Week 8 has no second run: the deload's Wednesday is not "the
-      // prescription's own 20 minutes", it is nothing.
-      var omitted = 0;
-      for (var week = 1; week <= programme.totalWeeks; week++) {
-        final row = programme.cardioForWeek(week);
-        if (row == null) continue;
-        final block = programme.blockForWeek(week)!;
-        final days = resolver.resolveDays(block, week);
-        final source = block.inherits
-            ? programme.blockById(block.inheritsDaysFrom!)!.days
-            : block.days;
-        for (final d in source) {
-          for (final p in d.allPrescriptions) {
-            if (p.progression.type != ProgressionType.cardioTable) continue;
-            if (column(row, p.progression.table!) != null) continue;
-            omitted++;
-            final day = days.firstWhere((x) => x.id == d.id);
-            expect(
-              day.allPrescriptions.map((q) => q.id),
-              isNot(contains(p.id)),
-              reason: '${p.id} week $week',
-            );
-            expect(day.note, isNotNull, reason: '${d.id} week $week');
-            expect(day.note!.toLowerCase(), contains('no '));
-            if (day.loggedPrescriptions.isEmpty) {
-              expect(day.kind, DayKind.rest, reason: 'nothing left to do');
-            }
-          }
-        }
+      // v4's table has no empty week, so one is made on a copy: week 8
+      // without its run. The deload's Sunday is then not "the
+      // prescription's own minutes", it is nothing.
+      final json = Fixtures.programmeJson;
+      for (final r
+          in (json['cardioProgression'] as List).cast<Map<String, dynamic>>()) {
+        if ((r['weeks'] as List).contains(8)) r['longRunMin'] = null;
       }
-      expect(omitted, greaterThan(0), reason: 'week 8 has no second run');
-
-      final wed = resolver
-          .resolveDays(programme.blockById('deload')!, 8)
-          .firstWhere((d) => d.id == 'b-wed');
-      expect(wed.loggedPrescriptions, isEmpty);
-      expect(wed.kind, DayKind.rest);
-      expect(wed.isTrainingDay, isFalse);
+      final edited = Programme.fromJson(json);
+      final days = BlockResolver(edited)
+          .resolveDays(edited.blockById('deload')!, 8);
+      final sun = days.firstWhere((d) => d.id == 'b-sun');
+      expect(sun.allPrescriptions.map((q) => q.id), isNot(contains('b-sun-1')));
+      expect(sun.note, isNotNull);
+      expect(sun.note!.toLowerCase(), contains('no '));
+      expect(sun.loggedPrescriptions, isEmpty);
+      expect(sun.kind, DayKind.rest);
+      expect(sun.isTrainingDay, isFalse);
     });
 
     test('a week with no row at all keeps the run as authored', () {
@@ -412,7 +420,7 @@ void main() {
       final detached = resolver.detach(programme.blockById('deload')!);
       expect(
         detached.days.expand((d) => d.allPrescriptions).map((p) => p.id),
-        contains('b-wed-1'),
+        contains('b-sun-1'),
       );
     });
   });

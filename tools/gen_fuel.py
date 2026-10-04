@@ -6,11 +6,11 @@ as foods and a target, and the generator SOLVES the portions that hit it. Typing
 "120 g rice, 150 g chicken, 480 kcal" is how a plan ends up 300 kcal short of
 its own headline, which is exactly what happened to v1's macros.
 
-Who this is for: Saad — 22, male, 167 cm, 50 kg, BMI 17.9, training five
-evenings a week and trying to reach 55-60 kg. The hard part of his diet is not
-protein, it is TOTAL CALORIES: 2,600 kcal at 50 kg is 52 kcal/kg, and that is a
-lot of chewing. So the plan leans on calorie-dense food and two liquid meals a
-day, which is the only way a small appetite hits that number five days a week.
+Who this is for: Saad — 22, male, 167 cm, 50 kg, BMI 17.9, a working student
+who trains three half-hours a week and wants to be fit (v4, docs/11-v4-plan.md).
+He eats four times a day — breakfast, lunch, a small evening snack, dinner —
+and the plan is built around exactly that: about 2,300 kcal, a little above
+what he burns, because at BMI 17.9 he should fill out a little, not more.
 
 Rules the food list obeys:
   - **Halal.** No pork, no gelatine of unstated origin, no alcohol, no vanilla
@@ -202,15 +202,16 @@ HARAM = ["schwein", "schinken", "speck", "bacon", "pork", "ham ", "lard",
 # wastes the training. The only ceiling is a sanity one, because protein
 # crowding out carbohydrate is a real way to stall a hardgainer.
 SLOTS = [
-    ("breakfast",     "Breakfast",          "07:30", "both",     540, 22),
-    ("mid_morning",   "Mid-morning",        "10:30", "both",     330, 10),
-    ("lunch",         "Lunch",              "13:00", "both",     560, 30),
-    ("pre_training",  "Before training",    "17:00", "training", 250, 3),
-    ("post_training", "Straight after",     "19:45", "training", 280, 24),
-    ("afternoon",     "Afternoon",          "17:00", "rest",     530, 27),
-    ("dinner",        "Dinner",             "20:45", "both",     520, 32),
-    ("before_bed",    "Before bed",         "22:30", "both",     120, 10),
+    # The four times he eats, placed around a timetable (docs/11-v4-plan.md):
+    # breakfast before the 07:00 job; lunch in the gap after the morning; a
+    # small snack before the evening session or the German course; dinner.
+    ("breakfast", "Breakfast",     "06:45", "both", 600, 25),
+    ("lunch",     "Lunch",         "13:30", "both", 750, 35),
+    ("snack",     "Evening snack", "17:15", "both", 250, 5),
+    ("dinner",    "Dinner",        "20:00", "both", 700, 30),
 ]
+# On a training evening the snack is the session's fuel: Fuel says so.
+AROUND_SESSION = {"snack"}
 
 # Every template: the portions that ARE the meal, written as they are eaten
 # (three eggs, 70 g of oats, a tin of tuna), plus ONE flex food whose grams the
@@ -226,138 +227,94 @@ SLOTS = [
 #
 # (slot, id, name, note, fixed[(food, g)], flex_food)
 TEMPLATES = [
-    # ---- breakfast: 540 kcal ----------------------------------------------
+    # ---- breakfast: 600 kcal ----------------------------------------------
     ("breakfast", "porridge_pb", "Porridge with peanut butter",
      "Cook the oats in the milk, not water. Stir the peanut butter in at the end.",
-     [("haferflocken", 55), ("erdnussmus", 15), ("banane", 100),
+     [("haferflocken", 60), ("erdnussmus", 20), ("banane", 100),
       ("magerquark", 100)], "vollmilch"),
     ("breakfast", "eggs_bread", "Eggs on wholemeal bread",
      "Three eggs, scrambled in the oil, with a sliced tomato.",
-     [("eier", 116), ("rapsoel", 5), ("tomaten", 80)], "vollkornbrot"),
+     [("eier", 174), ("rapsoel", 8), ("tomaten", 80)], "vollkornbrot"),
     ("breakfast", "quark_oats", "Overnight oats with quark",
-     "Made the night before. The one breakfast that survives oversleeping.",
-     [("magerquark", 110), ("rosinen", 25), ("honig", 15)], "haferflocken"),
+     "Made the night before. The one breakfast that survives a 07:00 start.",
+     [("magerquark", 150), ("rosinen", 25), ("erdnussmus", 10)], "haferflocken"),
 
-    # ---- mid-morning: 330 kcal --------------------------------------------
-    ("mid_morning", "dates_nuts", "Dates, almonds and a glass of milk",
-     "Pocket food. The milk is what makes it a meal rather than a snack.",
-     [("datteln", 50), ("mandeln", 15)], "vollmilch"),
-    ("mid_morning", "bread_cheese", "Bread, cheese and an apple",
-     "Two slices, sliced Gouda, an apple on the walk.",
-     [("vollkornbrot", 70), ("apfel", 150)], "gouda"),
-    ("mid_morning", "banana_shake", "Banana milk",
-     "Blended, or just shaken in a bottle on the way out.",
-     [("banane", 110), ("honig", 10), ("magerquark", 100)], "vollmilch"),
-
-    # ---- lunch: 560 kcal --------------------------------------------------
+    # ---- lunch: 750 kcal --------------------------------------------------
     ("lunch", "chicken_rice", "Chicken thighs, rice and vegetables",
      "Cooked on prep night with the dinner's chicken. Reheat until steaming.",
-     [("haehnchen_ok", 130), ("gemuese_tk", 150), ("rapsoel", 8)], "reis"),
+     [("haehnchen_ok", 150), ("gemuese_tk", 150), ("rapsoel", 10)], "reis"),
     ("lunch", "chickpea_rice", "Chickpea curry with rice",
-     "Half a tin of chickpeas, passata, spinach, onion, with a spoon of skyr "
-     "on top. Cook the whole tin: the other half is tonight's dinner.",
+     "Half a tin of chickpeas, passata, spinach, onion, with skyr on top. Cook the "
+     "whole tin: the other half is tonight's dinner.",
      [("kichererbsen", 130), ("passata", 100), ("zwiebel", 50),
-      ("spinat_tk", 100), ("rapsoel", 10), ("skyr", 100)], "reis"),
+      ("spinat_tk", 100), ("rapsoel", 12), ("skyr", 150)], "reis"),
     ("lunch", "egg_rice", "Egg fried rice",
      "Yesterday's rice is better than fresh for this. Three eggs, frozen veg.",
-     [("eier", 174), ("gemuese_tk", 150), ("rapsoel", 5)], "reis"),
+     [("eier", 174), ("gemuese_tk", 150), ("rapsoel", 8)], "reis"),
     ("lunch", "lentil_bulgur", "Red lentils with bulgur",
      "Mercimek. Cheap, filling, and it reheats better than it cooks.",
-     [("linsen_rot", 65), ("zwiebel", 60), ("olivenoel", 12),
+     [("linsen_rot", 70), ("zwiebel", 60), ("olivenoel", 14),
       ("passata", 100)], "bulgur"),
     ("lunch", "tuna_pasta", "Tuna pasta",
      "A whole tin, wholemeal pasta, passata. Fifteen minutes.",
-     [("thunfisch", 110), ("passata", 150), ("olivenoel", 10),
+     [("thunfisch", 110), ("passata", 150), ("olivenoel", 12),
       ("paprika", 80)], "nudeln"),
     ("lunch", "mince_potato", "Mince and potatoes",
      "Halal beef mince, potatoes, whatever vegetable is in the drawer.",
-     [("rinderhack", 130), ("karotten", 100), ("zwiebel", 50)], "kartoffeln"),
+     [("rinderhack", 150), ("karotten", 100), ("zwiebel", 50)], "kartoffeln"),
 
-    # ---- before training: 250 kcal ----------------------------------------
-    ("pre_training", "banana_dates", "Banana and dates",
-     "Ninety minutes before you go down. Nothing heavy, nothing fatty.",
+    # ---- evening snack: 250 kcal ------------------------------------------
+    # Before the evening session or the German course: light, quick, carbs.
+    ("snack", "banana_dates", "Banana and dates",
+     "Before the session or the German course. Nothing heavy.",
      [("banane", 120)], "datteln"),
-    ("pre_training", "rice_honey", "Rice with honey",
-     "If the dates are gone. Fast, boring, works.",
-     [("honig", 20)], "reis"),
-    ("pre_training", "oat_shake", "Oats and dates, blended",
-     "When the day got away from you and it has to be liquid. No milk this "
-     "close to training -- fat and protein sit in the stomach.",
-     [("datteln", 30)], "haferflocken"),
+    ("snack", "apple_nuts", "An apple and almonds",
+     "Pocket food for a day of lectures.",
+     [("apfel", 150)], "mandeln"),
+    ("snack", "quark_honey", "Quark with honey",
+     "A tub and a spoon. Two minutes at home.",
+     [("magerquark", 150), ("honig", 15)], "rosinen"),
+    ("snack", "bread_cheese", "Bread and cheese",
+     "One slice, cheese, an apple on the walk.",
+     [("vollkornbrot", 60), ("apfel", 100)], "gouda"),
 
-    # ---- straight after: 280 kcal -----------------------------------------
-    ("post_training", "whey_banana", "Whey and banana",
-     "Drink it in the basement, before you shower. This is the easy 30 g.",
-     [("whey", 25), ("banane", 120)], "vollmilch"),
-    ("post_training", "quark_honey", "Quark with honey",
-     "If the whey has run out. Slower, just as good.",
-     [("magerquark", 140), ("honig", 20)], "rosinen"),
-    ("post_training", "milk_oats", "Oats, milk and quark",
-     "The cheapest recovery meal in this plan.",
-     [("magerquark", 100), ("haferflocken", 40)], "vollmilch"),
-
-    # ---- rest-day afternoon: 530 kcal -------------------------------------
-    ("afternoon", "chickpea_couscous", "Lentils and couscous",
-     "Rest-day second lunch. The red lentils simmer in fifteen minutes "
-     "while the couscous soaks in kettle water.",
-     [("linsen_rot", 60), ("olivenoel", 6), ("paprika", 80),
-      ("zwiebel", 40)], "couscous"),
-    ("afternoon", "eggs_bread_big", "Eggs, bread and avocado",
-     "Four eggs. A rest day still has to hit the number.",
-     [("eier", 145), ("avocado", 40), ("tomaten", 80)], "vollkornbrot"),
-    ("afternoon", "quark_bowl", "Quark bowl",
-     "Quark, oats, fruit, nut butter. Two minutes.",
-     [("magerquark", 130), ("erdnussmus", 12), ("banane", 120)],
-     "haferflocken"),
-
-    # ---- dinner: 520 kcal -------------------------------------------------
+    # ---- dinner: 700 kcal -------------------------------------------------
     ("dinner", "chicken_potato", "Chicken thighs and potatoes",
      "The other half of prep night's chicken. Potatoes boiled in the same go.",
-     [("haehnchen_ok", 130), ("gemuese_tk", 150), ("rapsoel", 6)], "kartoffeln"),
+     [("haehnchen_ok", 150), ("gemuese_tk", 150), ("rapsoel", 10)], "kartoffeln"),
     ("dinner", "lentil_dal", "Red lentil dal with rice",
      "Lentils, passata, onion, spinach, cumin, skyr stirred through at the "
      "end. The cheapest good dinner there is.",
-     [("reis", 50), ("passata", 100), ("zwiebel", 30), ("spinat_tk", 80),
-      ("rapsoel", 8), ("skyr", 100)], "linsen_rot"),
+     [("reis", 70), ("passata", 100), ("zwiebel", 30), ("spinat_tk", 80),
+      ("rapsoel", 14), ("skyr", 100)], "linsen_rot"),
     ("dinner", "shakshuka", "Shakshuka with bread",
      "Eggs poached in tomato, pepper and onion. One pan, fifteen minutes.",
      [("eier", 174), ("passata", 150), ("zwiebel", 40), ("paprika", 80),
-      ("olivenoel", 5)], "vollkornbrot"),
+      ("olivenoel", 8)], "vollkornbrot"),
     ("dinner", "chickpea_bowl", "Chickpeas, couscous and a quark dip",
      "Couscous needs only a kettle. The other half of the tin, pepper, "
      "cucumber, and quark with garlic and lemon.",
      [("kichererbsen", 130), ("paprika", 80), ("gurke", 80),
-      ("olivenoel", 8), ("magerquark", 100)], "couscous"),
+      ("olivenoel", 12), ("magerquark", 120)], "couscous"),
     ("dinner", "tuna_potato", "Tuna and potato salad",
      "Boiled potatoes, a tin of tuna, cucumber, onion, oil. Cold is fine.",
      [("thunfisch", 110), ("gurke", 80), ("zwiebel", 30),
-      ("olivenoel", 12)], "kartoffeln"),
+      ("olivenoel", 14)], "kartoffeln"),
     ("dinner", "mince_pasta", "Pasta with mince sauce",
      "Sunday: mince, passata, onion, carrot. Once a week — mince is the dear one.",
-     [("rinderhack", 100), ("passata", 150), ("zwiebel", 50),
+     [("rinderhack", 120), ("passata", 150), ("zwiebel", 50),
       ("karotten", 60)], "nudeln"),
     ("dinner", "salmon_potato", "Salmon and potatoes",
      "Frozen fillet, oven, done. The dearest dinner here — a treat, not a habit.",
-     [("lachs", 120), ("brokkoli", 120), ("olivenoel", 6)], "kartoffeln"),
+     [("lachs", 130), ("brokkoli", 120), ("olivenoel", 8)], "kartoffeln"),
     ("dinner", "tofu_stirfry", "Tofu and vegetables",
      "Whatever is in the drawer, hot pan, soy sauce.",
-     [("tofu", 150), ("paprika", 100), ("zwiebel", 50),
-      ("rapsoel", 8)], "reis"),
+     [("tofu", 200), ("paprika", 100), ("zwiebel", 50),
+      ("rapsoel", 10)], "reis"),
     ("dinner", "chicken_salad", "Chicken, bread and salad",
-     "The one to cook when you got home late and still have to eat properly.",
-     [("haehnchenbrust", 110), ("gurke", 100), ("tomaten", 100),
-      ("olivenoel", 10)], "vollkornbrot"),
-
-    # ---- before bed: 120 kcal ---------------------------------------------
-    ("before_bed", "quark_small", "Quark",
-     "Slow protein overnight. Non-negotiable on training days.",
-     [], "magerquark"),
-    ("before_bed", "skyr_small", "Skyr",
-     "Same job, different tub.",
-     [], "skyr"),
-    ("before_bed", "milk_glass", "Warm milk with honey",
-     "When you cannot face another spoonful of quark.",
-     [("honig", 10)], "vollmilch"),
+     "The one to make when you got home late and still have to eat properly.",
+     [("haehnchenbrust", 130), ("gurke", 100), ("tomaten", 100),
+      ("olivenoel", 12), ("avocado", 50)], "vollkornbrot"),
 ]
 
 # What each meal is built around, and whether it is cooked ahead.
@@ -371,7 +328,6 @@ MEAL_META = {
     "chicken_salad": ("chicken", False),
     "lentil_bulgur": ("legumes", True), "lentil_dal": ("legumes", True),
     "chickpea_rice": ("legumes", True), "chickpea_bowl": ("legumes", True),
-    "chickpea_couscous": ("legumes", False),
     "egg_rice": ("eggs", False), "shakshuka": ("eggs", False),
     "tuna_pasta": ("fish", False), "tuna_potato": ("fish", False),
     "salmon_potato": ("fish", False),
@@ -387,34 +343,20 @@ MEAT_OR_FISH = {"chicken", "fish", "mince"}
 #
 # (weekday 1-7, theme, {slot: meal})
 ROTATION = [
-    (1, "Chicken", {"breakfast": "porridge_pb", "mid_morning": "banana_shake",
-                    "lunch": "chicken_rice", "pre_training": "oat_shake",
-                    "post_training": "milk_oats", "afternoon": "quark_bowl",
-                    "dinner": "chicken_potato", "before_bed": "quark_small"}),
-    (2, "Lentils", {"breakfast": "quark_oats", "mid_morning": "bread_cheese",
-                    "lunch": "lentil_bulgur", "pre_training": "banana_dates",
-                    "post_training": "quark_honey", "afternoon": "eggs_bread_big",
-                    "dinner": "lentil_dal", "before_bed": "quark_small"}),
-    (3, "Eggs", {"breakfast": "porridge_pb", "mid_morning": "banana_shake",
-                 "lunch": "egg_rice", "pre_training": "rice_honey",
-                 "post_training": "milk_oats", "afternoon": "quark_bowl",
-                 "dinner": "shakshuka", "before_bed": "milk_glass"}),
-    (4, "Chicken", {"breakfast": "eggs_bread", "mid_morning": "dates_nuts",
-                    "lunch": "chicken_rice", "pre_training": "oat_shake",
-                    "post_training": "whey_banana", "afternoon": "quark_bowl",
-                    "dinner": "chicken_potato", "before_bed": "quark_small"}),
-    (5, "Chickpeas", {"breakfast": "quark_oats", "mid_morning": "bread_cheese",
-                      "lunch": "chickpea_rice", "pre_training": "banana_dates",
-                      "post_training": "milk_oats", "afternoon": "eggs_bread_big",
-                      "dinner": "chickpea_bowl", "before_bed": "quark_small"}),
-    (6, "Tuna", {"breakfast": "porridge_pb", "mid_morning": "banana_shake",
-                 "lunch": "tuna_pasta", "pre_training": "rice_honey",
-                 "post_training": "milk_oats", "afternoon": "quark_bowl",
-                 "dinner": "tuna_potato", "before_bed": "quark_small"}),
-    (7, "Mince", {"breakfast": "eggs_bread", "mid_morning": "dates_nuts",
-                  "lunch": "mince_potato", "pre_training": "oat_shake",
-                  "post_training": "milk_oats", "afternoon": "quark_bowl",
-                  "dinner": "mince_pasta", "before_bed": "quark_small"}),
+    (1, "Chicken", {"breakfast": "porridge_pb", "lunch": "chicken_rice",
+                    "snack": "banana_dates", "dinner": "chicken_potato"}),
+    (2, "Lentils", {"breakfast": "quark_oats", "lunch": "lentil_bulgur",
+                    "snack": "apple_nuts", "dinner": "lentil_dal"}),
+    (3, "Eggs", {"breakfast": "porridge_pb", "lunch": "egg_rice",
+                 "snack": "quark_honey", "dinner": "shakshuka"}),
+    (4, "Chicken", {"breakfast": "eggs_bread", "lunch": "chicken_rice",
+                    "snack": "banana_dates", "dinner": "chicken_potato"}),
+    (5, "Chickpeas", {"breakfast": "quark_oats", "lunch": "chickpea_rice",
+                      "snack": "bread_cheese", "dinner": "chickpea_bowl"}),
+    (6, "Tuna", {"breakfast": "porridge_pb", "lunch": "tuna_pasta",
+                 "snack": "apple_nuts", "dinner": "tuna_potato"}),
+    (7, "Mince", {"breakfast": "eggs_bread", "lunch": "mince_potato",
+                  "snack": "quark_honey", "dinner": "mince_pasta"}),
 ]
 
 # Prep nights: what is cooked when, for which days. Cooked chicken, rice and
@@ -433,20 +375,13 @@ PREP = {
 BUDGET_EUR_PER_DAY = 7.00
 BUDGET_EUR_PER_WEEK = 45.00
 
-# Phase modules. The base day is 2,600 kcal; the later phases ADD to it rather
-# than being authored again, because three separate plans is three things to
-# keep in step.
+# The one module: what the stalled-scale rule adds (the programme's
+# kcalBumpWhenFlat), as food, so Fuel can show it as food rather than a number.
 MODULES = [
-    ("phase2", "Weeks 5-8: +150", 150, 5,
-     "TDEE rose with your bodyweight. Add this to any meal.",
+    ("boost150", "Stalled: +150", 150, 6,
+     "The scale has not moved for three weeks. A spoon of peanut butter a day "
+     "is the fix, and it stays until the scale moves again.",
      [("erdnussmus", 25)]),
-    ("phase3", "Weeks 9-12: +300", 300, 10,
-     "Final push. Split it: half in the morning, half after training.",
-     [("erdnussmus", 25), ("haferflocken", 40)]),
-    ("boost250", "Stalled: +250", 250, 8,
-     "The scale has not moved for two weeks. This is the fix, and it stays "
-     "applied until the scale moves again.",
-     [("erdnussmus", 20), ("datteln", 40)]),
 ]
 
 SUPPLEMENTS = [
@@ -575,18 +510,17 @@ for slot_id, tid, name, note, fixed, flex in TEMPLATES:
 # 3^7 of them, take the lightest and heaviest template in each slot: if both
 # extremes are inside the tolerance, everything between them is too.
 PHASES = [
-    ("weeks 1-4", 2600, 110, None),
-    ("weeks 5-8", 2750, 115, "phase2"),
-    ("weeks 9-12", 2900, 120, "phase3"),
+    ("weeks 1-12", 2300, 90, None),
 ]
+DAY_SLOTS = {
+    kind: [sid for sid, _, _, days, _, _ in SLOTS if days in ("both", kind)]
+    for kind in ("training", "rest")
+}
 MODULE_BY_ID = {m[0]: m for m in MODULES}
+# 4.5 g per kilo at 50 kg: enough for three sessions a week.
+CARB_FLOOR = 225
 
-for day_kind, slot_ids in [
-    ("training", ["breakfast", "mid_morning", "lunch", "pre_training",
-                  "post_training", "dinner", "before_bed"]),
-    ("rest", ["breakfast", "mid_morning", "lunch", "afternoon", "dinner",
-              "before_bed"]),
-]:
+for day_kind, slot_ids in DAY_SLOTS.items():
     for label, kcal_t, prot_t, module_id in PHASES:
         add = macros(MODULE_BY_ID[module_id][5]) if module_id else {
             "kcal": 0, "proteinG": 0, "carbsG": 0, "fatG": 0}
@@ -629,10 +563,10 @@ for day_kind, slot_ids in [
             # carbohydrate that fuels five sessions a week, so THAT is what
             # is checked. 250 g is 5 g per kilo at 50 kg, which is enough to
             # train on; below it the day is worth re-authoring.
-            if tot["carbsG"] < 250:
+            if tot["carbsG"] < CARB_FLOOR:
                 fail(f"{day_kind} {label}, {bound} day: {tot['carbsG']:.0f} g "
-                     f"of carbohydrate, under the 250 g floor -- the protein "
-                     f"is crowding out the fuel")
+                     f"of carbohydrate, under the {CARB_FLOOR} g floor -- the "
+                     f"protein is crowding out the fuel")
             if tot["fatG"] < 40:
                 fail(f"{day_kind} {label}, {bound} day: {tot['fatG']:.0f} g fat "
                      f"— below the 40 g floor hormones need")
@@ -644,12 +578,7 @@ for day_kind, slot_ids in [
 BUILT = {t["id"]: t for t in built}
 week_cost = {"training": 0.0, "rest": 0.0}
 for wd, theme, meals in ROTATION:
-    for day_kind, slot_ids in [
-        ("training", ["breakfast", "mid_morning", "lunch", "pre_training",
-                      "post_training", "dinner", "before_bed"]),
-        ("rest", ["breakfast", "mid_morning", "lunch", "afternoon", "dinner",
-                  "before_bed"]),
-    ]:
+    for day_kind, slot_ids in DAY_SLOTS.items():
         chosen = []
         for sid in slot_ids:
             mid = meals.get(sid)
@@ -661,13 +590,14 @@ for wd, theme, meals in ROTATION:
         tot = {k: sum(t[k] for t in chosen) for k in ("kcal", "proteinG", "carbsG", "fatG")}
         cost = sum(t["costEur"] for t in chosen)
         week_cost[day_kind] += cost
-        target = 2600
+        target, floor = PHASES[0][1], PHASES[0][2]
         if abs(tot["kcal"] - target) > target * 0.03:
             fail(f"rotation day {wd} {day_kind}: {tot['kcal']} kcal against {target}")
-        if tot["proteinG"] < 110:
-            fail(f"rotation day {wd} {day_kind}: {tot['proteinG']:.0f} g protein, under 110")
-        if tot["carbsG"] < 250:
-            fail(f"rotation day {wd} {day_kind}: {tot['carbsG']:.0f} g carbohydrate, under 250")
+        if tot["proteinG"] < floor:
+            fail(f"rotation day {wd} {day_kind}: {tot['proteinG']:.0f} g protein, under {floor}")
+        if tot["carbsG"] < CARB_FLOOR:
+            fail(f"rotation day {wd} {day_kind}: {tot['carbsG']:.0f} g carbohydrate, "
+                 f"under {CARB_FLOOR}")
         if tot["fatG"] < 40:
             fail(f"rotation day {wd} {day_kind}: {tot['fatG']:.0f} g fat, under 40")
         if cost > BUDGET_EUR_PER_DAY:
@@ -715,7 +645,8 @@ doc = {
         for fid, f in FOODS.items()
     ],
     "slots": [
-        {"id": i, "name": n, "time": t, "days": d, "kcal": k, "proteinG": p}
+        {"id": i, "name": n, "time": t, "days": d, "kcal": k, "proteinG": p,
+         "aroundSession": i in AROUND_SESSION}
         for i, n, t, d, k, p in SLOTS
     ],
     "meals": built,
@@ -727,9 +658,7 @@ doc = {
     "phases": [
         {"weeks": w, "kcal": k, "proteinG": p, "moduleId": m}
         for w, k, p, m in [
-            ([1, 2, 3, 4], 2600, 110, None),
-            ([5, 6, 7, 8], 2750, 115, "phase2"),
-            ([9, 10, 11, 12], 2900, 120, "phase3"),
+            (list(range(1, 13)), 2300, 90, None),
         ]
     ],
     "supplements": [

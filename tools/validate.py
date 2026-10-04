@@ -285,14 +285,19 @@ for t in prog.get("strengthTargets", []):
     used.add(t["exerciseId"])
 orphans = sorted(set(LIB) - used)
 if orphans:
-    fail("V10", f"{len(orphans)} library exercises are unreachable: {', '.join(orphans)}")
+    # v4: the three-day programme uses a slice of the library; the rest stays
+    # for browsing and as stand-ins. Unreachable is now worth knowing, not a
+    # broken build.
+    warn(f"V10 {len(orphans)} library exercises are not in the programme "
+         f"(browsable only): {', '.join(orphans)}")
 
-# =========================================== V11 sixty-minute ceiling ========
+# ========================================= V11 thirty-five-minute ceiling ====
 # Every session, not only lift days: gen.py costs a cardio day at the longest
 # week its cardio table can ask of it, so a 35-minute week-11 run is inside
 # the number. (Before v3 cardio days were not gated, and b-sun's estimate used
 # the 26-minute week-5 run.)
-CEIL = 60
+# v4: a working student's half hour, with five minutes of slack.
+CEIL = 35
 for b in OWN:
     for d in b.get("days", []):
         if d["kind"] != "rest" and d["estMinutes"] > CEIL:

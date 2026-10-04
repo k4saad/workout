@@ -233,27 +233,27 @@ void main() {
 
     test('the median ignores one runaway evening', () {
       final stats = SessionStats([
-        d(2, 52),
-        d(3, 55),
-        d(5, 140), // took a phone call
-        d(6, 54),
-        d(9, 53),
+        d(2, 28),
+        d(3, 31),
+        d(5, 95), // took a phone call
+        d(6, 30),
+        d(9, 29),
       ]);
-      expect(stats.medianMinutes, 54);
-      expect(stats.longestMinutes, 140);
+      expect(stats.medianMinutes, 30);
+      expect(stats.longestMinutes, 95);
       expect(stats.ceilingIsFiction, isFalse);
       expect(stats.verdict, contains('holds'));
     });
 
-    test('a majority over the hour means the sessions are too big', () {
-      final stats = SessionStats([d(2, 72), d(3, 68), d(5, 75), d(6, 58)]);
+    test('a majority over the ceiling means the sessions are too big', () {
+      final stats = SessionStats([d(2, 42), d(3, 40), d(5, 45), d(6, 33)]);
       expect(stats.ceilingIsFiction, isTrue);
       expect(stats.verdict, contains('cut volume'));
       expect(stats.overCeilingCount, 3);
     });
 
     test('two long sessions are not yet a pattern', () {
-      final stats = SessionStats([d(2, 72), d(3, 70)]);
+      final stats = SessionStats([d(2, 42), d(3, 44)]);
       expect(stats.ceilingIsFiction, isFalse);
     });
 

@@ -90,6 +90,7 @@ class TodayScreen extends ConsumerWidget {
                   ProgrammeStatus.active => _DayCard(
                     planned: planned,
                     programme: b.programme,
+                    next: b.calendar.nextSession(today),
                   ),
                 },
               ),
@@ -232,10 +233,17 @@ class _OpenRunBanner extends ConsumerWidget {
 
 /// Today's session: the one thing on the screen, until it is done.
 class _DayCard extends ConsumerWidget {
-  const _DayCard({required this.planned, required this.programme});
+  const _DayCard({
+    required this.planned,
+    required this.programme,
+    required this.next,
+  });
 
   final PlannedDay planned;
   final Programme programme;
+
+  /// The next required session, which a rest day names.
+  final PlannedDay? next;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -284,6 +292,26 @@ class _DayCard extends ConsumerWidget {
                 '${DateFormat('EEEE').format(r.plannedDate)}’s session is '
                 'here today',
                 style: t.titleSmall,
+              ),
+            ],
+            if (next case final n? when entry.movedHere.isEmpty) ...[
+              Gap.m,
+              Row(
+                children: [
+                  const Icon(
+                    Icons.arrow_forward,
+                    size: 18,
+                    color: AppTheme.textDim,
+                  ),
+                  Gap.s,
+                  Expanded(
+                    child: Text(
+                      'Next: ${n.day!.title}, '
+                      '${ProgrammeCalendar.daysBetween(today, n.date) == 1 ? 'tomorrow' : DateFormat('EEEE').format(n.date)}',
+                      style: t.titleSmall,
+                    ),
+                  ),
+                ],
               ),
             ],
           ],

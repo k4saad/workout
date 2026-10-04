@@ -21,7 +21,7 @@ void main() {
   late ProgrammeRepository repo;
 
   // A Friday: the Plan opens on next week, the one about to be shopped for.
-  final today = DateTime(2026, 10, 2);
+  final today = DateTime(2026, 10, 16);
 
   setUp(() async {
     await Screenshot.loadRealFonts();
@@ -91,8 +91,8 @@ void main() {
       await toTop(find.text('THE WEEK'));
       await Screenshot.capture(tester, 'fuel_plan_week');
 
-      await toTop(find.text('Tue 6 Oct'));
-      await tester.tap(find.text('Tue 6 Oct'));
+      await toTop(find.text('Tue 20 Oct'));
+      await tester.tap(find.text('Tue 20 Oct'));
       await Screenshot.settle(tester);
       await Screenshot.capture(tester, 'fuel_plan_day');
 

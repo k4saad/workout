@@ -14,10 +14,12 @@ void main() {
   final programme = Fixtures.programme;
   final resolver = BlockResolver(programme);
 
-  /// Build-block Monday: squat, RDL, two supersets.
-  Day monday() => resolver
+  Day buildDay(String id) => resolver
       .resolveDays(programme.blockById('build')!, 5)
-      .firstWhere((d) => d.id == 'b-mon');
+      .firstWhere((d) => d.id == id);
+
+  /// Build-block Tuesday: squat, a dumbbell superset, knee raises.
+  Day tuesday() => buildDay('b-tue');
 
   setUp(() {
     db = AppDatabase.memory();
@@ -25,11 +27,11 @@ void main() {
   });
   tearDown(() => db.close());
 
-  Future<Session> startMonday({DateTime? on, bool retroactive = false}) =>
+  Future<Session> startTuesday({DateTime? on, bool retroactive = false}) =>
       svc.start(
         programmeId: programme.id,
         blockId: 'build',
-        day: monday(),
+        day: tuesday(),
         weekNo: 5,
         date: on ?? DateTime(2026, 11, 2),
         retroactive: retroactive,
@@ -37,22 +39,22 @@ void main() {
 
   group('starting', () {
     test('creates one in-progress session', () async {
-      final s = await startMonday();
+      final s = await startTuesday();
       expect(s.status, SessionStatus.inProgress);
-      expect(s.dayId, 'b-mon');
+      expect(s.dayId, 'b-tue');
       expect(s.weekNo, 5);
       expect(s.startedAt, isNotNull);
     });
 
     test('starting the same day twice does not fork history', () async {
-      final a = await startMonday();
-      final b = await startMonday();
+      final a = await startTuesday();
+      final b = await startTuesday();
       expect(b.id, a.id);
       expect(await db.select(db.sessions).get(), hasLength(1));
     });
 
     test('a retroactive session records that it was reconstructed', () async {
-      final s = await startMonday(retroactive: true);
+      final s = await startTuesday(retroactive: true);
       expect(s.loggedRetroactively, isTrue);
       expect(
         s.startedAt,
@@ -64,11 +66,11 @@ void main() {
     test(
       'reopening a finished day keeps its sets and goes back in progress',
       () async {
-        final s = await startMonday();
+        final s = await startTuesday();
         await svc.logSet(
           s.id,
           const SetEntry(
-            prescriptionId: 'b-mon-1',
+            prescriptionId: 'b-tue-1',
             exerciseId: 'barbell-back-squat',
             setIndex: 1,
             reps: 5,
@@ -77,7 +79,7 @@ void main() {
         );
         await svc.finish(s.id);
 
-        final again = await startMonday();
+        final again = await startTuesday();
         expect(again.id, s.id);
         expect(again.status, SessionStatus.inProgress);
         expect(again.finishedAt, isNull);
@@ -88,11 +90,11 @@ void main() {
 
   group('logging', () {
     test('a set is persisted immediately, not at finish', () async {
-      final s = await startMonday();
+      final s = await startTuesday();
       await svc.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-mon-1',
+          prescriptionId: 'b-tue-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 1,
           reps: 5,
@@ -120,14 +122,14 @@ void main() {
       final s = await clocked.start(
         programmeId: programme.id,
         blockId: 'build',
-        day: monday(),
+        day: tuesday(),
         weekNo: 5,
         date: DateTime(2026, 11, 2),
       );
       await clocked.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-mon-1',
+          prescriptionId: 'b-tue-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 1,
           reps: 5,
@@ -139,11 +141,11 @@ void main() {
     });
 
     test('a killed session is resumable', () async {
-      final s = await startMonday();
+      final s = await startTuesday();
       await svc.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-mon-1',
+          prescriptionId: 'b-tue-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 1,
           reps: 5,
@@ -153,15 +155,15 @@ void main() {
 
       final resumed = await svc.resumable();
       expect(resumed?.id, s.id);
-      expect(await svc.loggedSetCount(s.id, 'b-mon-1'), 1);
+      expect(await svc.loggedSetCount(s.id, 'b-tue-1'), 1);
     });
 
     test('ramp sets are logged but do not count as working sets', () async {
-      final s = await startMonday();
+      final s = await startTuesday();
       await svc.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-mon-1',
+          prescriptionId: 'b-tue-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 0,
           reps: 8,
@@ -169,16 +171,16 @@ void main() {
           isWarmup: true,
         ),
       );
-      expect(await svc.loggedSetCount(s.id, 'b-mon-1'), 0);
+      expect(await svc.loggedSetCount(s.id, 'b-tue-1'), 0);
       expect(await db.setsForSession(s.id), hasLength(1));
     });
 
     test('a mis-tapped set can be corrected', () async {
-      final s = await startMonday();
+      final s = await startTuesday();
       final id = await svc.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-mon-1',
+          prescriptionId: 'b-tue-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 1,
           reps: 50,
@@ -193,9 +195,8 @@ void main() {
 
   group('per-side work', () {
     test('a 3 x 8 per-side prescription plans six entries, not three', () {
-      final bss = monday().allPrescriptions.firstWhere(
-        (p) => p.id == 'b-mon-3a',
-      );
+      final bss = buildDay('b-sat').allPrescriptions
+          .firstWhere((p) => p.id == 'b-sat-3a');
       expect(bss.perSide, isTrue);
       final planned = SessionService.plannedSets(bss);
       expect(planned, hasLength(6));
@@ -204,11 +205,11 @@ void main() {
     });
 
     test('a bilateral prescription plans one entry per set', () {
-      final squat = monday().allPrescriptions.firstWhere(
-        (p) => p.id == 'b-mon-1',
+      final squat = tuesday().allPrescriptions.firstWhere(
+        (p) => p.id == 'b-tue-1',
       );
       expect(squat.perSide, isFalse);
-      expect(SessionService.plannedSets(squat), hasLength(4));
+      expect(SessionService.plannedSets(squat), hasLength(3));
       expect(
         SessionService.plannedSets(squat).every((e) => e.side == null),
         isTrue,
@@ -218,28 +219,25 @@ void main() {
 
   group('input kind', () {
     test('a loaded barbell lift asks for reps and load', () {
-      final squat = monday().allPrescriptions.firstWhere(
-        (p) => p.id == 'b-mon-1',
+      final squat = tuesday().allPrescriptions.firstWhere(
+        (p) => p.id == 'b-tue-1',
       );
       expect(SessionService.inputKindFor(squat), SetInputKind.repsAndLoad);
     });
 
     test('a bodyweight movement asks for reps only', () {
-      final calf = monday().allPrescriptions.firstWhere(
-        (p) => p.id == 'b-mon-3b',
+      final raise = tuesday().allPrescriptions.firstWhere(
+        (p) => p.id == 'b-tue-3',
       );
-      expect(calf.loadMode, LoadMode.bodyweight);
-      expect(SessionService.inputKindFor(calf), SetInputKind.reps);
+      expect(raise.loadMode, LoadMode.bodyweight);
+      expect(SessionService.inputKindFor(raise), SetInputKind.reps);
     });
 
-    test('a timed prescription asks for a duration, not 120 reps', () {
-      final bag = resolver
-          .resolveDays(programme.blockById('build')!, 5)
-          .firstWhere((d) => d.id == 'b-sun')
-          .allPrescriptions
-          .firstWhere((p) => p.exerciseId == 'heavy-bag-rounds');
-      expect(bag.unit, RepUnit.sec);
-      expect(SessionService.inputKindFor(bag), SetInputKind.duration);
+    test('a timed prescription asks for a duration, not 30 reps', () {
+      final plank = buildDay('b-sat').allPrescriptions
+          .firstWhere((p) => p.exerciseId == 'side-plank');
+      expect(plank.unit, RepUnit.sec);
+      expect(SessionService.inputKindFor(plank), SetInputKind.duration);
     });
 
     test('the 5K asks for a distance', () {
@@ -254,14 +252,14 @@ void main() {
 
   group('finishing', () {
     test('completed vs partial are distinguished', () async {
-      final a = await startMonday(on: DateTime(2026, 11, 2));
+      final a = await startTuesday(on: DateTime(2026, 11, 2));
       await svc.finish(a.id);
       expect((await db.sessionById(a.id))!.status, SessionStatus.completed);
 
       final b = await svc.start(
         programmeId: programme.id,
         blockId: 'build',
-        day: monday(),
+        day: tuesday(),
         weekNo: 5,
         date: DateTime(2026, 11, 9),
       );
@@ -272,18 +270,17 @@ void main() {
     });
 
     test('progress counts working sets against the plan', () async {
-      final day = monday();
-      final s = await startMonday();
+      final day = tuesday();
+      final s = await startTuesday();
       final before = await svc.progress(s.id, day);
       expect(before.done, 0);
-      // 4 squat + 3 RDL + 6 BSS (per side) + 6 calf (per side) + 3 knee raise
-      // + 3 negatives + 3 lateral raises = 28
-      expect(before.planned, 28);
+      // 3 squat + 3 incline press + 3 row + 2 knee raise = 11
+      expect(before.planned, 11);
 
       await svc.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-mon-1',
+          prescriptionId: 'b-tue-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 1,
           reps: 5,
@@ -296,7 +293,7 @@ void main() {
 
   group('rescheduling', () {
     test('drawn on the new date, still counted in the old week', () async {
-      final s = await startMonday(on: DateTime(2026, 11, 2));
+      final s = await startTuesday(on: DateTime(2026, 11, 2));
       await svc.reschedule(s.id, DateTime(2026, 11, 4));
       final moved = (await db.sessionById(s.id))!;
       expect(moved.scheduledDate, DateTime(2026, 11, 4));
@@ -310,7 +307,7 @@ void main() {
   });
 
   test('a niggle can be recorded mid-session', () async {
-    final s = await startMonday();
+    final s = await startTuesday();
     await svc.logNiggle(
       site: NiggleSite.knee,
       severity: 2,

@@ -2,14 +2,14 @@
   "id": "keller-twelve",
   "name": "The Keller Twelve",
   "schemaVersion": 2,
-  "revision": 2,
-  "startDate": "2026-09-28",
+  "revision": 3,
+  "startDate": "2026-10-12",
   "totalWeeks": 12,
-  "notes": "Beginner hypertrophy block for a 167 cm / 50 kg lifter training alone five evenings a week in a basement gym, on a 60-minute session ceiling. Every load in this file is snapped to the plate lattice described in inventory.json -- change the inventory and regenerate with tools/gen.py rather than editing loads by hand. Cardio is deliberately capped so it does not eat the caloric surplus.",
+  "notes": "A fitness block for a working student: 167 cm / 50 kg, training alone in a basement gym three times a week -- Tuesday and Thursday evening, Saturday morning -- for about half an hour, with an optional run or hike on Sunday. Every load in this file is snapped to the plate lattice described in inventory.json -- change the inventory and regenerate with tools/gen.py rather than editing loads by hand.",
   "athlete": {
     "startWeightKg": 50.0,
     "heightCm": 167,
-    "targetWeightKg": 55.0,
+    "targetWeightKg": 53.0,
     "ageYears": 22,
     "sex": "male",
     "experience": "beginner",
@@ -21,45 +21,27 @@
         1,
         2,
         3,
-        4
-      ],
-      "kcal": 2600,
-      "proteinG": 110,
-      "carbsG": 382,
-      "fatG": 70,
-      "note": "Start here. ~52 kcal/kg -- two liquid meals a day make this easy."
-    },
-    {
-      "weeks": [
+        4,
         5,
         6,
         7,
-        8
-      ],
-      "kcal": 2750,
-      "proteinG": 115,
-      "carbsG": 410,
-      "fatG": 72,
-      "note": "TDEE has risen with your bodyweight. So does the target."
-    },
-    {
-      "weeks": [
+        8,
         9,
         10,
         11,
         12
       ],
-      "kcal": 2900,
-      "proteinG": 120,
-      "carbsG": 440,
-      "fatG": 75,
-      "note": "Final push. If the waist is growing faster than the lifts, cut 200."
+      "kcal": 2300,
+      "proteinG": 90,
+      "carbsG": 327,
+      "fatG": 70,
+      "note": "Four normal meals, a little more than you burn: fit, and slowly filling out."
     }
   ],
   "nutritionRules": {
-    "gainKgPerWeek": 0.3,
-    "flatWeeksBeforeBump": 2,
-    "kcalBumpWhenFlat": 250,
+    "gainKgPerWeek": 0.15,
+    "flatWeeksBeforeBump": 3,
+    "kcalBumpWhenFlat": 150,
     "useRollingAverage": true,
     "rollingAverageDays": 7,
     "waistGrowthLimitCm": 3.0,
@@ -71,16 +53,16 @@
       "foundation"
     ],
     "seedFrom": "test",
-    "bodyweightTargetKg": 60.0
+    "bodyweightTargetKg": 55.0
   },
   "rules": [
-    "Eat in surplus every single day. A missed meal is a missed session.",
+    "Eat your four meals. Skipping lunch on a long day is the easiest way to stall.",
     "Leave 2 reps in the tank -- 3 during weeks 1 to 4.",
     "Collars on. Check them mid-set. Spinlock collars work loose under load.",
     "Never fail alone under a bar. Set the catch pins, or press dumbbells.",
     "Add weight only when you earn it: top of the rep range on every set.",
     "Log every set. A session you didn't log is a session you can't beat next week.",
-    "Sixty minutes means sixty minutes. If you are over, cut the last superset -- not the main lift, not the warm-up.",
+    "Half an hour means half an hour. If you are over, cut the last superset -- not the main lift, not the warm-up.",
     "If something hurts -- not burns, HURTS -- stop the set, log the niggle, use the substitute."
   ],
   "cardioProgression": [
@@ -93,13 +75,10 @@
         15,
         18
       ],
-      "secondRunMin": [
-        12,
-        15
-      ],
-      "skipping": "Tue 6 x 60 s · Sun 3 x 60 s",
+      "secondRunMin": null,
+      "skipping": "Warm-up 2 min on lift days",
       "bag": null,
-      "note": "Calves and Achilles need four weeks to adapt. Don't rush this."
+      "note": "Sunday is optional: an easy run, or a hike instead. Start short."
     },
     {
       "weeks": [
@@ -110,13 +89,10 @@
         20,
         22
       ],
-      "secondRunMin": [
-        15,
-        18
-      ],
-      "skipping": "Tue 6 x 60 s · Sun 3 x 60 s",
+      "secondRunMin": null,
+      "skipping": "Warm-up 2 min on lift days",
       "bag": null,
-      "note": "A little longer, same easy pace. The bag arrives with Build in week 5."
+      "note": "A little longer, same easy pace."
     },
     {
       "weeks": [
@@ -124,32 +100,26 @@
         6
       ],
       "longRunMin": [
-        24,
-        26
+        22,
+        25
       ],
-      "secondRunMin": [
-        20,
-        20
-      ],
-      "skipping": "Warm-up 3 min on lift days",
-      "bag": "Sun 3 x 2 min",
-      "note": "Second run becomes the optional Wednesday -- skip it if you are behind on food. Strides after the Sunday run from now on. The bag appears: wraps or gloves."
+      "secondRunMin": null,
+      "skipping": "Warm-up 2 min on lift days",
+      "bag": null,
+      "note": "Easy means you could talk the whole way."
     },
     {
       "weeks": [
         7
       ],
       "longRunMin": [
-        28,
-        28
+        25,
+        25
       ],
-      "secondRunMin": [
-        20,
-        20
-      ],
-      "skipping": "Warm-up 3 min on lift days",
-      "bag": "Sun 3 x 2 min",
-      "note": "Highest cardio week before the deload."
+      "secondRunMin": null,
+      "skipping": "Warm-up 2 min on lift days",
+      "bag": null,
+      "note": "Longest before the deload."
     },
     {
       "weeks": [
@@ -160,9 +130,9 @@
         15
       ],
       "secondRunMin": null,
-      "skipping": "Warm-up 3 min on lift days",
-      "bag": "Sun 2 x 2 min",
-      "note": "Deload. Everything comes down, including this. No Wednesday run, no strides."
+      "skipping": "Warm-up 2 min on lift days",
+      "bag": null,
+      "note": "Deload. Everything comes down, including this."
     },
     {
       "weeks": [
@@ -170,15 +140,12 @@
         10
       ],
       "longRunMin": [
-        30,
-        33
+        25,
+        28
       ],
-      "secondRunMin": [
-        20,
-        25
-      ],
-      "skipping": "Warm-up 3 min on lift days",
-      "bag": "Sun 3 x 2 min",
+      "secondRunMin": null,
+      "skipping": "Warm-up 2 min on lift days",
+      "bag": null,
       "note": "Runs get longer, never faster."
     },
     {
@@ -186,16 +153,13 @@
         11
       ],
       "longRunMin": [
-        35,
-        35
+        30,
+        30
       ],
-      "secondRunMin": [
-        25,
-        25
-      ],
-      "skipping": "Warm-up 3 min on lift days",
-      "bag": "Sun 3 x 2 min",
-      "note": "Last easy long run -- the longest Sunday of the cycle, and it still fits the hour."
+      "secondRunMin": null,
+      "skipping": "Warm-up 2 min on lift days",
+      "bag": null,
+      "note": "The longest Sunday of the cycle -- or the longest hike."
     },
     {
       "weeks": [
@@ -203,9 +167,9 @@
       ],
       "longRunMin": null,
       "secondRunMin": null,
-      "skipping": "Warm-up 3 min on lift days",
+      "skipping": "Warm-up 2 min on lift days",
       "bag": null,
-      "note": "5K time trial replaces the Sunday run. Target 28-32 min."
+      "note": "A 5K if you want to know your number. Optional."
     }
   ],
   "checkpoints": [
@@ -231,8 +195,8 @@
     {
       "week": 4,
       "expectedWeightKg": [
-        51.0,
-        52.0
+        50.2,
+        51.0
       ],
       "autoTick": {
         "photos": 0,
@@ -249,8 +213,8 @@
     {
       "week": 8,
       "expectedWeightKg": [
-        53.0,
-        54.0
+        50.6,
+        51.6
       ],
       "autoTick": {
         "photos": 0,
@@ -261,14 +225,14 @@
         "Measurements",
         "DELOAD WEEK -- do it properly, you will want to skip it",
         "Waist vs the 3 cm rule -- if it is growing faster than the lifts, cut 200 kcal",
-        "Clothes should fit differently across the shoulders"
+        "Stairs and the walk to campus should feel easier than in week 1"
       ]
     },
     {
       "week": 12,
       "expectedWeightKg": [
-        55.0,
-        56.5
+        51.0,
+        52.5
       ],
       "autoTick": {
         "photos": 0,
@@ -279,7 +243,7 @@
         "Measurements",
         "5-rep tests: squat, bench, row, deadlift, overhead press",
         "Max strict pull-ups",
-        "5K time trial",
+        "5K time trial, if you want it",
         "Seed cycle 2 from the test numbers"
       ]
     }
@@ -297,7 +261,7 @@
       ],
       "reps": 5,
       "isFloor": true,
-      "note": "e1RM ~40 kg, 0.72x a 55 kg bodyweight. A FLOOR, not a goal."
+      "note": "e1RM ~40 kg, 0.75x a 53 kg bodyweight. A FLOOR, not a goal."
     },
     {
       "exerciseId": "barbell-deadlift",
@@ -311,7 +275,7 @@
       ],
       "reps": 5,
       "isFloor": true,
-      "note": "e1RM ~70 kg, 1.27x a 55 kg bodyweight."
+      "note": "e1RM ~70 kg, 1.32x a 53 kg bodyweight."
     },
     {
       "exerciseId": "barbell-bench-press",
@@ -325,7 +289,7 @@
       ],
       "reps": 5,
       "isFloor": true,
-      "note": "e1RM ~28 kg, 0.51x a 55 kg bodyweight."
+      "note": "e1RM ~28 kg, 0.53x a 53 kg bodyweight."
     },
     {
       "exerciseId": "barbell-overhead-press",
@@ -339,7 +303,7 @@
       ],
       "reps": 5,
       "isFloor": true,
-      "note": "e1RM ~23 kg, 0.42x a 55 kg bodyweight. The slowest-moving lift you own -- that is normal."
+      "note": "e1RM ~23 kg, 0.44x a 53 kg bodyweight. The slowest-moving lift you own -- that is normal."
     },
     {
       "exerciseId": "barbell-bent-over-row",
@@ -353,21 +317,7 @@
       ],
       "reps": 5,
       "isFloor": true,
-      "note": "e1RM ~35 kg, 0.64x a 55 kg bodyweight."
-    },
-    {
-      "exerciseId": "barbell-romanian-deadlift",
-      "week4Kg": [
-        25.0,
-        25.0
-      ],
-      "week12Kg": [
-        37.0,
-        37.0
-      ],
-      "reps": 8,
-      "isFloor": true,
-      "note": "e1RM ~47 kg, 0.85x a 55 kg bodyweight."
+      "note": "e1RM ~35 kg, 0.66x a 53 kg bodyweight."
     },
     {
       "exerciseId": "pull-up",
@@ -402,18 +352,29 @@
       "setRounding": "up",
       "includeSupersets": true,
       "includeFinishers": true,
-      "summary": "Full body three times a week. Light loads, perfect reps, every barbell lift introduced with the empty 10 kg bar, and a short arms-and-delts superset to finish. Build the eating habit here.",
+      "summary": "Full body three times a week, about half an hour each: Tuesday and Thursday evening, Saturday morning. Light loads, perfect reps, every barbell lift introduced with the empty 10 kg bar.",
       "inheritsDaysFrom": null,
       "dayOverrides": {},
       "days": [
         {
           "id": "f-mon",
           "weekday": "mon",
+          "title": "Rest",
+          "kind": "rest",
+          "optional": false,
+          "estMinutes": 0,
+          "note": "Your long day: job, lectures, the German course. Nothing else. Eat your four meals.",
+          "warnings": [],
+          "sections": []
+        },
+        {
+          "id": "f-tue",
+          "weekday": "tue",
           "title": "Full Body A",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 45,
-          "note": "Squat-led. Every load is deliberately light — you are rehearsing patterns, not testing yourself. The four weeks you spend here are the four you don't lose to a tweaked back in week six.",
+          "estMinutes": 26,
+          "note": "Squat-led, about half an hour. Light on purpose — you are learning the patterns.",
           "warnings": [
             {
               "title": "Set the catch pins",
@@ -428,19 +389,19 @@
             {
               "type": "warmup",
               "title": "Warm-up",
-              "estMinutes": 4,
+              "estMinutes": 3,
               "drills": [
                 {
                   "exerciseId": "rope-skipping",
                   "order": 1,
-                  "text": "6 x 30 s on / 30 s off",
+                  "text": "2 min",
                   "note": "On the interlocking mats, never bare concrete."
                 },
                 {
-                  "exerciseId": "broomstick-pass-through",
+                  "exerciseId": "leg-swing",
                   "order": 2,
-                  "text": "x 10",
-                  "note": "Wide grip, over the head and behind."
+                  "text": "x 10 / side",
+                  "note": null
                 },
                 {
                   "exerciseId": "bodyweight-squat",
@@ -453,18 +414,6 @@
                   "order": 4,
                   "text": "x 15",
                   "note": null
-                },
-                {
-                  "exerciseId": "band-pull-apart",
-                  "order": 5,
-                  "text": "x 20",
-                  "note": "Green band."
-                },
-                {
-                  "exerciseId": "leg-swing",
-                  "order": 6,
-                  "text": "x 10 / side",
-                  "note": null
                 }
               ],
               "prescriptions": []
@@ -472,11 +421,11 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 39,
+              "estMinutes": 22,
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "f-mon-1",
+                  "id": "f-tue-1",
                   "exerciseId": "barbell-back-squat",
                   "order": 1,
                   "groupId": null,
@@ -485,7 +434,7 @@
                   "repsMin": 8,
                   "repsMax": 8,
                   "repsCreepMax": null,
-                  "restSec": 120,
+                  "restSec": 90,
                   "targetRir": null,
                   "loadMode": "barbell",
                   "startLoadKg": 10.0,
@@ -503,49 +452,17 @@
                   },
                   "substitutes": [
                     "goblet-squat",
-                    "dumbbell-squat"
+                    "dumbbell-squat",
+                    "barbell-front-squat"
                   ],
-                  "coachNote": "EMPTY BAR (10 kg) in week 1. No exceptions. Brace as if someone is about to punch your stomach, then sit down and stand up.",
+                  "coachNote": "EMPTY BAR (10 kg) in week 1. Brace as if someone is about to punch your stomach, then sit down and stand up.",
                   "tempo": null
                 },
                 {
-                  "id": "f-mon-2",
-                  "exerciseId": "barbell-romanian-deadlift",
-                  "order": 2,
-                  "groupId": null,
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 10,
-                  "repsMax": 10,
-                  "repsCreepMax": null,
-                  "restSec": 90,
-                  "targetRir": null,
-                  "loadMode": "barbell",
-                  "startLoadKg": 16.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 3.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.3
-                  },
-                  "substitutes": [
-                    "dumbbell-romanian-deadlift",
-                    "barbell-good-morning"
-                  ],
-                  "coachNote": "Same bar, add plates. The bar stays in contact with your legs the whole way down. If it drifts forward, your lower back takes it.",
-                  "tempo": null
-                },
-                {
-                  "id": "f-mon-3a",
+                  "id": "f-tue-2a",
                   "exerciseId": "push-up-handles",
-                  "order": 3,
-                  "groupId": "f-mon-ss1",
+                  "order": 2,
+                  "groupId": "f-tue-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 8,
@@ -567,16 +484,17 @@
                   "substitutes": [
                     "incline-push-up",
                     "dumbbell-floor-press",
-                    "dumbbell-bench-press"
+                    "dumbbell-bench-press",
+                    "incline-dumbbell-press"
                   ],
-                  "coachNote": "Bodyweight on purpose, so the one dumbbell stays loaded through the whole superset. If you can't get 8, put your hands on the bench and do them at an incline.",
+                  "coachNote": "If you can't get 8, put your hands on the bench and do them at an incline.",
                   "tempo": null
                 },
                 {
-                  "id": "f-mon-3b",
+                  "id": "f-tue-2b",
                   "exerciseId": "one-arm-dumbbell-row",
-                  "order": 4,
-                  "groupId": "f-mon-ss1",
+                  "order": 3,
+                  "groupId": "f-tue-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 10,
@@ -606,16 +524,16 @@
                   "tempo": null
                 },
                 {
-                  "id": "f-mon-4",
+                  "id": "f-tue-3",
                   "exerciseId": "plank",
-                  "order": 5,
-                  "groupId": "f-mon-ss2",
+                  "order": 4,
+                  "groupId": null,
                   "unit": "sec",
-                  "sets": 3,
+                  "sets": 2,
                   "repsMin": 30,
                   "repsMax": 30,
                   "repsCreepMax": 60,
-                  "restSec": 0,
+                  "restSec": 30,
                   "targetRir": null,
                   "loadMode": "timed",
                   "startLoadKg": null,
@@ -631,72 +549,12 @@
                   },
                   "substitutes": [
                     "dead-bug",
-                    "hollow-hold"
+                    "hollow-hold",
+                    "side-plank",
+                    "ab-wheel-knees",
+                    "hanging-knee-raise"
                   ],
-                  "coachNote": "The second your lower back sags, the set is over. Reset rather than holding a bad shape.",
-                  "tempo": null
-                },
-                {
-                  "id": "f-mon-5a",
-                  "exerciseId": "ez-bar-curl",
-                  "order": 6,
-                  "groupId": "f-mon-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 10,
-                  "repsMax": 12,
-                  "repsCreepMax": 15,
-                  "restSec": 0,
-                  "targetRir": 3,
-                  "loadMode": "ezBar",
-                  "startLoadKg": 7.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 1.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
-                  },
-                  "substitutes": [
-                    "dumbbell-curl",
-                    "hammer-curl"
-                  ],
-                  "coachNote": "The bare 7 kg EZ bar. Elbows pinned to the ribs, lower it over a slow count. Easy on purpose: this is the habit, not the stimulus, for four weeks.",
-                  "tempo": null
-                },
-                {
-                  "id": "f-mon-5b",
-                  "exerciseId": "cable-face-pull",
-                  "order": 7,
-                  "groupId": "f-mon-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 15,
-                  "repsMax": 15,
-                  "repsCreepMax": null,
-                  "restSec": 60,
-                  "targetRir": null,
-                  "loadMode": "cable",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "bandProgression",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "band-face-pull",
-                    "band-pull-apart"
-                  ],
-                  "coachNote": "Wall cable, light. Elbows high and wide, hands rotating back at the end.",
+                  "coachNote": "The second your lower back sags, the set is over.",
                   "tempo": null
                 }
               ]
@@ -717,12 +575,6 @@
                   "order": 2,
                   "text": "45 s / side",
                   "note": null
-                },
-                {
-                  "exerciseId": "doorway-chest-stretch",
-                  "order": 3,
-                  "text": "45 s / side",
-                  "note": null
                 }
               ],
               "prescriptions": []
@@ -730,174 +582,24 @@
           ]
         },
         {
-          "id": "f-tue",
-          "weekday": "tue",
-          "title": "Skip, Run & Core",
-          "kind": "cardio",
-          "optional": false,
-          "estMinutes": 39,
-          "note": "Easy means easy. This session exists for your heart and your calves, not to burn calories — you need those.",
-          "warnings": [],
-          "sections": [
-            {
-              "type": "cardio",
-              "title": "Session",
-              "estMinutes": 39,
-              "drills": [],
-              "prescriptions": [
-                {
-                  "id": "f-tue-1",
-                  "exerciseId": "rope-skipping",
-                  "order": 1,
-                  "groupId": null,
-                  "unit": "sec",
-                  "sets": 6,
-                  "repsMin": 60,
-                  "repsMax": 60,
-                  "repsCreepMax": 180,
-                  "restSec": 60,
-                  "targetRir": null,
-                  "loadMode": "timed",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "timeOnly",
-                    "incrementSec": 15,
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [],
-                  "coachNote": "Skipping wrecks untrained calves and Achilles tendons, so we ramp it over four weeks.",
-                  "tempo": null
-                },
-                {
-                  "id": "f-tue-2",
-                  "exerciseId": "easy-run",
-                  "order": 2,
-                  "groupId": null,
-                  "unit": "sec",
-                  "sets": 1,
-                  "repsMin": 720,
-                  "repsMax": 900,
-                  "repsCreepMax": null,
-                  "restSec": 0,
-                  "targetRir": null,
-                  "loadMode": "timed",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "cardioTable",
-                    "table": "second",
-                    "stallLimit": 99,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "run-intervals"
-                  ],
-                  "coachNote": "Conversational pace. If you cannot speak a full sentence, you are going too fast.",
-                  "tempo": null
-                },
-                {
-                  "id": "f-tue-3a",
-                  "exerciseId": "dead-bug",
-                  "order": 3,
-                  "groupId": "f-tue-core",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 10,
-                  "repsMax": 10,
-                  "repsCreepMax": null,
-                  "restSec": 0,
-                  "targetRir": null,
-                  "loadMode": "bodyweight",
-                  "startLoadKg": null,
-                  "perSide": true,
-                  "unilateral": true,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "repsOnly",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [],
-                  "coachNote": "Three-round circuit with the side plank and hollow hold.",
-                  "tempo": null
-                },
-                {
-                  "id": "f-tue-3b",
-                  "exerciseId": "side-plank",
-                  "order": 4,
-                  "groupId": "f-tue-core",
-                  "unit": "sec",
-                  "sets": 3,
-                  "repsMin": 20,
-                  "repsMax": 20,
-                  "repsCreepMax": 45,
-                  "restSec": 0,
-                  "targetRir": null,
-                  "loadMode": "timed",
-                  "startLoadKg": null,
-                  "perSide": true,
-                  "unilateral": true,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "timeOnly",
-                    "incrementSec": 5,
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [],
-                  "coachNote": null,
-                  "tempo": null
-                },
-                {
-                  "id": "f-tue-3c",
-                  "exerciseId": "hollow-hold",
-                  "order": 5,
-                  "groupId": "f-tue-core",
-                  "unit": "sec",
-                  "sets": 3,
-                  "repsMin": 20,
-                  "repsMax": 20,
-                  "repsCreepMax": 45,
-                  "restSec": 45,
-                  "targetRir": null,
-                  "loadMode": "timed",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "timeOnly",
-                    "incrementSec": 5,
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [],
-                  "coachNote": null,
-                  "tempo": null
-                }
-              ]
-            }
-          ]
-        },
-        {
           "id": "f-wed",
           "weekday": "wed",
+          "title": "Rest",
+          "kind": "rest",
+          "optional": false,
+          "estMinutes": 0,
+          "note": "Rest. A walk between lectures counts.",
+          "warnings": [],
+          "sections": []
+        },
+        {
+          "id": "f-thu",
+          "weekday": "thu",
           "title": "Full Body B",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 43,
-          "note": "Hinge-led, and the day that teaches you the deadlift and the overhead press — the two lifts a beginner is most often thrown into cold.",
+          "estMinutes": 28,
+          "note": "Hinge-led: the deadlift and the overhead press, then a quick pull-and-squat superset.",
           "warnings": [
             {
               "title": "Bar height — read before your first pull",
@@ -916,7 +618,7 @@
             {
               "type": "warmup",
               "title": "Warm-up",
-              "estMinutes": 4,
+              "estMinutes": 3,
               "drills": [
                 {
                   "exerciseId": "rope-skipping",
@@ -931,20 +633,14 @@
                   "note": null
                 },
                 {
-                  "exerciseId": "glute-bridge",
+                  "exerciseId": "bodyweight-good-morning",
                   "order": 3,
                   "text": "x 15",
                   "note": null
                 },
                 {
-                  "exerciseId": "bodyweight-good-morning",
-                  "order": 4,
-                  "text": "x 15",
-                  "note": null
-                },
-                {
                   "exerciseId": "band-pull-apart",
-                  "order": 5,
+                  "order": 4,
                   "text": "x 20",
                   "note": null
                 }
@@ -954,11 +650,11 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 37,
+              "estMinutes": 24,
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "f-wed-1",
+                  "id": "f-thu-1",
                   "exerciseId": "barbell-deadlift",
                   "order": 1,
                   "groupId": null,
@@ -967,7 +663,7 @@
                   "repsMin": 5,
                   "repsMax": 5,
                   "repsCreepMax": null,
-                  "restSec": 150,
+                  "restSec": 105,
                   "targetRir": null,
                   "loadMode": "barbell",
                   "startLoadKg": 10.0,
@@ -985,13 +681,15 @@
                   },
                   "substitutes": [
                     "dumbbell-deadlift",
-                    "barbell-romanian-deadlift"
+                    "barbell-romanian-deadlift",
+                    "single-leg-rdl",
+                    "barbell-hip-thrust"
                   ],
                   "coachNote": "EMPTY BAR (10 kg) from the blocks in week 1. Take the slack out of the bar before you pull — you should hear it click. Set it down and reset every rep.",
                   "tempo": null
                 },
                 {
-                  "id": "f-wed-2",
+                  "id": "f-thu-2",
                   "exerciseId": "barbell-overhead-press",
                   "order": 2,
                   "groupId": null,
@@ -1000,7 +698,7 @@
                   "repsMin": 8,
                   "repsMax": 8,
                   "repsCreepMax": null,
-                  "restSec": 105,
+                  "restSec": 90,
                   "targetRir": null,
                   "loadMode": "barbell",
                   "startLoadKg": 10.0,
@@ -1020,14 +718,14 @@
                     "dumbbell-overhead-press",
                     "seated-dumbbell-press"
                   ],
-                  "coachNote": "Empty 10 kg bar in week 1. Ribs down, glutes and abs locked. Leaning back to move the weight means it is too heavy.",
+                  "coachNote": "Empty 10 kg bar in week 1. Ribs down, glutes and abs locked.",
                   "tempo": null
                 },
                 {
-                  "id": "f-wed-3a",
+                  "id": "f-thu-3a",
                   "exerciseId": "ring-row",
                   "order": 3,
-                  "groupId": "f-wed-ss1",
+                  "groupId": "f-thu-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 8,
@@ -1050,20 +748,20 @@
                     "one-arm-dumbbell-row",
                     "chest-supported-dumbbell-row"
                   ],
-                  "coachNote": "The more horizontal your body, the harder it gets. Log your foot position so you can repeat it.",
+                  "coachNote": "The more horizontal your body, the harder it gets. Log your foot position.",
                   "tempo": null
                 },
                 {
-                  "id": "f-wed-3b",
+                  "id": "f-thu-3b",
                   "exerciseId": "goblet-squat",
                   "order": 4,
-                  "groupId": "f-wed-ss1",
+                  "groupId": "f-thu-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 10,
                   "repsMax": 10,
                   "repsCreepMax": 15,
-                  "restSec": 75,
+                  "restSec": 60,
                   "targetRir": null,
                   "loadMode": "kettlebell",
                   "startLoadKg": 8.0,
@@ -1078,72 +776,11 @@
                   },
                   "substitutes": [
                     "dumbbell-squat",
-                    "barbell-back-squat"
+                    "step-up",
+                    "walking-lunge"
                   ],
-                  "coachNote": "One bell, so it progresses by reps: 10 up to 15, three seconds down every rep. Depth is whatever you can hold without the lower back rounding.",
+                  "coachNote": "One bell, so it progresses by reps: 10 up to 15, three seconds down every rep.",
                   "tempo": "3s eccentric"
-                },
-                {
-                  "id": "f-wed-5a",
-                  "exerciseId": "lateral-raise",
-                  "order": 5,
-                  "groupId": "f-wed-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 12,
-                  "repsMax": 15,
-                  "repsCreepMax": 20,
-                  "restSec": 0,
-                  "targetRir": 3,
-                  "loadMode": "dumbbellPair",
-                  "startLoadKg": 2.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 1.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
-                  },
-                  "substitutes": [
-                    "band-lateral-raise"
-                  ],
-                  "coachNote": "The bare 2 kg handles. Lead with the elbows, stop at shoulder height. The reps climb to 20 before the weight moves.",
-                  "tempo": "3s eccentric"
-                },
-                {
-                  "id": "f-wed-5b",
-                  "exerciseId": "cable-triceps-pushdown",
-                  "order": 6,
-                  "groupId": "f-wed-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 12,
-                  "repsMax": 15,
-                  "repsCreepMax": null,
-                  "restSec": 60,
-                  "targetRir": null,
-                  "loadMode": "cable",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "bandProgression",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "ez-bar-skullcrusher",
-                    "overhead-dumbbell-extension"
-                  ],
-                  "coachNote": "Wall cable, light. Elbows pinned to the ribs, squeeze at the bottom.",
-                  "tempo": null
                 }
               ]
             },
@@ -1159,14 +796,8 @@
                   "note": null
                 },
                 {
-                  "exerciseId": "thoracic-rotation",
-                  "order": 2,
-                  "text": "10 / side",
-                  "note": null
-                },
-                {
                   "exerciseId": "standing-hamstring-stretch",
-                  "order": 3,
+                  "order": 2,
                   "text": "45 s / side",
                   "note": null
                 }
@@ -1176,24 +807,24 @@
           ]
         },
         {
-          "id": "f-thu",
-          "weekday": "thu",
+          "id": "f-fri",
+          "weekday": "fri",
           "title": "Rest",
           "kind": "rest",
           "optional": false,
           "estMinutes": 0,
-          "note": "A real rest day. Eat your full target, get eight hours, walk if you feel like moving. Muscle is built on the days you don't train — the session only sends the signal.",
+          "note": "Rest. Jumu'ah, the study project, home.",
           "warnings": [],
           "sections": []
         },
         {
-          "id": "f-fri",
-          "weekday": "fri",
+          "id": "f-sat",
+          "weekday": "sat",
           "title": "Full Body C",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 43,
-          "note": "Press-led, plus the first work towards a pull-up. You will not get a pull-up by trying pull-ups — you get it by lowering yourself slowly, over and over.",
+          "estMinutes": 28,
+          "note": "Press-led, plus the first work towards a pull-up. Saturday morning, then the weekend.",
           "warnings": [
             {
               "title": "Bench pins at chest height",
@@ -1208,7 +839,7 @@
             {
               "type": "warmup",
               "title": "Warm-up",
-              "estMinutes": 4,
+              "estMinutes": 3,
               "drills": [
                 {
                   "exerciseId": "rope-skipping",
@@ -1229,14 +860,8 @@
                   "note": null
                 },
                 {
-                  "exerciseId": "push-up-handles",
-                  "order": 4,
-                  "text": "x 10",
-                  "note": null
-                },
-                {
                   "exerciseId": "dead-hang",
-                  "order": 5,
+                  "order": 4,
                   "text": "2 x 20 s",
                   "note": null
                 }
@@ -1246,11 +871,11 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 37,
+              "estMinutes": 23,
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "f-fri-1",
+                  "id": "f-sat-1",
                   "exerciseId": "barbell-bench-press",
                   "order": 1,
                   "groupId": null,
@@ -1259,7 +884,7 @@
                   "repsMin": 8,
                   "repsMax": 8,
                   "repsCreepMax": null,
-                  "restSec": 120,
+                  "restSec": 90,
                   "targetRir": null,
                   "loadMode": "barbell",
                   "startLoadKg": 10.0,
@@ -1279,11 +904,11 @@
                     "dumbbell-floor-press",
                     "dumbbell-bench-press"
                   ],
-                  "coachNote": "Empty 10 kg bar in week 1. Feet flat, shoulder blades pinched back and down, bar to the lower chest, elbows at 45-60 degrees.",
+                  "coachNote": "Empty 10 kg bar in week 1. Feet flat, shoulder blades pinched back and down, bar to the lower chest.",
                   "tempo": null
                 },
                 {
-                  "id": "f-fri-2",
+                  "id": "f-sat-2",
                   "exerciseId": "barbell-bent-over-row",
                   "order": 2,
                   "groupId": null,
@@ -1292,7 +917,7 @@
                   "repsMin": 8,
                   "repsMax": 8,
                   "repsCreepMax": null,
-                  "restSec": 105,
+                  "restSec": 90,
                   "targetRir": null,
                   "loadMode": "barbell",
                   "startLoadKg": 10.0,
@@ -1312,14 +937,14 @@
                     "one-arm-dumbbell-row",
                     "chest-supported-dumbbell-row"
                   ],
-                  "coachNote": "Same bar as the bench. Pull to the navel. If your torso rises with every rep, the weight is winning.",
+                  "coachNote": "Same bar as the bench. Pull to the navel.",
                   "tempo": null
                 },
                 {
-                  "id": "f-fri-3a",
+                  "id": "f-sat-3a",
                   "exerciseId": "pull-up-negative",
                   "order": 3,
-                  "groupId": "f-fri-ss1",
+                  "groupId": "f-sat-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 4,
@@ -1340,16 +965,17 @@
                   },
                   "substitutes": [
                     "pull-up-assisted",
-                    "ring-row"
+                    "ring-row",
+                    "pull-up"
                   ],
-                  "coachNote": "Step or jump to the top, then fight the way down for a full five seconds. This is the fastest route to your first strict pull-up.",
+                  "coachNote": "Step to the top, then fight the way down for five seconds. The road to your first pull-up.",
                   "tempo": "5s eccentric"
                 },
                 {
-                  "id": "f-fri-3b",
+                  "id": "f-sat-3b",
                   "exerciseId": "bulgarian-split-squat",
                   "order": 4,
-                  "groupId": "f-fri-ss1",
+                  "groupId": "f-sat-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 8,
@@ -1370,101 +996,10 @@
                   },
                   "substitutes": [
                     "split-squat",
-                    "reverse-lunge"
+                    "reverse-lunge",
+                    "step-up"
                   ],
-                  "coachNote": "Bodyweight only for four weeks. Brutal for a bodyweight movement — that is normal, don't add load.",
-                  "tempo": null
-                },
-                {
-                  "id": "f-fri-4",
-                  "exerciseId": "ab-wheel-knees",
-                  "order": 5,
-                  "groupId": null,
-                  "unit": "reps",
-                  "sets": 2,
-                  "repsMin": 6,
-                  "repsMax": 6,
-                  "repsCreepMax": 10,
-                  "restSec": 60,
-                  "targetRir": null,
-                  "loadMode": "bodyweight",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "repsOnly",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "plank",
-                    "hollow-hold"
-                  ],
-                  "coachNote": "Partial range. If your back arches at all, swap for a 3 x 40 s plank until week 3.",
-                  "tempo": null
-                },
-                {
-                  "id": "f-fri-5a",
-                  "exerciseId": "lateral-raise",
-                  "order": 6,
-                  "groupId": "f-fri-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 12,
-                  "repsMax": 15,
-                  "repsCreepMax": 20,
-                  "restSec": 0,
-                  "targetRir": 3,
-                  "loadMode": "dumbbellPair",
-                  "startLoadKg": 2.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 1.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
-                  },
-                  "substitutes": [
-                    "band-lateral-raise"
-                  ],
-                  "coachNote": "The bare 2 kg handles again. Side delts are what make shoulders look wider on a light frame, and pressing barely touches them. Only direct work grows them.",
-                  "tempo": "3s eccentric"
-                },
-                {
-                  "id": "f-fri-5b",
-                  "exerciseId": "cable-triceps-pushdown",
-                  "order": 7,
-                  "groupId": "f-fri-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 12,
-                  "repsMax": 15,
-                  "repsCreepMax": null,
-                  "restSec": 60,
-                  "targetRir": null,
-                  "loadMode": "cable",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "bandProgression",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "ez-bar-skullcrusher",
-                    "overhead-dumbbell-extension"
-                  ],
-                  "coachNote": "Wall cable — no plate change inside the superset. Elbows pinned to the ribs.",
+                  "coachNote": "Bodyweight only for four weeks. Harder than it looks.",
                   "tempo": null
                 }
               ]
@@ -1492,30 +1027,19 @@
           ]
         },
         {
-          "id": "f-sat",
-          "weekday": "sat",
-          "title": "Rest",
-          "kind": "rest",
-          "optional": false,
-          "estMinutes": 0,
-          "note": "Off. Cook something big — Saturday is the easiest day of the week to bank a 3,000 kcal day, and a good week of eating covers a mediocre week of training.",
-          "warnings": [],
-          "sections": []
-        },
-        {
           "id": "f-sun",
           "weekday": "sun",
-          "title": "Easy Run & Mobility",
+          "title": "Run or hike",
           "kind": "cardio",
-          "optional": false,
-          "estMinutes": 35,
-          "note": null,
+          "optional": true,
+          "estMinutes": 24,
+          "note": "Outside, easy, for the heart and the head. Optional.",
           "warnings": [],
           "sections": [
             {
               "type": "cardio",
               "title": "Session",
-              "estMinutes": 31,
+              "estMinutes": 22,
               "drills": [],
               "prescriptions": [
                 {
@@ -1545,63 +1069,7 @@
                   "substitutes": [
                     "run-intervals"
                   ],
-                  "coachNote": "The longer of your two runs. Same conversational pace.",
-                  "tempo": null
-                },
-                {
-                  "id": "f-sun-2",
-                  "exerciseId": "rope-skipping",
-                  "order": 2,
-                  "groupId": null,
-                  "unit": "sec",
-                  "sets": 3,
-                  "repsMin": 60,
-                  "repsMax": 60,
-                  "repsCreepMax": 180,
-                  "restSec": 60,
-                  "targetRir": null,
-                  "loadMode": "timed",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "timeOnly",
-                    "incrementSec": 15,
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [],
-                  "coachNote": null,
-                  "tempo": null
-                },
-                {
-                  "id": "f-sun-3",
-                  "exerciseId": "dead-hang",
-                  "order": 3,
-                  "groupId": null,
-                  "unit": "sec",
-                  "sets": 3,
-                  "repsMin": 20,
-                  "repsMax": 20,
-                  "repsCreepMax": 60,
-                  "restSec": 45,
-                  "targetRir": null,
-                  "loadMode": "timed",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "timeOnly",
-                    "incrementSec": 5,
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [],
-                  "coachNote": "From the rings or the wall bar. Relax into it — this decompresses everything the squats and rows compressed all week.",
+                  "coachNote": "Conversational pace — or swap it for a hike and record that instead. Optional: a week without it is still a good week.",
                   "tempo": null
                 }
               ]
@@ -1609,36 +1077,18 @@
             {
               "type": "cooldown",
               "title": "Mobility",
-              "estMinutes": 4,
+              "estMinutes": 2,
               "drills": [
                 {
-                  "exerciseId": "ninety-ninety-hip-switch",
-                  "order": 1,
-                  "text": "10 / side",
-                  "note": null
-                },
-                {
                   "exerciseId": "couch-stretch",
-                  "order": 2,
+                  "order": 1,
                   "text": "45 s / side",
-                  "note": null
-                },
-                {
-                  "exerciseId": "thoracic-rotation",
-                  "order": 3,
-                  "text": "10 / side",
                   "note": null
                 },
                 {
                   "exerciseId": "standing-hamstring-stretch",
-                  "order": 4,
+                  "order": 2,
                   "text": "45 s / side",
-                  "note": null
-                },
-                {
-                  "exerciseId": "cat-cow",
-                  "order": 5,
-                  "text": "x 10",
                   "note": null
                 }
               ],
@@ -1663,18 +1113,29 @@
       "setRounding": "up",
       "includeSupersets": true,
       "includeFinishers": true,
-      "summary": "Upper/Lower across four days. Every movement pattern gets two exposures a week, every upper day presses and pulls, and the accessories are supersetted so it all fits in 60 minutes.",
+      "summary": "The same three days, a little heavier: fewer reps on the main lift, and the accessories supersetted so each session still fits in half an hour.",
       "inheritsDaysFrom": null,
       "dayOverrides": {},
       "days": [
         {
           "id": "b-mon",
           "weekday": "mon",
-          "title": "Lower A · Squat",
+          "title": "Rest",
+          "kind": "rest",
+          "optional": false,
+          "estMinutes": 0,
+          "note": "Rest. Your long day: work, lectures, the German course. Eat your four meals and sleep.",
+          "warnings": [],
+          "sections": []
+        },
+        {
+          "id": "b-tue",
+          "weekday": "tue",
+          "title": "Full Body A · Squat",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 51,
-          "note": "Quads, glutes and the whole brace. If you only ever do one thing properly, make it this squat.",
+          "estMinutes": 26,
+          "note": "Squat-led. The most important set of your week is the first one.",
           "warnings": [
             {
               "title": "Set the catch pins",
@@ -1694,8 +1155,8 @@
                 {
                   "exerciseId": "rope-skipping",
                   "order": 1,
-                  "text": "3 min",
-                  "note": null
+                  "text": "2 min",
+                  "note": "On the interlocking mats, never bare concrete."
                 },
                 {
                   "exerciseId": "leg-swing",
@@ -1721,20 +1182,20 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 46,
+              "estMinutes": 21,
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "b-mon-1",
+                  "id": "b-tue-1",
                   "exerciseId": "barbell-back-squat",
                   "order": 1,
                   "groupId": null,
                   "unit": "reps",
-                  "sets": 4,
-                  "repsMin": 5,
-                  "repsMax": 5,
-                  "repsCreepMax": 7,
-                  "restSec": 150,
+                  "sets": 3,
+                  "repsMin": 6,
+                  "repsMax": 6,
+                  "repsCreepMax": 8,
+                  "restSec": 105,
                   "targetRir": null,
                   "loadMode": "barbell",
                   "startLoadKg": 21.0,
@@ -1754,350 +1215,13 @@
                     "barbell-front-squat",
                     "goblet-squat"
                   ],
-                  "coachNote": "The most important set of your week. Drive the whole foot through the floor coming up — don't let the hips shoot up first.",
+                  "coachNote": "Drive the whole foot through the floor coming up — don't let the hips shoot up first.",
                   "tempo": null
                 },
                 {
-                  "id": "b-mon-2",
-                  "exerciseId": "barbell-romanian-deadlift",
-                  "order": 2,
-                  "groupId": null,
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 8,
-                  "repsMax": 8,
-                  "repsCreepMax": 12,
-                  "restSec": 120,
-                  "targetRir": null,
-                  "loadMode": "barbell",
-                  "startLoadKg": 27.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 2.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.15
-                  },
-                  "substitutes": [
-                    "dumbbell-romanian-deadlift",
-                    "barbell-good-morning",
-                    "single-leg-rdl"
-                  ],
-                  "coachNote": "Same bar: one plate change up to the RDL weight. Squeeze the glutes to stand up rather than pulling with the lower back.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-mon-3a",
-                  "exerciseId": "bulgarian-split-squat",
-                  "order": 3,
-                  "groupId": "b-mon-ss1",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 8,
-                  "repsMax": 8,
-                  "repsCreepMax": 12,
-                  "restSec": 0,
-                  "targetRir": null,
-                  "loadMode": "dumbbellPair",
-                  "startLoadKg": 6.0,
-                  "perSide": true,
-                  "unilateral": true,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 1.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
-                  },
-                  "substitutes": [
-                    "reverse-lunge",
-                    "split-squat",
-                    "step-up",
-                    "walking-lunge"
-                  ],
-                  "coachNote": "Torso slightly forward loads the glute, upright loads the quad. Pick one and stay consistent.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-mon-3b",
-                  "exerciseId": "single-leg-calf-raise",
-                  "order": 4,
-                  "groupId": "b-mon-ss1",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 15,
-                  "repsMax": 15,
-                  "repsCreepMax": 25,
-                  "restSec": 75,
-                  "targetRir": 1,
-                  "loadMode": "bodyweight",
-                  "startLoadKg": null,
-                  "perSide": true,
-                  "unilateral": true,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "repsOnly",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "standing-calf-raise"
-                  ],
-                  "coachNote": "On the edge of the step platform. Bodyweight on purpose — no plate change inside the superset. Full stretch at the bottom, 2-second squeeze at the top.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-mon-4a",
-                  "exerciseId": "hanging-knee-raise",
-                  "order": 5,
-                  "groupId": "b-mon-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 8,
-                  "repsMax": 12,
-                  "repsCreepMax": 18,
-                  "restSec": 0,
-                  "targetRir": 1,
-                  "loadMode": "bodyweight",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "repsOnly",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "dead-bug",
-                    "hollow-hold"
-                  ],
-                  "coachNote": "No swinging. Curl the pelvis up towards the ribs, don't just lift the thighs.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-mon-4b",
-                  "exerciseId": "pull-up-negative",
-                  "order": 6,
-                  "groupId": "b-mon-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 3,
-                  "repsMax": 3,
-                  "repsCreepMax": 6,
-                  "restSec": 0,
-                  "targetRir": null,
-                  "loadMode": "bodyweight",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "repsOnly",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "pull-up-assisted",
-                    "ring-row"
-                  ],
-                  "coachNote": "You are already hanging on the bar, so this costs you almost nothing. A second vertical-pull exposure in the week is what buys you your first strict pull-up.",
-                  "tempo": "5s eccentric"
-                },
-                {
-                  "id": "b-mon-4c",
-                  "exerciseId": "lateral-raise",
-                  "order": 7,
-                  "groupId": "b-mon-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 12,
-                  "repsMax": 15,
-                  "repsCreepMax": 20,
-                  "restSec": 60,
-                  "targetRir": 1,
-                  "loadMode": "dumbbellPair",
-                  "startLoadKg": 2.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 1.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
-                  },
-                  "substitutes": [
-                    "band-lateral-raise"
-                  ],
-                  "coachNote": "Bare 2 kg handles to start: strip the split-squat dumbbells once, before this superset, never inside it. Lead with the elbows, stop at shoulder height.",
-                  "tempo": "3s eccentric"
-                }
-              ]
-            },
-            {
-              "type": "cooldown",
-              "title": "Cool-down",
-              "estMinutes": 2,
-              "drills": [
-                {
-                  "exerciseId": "couch-stretch",
-                  "order": 1,
-                  "text": "45 s / side",
-                  "note": null
-                },
-                {
-                  "exerciseId": "ninety-ninety-hip-switch",
-                  "order": 2,
-                  "text": "10 / side",
-                  "note": null
-                }
-              ],
-              "prescriptions": []
-            }
-          ]
-        },
-        {
-          "id": "b-tue",
-          "weekday": "tue",
-          "title": "Upper A · Bench-led",
-          "kind": "lift",
-          "optional": false,
-          "estMinutes": 50,
-          "note": "Seven pressing sets and seven pulling sets on the compounds, then arms and side delts. Every upper day in this programme pulls as much as it presses.",
-          "warnings": [
-            {
-              "title": "Bench pins at chest height",
-              "body": "Set the pins so a failed rep lands on them and not on you. Never take the bench press to failure alone."
-            },
-            {
-              "title": "Collars on, checked mid-set",
-              "body": "Spinlock collars work loose under load. A plate sliding off one end is the single most likely injury in your room."
-            }
-          ],
-          "sections": [
-            {
-              "type": "warmup",
-              "title": "Warm-up",
-              "estMinutes": 3,
-              "drills": [
-                {
-                  "exerciseId": "rope-skipping",
-                  "order": 1,
-                  "text": "3 min",
-                  "note": null
-                },
-                {
-                  "exerciseId": "band-pull-apart",
-                  "order": 2,
-                  "text": "2 x 20",
-                  "note": null
-                },
-                {
-                  "exerciseId": "wall-slide",
-                  "order": 3,
-                  "text": "x 10",
-                  "note": null
-                },
-                {
-                  "exerciseId": "push-up-handles",
-                  "order": 4,
-                  "text": "x 10",
-                  "note": null
-                }
-              ],
-              "prescriptions": []
-            },
-            {
-              "type": "main",
-              "title": "Main work",
-              "estMinutes": 46,
-              "drills": [],
-              "prescriptions": [
-                {
-                  "id": "b-tue-1",
-                  "exerciseId": "barbell-bench-press",
-                  "order": 1,
-                  "groupId": null,
-                  "unit": "reps",
-                  "sets": 4,
-                  "repsMin": 6,
-                  "repsMax": 6,
-                  "repsCreepMax": 10,
-                  "restSec": 150,
-                  "targetRir": null,
-                  "loadMode": "barbell",
-                  "startLoadKg": 17.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": true,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 1.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
-                  },
-                  "substitutes": [
-                    "dumbbell-bench-press",
-                    "dumbbell-floor-press"
-                  ],
-                  "coachNote": "Bar to the lower chest, elbows at 45-60 degrees, drive up and slightly towards your face. Pins at chest height.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-tue-2",
-                  "exerciseId": "barbell-bent-over-row",
-                  "order": 2,
-                  "groupId": null,
-                  "unit": "reps",
-                  "sets": 4,
-                  "repsMin": 8,
-                  "repsMax": 8,
-                  "repsCreepMax": 12,
-                  "restSec": 120,
-                  "targetRir": null,
-                  "loadMode": "barbell",
-                  "startLoadKg": 18.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 2.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.15
-                  },
-                  "substitutes": [
-                    "one-arm-dumbbell-row",
-                    "chest-supported-dumbbell-row"
-                  ],
-                  "coachNote": "Same bar as the bench. This is the row v1 left out of push day — your shoulders need it on the same day you press.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-tue-3a",
+                  "id": "b-tue-2a",
                   "exerciseId": "incline-dumbbell-press",
-                  "order": 3,
+                  "order": 2,
                   "groupId": "b-tue-ss1",
                   "unit": "reps",
                   "sets": 3,
@@ -2121,88 +1245,26 @@
                     "maxJumpPct": 0.1
                   },
                   "substitutes": [
+                    "push-up-handles",
                     "dumbbell-bench-press"
                   ],
                   "coachNote": "Bench at its lower incline notch, roughly 30 degrees.",
                   "tempo": null
                 },
                 {
-                  "id": "b-tue-3b",
-                  "exerciseId": "cable-face-pull",
-                  "order": 4,
+                  "id": "b-tue-2b",
+                  "exerciseId": "chest-supported-dumbbell-row",
+                  "order": 3,
                   "groupId": "b-tue-ss1",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 15,
-                  "repsMax": 15,
-                  "repsCreepMax": null,
-                  "restSec": 60,
-                  "targetRir": null,
-                  "loadMode": "cable",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "bandProgression",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "band-face-pull",
-                    "band-pull-apart"
-                  ],
-                  "coachNote": "Use the wall cable — no plate change inside the superset. Elbows high and wide, rotating the hands back. The insurance policy on every press you do.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-tue-4a",
-                  "exerciseId": "ez-bar-curl",
-                  "order": 5,
-                  "groupId": "b-tue-ss2",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 10,
                   "repsMax": 10,
                   "repsCreepMax": 14,
-                  "restSec": 0,
-                  "targetRir": 1,
-                  "loadMode": "ezBar",
-                  "startLoadKg": 8.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 1.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
-                  },
-                  "substitutes": [
-                    "dumbbell-curl",
-                    "hammer-curl"
-                  ],
-                  "coachNote": "Elbows pinned to the ribs. Lower over 3 seconds — the negative is where the arm grows.",
-                  "tempo": "3s eccentric"
-                },
-                {
-                  "id": "b-tue-4b",
-                  "exerciseId": "lateral-raise",
-                  "order": 6,
-                  "groupId": "b-tue-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 12,
-                  "repsMax": 15,
-                  "repsCreepMax": 20,
-                  "restSec": 0,
-                  "targetRir": 1,
+                  "restSec": 75,
+                  "targetRir": null,
                   "loadMode": "dumbbellPair",
-                  "startLoadKg": 2.0,
+                  "startLoadKg": 7.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
@@ -2216,39 +1278,41 @@
                     "maxJumpPct": 0.1
                   },
                   "substitutes": [
-                    "band-lateral-raise"
+                    "one-arm-dumbbell-row",
+                    "ring-row"
                   ],
-                  "coachNote": "Starts on the bare 2 kg handles; the reps climb to 20 before the weight moves. Lead with the elbows. There is no such thing as a heavy lateral raise.",
-                  "tempo": "3s eccentric"
+                  "coachNote": "Same dumbbells as the press: no re-plate inside the superset.",
+                  "tempo": null
                 },
                 {
-                  "id": "b-tue-4c",
-                  "exerciseId": "cable-triceps-pushdown",
-                  "order": 7,
-                  "groupId": "b-tue-ss2",
+                  "id": "b-tue-3",
+                  "exerciseId": "hanging-knee-raise",
+                  "order": 4,
+                  "groupId": null,
                   "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 12,
-                  "repsMax": 15,
-                  "repsCreepMax": null,
+                  "sets": 2,
+                  "repsMin": 8,
+                  "repsMax": 12,
+                  "repsCreepMax": 18,
                   "restSec": 45,
                   "targetRir": 1,
-                  "loadMode": "cable",
+                  "loadMode": "bodyweight",
                   "startLoadKg": null,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
                   "optional": false,
                   "progression": {
-                    "type": "bandProgression",
+                    "type": "repsOnly",
                     "stallLimit": 3,
                     "historyWindowDays": 21
                   },
                   "substitutes": [
-                    "ez-bar-skullcrusher",
-                    "overhead-dumbbell-extension"
+                    "dead-bug",
+                    "hollow-hold",
+                    "plank"
                   ],
-                  "coachNote": "Wall cable — no plate change inside the superset. Elbows pinned to the ribs; the second triceps exposure of the week.",
+                  "coachNote": "No swinging. Curl the pelvis up towards the ribs.",
                   "tempo": null
                 }
               ]
@@ -2259,13 +1323,13 @@
               "estMinutes": 2,
               "drills": [
                 {
-                  "exerciseId": "doorway-chest-stretch",
+                  "exerciseId": "couch-stretch",
                   "order": 1,
                   "text": "45 s / side",
                   "note": null
                 },
                 {
-                  "exerciseId": "thoracic-rotation",
+                  "exerciseId": "ninety-ninety-hip-switch",
                   "order": 2,
                   "text": "10 / side",
                   "note": null
@@ -2278,93 +1342,30 @@
         {
           "id": "b-wed",
           "weekday": "wed",
-          "title": "Easy Run or Nothing",
-          "kind": "cardio",
-          "optional": true,
-          "estMinutes": 27,
-          "note": "Genuinely optional. Take it if you slept well and ate enough; skip it without guilt if you are sore, behind on food, or the week is heavy. At your bodyweight, extra cardio is a cost, not a bonus.",
+          "title": "Rest",
+          "kind": "rest",
+          "optional": false,
+          "estMinutes": 0,
+          "note": "Complete rest. A walk between lectures counts; nothing else is asked of you today.",
           "warnings": [],
-          "sections": [
-            {
-              "type": "cardio",
-              "title": "Session",
-              "estMinutes": 25,
-              "drills": [],
-              "prescriptions": [
-                {
-                  "id": "b-wed-1",
-                  "exerciseId": "easy-run",
-                  "order": 1,
-                  "groupId": null,
-                  "unit": "sec",
-                  "sets": 1,
-                  "repsMin": 1200,
-                  "repsMax": 1200,
-                  "repsCreepMax": null,
-                  "restSec": 0,
-                  "targetRir": null,
-                  "loadMode": "timed",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "cardioTable",
-                    "table": "second",
-                    "stallLimit": 99,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [],
-                  "coachNote": "Zone 2. If you cannot breathe through your nose, you are going too fast.",
-                  "tempo": null
-                }
-              ]
-            },
-            {
-              "type": "cooldown",
-              "title": "Mobility",
-              "estMinutes": 2,
-              "drills": [
-                {
-                  "exerciseId": "ninety-ninety-hip-switch",
-                  "order": 1,
-                  "text": "10 / side",
-                  "note": null
-                },
-                {
-                  "exerciseId": "thoracic-rotation",
-                  "order": 2,
-                  "text": "10 / side",
-                  "note": null
-                },
-                {
-                  "exerciseId": "couch-stretch",
-                  "order": 3,
-                  "text": "45 s / side",
-                  "note": null
-                }
-              ],
-              "prescriptions": []
-            }
-          ]
+          "sections": []
         },
         {
           "id": "b-thu",
           "weekday": "thu",
-          "title": "Lower B · Deadlift",
+          "title": "Full Body B · Deadlift",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 45,
-          "note": "Deadlift day. The heaviest thing you lift all week and the lift with the least margin for sloppy technique. Five reps, never more, never to failure.",
+          "estMinutes": 29,
+          "note": "Hinge and press. Short, heavy-ish, done.",
           "warnings": [
             {
               "title": "Bar height — read before your first pull",
               "body": "Your plates are small-diameter, so a lightly loaded bar sits too low and forces your back to round at the start. Stack the two 20 kg tri-grips flat and rest each end of the bar on them for every pull, warm-ups included, until the 20s themselves go on the bar: 50 kg and up (the 10 kg bar plus a 20 on each side)."
             },
             {
-              "title": "Pad the hip thrust bar",
-              "body": "Fold the green mat over the bar. A bare bar on the hip bones ends the set early."
+              "title": "Check the ceiling",
+              "body": "Measure your overhead clearance before pressing. The basement beams and pipes are not at a uniform height."
             },
             {
               "title": "Collars on, checked mid-set",
@@ -2380,7 +1381,7 @@
                 {
                   "exerciseId": "rope-skipping",
                   "order": 1,
-                  "text": "3 min",
+                  "text": "2 min",
                   "note": null
                 },
                 {
@@ -2390,15 +1391,15 @@
                   "note": null
                 },
                 {
-                  "exerciseId": "glute-bridge",
+                  "exerciseId": "bodyweight-good-morning",
                   "order": 3,
-                  "text": "x 20",
+                  "text": "x 15",
                   "note": null
                 },
                 {
-                  "exerciseId": "bodyweight-good-morning",
+                  "exerciseId": "band-pull-apart",
                   "order": 4,
-                  "text": "x 15",
+                  "text": "x 20",
                   "note": null
                 }
               ],
@@ -2407,7 +1408,7 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 41,
+              "estMinutes": 25,
               "drills": [],
               "prescriptions": [
                 {
@@ -2420,7 +1421,7 @@
                   "repsMin": 5,
                   "repsMax": 5,
                   "repsCreepMax": 6,
-                  "restSec": 180,
+                  "restSec": 120,
                   "targetRir": null,
                   "loadMode": "barbell",
                   "startLoadKg": 30.0,
@@ -2440,118 +1441,86 @@
                     "barbell-romanian-deadlift",
                     "dumbbell-deadlift"
                   ],
-                  "coachNote": "Three sets, not four — this is the highest-fatigue lift you own. Set it down and reset every rep. Never to failure.",
+                  "coachNote": "Same setup every rep: bar over mid-foot, shins to the bar, chest up, pull.",
                   "tempo": null
                 },
                 {
                   "id": "b-thu-2",
-                  "exerciseId": "barbell-front-squat",
+                  "exerciseId": "barbell-overhead-press",
                   "order": 2,
                   "groupId": null,
                   "unit": "reps",
                   "sets": 3,
-                  "repsMin": 8,
-                  "repsMax": 8,
-                  "repsCreepMax": 12,
-                  "restSec": 120,
+                  "repsMin": 6,
+                  "repsMax": 6,
+                  "repsCreepMax": 8,
+                  "restSec": 90,
                   "targetRir": null,
                   "loadMode": "barbell",
-                  "startLoadKg": 16.0,
+                  "startLoadKg": 14.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
                   "optional": false,
                   "progression": {
                     "type": "doubleProgression",
-                    "incrementKg": 2.0,
+                    "incrementKg": 1.0,
                     "deloadPct": 0.1,
                     "stallLimit": 2,
                     "historyWindowDays": 21,
-                    "maxJumpPct": 0.15
+                    "maxJumpPct": 0.1
                   },
                   "substitutes": [
-                    "goblet-squat",
-                    "barbell-back-squat"
+                    "dumbbell-overhead-press",
+                    "seated-dumbbell-press"
                   ],
-                  "coachNote": "Your second squat exposure of the week. Elbows high, torso vertical. On a thin 30 mm bar a cross-arm grip is kinder to the wrists; swap to a goblet squat if they still complain.",
+                  "coachNote": "Ribs down. If you lean back to move it, it is too heavy.",
                   "tempo": null
                 },
                 {
                   "id": "b-thu-3a",
-                  "exerciseId": "barbell-hip-thrust",
+                  "exerciseId": "pull-up-negative",
                   "order": 3,
                   "groupId": "b-thu-ss1",
                   "unit": "reps",
                   "sets": 3,
-                  "repsMin": 10,
-                  "repsMax": 10,
-                  "repsCreepMax": 15,
+                  "repsMin": 4,
+                  "repsMax": 4,
+                  "repsCreepMax": 6,
                   "restSec": 0,
                   "targetRir": null,
-                  "loadMode": "barbell",
-                  "startLoadKg": 24.0,
+                  "loadMode": "bodyweight",
+                  "startLoadKg": null,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
                   "optional": false,
                   "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 2.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.15
+                    "type": "repsOnly",
+                    "stallLimit": 3,
+                    "historyWindowDays": 21
                   },
                   "substitutes": [
-                    "dumbbell-hip-thrust",
-                    "glute-bridge"
+                    "pull-up-assisted",
+                    "ring-row"
                   ],
-                  "coachNote": "Brace the bench against a wall first. Small plates sit the bar low, so lift it over your thighs rather than rolling it. Squeeze hard at the top for a full second; ribs stay down.",
-                  "tempo": "1s pause top"
+                  "coachNote": "A second vertical pull in the week buys the first strict pull-up.",
+                  "tempo": "5s eccentric"
                 },
                 {
                   "id": "b-thu-3b",
-                  "exerciseId": "single-leg-calf-raise",
+                  "exerciseId": "goblet-squat",
                   "order": 4,
                   "groupId": "b-thu-ss1",
                   "unit": "reps",
                   "sets": 3,
-                  "repsMin": 20,
-                  "repsMax": 20,
-                  "repsCreepMax": 30,
-                  "restSec": 60,
-                  "targetRir": 1,
-                  "loadMode": "bodyweight",
-                  "startLoadKg": null,
-                  "perSide": true,
-                  "unilateral": true,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "repsOnly",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "standing-calf-raise"
-                  ],
-                  "coachNote": "Higher reps than Monday, same quality. No bouncing.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-thu-4",
-                  "exerciseId": "ring-hamstring-curl",
-                  "order": 5,
-                  "groupId": null,
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 8,
+                  "repsMin": 12,
                   "repsMax": 12,
                   "repsCreepMax": 15,
-                  "restSec": 75,
+                  "restSec": 60,
                   "targetRir": null,
-                  "loadMode": "bodyweight",
-                  "startLoadKg": null,
+                  "loadMode": "kettlebell",
+                  "startLoadKg": 8.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
@@ -2562,10 +1531,10 @@
                     "historyWindowDays": 21
                   },
                   "substitutes": [
-                    "slider-hamstring-curl",
-                    "nordic-curl-negative"
+                    "dumbbell-squat",
+                    "step-up"
                   ],
-                  "coachNote": "Rings low, about 20 cm off the floor. Hips up and stay up; curl the heels in, straighten slowly. No rings? The slider curl, heels on a towel on bare floor, not the mats.",
+                  "coachNote": null,
                   "tempo": "3s eccentric"
                 }
               ]
@@ -2595,15 +1564,26 @@
         {
           "id": "b-fri",
           "weekday": "fri",
-          "title": "Upper B · Press-led",
+          "title": "Rest",
+          "kind": "rest",
+          "optional": false,
+          "estMinutes": 0,
+          "note": "Rest. Jumu'ah, the study project, home. Tomorrow morning is a session: get to bed.",
+          "warnings": [],
+          "sections": []
+        },
+        {
+          "id": "b-sat",
+          "weekday": "sat",
+          "title": "Full Body C · Bench",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 45,
-          "note": "10 pressing sets and 10 pulling sets again. Back and biceps are what make a physique read as trained, and they are what beginners skimp on.",
+          "estMinutes": 31,
+          "note": "Press and pull, then legs and trunk. The weekend starts after it.",
           "warnings": [
             {
-              "title": "Check the ceiling",
-              "body": "Measure your overhead clearance before pressing. The basement beams and pipes are not at a uniform height."
+              "title": "Bench pins at chest height",
+              "body": "Set the pins so a failed rep lands on them and not on you. Never take the bench press to failure alone."
             },
             {
               "title": "Collars on, checked mid-set",
@@ -2619,13 +1599,13 @@
                 {
                   "exerciseId": "rope-skipping",
                   "order": 1,
-                  "text": "3 min",
+                  "text": "2 min",
                   "note": null
                 },
                 {
                   "exerciseId": "band-pull-apart",
                   "order": 2,
-                  "text": "2 x 20",
+                  "text": "x 20",
                   "note": null
                 },
                 {
@@ -2646,23 +1626,23 @@
             {
               "type": "main",
               "title": "Main work",
-              "estMinutes": 41,
+              "estMinutes": 27,
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "b-fri-1",
-                  "exerciseId": "barbell-overhead-press",
+                  "id": "b-sat-1",
+                  "exerciseId": "barbell-bench-press",
                   "order": 1,
                   "groupId": null,
                   "unit": "reps",
-                  "sets": 4,
+                  "sets": 3,
                   "repsMin": 6,
                   "repsMax": 6,
                   "repsCreepMax": 10,
-                  "restSec": 150,
+                  "restSec": 105,
                   "targetRir": null,
                   "loadMode": "barbell",
-                  "startLoadKg": 14.0,
+                  "startLoadKg": 17.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": true,
@@ -2676,364 +1656,91 @@
                     "maxJumpPct": 0.1
                   },
                   "substitutes": [
-                    "dumbbell-overhead-press",
-                    "seated-dumbbell-press"
+                    "dumbbell-bench-press",
+                    "dumbbell-floor-press"
                   ],
-                  "coachNote": "Glutes and abs locked. Head moves back, then through, as the bar passes. Leaning back to move it means it is too heavy.",
+                  "coachNote": "Bar to the lower chest, elbows at 45-60 degrees. Pins at chest height.",
                   "tempo": null
                 },
                 {
-                  "id": "b-fri-2",
-                  "exerciseId": "pull-up-assisted",
+                  "id": "b-sat-2",
+                  "exerciseId": "barbell-bent-over-row",
                   "order": 2,
                   "groupId": null,
-                  "unit": "reps",
-                  "sets": 4,
-                  "repsMin": 3,
-                  "repsMax": 8,
-                  "repsCreepMax": null,
-                  "restSec": 120,
-                  "targetRir": 1,
-                  "loadMode": "banded",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "bandProgression",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "pull-up",
-                    "pull-up-negative",
-                    "ring-row"
-                  ],
-                  "coachNote": "Always stop one rep before failure. When you get 8 assisted, move to a thinner band. Log the band colour in the set note.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-fri-3a",
-                  "exerciseId": "dumbbell-bench-press",
-                  "order": 3,
-                  "groupId": "b-fri-ss1",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 10,
-                  "repsMax": 10,
-                  "repsCreepMax": 14,
-                  "restSec": 0,
-                  "targetRir": null,
-                  "loadMode": "dumbbellPair",
-                  "startLoadKg": 8.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 1.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
-                  },
-                  "substitutes": [
-                    "dumbbell-floor-press",
-                    "incline-dumbbell-press"
-                  ],
-                  "coachNote": null,
-                  "tempo": null
-                },
-                {
-                  "id": "b-fri-3b",
-                  "exerciseId": "ring-row",
-                  "order": 4,
-                  "groupId": "b-fri-ss1",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 10,
-                  "repsMax": 12,
-                  "repsCreepMax": 16,
-                  "restSec": 60,
-                  "targetRir": null,
-                  "loadMode": "bodyweight",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "repsOnly",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "chest-supported-dumbbell-row",
-                    "one-arm-dumbbell-row"
-                  ],
-                  "coachNote": "Bodyweight, so the dumbbells stay loaded through the whole superset. Walk your feet forward to make it harder.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-fri-4a",
-                  "exerciseId": "hammer-curl",
-                  "order": 5,
-                  "groupId": "b-fri-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 12,
-                  "repsMax": 12,
-                  "repsCreepMax": 16,
-                  "restSec": 0,
-                  "targetRir": 1,
-                  "loadMode": "dumbbellPair",
-                  "startLoadKg": 5.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "doubleProgression",
-                    "incrementKg": 1.0,
-                    "deloadPct": 0.1,
-                    "stallLimit": 2,
-                    "historyWindowDays": 21,
-                    "maxJumpPct": 0.1
-                  },
-                  "substitutes": [
-                    "dumbbell-curl",
-                    "ez-bar-curl"
-                  ],
-                  "coachNote": "Neutral grip, thumbs up. Hits the brachialis, which pushes the arm wider.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-fri-4b",
-                  "exerciseId": "cable-triceps-pushdown",
-                  "order": 6,
-                  "groupId": "b-fri-ss2",
-                  "unit": "reps",
-                  "sets": 3,
-                  "repsMin": 12,
-                  "repsMax": 15,
-                  "repsCreepMax": null,
-                  "restSec": 45,
-                  "targetRir": 1,
-                  "loadMode": "cable",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "bandProgression",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "ez-bar-skullcrusher",
-                    "overhead-dumbbell-extension",
-                    "bench-dip",
-                    "ring-dip"
-                  ],
-                  "coachNote": "Wall cable — no plate change inside the superset. Elbows pinned to the ribs.",
-                  "tempo": null
-                }
-              ]
-            },
-            {
-              "type": "cooldown",
-              "title": "Cool-down",
-              "estMinutes": 2,
-              "drills": [
-                {
-                  "exerciseId": "dead-hang",
-                  "order": 1,
-                  "text": "30 s",
-                  "note": null
-                },
-                {
-                  "exerciseId": "doorway-chest-stretch",
-                  "order": 2,
-                  "text": "45 s / side",
-                  "note": null
-                }
-              ],
-              "prescriptions": []
-            }
-          ]
-        },
-        {
-          "id": "b-sat",
-          "weekday": "sat",
-          "title": "Rest",
-          "kind": "rest",
-          "optional": false,
-          "estMinutes": 0,
-          "note": "Complete rest after four lifting days. Cook, sleep in, meal-prep for the week. If you are twitchy, a 30-minute walk is all you get.",
-          "warnings": [],
-          "sections": []
-        },
-        {
-          "id": "b-sun",
-          "weekday": "sun",
-          "title": "Run, Bag & Core",
-          "kind": "cardio",
-          "optional": false,
-          "estMinutes": 58,
-          "note": null,
-          "warnings": [],
-          "sections": [
-            {
-              "type": "cardio",
-              "title": "Run",
-              "estMinutes": 35,
-              "drills": [],
-              "prescriptions": [
-                {
-                  "id": "b-sun-1",
-                  "exerciseId": "easy-run",
-                  "order": 1,
-                  "groupId": null,
-                  "unit": "sec",
-                  "sets": 1,
-                  "repsMin": 1440,
-                  "repsMax": 1560,
-                  "repsCreepMax": null,
-                  "restSec": 0,
-                  "targetRir": null,
-                  "loadMode": "timed",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "cardioTable",
-                    "table": "long",
-                    "stallLimit": 99,
-                    "historyWindowDays": 21
-                  },
-                  "substitutes": [
-                    "run-intervals"
-                  ],
-                  "coachNote": "Your long run, 48 hours clear of Thursday's deadlifts and a full day before Monday's squat. Easy pace, by time not distance. Straight after it, while you are warm: four relaxed 15-second strides, walking back between them.",
-                  "tempo": null
-                }
-              ]
-            },
-            {
-              "type": "cardio",
-              "title": "Strides, bag & core",
-              "estMinutes": 20,
-              "drills": [
-                {
-                  "exerciseId": "running-strides",
-                  "order": 1,
-                  "text": "4 x 15 s, walk back",
-                  "note": "Quick and tall, about 80% effort, never a sprint. Skip them in the deload week."
-                }
-              ],
-              "prescriptions": [
-                {
-                  "id": "b-sun-3",
-                  "exerciseId": "heavy-bag-rounds",
-                  "order": 3,
-                  "groupId": null,
-                  "unit": "sec",
-                  "sets": 3,
-                  "repsMin": 120,
-                  "repsMax": 120,
-                  "repsCreepMax": null,
-                  "restSec": 60,
-                  "targetRir": null,
-                  "loadMode": "timed",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "none"
-                  },
-                  "substitutes": [
-                    "rope-skipping"
-                  ],
-                  "coachNote": "Wraps or gloves on, always. Straight punches, move your feet, breathe out on every shot. This lives on Sunday, not on lifting days — that is where v1's 77-minute sessions came from.",
-                  "tempo": null
-                },
-                {
-                  "id": "b-sun-4a",
-                  "exerciseId": "ab-wheel-knees",
-                  "order": 4,
-                  "groupId": "b-sun-core",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 8,
                   "repsMax": 8,
-                  "repsCreepMax": 14,
-                  "restSec": 0,
-                  "targetRir": 1,
-                  "loadMode": "bodyweight",
-                  "startLoadKg": null,
+                  "repsCreepMax": 12,
+                  "restSec": 90,
+                  "targetRir": null,
+                  "loadMode": "barbell",
+                  "startLoadKg": 18.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": false,
                   "optional": false,
                   "progression": {
-                    "type": "repsOnly",
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
+                    "type": "doubleProgression",
+                    "incrementKg": 2.0,
+                    "deloadPct": 0.1,
+                    "stallLimit": 2,
+                    "historyWindowDays": 21,
+                    "maxJumpPct": 0.15
                   },
                   "substitutes": [
-                    "plank"
+                    "one-arm-dumbbell-row",
+                    "chest-supported-dumbbell-row"
                   ],
-                  "coachNote": null,
+                  "coachNote": "Same bar as the bench. Your shoulders need the row on the day you press.",
                   "tempo": null
                 },
                 {
-                  "id": "b-sun-4b",
-                  "exerciseId": "hollow-hold",
-                  "order": 5,
-                  "groupId": "b-sun-core",
-                  "unit": "sec",
+                  "id": "b-sat-3a",
+                  "exerciseId": "bulgarian-split-squat",
+                  "order": 3,
+                  "groupId": "b-sat-ss1",
+                  "unit": "reps",
                   "sets": 3,
-                  "repsMin": 30,
-                  "repsMax": 30,
-                  "repsCreepMax": 60,
+                  "repsMin": 8,
+                  "repsMax": 8,
+                  "repsCreepMax": 12,
                   "restSec": 0,
                   "targetRir": null,
-                  "loadMode": "timed",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
+                  "loadMode": "dumbbellPair",
+                  "startLoadKg": 6.0,
+                  "perSide": true,
+                  "unilateral": true,
                   "warmupRamp": false,
                   "optional": false,
                   "progression": {
-                    "type": "timeOnly",
-                    "incrementSec": 5,
-                    "stallLimit": 3,
-                    "historyWindowDays": 21
+                    "type": "doubleProgression",
+                    "incrementKg": 1.0,
+                    "deloadPct": 0.1,
+                    "stallLimit": 2,
+                    "historyWindowDays": 21,
+                    "maxJumpPct": 0.1
                   },
                   "substitutes": [
-                    "dead-bug"
+                    "reverse-lunge",
+                    "split-squat",
+                    "step-up",
+                    "walking-lunge"
                   ],
                   "coachNote": null,
                   "tempo": null
                 },
                 {
-                  "id": "b-sun-4c",
+                  "id": "b-sat-3b",
                   "exerciseId": "side-plank",
-                  "order": 6,
-                  "groupId": "b-sun-core",
+                  "order": 4,
+                  "groupId": "b-sat-ss1",
                   "unit": "sec",
                   "sets": 3,
                   "repsMin": 30,
                   "repsMax": 30,
                   "repsCreepMax": 60,
-                  "restSec": 45,
+                  "restSec": 60,
                   "targetRir": null,
                   "loadMode": "timed",
                   "startLoadKg": null,
@@ -3059,8 +1766,78 @@
             },
             {
               "type": "cooldown",
-              "title": "Stretch",
-              "estMinutes": 3,
+              "title": "Cool-down",
+              "estMinutes": 2,
+              "drills": [
+                {
+                  "exerciseId": "doorway-chest-stretch",
+                  "order": 1,
+                  "text": "45 s / side",
+                  "note": null
+                },
+                {
+                  "exerciseId": "thoracic-rotation",
+                  "order": 2,
+                  "text": "10 / side",
+                  "note": null
+                }
+              ],
+              "prescriptions": []
+            }
+          ]
+        },
+        {
+          "id": "b-sun",
+          "weekday": "sun",
+          "title": "Run or hike",
+          "kind": "cardio",
+          "optional": true,
+          "estMinutes": 32,
+          "note": "Outside, easy, for the heart and the head. Optional.",
+          "warnings": [],
+          "sections": [
+            {
+              "type": "cardio",
+              "title": "Session",
+              "estMinutes": 30,
+              "drills": [],
+              "prescriptions": [
+                {
+                  "id": "b-sun-1",
+                  "exerciseId": "easy-run",
+                  "order": 1,
+                  "groupId": null,
+                  "unit": "sec",
+                  "sets": 1,
+                  "repsMin": 1320,
+                  "repsMax": 1500,
+                  "repsCreepMax": null,
+                  "restSec": 0,
+                  "targetRir": null,
+                  "loadMode": "timed",
+                  "startLoadKg": null,
+                  "perSide": false,
+                  "unilateral": false,
+                  "warmupRamp": false,
+                  "optional": false,
+                  "progression": {
+                    "type": "cardioTable",
+                    "table": "long",
+                    "stallLimit": 99,
+                    "historyWindowDays": 21
+                  },
+                  "substitutes": [
+                    "run-intervals"
+                  ],
+                  "coachNote": "Conversational pace — or swap it for a hike and record that instead. Optional: a week without it is still a good week.",
+                  "tempo": null
+                }
+              ]
+            },
+            {
+              "type": "cooldown",
+              "title": "Mobility",
+              "estMinutes": 2,
               "drills": [
                 {
                   "exerciseId": "couch-stretch",
@@ -3069,21 +1846,9 @@
                   "note": null
                 },
                 {
-                  "exerciseId": "ninety-ninety-hip-switch",
-                  "order": 2,
-                  "text": "10 / side",
-                  "note": null
-                },
-                {
                   "exerciseId": "standing-hamstring-stretch",
-                  "order": 3,
+                  "order": 2,
                   "text": "45 s / side",
-                  "note": null
-                },
-                {
-                  "exerciseId": "thoracic-rotation",
-                  "order": 4,
-                  "text": "10 / side",
                   "note": null
                 }
               ],
@@ -3106,7 +1871,7 @@
       "setRounding": "up",
       "includeSupersets": false,
       "includeFinishers": false,
-      "summary": "Same four days, 70% of the load, 60% of the sets, supersets unwound so nothing is rushed. Bar speed stays fast. You will want to skip this week -- it is the week the previous three turn into muscle.",
+      "summary": "Same three days, 70% of the load, 60% of the sets, supersets unwound so nothing is rushed. You will want to skip this week -- it is the week the previous three turn into muscle.",
       "inheritsDaysFrom": "build",
       "dayOverrides": {},
       "days": []
@@ -3126,21 +1891,12 @@
       "setRounding": "up",
       "includeSupersets": true,
       "includeFinishers": true,
-      "summary": "Same split, one set added to the lead lift of each day, 1 rep in reserve on those sets. Nordic curl negatives replace the ring hamstring curl on Thursday.",
+      "summary": "Same three days, the lead lift of each one taken to 1 rep in reserve. Still half an hour.",
       "inheritsDaysFrom": "build",
       "dayOverrides": {
-        "b-mon": {
-          "prescriptionOverrides": {
-            "b-mon-1": {
-              "sets": 5,
-              "targetRir": 1
-            }
-          }
-        },
         "b-tue": {
           "prescriptionOverrides": {
             "b-tue-1": {
-              "sets": 5,
               "targetRir": 1
             }
           }
@@ -3148,24 +1904,13 @@
         "b-thu": {
           "prescriptionOverrides": {
             "b-thu-1": {
-              "sets": 4,
               "targetRir": 1
-            },
-            "b-thu-4": {
-              "exerciseId": "nordic-curl-negative",
-              "repsMin": 3,
-              "repsMax": 5,
-              "repsCreepMax": 8,
-              "restSec": 90,
-              "tempo": "max eccentric",
-              "coachNote": "Weeks 9-11: nordic negatives replace the ring curl. Kneel on the mat with your heels under a loaded barbell on the floor, padded with the folded mat -- never the squat stand, it can tip. Lower as slowly as you can; expect to fall fast at first."
             }
           }
         },
-        "b-fri": {
+        "b-sat": {
           "prescriptionOverrides": {
-            "b-fri-1": {
-              "sets": 5,
+            "b-sat-1": {
               "targetRir": 1
             }
           }
@@ -3186,17 +1931,28 @@
       "setRounding": "up",
       "includeSupersets": true,
       "includeFinishers": false,
-      "summary": "Five-rep tests on the five barbell lifts, max strict pull-ups, and the 5K. These numbers seed cycle 2.",
+      "summary": "Five-rep tests on the five barbell lifts across the three days, max strict pull-ups, and a 5K if you want it. These numbers seed cycle 2.",
       "inheritsDaysFrom": null,
       "dayOverrides": {},
       "days": [
         {
           "id": "t-mon",
           "weekday": "mon",
-          "title": "Test · Squat",
+          "title": "Rest",
+          "kind": "rest",
+          "optional": false,
+          "estMinutes": 0,
+          "note": "Test week. Rest today.",
+          "warnings": [],
+          "sections": []
+        },
+        {
+          "id": "t-tue",
+          "weekday": "tue",
+          "title": "Test · Squat & Row",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 21,
+          "estMinutes": 15,
           "note": "Test week. Nothing to prove except what twelve weeks bought you.",
           "warnings": [
             {
@@ -3217,8 +1973,8 @@
                 {
                   "exerciseId": "rope-skipping",
                   "order": 1,
-                  "text": "3 min",
-                  "note": null
+                  "text": "2 min",
+                  "note": "On the interlocking mats, never bare concrete."
                 },
                 {
                   "exerciseId": "leg-swing",
@@ -3244,11 +2000,11 @@
             {
               "type": "main",
               "title": "Test",
-              "estMinutes": 18,
+              "estMinutes": 12,
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "t-mon-1",
+                  "id": "t-tue-1",
                   "exerciseId": "barbell-back-squat",
                   "order": 1,
                   "groupId": null,
@@ -3257,149 +2013,10 @@
                   "repsMin": 5,
                   "repsMax": 5,
                   "repsCreepMax": null,
-                  "restSec": 300,
+                  "restSec": 240,
                   "targetRir": 0,
                   "loadMode": "barbell",
                   "startLoadKg": 34.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": true,
-                  "optional": false,
-                  "progression": {
-                    "type": "none"
-                  },
-                  "substitutes": [],
-                  "coachNote": "Work up in singles and doubles to one hard set of 5. HARD means the last rep grinds but the bar still moves and the shape holds. NOT a failed rep, NOT a maximal single — you train alone. The number below is the target; beat it if it is there.",
-                  "tempo": null
-                },
-                {
-                  "id": "t-mon-2a",
-                  "exerciseId": "bulgarian-split-squat",
-                  "order": 2,
-                  "groupId": "t-mon-ss1",
-                  "unit": "reps",
-                  "sets": 2,
-                  "repsMin": 10,
-                  "repsMax": 10,
-                  "repsCreepMax": null,
-                  "restSec": 0,
-                  "targetRir": 3,
-                  "loadMode": "dumbbellPair",
-                  "startLoadKg": 6.0,
-                  "perSide": true,
-                  "unilateral": true,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "none"
-                  },
-                  "substitutes": [
-                    "step-up",
-                    "reverse-lunge"
-                  ],
-                  "coachNote": "Light. Just moving.",
-                  "tempo": null
-                },
-                {
-                  "id": "t-mon-2b",
-                  "exerciseId": "single-leg-calf-raise",
-                  "order": 3,
-                  "groupId": "t-mon-ss1",
-                  "unit": "reps",
-                  "sets": 2,
-                  "repsMin": 15,
-                  "repsMax": 15,
-                  "repsCreepMax": null,
-                  "restSec": 60,
-                  "targetRir": 3,
-                  "loadMode": "bodyweight",
-                  "startLoadKg": null,
-                  "perSide": true,
-                  "unilateral": true,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "none"
-                  },
-                  "substitutes": [],
-                  "coachNote": null,
-                  "tempo": null
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "t-tue",
-          "weekday": "tue",
-          "title": "Test · Bench & Row",
-          "kind": "lift",
-          "optional": false,
-          "estMinutes": 23,
-          "note": null,
-          "warnings": [
-            {
-              "title": "Bench pins at chest height",
-              "body": "Set the pins so a failed rep lands on them and not on you. Never take the bench press to failure alone."
-            },
-            {
-              "title": "Collars on, checked mid-set",
-              "body": "Spinlock collars work loose under load. A plate sliding off one end is the single most likely injury in your room."
-            }
-          ],
-          "sections": [
-            {
-              "type": "warmup",
-              "title": "Warm-up",
-              "estMinutes": 3,
-              "drills": [
-                {
-                  "exerciseId": "rope-skipping",
-                  "order": 1,
-                  "text": "3 min",
-                  "note": null
-                },
-                {
-                  "exerciseId": "band-pull-apart",
-                  "order": 2,
-                  "text": "2 x 20",
-                  "note": null
-                },
-                {
-                  "exerciseId": "wall-slide",
-                  "order": 3,
-                  "text": "x 10",
-                  "note": null
-                },
-                {
-                  "exerciseId": "push-up-handles",
-                  "order": 4,
-                  "text": "x 10",
-                  "note": null
-                }
-              ],
-              "prescriptions": []
-            },
-            {
-              "type": "main",
-              "title": "Test",
-              "estMinutes": 20,
-              "drills": [],
-              "prescriptions": [
-                {
-                  "id": "t-tue-1",
-                  "exerciseId": "barbell-bench-press",
-                  "order": 1,
-                  "groupId": null,
-                  "unit": "reps",
-                  "sets": 1,
-                  "repsMin": 5,
-                  "repsMax": 5,
-                  "repsCreepMax": null,
-                  "restSec": 300,
-                  "targetRir": 0,
-                  "loadMode": "barbell",
-                  "startLoadKg": 24.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": true,
@@ -3421,7 +2038,7 @@
                   "repsMin": 5,
                   "repsMax": 5,
                   "repsCreepMax": null,
-                  "restSec": 240,
+                  "restSec": 180,
                   "targetRir": 0,
                   "loadMode": "barbell",
                   "startLoadKg": 30.0,
@@ -3434,56 +2051,6 @@
                   },
                   "substitutes": [],
                   "coachNote": "Work up in singles and doubles to one hard set of 5. HARD means the last rep grinds but the bar still moves and the shape holds. NOT a failed rep, NOT a maximal single — you train alone. The number below is the target; beat it if it is there.",
-                  "tempo": null
-                },
-                {
-                  "id": "t-tue-3a",
-                  "exerciseId": "incline-dumbbell-press",
-                  "order": 3,
-                  "groupId": "t-tue-ss1",
-                  "unit": "reps",
-                  "sets": 2,
-                  "repsMin": 12,
-                  "repsMax": 12,
-                  "repsCreepMax": null,
-                  "restSec": 0,
-                  "targetRir": 3,
-                  "loadMode": "dumbbellPair",
-                  "startLoadKg": 7.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "none"
-                  },
-                  "substitutes": [],
-                  "coachNote": null,
-                  "tempo": null
-                },
-                {
-                  "id": "t-tue-3b",
-                  "exerciseId": "cable-face-pull",
-                  "order": 4,
-                  "groupId": "t-tue-ss1",
-                  "unit": "reps",
-                  "sets": 2,
-                  "repsMin": 15,
-                  "repsMax": 15,
-                  "repsCreepMax": null,
-                  "restSec": 60,
-                  "targetRir": 3,
-                  "loadMode": "cable",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "none"
-                  },
-                  "substitutes": [],
-                  "coachNote": null,
                   "tempo": null
                 }
               ]
@@ -3504,118 +2071,16 @@
         {
           "id": "t-thu",
           "weekday": "thu",
-          "title": "Test · Deadlift",
+          "title": "Test · Deadlift & Press",
           "kind": "lift",
           "optional": false,
-          "estMinutes": 13,
-          "note": "One lift, then go home and eat.",
+          "estMinutes": 15,
+          "note": "Two lifts, then go home and eat.",
           "warnings": [
             {
               "title": "Bar height — read before your first pull",
               "body": "Your plates are small-diameter, so a lightly loaded bar sits too low and forces your back to round at the start. Stack the two 20 kg tri-grips flat and rest each end of the bar on them for every pull, warm-ups included, until the 20s themselves go on the bar: 50 kg and up (the 10 kg bar plus a 20 on each side)."
             },
-            {
-              "title": "Collars on, checked mid-set",
-              "body": "Spinlock collars work loose under load. A plate sliding off one end is the single most likely injury in your room."
-            }
-          ],
-          "sections": [
-            {
-              "type": "warmup",
-              "title": "Warm-up",
-              "estMinutes": 3,
-              "drills": [
-                {
-                  "exerciseId": "rope-skipping",
-                  "order": 1,
-                  "text": "3 min",
-                  "note": null
-                },
-                {
-                  "exerciseId": "cat-cow",
-                  "order": 2,
-                  "text": "x 10",
-                  "note": null
-                },
-                {
-                  "exerciseId": "glute-bridge",
-                  "order": 3,
-                  "text": "x 20",
-                  "note": null
-                },
-                {
-                  "exerciseId": "bodyweight-good-morning",
-                  "order": 4,
-                  "text": "x 15",
-                  "note": null
-                }
-              ],
-              "prescriptions": []
-            },
-            {
-              "type": "main",
-              "title": "Test",
-              "estMinutes": 9,
-              "drills": [],
-              "prescriptions": [
-                {
-                  "id": "t-thu-1",
-                  "exerciseId": "barbell-deadlift",
-                  "order": 1,
-                  "groupId": null,
-                  "unit": "reps",
-                  "sets": 1,
-                  "repsMin": 5,
-                  "repsMax": 5,
-                  "repsCreepMax": null,
-                  "restSec": 300,
-                  "targetRir": 0,
-                  "loadMode": "barbell",
-                  "startLoadKg": 60.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": true,
-                  "optional": false,
-                  "progression": {
-                    "type": "none"
-                  },
-                  "substitutes": [],
-                  "coachNote": "Work up in singles and doubles to one hard set of 5. HARD means the last rep grinds but the bar still moves and the shape holds. NOT a failed rep, NOT a maximal single — you train alone. The number below is the target; beat it if it is there. Then stop. Nothing else today.",
-                  "tempo": null
-                }
-              ]
-            },
-            {
-              "type": "cooldown",
-              "title": "Cool-down",
-              "estMinutes": 2,
-              "drills": [
-                {
-                  "exerciseId": "standing-hamstring-stretch",
-                  "order": 1,
-                  "text": "45 s / side",
-                  "note": null
-                },
-                {
-                  "exerciseId": "cat-cow",
-                  "order": 2,
-                  "text": "x 10",
-                  "note": null
-                }
-              ],
-              "prescriptions": []
-            }
-          ]
-        },
-        {
-          "id": "t-fri",
-          "weekday": "fri",
-          "title": "Test · Press & Pull-ups",
-          "kind": "lift",
-          "optional": false,
-          "estMinutes": 23,
-          "note": "Last lifting session of the cycle. Take the week-12 photos afterwards, while you are still pumped — same four poses, same spot, same light.",
-          "warnings": [
             {
               "title": "Check the ceiling",
               "body": "Measure your overhead clearance before pressing. The basement beams and pipes are not at a uniform height."
@@ -3634,13 +2099,139 @@
                 {
                   "exerciseId": "rope-skipping",
                   "order": 1,
-                  "text": "3 min",
+                  "text": "2 min",
+                  "note": null
+                },
+                {
+                  "exerciseId": "cat-cow",
+                  "order": 2,
+                  "text": "x 10",
+                  "note": null
+                },
+                {
+                  "exerciseId": "bodyweight-good-morning",
+                  "order": 3,
+                  "text": "x 15",
+                  "note": null
+                },
+                {
+                  "exerciseId": "band-pull-apart",
+                  "order": 4,
+                  "text": "x 20",
+                  "note": null
+                }
+              ],
+              "prescriptions": []
+            },
+            {
+              "type": "main",
+              "title": "Test",
+              "estMinutes": 12,
+              "drills": [],
+              "prescriptions": [
+                {
+                  "id": "t-thu-1",
+                  "exerciseId": "barbell-deadlift",
+                  "order": 1,
+                  "groupId": null,
+                  "unit": "reps",
+                  "sets": 1,
+                  "repsMin": 5,
+                  "repsMax": 5,
+                  "repsCreepMax": null,
+                  "restSec": 240,
+                  "targetRir": 0,
+                  "loadMode": "barbell",
+                  "startLoadKg": 60.0,
+                  "perSide": false,
+                  "unilateral": false,
+                  "warmupRamp": true,
+                  "optional": false,
+                  "progression": {
+                    "type": "none"
+                  },
+                  "substitutes": [],
+                  "coachNote": "Work up in singles and doubles to one hard set of 5. HARD means the last rep grinds but the bar still moves and the shape holds. NOT a failed rep, NOT a maximal single — you train alone. The number below is the target; beat it if it is there.",
+                  "tempo": null
+                },
+                {
+                  "id": "t-thu-2",
+                  "exerciseId": "barbell-overhead-press",
+                  "order": 2,
+                  "groupId": null,
+                  "unit": "reps",
+                  "sets": 1,
+                  "repsMin": 5,
+                  "repsMax": 5,
+                  "repsCreepMax": null,
+                  "restSec": 180,
+                  "targetRir": 0,
+                  "loadMode": "barbell",
+                  "startLoadKg": 20.0,
+                  "perSide": false,
+                  "unilateral": false,
+                  "warmupRamp": false,
+                  "optional": false,
+                  "progression": {
+                    "type": "none"
+                  },
+                  "substitutes": [],
+                  "coachNote": "Work up in singles and doubles to one hard set of 5. HARD means the last rep grinds but the bar still moves and the shape holds. NOT a failed rep, NOT a maximal single — you train alone. The number below is the target; beat it if it is there.",
+                  "tempo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "t-fri",
+          "weekday": "fri",
+          "title": "Rest",
+          "kind": "rest",
+          "optional": false,
+          "estMinutes": 0,
+          "note": "Rest. Tomorrow is the bench test: sleep is part of it.",
+          "warnings": [],
+          "sections": []
+        },
+        {
+          "id": "t-sat",
+          "weekday": "sat",
+          "title": "Test · Bench & Pull-ups",
+          "kind": "lift",
+          "optional": false,
+          "estMinutes": 15,
+          "note": "Last session of the cycle. Take the week-12 photos afterwards.",
+          "warnings": [
+            {
+              "title": "Bench pins at chest height",
+              "body": "Set the pins so a failed rep lands on them and not on you. Never take the bench press to failure alone."
+            },
+            {
+              "title": "Check the ceiling",
+              "body": "Measure your overhead clearance before pressing. The basement beams and pipes are not at a uniform height."
+            },
+            {
+              "title": "Collars on, checked mid-set",
+              "body": "Spinlock collars work loose under load. A plate sliding off one end is the single most likely injury in your room."
+            }
+          ],
+          "sections": [
+            {
+              "type": "warmup",
+              "title": "Warm-up",
+              "estMinutes": 3,
+              "drills": [
+                {
+                  "exerciseId": "rope-skipping",
+                  "order": 1,
+                  "text": "2 min",
                   "note": null
                 },
                 {
                   "exerciseId": "band-pull-apart",
                   "order": 2,
-                  "text": "2 x 20",
+                  "text": "x 20",
                   "note": null
                 },
                 {
@@ -3661,12 +2252,12 @@
             {
               "type": "main",
               "title": "Test",
-              "estMinutes": 20,
+              "estMinutes": 12,
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "t-fri-1",
-                  "exerciseId": "barbell-overhead-press",
+                  "id": "t-sat-1",
+                  "exerciseId": "barbell-bench-press",
                   "order": 1,
                   "groupId": null,
                   "unit": "reps",
@@ -3674,10 +2265,10 @@
                   "repsMin": 5,
                   "repsMax": 5,
                   "repsCreepMax": null,
-                  "restSec": 300,
+                  "restSec": 240,
                   "targetRir": 0,
                   "loadMode": "barbell",
-                  "startLoadKg": 20.0,
+                  "startLoadKg": 24.0,
                   "perSide": false,
                   "unilateral": false,
                   "warmupRamp": true,
@@ -3690,7 +2281,7 @@
                   "tempo": null
                 },
                 {
-                  "id": "t-fri-2",
+                  "id": "t-sat-2",
                   "exerciseId": "pull-up",
                   "order": 2,
                   "groupId": null,
@@ -3699,7 +2290,7 @@
                   "repsMin": 1,
                   "repsMax": 12,
                   "repsCreepMax": null,
-                  "restSec": 240,
+                  "restSec": 180,
                   "targetRir": 0,
                   "loadMode": "bodyweight",
                   "startLoadKg": null,
@@ -3713,57 +2304,7 @@
                   "substitutes": [
                     "pull-up-assisted"
                   ],
-                  "coachNote": "MAX STRICT REPS. No kipping, no half reps — chin over the bar, full hang at the bottom. This is the number you will remember.",
-                  "tempo": null
-                },
-                {
-                  "id": "t-fri-3a",
-                  "exerciseId": "hammer-curl",
-                  "order": 3,
-                  "groupId": "t-fri-ss1",
-                  "unit": "reps",
-                  "sets": 2,
-                  "repsMin": 12,
-                  "repsMax": 12,
-                  "repsCreepMax": null,
-                  "restSec": 0,
-                  "targetRir": 3,
-                  "loadMode": "dumbbellPair",
-                  "startLoadKg": 5.0,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "none"
-                  },
-                  "substitutes": [],
-                  "coachNote": null,
-                  "tempo": null
-                },
-                {
-                  "id": "t-fri-3b",
-                  "exerciseId": "cable-triceps-pushdown",
-                  "order": 4,
-                  "groupId": "t-fri-ss1",
-                  "unit": "reps",
-                  "sets": 2,
-                  "repsMin": 15,
-                  "repsMax": 15,
-                  "repsCreepMax": null,
-                  "restSec": 60,
-                  "targetRir": 3,
-                  "loadMode": "cable",
-                  "startLoadKg": null,
-                  "perSide": false,
-                  "unilateral": false,
-                  "warmupRamp": false,
-                  "optional": false,
-                  "progression": {
-                    "type": "none"
-                  },
-                  "substitutes": [],
-                  "coachNote": null,
+                  "coachNote": "MAX STRICT REPS. Chin over the bar, full hang at the bottom.",
                   "tempo": null
                 }
               ]
@@ -3771,29 +2312,18 @@
           ]
         },
         {
-          "id": "t-sat",
-          "weekday": "sat",
-          "title": "Rest",
-          "kind": "rest",
-          "optional": false,
-          "estMinutes": 0,
-          "note": "Rest before the time trial.",
-          "warnings": [],
-          "sections": []
-        },
-        {
           "id": "t-sun",
           "weekday": "sun",
-          "title": "Test · 5K Time Trial",
+          "title": "5K, if you want it",
           "kind": "cardio",
-          "optional": false,
+          "optional": true,
           "estMinutes": 26,
-          "note": null,
+          "note": "Outside, easy, for the heart and the head. Optional.",
           "warnings": [],
           "sections": [
             {
               "type": "cardio",
-              "title": "Test",
+              "title": "Session",
               "estMinutes": 25,
               "drills": [],
               "prescriptions": [
@@ -3821,24 +2351,24 @@
                   "substitutes": [
                     "easy-run"
                   ],
-                  "coachNote": "Flat measured route. Even pacing beats a fast first kilometre. Target 28-32 min. Then you are done — twelve weeks, logged.",
+                  "coachNote": "If you feel like it: a flat measured 5K, even pacing. If not, a hike or a walk counts. Twelve weeks, logged either way.",
                   "tempo": null
                 }
               ]
             },
             {
               "type": "cooldown",
-              "title": "Cool-down",
+              "title": "Mobility",
               "estMinutes": 2,
               "drills": [
                 {
-                  "exerciseId": "standing-hamstring-stretch",
+                  "exerciseId": "couch-stretch",
                   "order": 1,
                   "text": "45 s / side",
                   "note": null
                 },
                 {
-                  "exerciseId": "couch-stretch",
+                  "exerciseId": "standing-hamstring-stretch",
                   "order": 2,
                   "text": "45 s / side",
                   "note": null

@@ -74,7 +74,7 @@ void main() {
               debugShowCheckedModeBanner: false,
               theme: Screenshot.themed(AppTheme.dark),
               builder: (context, child) => LaunchGate(
-                now: () => DateTime(2026, 10, 19, 6, 40),
+                now: () => DateTime(2026, 11, 2, 6, 40),
                 child: child!,
               ),
               home: const Scaffold(),
@@ -90,7 +90,7 @@ void main() {
   }
 
   testWidgets('today, mid-programme', skip: !_enabled, (tester) async {
-    final today = DateTime(2026, 10, 14);
+    final today = DateTime(2026, 10, 29);
     await tester.runAsync(
       () => Screenshot.seedHistory(db, repo: repo, today: today),
     );
@@ -111,7 +111,7 @@ void main() {
   });
 
   testWidgets('today, trained', skip: !_enabled, (tester) async {
-    final today = DateTime(2026, 10, 14);
+    final today = DateTime(2026, 10, 29);
     await tester.runAsync(() async {
       await Screenshot.seedHistory(db, repo: repo, today: today);
       final programme = await repo.loadProgramme();
@@ -121,7 +121,7 @@ void main() {
             SessionsCompanion.insert(
               programmeId: programme.id,
               blockId: 'foundation',
-              dayId: 'f-wed',
+              dayId: 'f-thu',
               weekNo: 3,
               plannedDate: today,
               scheduledDate: today,
@@ -153,7 +153,7 @@ void main() {
       db: db,
       repo: repo,
       overrides: [
-        Screenshot.pinToday(DateTime(2026, 9, 25)),
+        Screenshot.pinToday(DateTime(2026, 10, 9)),
         quoteOfDayProvider.overrideWith(
           (ref) async => (quote: book.byId('g-plato-beginning')!, fresh: false),
         ),

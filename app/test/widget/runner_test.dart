@@ -92,10 +92,10 @@ void main() {
   }
 
   testWidgets('opens on the first movement of the day', (tester) async {
-    await open(tester, 'b-mon');
-    expect(find.text('Lower A · Squat'), findsOneWidget);
+    await open(tester, 'b-tue');
+    expect(find.text('Full Body A · Squat'), findsOneWidget);
     expect(find.text('Barbell back squat'), findsWidgets);
-    expect(find.textContaining('Set 1 of 4'), findsOneWidget);
+    expect(find.textContaining('Set 1 of 3'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -109,7 +109,7 @@ void main() {
   });
 
   testWidgets('a lift has no GPS button', (tester) async {
-    await open(tester, 'b-mon');
+    await open(tester, 'b-tue');
     expect(find.text('Run it with GPS'), findsNothing);
   });
 
@@ -128,7 +128,7 @@ void main() {
   testWidgets('the load stepper starts at the prescribed weight', (
     tester,
   ) async {
-    await open(tester, 'b-mon');
+    await open(tester, 'b-tue');
     // Squat starts at 21 kg on the lattice.
     expect(find.text('21'), findsWidgets);
     expect(find.text('kg'), findsWidgets);
@@ -137,10 +137,10 @@ void main() {
   testWidgets('logging a set records it and starts the rest timer', (
     tester,
   ) async {
-    await open(tester, 'b-mon');
+    await open(tester, 'b-tue');
 
-    // 4 + 3 + (3 + 3) x 2 sides + 3 + 3 + 3 lateral raises (v3) = 28.
-    expect(find.textContaining('0 / 28 sets'), findsOneWidget);
+    // 3 squat + 3 incline press + 3 row + 2 knee raise (v4) = 11.
+    expect(find.textContaining('0 / 11 sets'), findsOneWidget);
 
     await tester.tap(find.textContaining('Log set 1'));
     for (var i = 0; i < 10; i++) {
@@ -156,13 +156,13 @@ void main() {
     // And the rest timer is up.
     expect(find.text('RESTING'), findsOneWidget);
     expect(find.text('Skip rest'), findsOneWidget);
-    expect(find.textContaining('Set 2 of 4'), findsOneWidget);
+    expect(find.textContaining('Set 2 of 3'), findsOneWidget);
   });
 
   testWidgets('the reps stepper changes what gets logged', (tester) async {
-    await open(tester, 'b-mon');
+    await open(tester, 'b-tue');
 
-    // Squat is 4 x 5; bump to 6 reps.
+    // Squat is 3 x 6; bump to 7 reps.
     await tester.tap(find.byIcon(Icons.add).first);
     await tester.pump();
     await tester.tap(find.textContaining('Log set 1'));
@@ -171,11 +171,11 @@ void main() {
     }
 
     final sets = await db.select(db.setLogs).get();
-    expect(sets.single.reps, 6);
+    expect(sets.single.reps, 7);
   });
 
   testWidgets('skipping the rest clears the bar', (tester) async {
-    await open(tester, 'b-mon');
+    await open(tester, 'b-tue');
     await tester.tap(find.textContaining('Log set 1'));
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 50));
@@ -190,7 +190,7 @@ void main() {
   });
 
   testWidgets('a per-side movement asks for a side', (tester) async {
-    await open(tester, 'b-mon');
+    await open(tester, 'b-sat');
     // Bulgarian split squat is the third pill.
     await focusMovement(tester, 'Bulgarian split squat');
     expect(find.textContaining('left'), findsOneWidget);
@@ -200,7 +200,7 @@ void main() {
   testWidgets('the first superset member logs without starting a rest', (
     tester,
   ) async {
-    await open(tester, 'b-mon');
+    await open(tester, 'b-sat');
     await focusMovement(tester, 'Bulgarian split squat');
     await tester.tap(find.textContaining('Log set 1 (L)'));
     for (var i = 0; i < 10; i++) {
@@ -212,14 +212,14 @@ void main() {
   });
 
   testWidgets('a timed movement asks for seconds, not reps', (tester) async {
-    await open(tester, 'b-sun');
-    await focusMovement(tester, 'Heavy bag rounds');
+    await open(tester, 'b-sat');
+    await focusMovement(tester, 'Side plank');
     expect(find.textContaining('SECONDS'), findsOneWidget);
     expect(find.textContaining('REPS  ·'), findsNothing);
   });
 
   testWidgets('undo removes the set from the database', (tester) async {
-    await open(tester, 'b-mon');
+    await open(tester, 'b-tue');
     await tester.tap(find.textContaining('Log set 1'));
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 50));
@@ -236,7 +236,7 @@ void main() {
   testWidgets('reopening the day resumes rather than starting over', (
     tester,
   ) async {
-    await open(tester, 'b-mon');
+    await open(tester, 'b-tue');
     await tester.tap(find.textContaining('Log set 1'));
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 50));
@@ -245,15 +245,15 @@ void main() {
     // Tear the screen down as if the app had been killed, then reopen.
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
-    await open(tester, 'b-mon');
+    await open(tester, 'b-tue');
 
     expect(await db.select(db.sessions).get(), hasLength(1));
-    expect(find.textContaining('Set 2 of 4'), findsOneWidget);
-    expect(find.textContaining('1 / 28 sets'), findsOneWidget);
+    expect(find.textContaining('Set 2 of 3'), findsOneWidget);
+    expect(find.textContaining('1 / 11 sets'), findsOneWidget);
   });
 
   testWidgets('a deload day offers the deloaded weight', (tester) async {
-    await open(tester, 'b-mon', week: 8);
+    await open(tester, 'b-tue', week: 8);
     // 21 * 0.70 = 14.7, which the plates cannot make. The runner offers the
     // loadable weight below it: bar 10 + 2.25 per side = 14.5.
     expect(find.text('14.5'), findsWidgets);
@@ -264,7 +264,7 @@ void main() {
     testWidgets('a cold start says so and shows the plate breakdown', (
       tester,
     ) async {
-      await open(tester, 'b-mon');
+      await open(tester, 'b-tue');
       expect(find.textContaining('Programme start'), findsOneWidget);
       // 21 kg = bar 10 + 5.5 per side, on the shipped kit
       expect(find.textContaining('bar 10'), findsOneWidget);
@@ -281,36 +281,36 @@ void main() {
             SessionsCompanion.insert(
               programmeId: 'keller-twelve',
               blockId: 'build',
-              dayId: 'b-mon',
+              dayId: 'b-tue',
               weekNo: 4,
               plannedDate: DateTime.now().subtract(const Duration(days: 7)),
               scheduledDate: DateTime.now().subtract(const Duration(days: 7)),
               status: const Value(SessionStatus.completed),
             ),
           );
-      for (var i = 1; i <= 4; i++) {
+      for (var i = 1; i <= 3; i++) {
         await db
             .into(db.setLogs)
             .insert(
               SetLogsCompanion.insert(
                 sessionId: session,
-                prescriptionId: 'b-mon-1',
+                prescriptionId: 'b-tue-1',
                 exerciseId: 'barbell-back-squat',
                 setIndex: i,
-                reps: const Value(5),
+                reps: const Value(6),
                 loadKg: const Value(21),
                 rir: const Value(2),
-                targetRepsMin: const Value(5),
-                targetRepsMax: const Value(5),
+                targetRepsMin: const Value(6),
+                targetRepsMax: const Value(6),
                 completedAt: DateTime.now().subtract(const Duration(days: 7)),
               ),
             );
       }
 
-      await open(tester, 'b-mon');
+      await open(tester, 'b-tue');
       expect(find.textContaining('Earned'), findsOneWidget);
-      // 21 + 2.5 = 23.5, which is on the 0.5 kg lattice.
-      expect(find.textContaining('23.5 kg'), findsWidgets);
+      // 21 + 2 = 23, which is on the 0.5 kg lattice.
+      expect(find.textContaining('23 kg'), findsWidgets);
     });
 
     testWidgets('a stall is explained rather than silently repeated', (
@@ -322,33 +322,33 @@ void main() {
             SessionsCompanion.insert(
               programmeId: 'keller-twelve',
               blockId: 'build',
-              dayId: 'b-mon',
+              dayId: 'b-tue',
               weekNo: 4,
               plannedDate: DateTime.now().subtract(const Duration(days: 7)),
               scheduledDate: DateTime.now().subtract(const Duration(days: 7)),
               status: const Value(SessionStatus.completed),
             ),
           );
-      for (final reps in [5, 4, 3, 3]) {
+      for (final reps in [6, 5, 4]) {
         await db
             .into(db.setLogs)
             .insert(
               SetLogsCompanion.insert(
                 sessionId: session,
-                prescriptionId: 'b-mon-1',
+                prescriptionId: 'b-tue-1',
                 exerciseId: 'barbell-back-squat',
-                setIndex: reps,
+                setIndex: 7 - reps,
                 reps: Value(reps),
                 loadKg: const Value(21),
                 rir: const Value(0),
-                targetRepsMin: const Value(5),
-                targetRepsMax: const Value(5),
+                targetRepsMin: const Value(6),
+                targetRepsMax: const Value(6),
                 completedAt: DateTime.now().subtract(const Duration(days: 7)),
               ),
             );
       }
 
-      await open(tester, 'b-mon');
+      await open(tester, 'b-tue');
       expect(find.textContaining('stall 1 of 2'), findsOneWidget);
     });
   });

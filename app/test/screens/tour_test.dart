@@ -20,7 +20,7 @@ const routes = <(String, String)>[
   ('today', '/'),
   ('week', '/week'),
   ('calendar', '/week/calendar'),
-  ('day-detail', '/week/1/day/f-mon'),
+  ('day-detail', '/week/1/day/f-tue'),
   ('fuel', '/fuel'),
   ('progress', '/progress'),
   ('progress-body', '/progress/body'),
@@ -30,7 +30,7 @@ const routes = <(String, String)>[
   ('exercises', '/more/exercises'),
   ('exercise-squat', '/more/exercises/barbell-back-squat'),
   ('exercise-pullup', '/more/exercises/pull-up'),
-  ('runner', '/run/1/f-mon'),
+  ('runner', '/run/1/f-tue'),
   ('runner-run', '/run/5/b-sun'),
   ('runs', '/progress/runs'),
   ('cardio', '/more/cardio'),
@@ -69,7 +69,7 @@ void main() {
         db: db,
         repo: repo,
         location: location,
-        overrides: [Screenshot.pinToday(DateTime(2026, 9, 23))],
+        overrides: [Screenshot.pinToday(DateTime(2026, 10, 7))],
       );
       await Screenshot.capture(tester, 'pre_$name');
     });
@@ -78,7 +78,7 @@ void main() {
   // Mid-programme: week 3, with three weeks of history behind it.
   for (final (name, location) in routes) {
     testWidgets('week 3: $name', skip: !_enabled, (tester) async {
-      final today = DateTime(2026, 10, 14);
+      final today = DateTime(2026, 10, 28);
       await tester.runAsync(
         () => Screenshot.seedHistory(db, repo: repo, today: today),
       );

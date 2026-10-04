@@ -29,8 +29,7 @@ void main() {
     );
     final list = reminders.upcoming(from: from, loggedDates: const {}, days: 7);
 
-    // The Build week is five lift days plus two cardio days, minus Saturday's
-    // rest.
+    // The Build week is three lift days and the optional Sunday.
     expect(list, isNotEmpty);
     expect(list.length, lessThanOrEqualTo(7));
     for (final r in list) {
@@ -47,16 +46,20 @@ void main() {
       loggedDates: const {},
       days: 7,
     );
-    final saturday = ProgrammeCalendar.addDays(mondayOfWeek(5), 5);
-    expect(
-      list.any(
-        (r) =>
-            r.at.year == saturday.year &&
-            r.at.month == saturday.month &&
-            r.at.day == saturday.day,
-      ),
-      isFalse,
-    );
+    for (final offset in [0, 2, 4]) {
+      // Monday, Wednesday and Friday.
+      final rest = ProgrammeCalendar.addDays(mondayOfWeek(5), offset);
+      expect(
+        list.any(
+          (r) =>
+              r.at.year == rest.year &&
+              r.at.month == rest.month &&
+              r.at.day == rest.day,
+        ),
+        isFalse,
+        reason: 'weekday ${offset + 1}',
+      );
+    }
   });
 
   test('a day already logged is not reminded about', () {
@@ -68,15 +71,16 @@ void main() {
       loggedDates: const {},
       days: 7,
     );
+    final tuesday = ProgrammeCalendar.addDays(monday, 1);
     final with_ = reminders.upcoming(
       from: from,
-      loggedDates: {monday},
+      loggedDates: {tuesday},
       days: 7,
     );
 
     expect(with_.length, without.length - 1);
     expect(
-      with_.any((r) => r.at.day == monday.day && r.at.month == monday.month),
+      with_.any((r) => r.at.day == tuesday.day && r.at.month == tuesday.month),
       isFalse,
     );
   });
@@ -95,8 +99,8 @@ void main() {
   });
 
   test('a reminder for later today is kept, one for this morning is not', () {
-    final monday = mondayOfWeek(5);
-    final lateEvening = DateTime(monday.year, monday.month, monday.day, 21);
+    final tuesday = ProgrammeCalendar.addDays(mondayOfWeek(5), 1);
+    final lateEvening = DateTime(tuesday.year, tuesday.month, tuesday.day, 21);
 
     final list = reminders.upcoming(
       from: lateEvening,
@@ -111,9 +115,9 @@ void main() {
   });
 
   test('the body says what the session opens with', () {
-    final monday = mondayOfWeek(5);
+    final tuesday = ProgrammeCalendar.addDays(mondayOfWeek(5), 1);
     final list = reminders.upcoming(
-      from: DateTime(monday.year, monday.month, monday.day, 6),
+      from: DateTime(tuesday.year, tuesday.month, tuesday.day, 6),
       loggedDates: const {},
       days: 1,
     );

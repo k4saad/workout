@@ -150,7 +150,7 @@ class _SessionRunnerScreenState extends ConsumerState<SessionRunnerScreen> {
         content: Text(
           'You are ${s.elapsedMinutes(DateTime.now())} minutes in, with '
           '${s.visibleItems.where((i) => !i.isComplete).length} movements '
-          'left.\n\nSixty minutes means sixty minutes. Cut the last '
+          'left.\n\nHalf an hour means half an hour. Cut the last '
           'superset and finish the main lifts properly.',
           style: Theme.of(context).textTheme.bodyMedium,
         ),

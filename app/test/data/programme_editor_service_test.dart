@@ -56,7 +56,7 @@ void main() {
       final before = await repo.loadProgramme();
       final edited = editor.updatePrescription(
         before,
-        'b-mon-1',
+        'b-tue-1',
         (p) => p.copyWith(sets: 5),
       );
 
@@ -67,14 +67,14 @@ void main() {
       // And it is on disk, not just in memory.
       final reloaded = await ProgrammeRepository(documentsDir: docs)
           .loadProgramme();
-      expect(find(reloaded, 'b-mon-1').sets, 5);
+      expect(find(reloaded, 'b-tue-1').sets, 5);
     });
 
     test('a broken edit is still saved, and reported', () async {
       final before = await repo.loadProgramme();
       final broken = editor.updatePrescription(
         before,
-        'b-mon-1',
+        'b-tue-1',
         (p) => p.copyWith(startLoadKg: 20.3),
       );
 
@@ -85,7 +85,7 @@ void main() {
       final reloaded = await ProgrammeRepository(documentsDir: docs)
           .loadProgramme();
       expect(
-        find(reloaded, 'b-mon-1').startLoadKg,
+        find(reloaded, 'b-tue-1').startLoadKg,
         20.3,
         reason:
             'a half-finished edit the app refuses to store is worse than one '
@@ -108,7 +108,7 @@ void main() {
     test('the diff names what would change', () async {
       final before = await repo.loadProgramme();
       final edited = editor
-          .swapExercise(before, 'b-mon-3a', 'reverse-lunge')
+          .swapExercise(before, 'b-sat-3a', 'reverse-lunge')
           .copyWith(revision: before.revision + 5);
 
       final file = File('${docs.path}/out/edited.json');
@@ -116,7 +116,7 @@ void main() {
       await file.writeAsString(jsonEncode(edited.toJson()));
 
       final preview = await service.inspectImport(file);
-      final change = preview.diff.changes.firstWhere((c) => c.id == 'b-mon-3a');
+      final change = preview.diff.changes.firstWhere((c) => c.id == 'b-sat-3a');
       expect(change.kind, ChangeKind.modified);
       expect(change.description, contains('reverse-lunge'));
       expect(preview.canApply, isTrue);
@@ -139,7 +139,7 @@ void main() {
       final broken = editor
           .updatePrescription(
             before,
-            'b-mon-1',
+            'b-tue-1',
             (p) => p.copyWith(startLoadKg: 20.3),
           )
           .copyWith(revision: before.revision + 1);
@@ -165,12 +165,12 @@ void main() {
     test('applying an import keeps the revision moving forward', () async {
       final before = await repo.loadProgramme();
       final incoming = editor
-          .updatePrescription(before, 'b-mon-1', (p) => p.copyWith(sets: 6))
+          .updatePrescription(before, 'b-tue-1', (p) => p.copyWith(sets: 6))
           .copyWith(revision: 99);
 
       final applied = await service.applyImport(incoming);
       expect(applied.revision, 99);
-      expect(find(applied, 'b-mon-1').sets, 6);
+      expect(find(applied, 'b-tue-1').sets, 6);
     });
   });
 
@@ -258,16 +258,16 @@ void main() {
             ),
           );
       for (final (kg, at) in [
-        (10.0, DateTime(2026, 11, 10, 19)),
-        (12.0, DateTime(2026, 11, 17, 19)),
+        (7.0, DateTime(2026, 11, 10, 19)),
+        (9.0, DateTime(2026, 11, 17, 19)),
       ]) {
         await db
             .into(db.setLogs)
             .insert(
               SetLogsCompanion.insert(
                 sessionId: sessionId,
-                prescriptionId: 'b-tue-4a',
-                exerciseId: 'ez-bar-curl',
+                prescriptionId: 'b-tue-2a',
+                exerciseId: 'incline-dumbbell-press',
                 setIndex: 1,
                 completedAt: at,
               ).copyWith(reps: const Value(10), loadKg: Value(kg)),
@@ -275,11 +275,15 @@ void main() {
       }
 
       final loads = await service.lastLoggedLoads();
-      expect(loads['ez-bar-curl'], 12.0, reason: 'the newest load should win');
+      expect(
+        loads['incline-dumbbell-press'],
+        9.0,
+        reason: 'the newest load should win',
+      );
 
       final seed = await service.proposeNextCycle();
-      final curl = find(seed.programme, 'b-tue-4a');
-      expect(curl.startLoadKg, 12.0);
+      final press = find(seed.programme, 'b-tue-2a');
+      expect(press.startLoadKg, 9.0);
     });
   });
 }

@@ -19,17 +19,18 @@ class SessionDuration {
   bool get overran => actualMinutes > estimatedMinutes;
 }
 
-/// Is sixty minutes real, or is it eighty?
+/// Is half an hour real, or is it fifty minutes?
 ///
-/// The programme is built around a hard 60-minute ceiling. If the sessions
-/// actually take eighty, the answer is to cut volume — not to quietly raise
-/// the estimate, which is how a training plan stops being a plan.
+/// The programme is built around a working student's half hour, with a hard
+/// 35-minute ceiling (V11). If the sessions actually take fifty, the answer
+/// is to cut volume — not to quietly raise the estimate, which is how a
+/// training plan stops being a plan.
 class SessionStats {
   const SessionStats(this.durations);
 
   final List<SessionDuration> durations;
 
-  static const int ceilingMinutes = 60;
+  static const int ceilingMinutes = 35;
 
   bool get isEmpty => durations.isEmpty;
 
@@ -74,12 +75,14 @@ class SessionStats {
     if (isEmpty) return 'No finished sessions yet.';
     if (ceilingIsFiction) {
       return 'Median $medianMinutes min across $count sessions — '
-          '$overCeilingCount ran past the hour. The sessions are too big for '
-          'the time they have; cut volume rather than moving the ceiling.';
+          '$overCeilingCount ran past $ceilingMinutes minutes. The sessions are '
+          'too big for the time they have; cut volume rather than moving the '
+          'ceiling.';
     }
     if (medianMinutes > ceilingMinutes) {
       return 'Median $medianMinutes min. Close to the line, worth watching.';
     }
-    return 'Median $medianMinutes min across $count sessions. The hour holds.';
+    return 'Median $medianMinutes min across $count sessions. The half hour '
+        'holds.';
   }
 }

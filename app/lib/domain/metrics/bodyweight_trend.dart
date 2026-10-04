@@ -278,9 +278,9 @@ class BodyweightTrend {
       return NutritionAdvice(
         verdict: NutritionVerdict.losing,
         message:
-            'Losing ${change.abs().toStringAsFixed(2)} kg a week while trying '
-            'to gain. Two liquid meals a day fixes this faster than anything '
-            'you can do in the basement.',
+            'Losing ${change.abs().toStringAsFixed(2)} kg a week. At your '
+            'weight that is the four meals not all happening — a long day '
+            'that skipped lunch is the usual culprit.',
         kcalDelta: rules.kcalBumpWhenFlat,
         flatWeeks: flat,
         weeklyChangeKg: change,

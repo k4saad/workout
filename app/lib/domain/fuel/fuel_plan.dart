@@ -179,13 +179,17 @@ class MealSlot {
     required this.days,
     required this.kcal,
     required this.proteinG,
+    this.aroundSession = false,
   });
 
   final String id;
   final String name;
 
-  /// `HH:mm`, placed around an 18:30 session.
+  /// `HH:mm`, placed around the day: the timetable and an evening session.
   final String time;
+
+  /// On a training day, the meal that fuels the session — Fuel marks it.
+  final bool aroundSession;
 
   /// `training`, `rest` or `both`.
   final String days;
@@ -203,10 +207,11 @@ class MealSlot {
     days: j['days'] as String,
     kcal: (j['kcal'] as num).toInt(),
     proteinG: (j['proteinG'] as num).toInt(),
+    aroundSession: j['aroundSession'] as bool? ?? false,
   );
 }
 
-/// An add-on: the phase step-ups, and the +250 when the scale stalls.
+/// An add-on: the booster when the scale stalls.
 class FuelModule {
   const FuelModule({
     required this.id,

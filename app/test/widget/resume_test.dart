@@ -48,7 +48,7 @@ void main() {
             SessionsCompanion.insert(
               programmeId: programme.id,
               blockId: 'foundation',
-              dayId: 'f-mon',
+              dayId: 'f-tue',
               weekNo: 1,
               plannedDate: yesterday,
               scheduledDate: yesterday,
@@ -77,7 +77,7 @@ void main() {
 
     // Its clock ran all night: that is an interruption, not a slow session.
     expect(find.text('Running long'), findsNothing);
-    expect(find.textContaining('/ 45 min'), findsNothing);
+    expect(find.textContaining(RegExp(r'/ \d+ min')), findsNothing);
     expect(find.textContaining('picked up again'), findsOneWidget);
   });
 }

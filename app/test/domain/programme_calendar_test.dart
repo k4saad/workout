@@ -9,7 +9,7 @@ void main() {
   final programme = Fixtures.programme;
   final cal = ProgrammeCalendar(programme);
 
-  // The shipped programme starts Monday 2026-09-28.
+  // The shipped programme starts Monday 2026-10-12.
   final start = programme.startDate;
 
   group('C-1 — startDate on a Monday', () {
@@ -94,26 +94,29 @@ void main() {
   });
 
   group('C-5 / C-6 / C-7 — week 8 resolves as a deload', () {
-    final monday = cal.forDate(cal.startOfWeek(8));
+    // Tuesday: v4's squat day.
+    final tuesday = cal.forDate(
+      ProgrammeCalendar.addDays(cal.startOfWeek(8), 1),
+    );
 
     test('multipliers are applied through the calendar', () {
-      final squat = monday.day!.allPrescriptions.firstWhere(
-        (p) => p.id == 'b-mon-1',
+      final squat = tuesday.day!.allPrescriptions.firstWhere(
+        (p) => p.id == 'b-tue-1',
       );
-      expect(squat.sets, 3); // 4 * 0.6 -> 2.4 -> ceil 3
+      expect(squat.sets, 2); // 3 * 0.6 -> 1.8 -> ceil 2
       expect(squat.startLoadKg, closeTo(21.0 * 0.7, 1e-9));
     });
 
     test('supersets are unwound', () {
       expect(
-        monday.day!.allPrescriptions.every((p) => p.groupId == null),
+        tuesday.day!.allPrescriptions.every((p) => p.groupId == null),
         isTrue,
       );
     });
 
     test('defaultRir 4 reaches the main lift', () {
-      final squat = monday.day!.allPrescriptions.firstWhere(
-        (p) => p.id == 'b-mon-1',
+      final squat = tuesday.day!.allPrescriptions.firstWhere(
+        (p) => p.id == 'b-tue-1',
       );
       expect(squat.targetRir, 4);
     });
@@ -209,11 +212,11 @@ void main() {
       }
     });
 
-    test('every week has five required sessions', () {
-      // Five evenings a week, as specified. Wednesday in Build is optional and
-      // must not count towards the streak.
+    test('every week has three required sessions', () {
+      // v4: Tuesday, Thursday, Saturday. Sunday's run or hike is optional
+      // and must not count towards the streak.
       for (var w = 1; w <= 12; w++) {
-        expect(cal.requiredSessionsInWeek(w), 5, reason: 'week $w');
+        expect(cal.requiredSessionsInWeek(w), 3, reason: 'week $w');
       }
     });
 
@@ -224,6 +227,45 @@ void main() {
       );
       expect(r, hasLength(14));
       expect(r.first.date, cal.startOfWeek(1));
+    });
+  });
+
+  group('the next session', () {
+    DateTime d(int offset) => ProgrammeCalendar.addDays(start, offset);
+
+    test('day one is a rest day: the next session is Tuesday', () {
+      expect(cal.forDate(start).hasSession, isFalse);
+      final next = cal.nextSession(start)!;
+      expect(next.date, d(1));
+      expect(next.day!.id, 'f-tue');
+    });
+
+    test('is strictly after the date asked about', () {
+      expect(cal.nextSession(d(1))!.date, d(3), reason: 'Tue -> Thu');
+    });
+
+    test('skips the optional Sunday unless asked for it', () {
+      final sat = d(5);
+      expect(cal.nextSession(sat)!.date, d(8), reason: 'Sat -> next Tue');
+      expect(cal.nextSession(sat)!.weekNo, 2);
+      expect(
+        cal.nextSession(sat, includeOptional: true)!.date,
+        d(6),
+        reason: 'the Sunday run, when optional days count',
+      );
+    });
+
+    test('before the start it is the first session of week 1', () {
+      final next = cal.nextSession(d(-10))!;
+      expect(next.date, d(1));
+    });
+
+    test('there is none after the last session of the programme', () {
+      expect(cal.nextSession(cal.lastDate), isNull);
+      expect(
+        cal.nextSession(ProgrammeCalendar.addDays(cal.lastDate, -1)),
+        isNull,
+      );
     });
   });
 

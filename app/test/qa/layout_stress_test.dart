@@ -18,7 +18,7 @@ const routes = <(String, String)>[
   ('history', '/history'),
   ('week', '/week'),
   ('calendar', '/week/calendar'),
-  ('day', '/week/3/day/f-mon'),
+  ('day', '/week/3/day/f-tue'),
   ('fuel', '/fuel'),
   ('fuel-plan', '/fuel#plan'),
   ('progress', '/progress'),
@@ -35,7 +35,7 @@ const routes = <(String, String)>[
   ('editor', '/more/settings/programme'),
   ('files', '/more/settings/files'),
   ('next-cycle', '/more/settings/next-cycle'),
-  ('runner', '/run/3/f-mon'),
+  ('runner', '/run/3/f-tue'),
 ];
 
 const configs = <(String, Size, double)>[
@@ -48,7 +48,7 @@ void main() {
   late Directory tmp;
   late AppDatabase db;
   late ProgrammeRepository repo;
-  final today = DateTime(2026, 10, 14); // Wednesday, week 3
+  final today = DateTime(2026, 10, 28); // Wednesday, week 3
   final all = <QaIssue>[];
 
   setUp(() async {

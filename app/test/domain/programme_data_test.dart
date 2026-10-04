@@ -216,7 +216,7 @@ void main() {
       }
       expect(
         checked,
-        greaterThan(20),
+        greaterThan(15),
         reason: 'expected the programme to carry real loads',
       );
     });
@@ -329,8 +329,10 @@ void main() {
     });
   });
 
-  group('V10 — no orphaned exercises', () {
-    test('every library exercise is reachable', () {
+  group('V10 — the programme and the library', () {
+    // v4: three short days use a slice of the library; the rest stays to
+    // browse and to stand in. validate.py warns rather than fails.
+    test('every library exercise not in the programme is still browsable', () {
       final used = <String>{};
       for (final b in programme.blocks) {
         for (final d in b.days) {
@@ -345,16 +347,11 @@ void main() {
       }
       used.addAll(programme.strengthTargets.map((t) => t.exerciseId));
 
-      final orphans = library.exercises
-          .map((e) => e.id)
-          .where((id) => !used.contains(id));
-      expect(
-        orphans,
-        isEmpty,
-        reason:
-            'unreachable: ${orphans.join(', ')} — an exercise with cues '
-            'and a detail page that nothing links to',
-      );
+      final orphans = library.exercises.where((e) => !used.contains(e.id));
+      for (final e in orphans) {
+        expect(e.cues, isNotEmpty, reason: '${e.id} has nothing to browse');
+      }
+      expect(used.length, greaterThan(30), reason: 'the programme is real');
     });
   });
 
@@ -492,30 +489,24 @@ void main() {
           }
         }
       }
-      expect(runs, greaterThanOrEqualTo(4));
+      expect(runs, 2, reason: 'the Sunday run, in Foundation and Build');
     });
 
-    test(
-      'Sunday runs read the long column, Tuesday and Wednesday the second',
-      () {
-        final raw = Fixtures.programmeJson;
-        for (final b in (raw['blocks'] as List).cast<Map>()) {
-          for (final d in (b['days'] as List).cast<Map>()) {
-            for (final s in (d['sections'] as List).cast<Map>()) {
-              for (final p in (s['prescriptions'] as List).cast<Map>()) {
-                final prog = p['progression'] as Map;
-                if (prog['type'] != 'cardioTable') continue;
-                expect(
-                  prog['table'],
-                  d['weekday'] == 'sun' ? 'long' : 'second',
-                  reason: '${p['id']} on ${d['weekday']}',
-                );
-              }
+    test('every run is the Sunday one, off the long column', () {
+      final raw = Fixtures.programmeJson;
+      for (final b in (raw['blocks'] as List).cast<Map>()) {
+        for (final d in (b['days'] as List).cast<Map>()) {
+          for (final s in (d['sections'] as List).cast<Map>()) {
+            for (final p in (s['prescriptions'] as List).cast<Map>()) {
+              final prog = p['progression'] as Map;
+              if (prog['type'] != 'cardioTable') continue;
+              expect(d['weekday'], 'sun', reason: '${p['id']}');
+              expect(prog['table'], 'long', reason: '${p['id']}');
             }
           }
         }
-      },
-    );
+      }
+    });
   });
 
   group('V16 — the kit makes every whole kilogram', () {

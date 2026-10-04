@@ -129,37 +129,37 @@ void main() {
   testWidgets('a day opens, showing its movements and warnings', (
     tester,
   ) async {
-    await pump(tester, const DayEditorScreen(blockId: 'build', dayId: 'b-mon'));
+    await pump(tester, const DayEditorScreen(blockId: 'build', dayId: 'b-tue'));
 
     expect(find.text('Barbell back squat'), findsWidgets);
-    expect(find.textContaining('4 x 5'), findsWidgets);
+    expect(find.textContaining('3 x 6'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 
   testWidgets('a superset is labelled and can be unpaired', (tester) async {
-    await pump(tester, const DayEditorScreen(blockId: 'build', dayId: 'b-mon'));
+    await pump(tester, const DayEditorScreen(blockId: 'build', dayId: 'b-tue'));
 
     expect(find.textContaining('rest once at the end'), findsWidgets);
 
     await tapAndSettle(tester, find.text('Unpair').first);
 
     final after = onDisk();
-    final mon = after
+    final tue = after
         .blockById('build')!
         .days
-        .firstWhere((d) => d.id == 'b-mon');
-    final calf = mon.allPrescriptions.firstWhere((p) => p.id == 'b-mon-3b');
-    expect(calf.groupId, isNull);
-    expect(calf.restSec, greaterThan(0));
+        .firstWhere((d) => d.id == 'b-tue');
+    final row = tue.allPrescriptions.firstWhere((p) => p.id == 'b-tue-2b');
+    expect(row.groupId, isNull);
+    expect(row.restSec, greaterThan(0));
   });
 
   testWidgets('editing sets through the sheet persists', (tester) async {
-    await pump(tester, const DayEditorScreen(blockId: 'build', dayId: 'b-mon'));
+    await pump(tester, const DayEditorScreen(blockId: 'build', dayId: 'b-tue'));
 
     await tapAndSettle(tester, find.text('Barbell back squat').first);
 
     expect(find.text('Sets'), findsOneWidget);
-    expect(find.text('4'), findsWidgets);
+    expect(find.text('3'), findsWidgets);
 
     // One tap on the plus beside "Sets".
     final setsRow = find.ancestor(
@@ -176,16 +176,16 @@ void main() {
     final squat = onDisk()
         .blockById('build')!
         .days
-        .firstWhere((d) => d.id == 'b-mon')
+        .firstWhere((d) => d.id == 'b-tue')
         .allPrescriptions
-        .firstWhere((p) => p.id == 'b-mon-1');
-    expect(squat.sets, 5);
+        .firstWhere((p) => p.id == 'b-tue-1');
+    expect(squat.sets, 4);
   });
 
   testWidgets('the load stepper can only produce loadable weights', (
     tester,
   ) async {
-    await pump(tester, const DayEditorScreen(blockId: 'build', dayId: 'b-mon'));
+    await pump(tester, const DayEditorScreen(blockId: 'build', dayId: 'b-tue'));
     await tapAndSettle(tester, find.text('Barbell back squat').first);
 
     final loadRow = find.ancestor(
@@ -202,9 +202,9 @@ void main() {
     final squat = onDisk()
         .blockById('build')!
         .days
-        .firstWhere((d) => d.id == 'b-mon')
+        .firstWhere((d) => d.id == 'b-tue')
         .allPrescriptions
-        .firstWhere((p) => p.id == 'b-mon-1');
+        .firstWhere((p) => p.id == 'b-tue-1');
 
     expect(squat.startLoadKg, isNot(21.0));
     expect(
@@ -224,10 +224,10 @@ void main() {
     final build = (raw['blocks'] as List).firstWhere(
       (b) => (b as Map)['id'] == 'build',
     );
-    final mon = ((build as Map)['days'] as List).firstWhere(
-      (d) => (d as Map)['id'] == 'b-mon',
+    final tue = ((build as Map)['days'] as List).firstWhere(
+      (d) => (d as Map)['id'] == 'b-tue',
     );
-    final main = (((mon as Map)['sections']) as List).firstWhere(
+    final main = (((tue as Map)['sections']) as List).firstWhere(
       (s) => (s as Map)['type'] == 'main',
     );
     ((main as Map)['prescriptions'] as List).first['startLoadKg'] = 20.3;
@@ -259,7 +259,7 @@ void main() {
   });
 
   testWidgets('a coach note survives an edit and a reload', (tester) async {
-    await pump(tester, const DayEditorScreen(blockId: 'build', dayId: 'b-mon'));
+    await pump(tester, const DayEditorScreen(blockId: 'build', dayId: 'b-tue'));
     await tapAndSettle(tester, find.text('Barbell back squat').first);
 
     await tester.enterText(
@@ -272,9 +272,9 @@ void main() {
     final squat = onDisk()
         .blockById('build')!
         .days
-        .firstWhere((d) => d.id == 'b-mon')
+        .firstWhere((d) => d.id == 'b-tue')
         .allPrescriptions
-        .firstWhere((p) => p.id == 'b-mon-1');
+        .firstWhere((p) => p.id == 'b-tue-1');
     expect(squat.coachNote, 'Brace before the unrack.');
   });
 
@@ -286,10 +286,10 @@ void main() {
             SessionsCompanion.insert(
               programmeId: 'keller-twelve',
               blockId: 'test',
-              dayId: 't-mon',
+              dayId: 't-tue',
               weekNo: 12,
-              plannedDate: DateTime(2026, 12, 14),
-              scheduledDate: DateTime(2026, 12, 14),
+              plannedDate: DateTime(2026, 12, 29),
+              scheduledDate: DateTime(2026, 12, 29),
             ),
           );
       await db
@@ -297,10 +297,10 @@ void main() {
           .insert(
             SetLogsCompanion.insert(
               sessionId: id,
-              prescriptionId: 't-mon-1',
+              prescriptionId: 't-tue-1',
               exerciseId: exerciseId,
               setIndex: 1,
-              completedAt: DateTime(2026, 12, 14, 19),
+              completedAt: DateTime(2026, 12, 29, 19),
             ).copyWith(reps: Value(reps), loadKg: Value(kg)),
           );
     }

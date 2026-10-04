@@ -192,7 +192,7 @@ void main() {
         .blockById('build')!
         .days
         .expand((d) => d.allPrescriptions)
-        .firstWhere((p) => p.id == 'b-mon-3a');
+        .firstWhere((p) => p.id == 'b-sat-3a');
     expect(
       at(bss.exerciseId, 5),
       bss.startLoadKg,
@@ -201,7 +201,7 @@ void main() {
   });
 
   test('week 9 starts above the deload AND above week 7', () {
-    for (final ex in [...floors.keys, 'barbell-romanian-deadlift']) {
+    for (final ex in floors.keys) {
       expect(at(ex, 8), lessThan(at(ex, 7)), reason: trace(ex));
       expect(at(ex, 9), greaterThan(at(ex, 8)), reason: trace(ex));
       expect(at(ex, 9), greaterThan(at(ex, 7)), reason: trace(ex));
@@ -258,7 +258,7 @@ void main() {
   });
 
   test('light dumbbell work actually gets heavier by week 11', () {
-    for (final id in ['b-mon-4c', 'b-tue-4b', 'b-fri-4a', 'b-tue-4a']) {
+    for (final id in ['b-tue-2a', 'b-tue-2b', 'b-sat-3a']) {
       final list = exposures[id]!;
       expect(
         list.last.kg,
@@ -269,23 +269,19 @@ void main() {
     }
   });
 
-  test('runs follow the cardio table, and week 8 has no second run', () {
+  test('the Sunday run follows the cardio table, deload week included', () {
     for (var week = 1; week <= 11; week++) {
       final row = programme.cardioForWeek(week)!;
       final long = week >= 5 ? 'b-sun-1' : 'f-sun-1';
       expect(target[long]?[week], row.longRunMin!.last * 60, reason: 'w$week');
     }
-    expect(ran[8], isNot(contains('b-wed')));
-    expect(
-      target['b-wed-1']?[9],
-      programme.cardioForWeek(9)!.secondRunMin!.last * 60,
-    );
+    expect(target['b-sun-1']?[8], 15 * 60, reason: 'the deload comes down');
   });
 
   test('a timed hold grows instead of resetting every week', () {
     // timeOnly logged the prescription's own seconds as the target, so the
     // plank added 5 s to 30 every week and never got past 35.
-    final plank = target['f-mon-4']!;
+    final plank = target['f-tue-3']!;
     expect(plank[4], greaterThan(plank[2]!), reason: '$plank');
   });
 

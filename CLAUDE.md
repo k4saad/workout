@@ -48,11 +48,12 @@ Follow the phases in order; do not skip ahead.
 - **A superset must not force a re-plate.** Members of the same `groupId` either share a
   load or pair a loaded movement with a bodyweight / cable / banded one. Otherwise the
   superset saves no time and the 60-minute ceiling breaks.
-- **The network is for map tiles only.** INTERNET exists (approved by Saad, 2026-09-23)
-  so the run map can draw OpenStreetMap tiles from `tile.openstreetmap.org`. Apart from
-  that, the only outbound action is `url_launcher` opening a YouTube link. No analytics,
-  no crash reporting, no cloud, no auth, no uploads of anything, ever.
-  `test/privacy_audit_test.dart` allow-lists the hosts.
+- **The network fetches open map data, and nothing else goes out.** INTERNET exists
+  (approved by Saad, 2026-09-23) for OpenStreetMap tiles (`tile.openstreetmap.org`); on
+  2026-10-04 he widened it to free, open map and elevation data as needed — the hike 3D
+  view reads AWS Terrain Tiles (`s3.amazonaws.com/elevation-tiles-prod`). Downloads of
+  open data only: no analytics, no crash reporting, no cloud, no auth, no uploads of
+  anything, ever. `test/privacy_audit_test.dart` allow-lists the hosts.
 - **Location is foreground-only.** FINE/COARSE plus FOREGROUND_SERVICE_LOCATION so a run
   records with the screen off, started from a tap. Never ACCESS_BACKGROUND_LOCATION.
   Only `lib/features/runs/`, `lib/data/run*` and `lib/app/run*` may import geolocator or
@@ -64,8 +65,9 @@ Follow the phases in order; do not skip ahead.
   programme JSON — exercises get swapped and history must survive.
 - **Never scrape or bundle copyrighted exercise images or GIFs.** Unlicense/CC sources
   only, licence recorded per exercise. **Never invent a YouTube URL.**
-- **Sessions must fit 60 minutes.** Test V11 enforces it. If a change pushes a lift day
-  over, cut volume — do not raise the estimate.
+- **Sessions fit half an hour.** v4 (docs/11-v4-plan.md): three full-body sessions a
+  week for a working student, Tue/Thu evening and Saturday. V11 fails any session over
+  35 minutes. If a change pushes a day over, cut volume — do not raise the estimate.
 
 ## Progress photos — non-negotiable
 

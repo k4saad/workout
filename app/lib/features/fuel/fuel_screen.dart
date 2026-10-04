@@ -100,9 +100,9 @@ class _Body extends ConsumerWidget {
         Gap.m,
         Text(
           day.isTrainingDay
-              ? 'Training day. The two meals either side of the session are '
+              ? 'Training day. The evening snack is your fuel for the session — '
                     'timed, not optional.'
-              : 'Rest day. Same calories — the muscle is built today.',
+              : 'Rest day. Same four meals — recovery happens today.',
           style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
         ),
 
@@ -114,9 +114,7 @@ class _Body extends ConsumerWidget {
           MealCard(
             slot: slot,
             date: date,
-            isAroundSession:
-                slot.slot.id == 'pre_training' ||
-                slot.slot.id == 'post_training',
+            isAroundSession: day.isTrainingDay && slot.slot.aroundSession,
             onSwap: () => _swap(context, ref, slot),
           ),
 

@@ -124,7 +124,7 @@ void main() {
   late MediaRepository media;
 
   // Thursday of week 4: the checkpoint week.
-  final today = DateTime(2026, 10, 22);
+  final today = DateTime(2026, 11, 5);
 
   setUp(() async {
     await Screenshot.loadRealFonts();
@@ -149,8 +149,8 @@ void main() {
     await media.ensurePosesSeeded();
     final poses = await db.enabledPoses();
     for (final (date, week, build) in [
-      (DateTime(2026, 9, 27), 1, 0.0),
-      (DateTime(2026, 10, 19), 4, 0.6),
+      (DateTime(2026, 10, 11), 1, 0.0),
+      (DateTime(2026, 11, 2), 4, 0.6),
     ]) {
       final shoot = await media.startShoot(date, weekNo: week);
       for (final (i, pose) in poses.indexed) {
@@ -174,8 +174,8 @@ void main() {
       MeasurementSite.neck: (33.0, 33.3),
     };
     for (final MapEntry(key: site, value: (a, b)) in sites.entries) {
-      await db.upsertMeasurement(DateTime(2026, 9, 27), site, a);
-      await db.upsertMeasurement(DateTime(2026, 10, 19), site, b);
+      await db.upsertMeasurement(DateTime(2026, 10, 11), site, a);
+      await db.upsertMeasurement(DateTime(2026, 11, 2), site, b);
     }
   }
 

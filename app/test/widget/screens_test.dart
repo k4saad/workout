@@ -95,7 +95,9 @@ void main() {
     await draw(tester, const TodayScreen());
     expect(find.text('The Keller Twelve'), findsOneWidget);
     expect(find.textContaining('Week 1 of 12'), findsOneWidget);
-    expect(find.text('Full Body A'), findsOneWidget);
+    // Day one is his long Monday: rest, and what comes next.
+    expect(find.text('Rest'), findsWidgets);
+    expect(find.text('Next: Full Body A, tomorrow'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -163,7 +165,7 @@ void main() {
     tester,
   ) async {
     phoneSized(tester, const Size(400, 2400));
-    await draw(tester, const DayDetailScreen(weekNo: 8, dayId: 'b-mon'));
+    await draw(tester, const DayDetailScreen(weekNo: 8, dayId: 'b-tue'));
 
     // 21 kg * 0.70 = 14.7, and the build number must not survive.
     expect(find.textContaining('14.7'), findsWidgets);
@@ -184,7 +186,6 @@ void main() {
 
     expect(find.textContaining('alternate, rest'), findsWidgets);
     expect(find.textContaining('SS1'), findsWidgets);
-    expect(find.textContaining('SS2'), findsWidgets);
   });
 
   testWidgets('a deload day shows NO supersets', (tester) async {
@@ -195,7 +196,7 @@ void main() {
 
   testWidgets('the rest day says why it exists', (tester) async {
     phoneSized(tester);
-    await draw(tester, const DayDetailScreen(weekNo: 5, dayId: 'b-sat'));
+    await draw(tester, const DayDetailScreen(weekNo: 5, dayId: 'b-wed'));
     expect(find.textContaining('Muscle is built on the days'), findsOneWidget);
   });
 
@@ -230,7 +231,7 @@ void main() {
     tester,
   ) async {
     phoneSized(tester, const Size(400, 2400));
-    await draw(tester, const DayDetailScreen(weekNo: 5, dayId: 'b-mon'));
+    await draw(tester, const DayDetailScreen(weekNo: 5, dayId: 'b-sat'));
     // Bulgarian split squats are 3 x 8 per side, not 3 x 8 total.
     expect(find.textContaining('/ side'), findsWidgets);
   });

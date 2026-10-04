@@ -43,7 +43,7 @@ void main() {
           SessionsCompanion.insert(
             programmeId: programme.id,
             blockId: 'build',
-            dayId: 'b-mon',
+            dayId: 'b-sat',
             weekNo: 5,
             plannedDate: on,
             scheduledDate: on,
@@ -71,19 +71,19 @@ void main() {
       .firstWhere((pre) => pre.id == id);
 
   test('the old movement keeps its logs after the swap', () async {
-    final slot = find(programme, 'b-mon-3a');
+    final slot = find(programme, 'b-sat-3a');
     expect(slot.exerciseId, 'bulgarian-split-squat');
 
     await logWork(
-      prescriptionId: 'b-mon-3a',
+      prescriptionId: 'b-sat-3a',
       exerciseId: 'bulgarian-split-squat',
       kg: 10,
       reps: 8,
       on: DateTime(2026, 11, 2),
     );
 
-    final after = editor.swapExercise(programme, 'b-mon-3a', 'reverse-lunge');
-    expect(find(after, 'b-mon-3a').exerciseId, 'reverse-lunge');
+    final after = editor.swapExercise(programme, 'b-sat-3a', 'reverse-lunge');
+    expect(find(after, 'b-sat-3a').exerciseId, 'reverse-lunge');
 
     // The logs are untouched — they carry their own exercise_id.
     final kept = await db.lastSetsForExercise('bulgarian-split-squat');
@@ -94,15 +94,15 @@ void main() {
 
   test('the new movement does not inherit the old load', () async {
     await logWork(
-      prescriptionId: 'b-mon-3a',
+      prescriptionId: 'b-sat-3a',
       exerciseId: 'bulgarian-split-squat',
       kg: 10,
       reps: 8,
       on: DateTime(2026, 11, 2),
     );
 
-    final after = editor.swapExercise(programme, 'b-mon-3a', 'reverse-lunge');
-    final history = await suggestions.historyFor(find(after, 'b-mon-3a'));
+    final after = editor.swapExercise(programme, 'b-sat-3a', 'reverse-lunge');
+    final history = await suggestions.historyFor(find(after, 'b-sat-3a'));
 
     expect(
       history,
@@ -115,21 +115,21 @@ void main() {
 
   test('a swap back finds the original history again', () async {
     await logWork(
-      prescriptionId: 'b-mon-3a',
+      prescriptionId: 'b-sat-3a',
       exerciseId: 'bulgarian-split-squat',
       kg: 10,
       reps: 8,
       on: DateTime(2026, 11, 2),
     );
 
-    final swapped = editor.swapExercise(programme, 'b-mon-3a', 'reverse-lunge');
+    final swapped = editor.swapExercise(programme, 'b-sat-3a', 'reverse-lunge');
     final back = editor.swapExercise(
       swapped,
-      'b-mon-3a',
+      'b-sat-3a',
       'bulgarian-split-squat',
     );
 
-    final history = await suggestions.historyFor(find(back, 'b-mon-3a'));
+    final history = await suggestions.historyFor(find(back, 'b-sat-3a'));
     expect(history, hasLength(3));
     expect(history.first.loadKg, 10);
   });
@@ -143,8 +143,8 @@ void main() {
       on: DateTime(2026, 11, 5),
     );
 
-    final after = editor.swapExercise(programme, 'b-mon-3a', 'reverse-lunge');
-    final history = await suggestions.historyFor(find(after, 'b-mon-3a'));
+    final after = editor.swapExercise(programme, 'b-sat-3a', 'reverse-lunge');
+    final history = await suggestions.historyFor(find(after, 'b-sat-3a'));
 
     expect(history, hasLength(3));
     expect(history.first.loadKg, 14);
@@ -152,33 +152,39 @@ void main() {
 
   test('two slots of the same lift still do not drive each other', () async {
     await logWork(
-      prescriptionId: 'b-mon-3b',
-      exerciseId: 'single-leg-calf-raise',
-      kg: 0,
-      reps: 15,
+      prescriptionId: 'f-thu-3b',
+      exerciseId: 'goblet-squat',
+      kg: 8,
+      reps: 10,
       on: DateTime(2026, 11, 2),
     );
     await logWork(
       prescriptionId: 'b-thu-3b',
-      exerciseId: 'single-leg-calf-raise',
-      kg: 0,
-      reps: 20,
+      exerciseId: 'goblet-squat',
+      kg: 8,
+      reps: 12,
       on: DateTime(2026, 11, 5),
     );
 
-    final monday = await suggestions.historyFor(find(programme, 'b-mon-3b'));
-    expect(monday.first.reps, 15, reason: 'Monday read Thursday history');
+    final foundation = await suggestions.historyFor(
+      find(programme, 'f-thu-3b'),
+    );
+    expect(
+      foundation.first.reps,
+      10,
+      reason: 'the Foundation slot read the Build slot history',
+    );
   });
 
   test('the swap clears the old opening load', () {
-    expect(find(programme, 'b-mon-3a').startLoadKg, isNotNull);
-    final after = editor.swapExercise(programme, 'b-mon-3a', 'reverse-lunge');
-    expect(find(after, 'b-mon-3a').startLoadKg, isNull);
+    expect(find(programme, 'b-sat-3a').startLoadKg, isNotNull);
+    final after = editor.swapExercise(programme, 'b-sat-3a', 'reverse-lunge');
+    expect(find(after, 'b-sat-3a').startLoadKg, isNull);
   });
 
   test('stall counters are keyed per exercise and prescription', () async {
-    await db.setStall('bulgarian-split-squat', 'b-mon-3a', 2);
-    final other = await db.stallFor('reverse-lunge', 'b-mon-3a');
+    await db.setStall('bulgarian-split-squat', 'b-sat-3a', 2);
+    final other = await db.stallFor('reverse-lunge', 'b-sat-3a');
     expect(
       other?.count ?? 0,
       0,

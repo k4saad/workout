@@ -271,7 +271,7 @@ void main() {
     // v2 entered the runner with context.go, which REPLACED the shell: back
     // mid-session closed the app. It is pushed now, and asks first.
     await pumpApp(tester);
-    router.push('/run/1/f-mon');
+    router.push('/run/1/f-tue');
     await settle(tester);
     // Let the page transition finish before looking: mid-fade, the shell
     // underneath is still on stage.

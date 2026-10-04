@@ -51,7 +51,7 @@ void main() {
     final out = <RunFix>[];
     var d = 0.0;
     final t0 = (startMs == 0
-        ? DateTime(2026, 10, 4, 18, 32).millisecondsSinceEpoch
+        ? DateTime(2026, 10, 18, 9, 32).millisecondsSinceEpoch
         : startMs);
     for (var s = 0; s <= seconds; s++) {
       final stopped = s >= 610 && s < 640;
@@ -99,7 +99,7 @@ void main() {
   });
 
   Future<int> seed() async {
-    final runs = RunRepository(db, clock: () => DateTime(2026, 10, 4, 18, 32));
+    final runs = RunRepository(db, clock: () => DateTime(2026, 10, 18, 9, 32));
     final id = await runs.start(
       link: const RunLink(exerciseId: 'easy-run', prescriptionId: 'f-sun-1'),
     );
@@ -115,7 +115,7 @@ void main() {
   }
 
   List<Override> overrides() => [
-    Screenshot.pinToday(DateTime(2026, 10, 5)),
+    Screenshot.pinToday(DateTime(2026, 10, 19)),
     mapTilesEnabledProvider.overrideWithValue(false),
     locationSourceProvider.overrideWithValue(gps),
   ];

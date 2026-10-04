@@ -20,7 +20,7 @@ void main() {
       expect(plan.foods, isNotEmpty);
       expect(plan.meals, isNotEmpty);
       expect(plan.slots, isNotEmpty);
-      expect(plan.phases, hasLength(3));
+      expect(plan.phases, hasLength(1), reason: 'v4: one phase, 2,300 kcal');
       expect(plan.supplements, isNotEmpty);
       expect(plan.buyingGuide, isNotEmpty);
     });
@@ -60,20 +60,22 @@ void main() {
   });
 
   group('the day it resolves', () {
-    test('a training day has the two session meals', () {
-      final day = plan.forDay(weekNo: 1, isTrainingDay: true);
-      final slots = day.slots.map((s) => s.slot.id).toList();
-      expect(slots, contains('pre_training'));
-      expect(slots, contains('post_training'));
-      expect(slots, isNot(contains('afternoon')));
+    test('four meals, the way he eats: breakfast, lunch, a snack, dinner', () {
+      for (final training in [true, false]) {
+        final day = plan.forDay(weekNo: 1, isTrainingDay: training);
+        expect(day.slots.map((s) => s.slot.id), [
+          'breakfast',
+          'lunch',
+          'snack',
+          'dinner',
+        ]);
+      }
     });
 
-    test('a rest day collapses them into one afternoon meal', () {
-      final day = plan.forDay(weekNo: 1, isTrainingDay: false);
-      final slots = day.slots.map((s) => s.slot.id).toList();
-      expect(slots, contains('afternoon'));
-      expect(slots, isNot(contains('pre_training')));
-      expect(slots, isNot(contains('post_training')));
+    test('the evening snack is the one that fuels a session', () {
+      final day = plan.forDay(weekNo: 1, isTrainingDay: true);
+      final fuel = day.slots.where((s) => s.slot.aroundSession).toList();
+      expect(fuel.map((s) => s.slot.id), ['snack']);
     });
 
     test('the slots come back in the order you eat them', () {
@@ -105,19 +107,17 @@ void main() {
       }
     });
 
-    test('the later phases are bigger than the first', () {
+    test('the same food all twelve weeks: no step-ups', () {
       final w1 = plan.forDay(weekNo: 1, isTrainingDay: true).totals.kcal;
-      final w6 = plan.forDay(weekNo: 6, isTrainingDay: true).totals.kcal;
       final w11 = plan.forDay(weekNo: 11, isTrainingDay: true).totals.kcal;
-      expect(w6, greaterThan(w1));
-      expect(w11, greaterThan(w6));
+      expect(w11, w1);
+      expect(plan.forDay(weekNo: 11, isTrainingDay: true).module, isNull);
     });
 
-    test('the phase module appears as a real item, not a number', () {
-      final day = plan.forDay(weekNo: 6, isTrainingDay: true);
-      expect(day.module, isNotNull);
-      expect(day.module!.items, isNotEmpty);
-      for (final i in day.module!.items) {
+    test('the stalled-scale booster is food, not a number', () {
+      final boost = plan.modules.singleWhere((m) => m.kcal == 150);
+      expect(boost.items, isNotEmpty);
+      for (final i in boost.items) {
         expect(plan.food(i.foodId), isNotNull);
       }
     });
@@ -142,17 +142,17 @@ void main() {
 
     test('a meal just due is still the next one', () {
       // v3 compared the clock only: at 10:35 the 10:30 meal had vanished.
-      expect(next('10:35'), 'mid_morning');
+      expect(next('13:35'), 'lunch');
     });
 
     test('a meal logged is not next any more', () {
-      expect(next('10:20', {'mid_morning'}), 'lunch');
-      expect(next('07:00', {'breakfast', 'mid_morning'}), 'lunch');
+      expect(next('13:20', {'lunch'}), 'snack');
+      expect(next('06:00', {'breakfast'}), 'lunch');
     });
 
     test('a meal two hours gone gives way to the one coming', () {
-      expect(next('15:10'), 'pre_training');
-      expect(next('14:50'), 'lunch');
+      expect(next('15:40'), 'snack');
+      expect(next('15:20'), 'lunch');
     });
 
     test('with everything logged, the day is done', () {
@@ -257,12 +257,12 @@ void main() {
       },
     );
 
-    test('a day costs its meals, plus the phase module', () {
+    test('a day costs its meals', () {
       final day = plan.forDay(weekNo: 6, isTrainingDay: true, weekday: 1);
       final meals = day.slots.fold<double>(0, (a, s) => a + s.chosen.costEur);
-      final module = plan.costOf(day.module!.items);
-      expect(module, greaterThan(0));
-      expect(day.costEur, closeTo(meals + module, 0.001));
+      expect(day.costEur, closeTo(meals, 0.001));
+      final boost = plan.modules.singleWhere((m) => m.kcal == 150);
+      expect(plan.costOf(boost.items), greaterThan(0));
     });
 
     test('cupboard food says how long a packet lasts', () {

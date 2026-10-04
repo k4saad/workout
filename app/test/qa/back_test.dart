@@ -15,7 +15,7 @@ const drillDowns = <(String, String, int)>[
   // (page, the parent it must come back to, its tab)
   ('/history', '/', 0),
   ('/week/calendar', '/week', 1),
-  ('/week/3/day/f-mon', '/week', 1),
+  ('/week/3/day/f-tue', '/week', 1),
   ('/progress/body', '/progress', 3),
   ('/progress/photos', '/progress', 3),
   ('/progress/runs', '/progress', 3),
@@ -65,7 +65,7 @@ void main() {
       final app = QaApp(db: db, repo: repo, tmp: tmp);
       app.collect('back $page');
       try {
-        await app.pump(tester, today: DateTime(2026, 10, 14));
+        await app.pump(tester, today: DateTime(2026, 10, 28));
         app.router.go(page);
         await QaApp.settle(tester);
 

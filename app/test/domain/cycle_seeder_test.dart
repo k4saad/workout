@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:keller_twelve/domain/models/enums.dart';
 import 'package:keller_twelve/domain/models/prescription.dart';
 import 'package:keller_twelve/domain/models/programme.dart';
 import 'package:keller_twelve/domain/plates/lattice.dart';
@@ -68,8 +69,14 @@ void main() {
 
     test('a bodyweight movement is not given a load', () {
       final seed = seeder.seed(programme: programme, results: results());
+      // Bodyweight and timed work: a kettlebell is not plate-loaded, but it
+      // is a load, and keeps one.
       final bw = allOf(seed.programme)
-          .where((p) => !p.loadMode.isPlateLoaded)
+          .where(
+            (p) =>
+                p.loadMode == LoadMode.bodyweight ||
+                p.loadMode == LoadMode.timed,
+          )
           .toList();
       expect(bw, isNotEmpty);
       expect(bw.every((p) => p.startLoadKg == null), isTrue);
@@ -130,7 +137,7 @@ void main() {
       final squat = seed.changes.firstWhere(
         (c) =>
             c.exerciseId == 'barbell-back-squat' &&
-            c.prescriptionId == 'b-mon-1',
+            c.prescriptionId == 'b-tue-1',
       );
       expect(squat.oldKg, 21.0);
       expect(squat.newKg, isNotNull);
@@ -168,15 +175,15 @@ void main() {
       final seed = seeder.seed(
         programme: programme,
         results: results(),
-        lastLoggedKg: const {'ez-bar-curl': 12.0},
+        lastLoggedKg: const {'incline-dumbbell-press': 9.0},
       );
-      final curl = allOf(seed.programme)
-          .firstWhere((p) => p.exerciseId == 'ez-bar-curl');
-      expect(curl.startLoadKg, 12.0);
-      expect(lattice.isValid(curl.startLoadKg!, curl.loadMode), isTrue);
+      final press = allOf(seed.programme)
+          .firstWhere((p) => p.exerciseId == 'incline-dumbbell-press');
+      expect(press.startLoadKg, 9.0);
+      expect(lattice.isValid(press.startLoadKg!, press.loadMode), isTrue);
 
       final change = seed.changes.firstWhere(
-        (c) => c.exerciseId == 'ez-bar-curl',
+        (c) => c.exerciseId == 'incline-dumbbell-press',
       );
       expect(change.basis, SeedBasis.carriedOver);
     });
@@ -185,19 +192,18 @@ void main() {
       final seed = seeder.seed(
         programme: programme,
         results: results(),
-        lastLoggedKg: const {'ez-bar-curl': 12.4},
+        lastLoggedKg: const {'incline-dumbbell-press': 9.3},
       );
-      final curl = allOf(seed.programme)
-          .firstWhere((p) => p.exerciseId == 'ez-bar-curl');
-      expect(lattice.isValid(curl.startLoadKg!, curl.loadMode), isTrue);
-      expect(curl.startLoadKg, lessThanOrEqualTo(12.4));
+      final press = allOf(seed.programme)
+          .firstWhere((p) => p.exerciseId == 'incline-dumbbell-press');
+      expect(lattice.isValid(press.startLoadKg!, press.loadMode), isTrue);
+      expect(press.startLoadKg, lessThanOrEqualTo(9.3));
     });
 
     test('no test result and no history keeps what was there', () {
       final seed = seeder.seed(programme: programme, results: results());
-      // By id: Foundation has its own EZ curl, and it is not seeded.
-      final before = allOf(programme).firstWhere((p) => p.id == 'b-tue-4a');
-      final after = allOf(seed.programme).firstWhere((p) => p.id == 'b-tue-4a');
+      final before = allOf(programme).firstWhere((p) => p.id == 'b-tue-2a');
+      final after = allOf(seed.programme).firstWhere((p) => p.id == 'b-tue-2a');
       expect(after.startLoadKg, before.startLoadKg);
       expect(after.exerciseId, before.exerciseId);
     });
@@ -214,9 +220,9 @@ void main() {
   });
 
   group('E-6  role decides the multiplier', () {
-    test('a 4x5 lead lift seeds near 0.75 of e1RM', () {
+    test('a lead lift seeds near 0.75 of e1RM', () {
       final seed = seeder.seed(programme: programme, results: results());
-      final squat = allOf(seed.programme).firstWhere((p) => p.id == 'b-mon-1');
+      final squat = allOf(seed.programme).firstWhere((p) => p.id == 'b-tue-1');
       const e1rm = 36 * (1 + 5 / 30);
       final target = CycleSeeder.leadFactor * e1rm;
       expect(squat.startLoadKg, lessThanOrEqualTo(target + 1e-9));
@@ -226,23 +232,24 @@ void main() {
       );
     });
 
-    test('a 3x8 secondary seeds near 0.65 of e1RM', () {
+    test('a secondary lift seeds near 0.65 of e1RM', () {
       final seed = seeder.seed(
         programme: programme,
         results: const [
           TestResult(
-            exerciseId: 'barbell-romanian-deadlift',
+            exerciseId: 'barbell-bent-over-row',
             weightKg: 50,
             reps: 5,
           ),
         ],
       );
-      final rdl = allOf(seed.programme).firstWhere((p) => p.id == 'b-mon-2');
+      // The row is Saturday's second lift: a secondary.
+      final row = allOf(seed.programme).firstWhere((p) => p.id == 'b-sat-2');
       const e1rm = 50 * (1 + 5 / 30);
       final target = CycleSeeder.secondaryFactor * e1rm;
-      expect(rdl.startLoadKg, lessThanOrEqualTo(target + 1e-9));
+      expect(row.startLoadKg, lessThanOrEqualTo(target + 1e-9));
       expect(
-        rdl.startLoadKg,
+        row.startLoadKg,
         greaterThan(target - lattice.nominalBarbellStep!),
       );
     });

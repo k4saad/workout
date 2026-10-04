@@ -108,7 +108,7 @@ void main() {
           SessionsCompanion.insert(
             programmeId: 'keller-twelve',
             blockId: 'foundation',
-            dayId: 'f-mon',
+            dayId: 'f-tue',
             weekNo: 1,
             plannedDate: DateTime(2026, 9, 28),
             scheduledDate: DateTime(2026, 9, 28),

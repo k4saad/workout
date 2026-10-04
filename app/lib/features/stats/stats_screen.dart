@@ -160,7 +160,7 @@ class _VolumeRow extends StatelessWidget {
   }
 }
 
-/// Is sixty minutes real, or is it eighty?
+/// Is half an hour real, or is it fifty minutes?
 class _DurationCard extends ConsumerWidget {
   const _DurationCard();
 

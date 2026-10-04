@@ -21,6 +21,7 @@ void main() {
   late Directory tmp;
   late AppDatabase db;
   late ProgrammeRepository repo;
+  late DateTime weekStart;
   late DateTime trainingDay;
 
   setUp(() async {
@@ -32,12 +33,13 @@ void main() {
     await repo.loadInventory();
     await repo.loadFuel();
     final programme = await repo.loadProgramme();
-    // Monday of week 2: a lift day, comfortably inside the programme.
-    trainingDay = DateTime(
+    // Week 2, comfortably inside the programme. Tuesday is a lift day.
+    weekStart = DateTime(
       programme.startDate.year,
       programme.startDate.month,
       programme.startDate.day + 7,
     );
+    trainingDay = DateTime(weekStart.year, weekStart.month, weekStart.day + 1);
   });
 
   tearDown(() async {
@@ -91,8 +93,8 @@ void main() {
     expect(find.text('Fuel'), findsOneWidget);
     expect(find.text('THE DAY'), findsOneWidget);
     // Every meal shows a real time, so the plan reads as a day.
-    expect(find.text('07:30'), findsOneWidget);
-    expect(find.text('22:30'), findsOneWidget);
+    expect(find.text('06:45'), findsOneWidget);
+    expect(find.text('20:00'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -103,13 +105,14 @@ void main() {
     expect(find.textContaining('Rolled oats'), findsWidgets);
   });
 
-  testWidgets('a training day says the session meals are timed', (
+  testWidgets('four meals, and on a training day the snack is the fuel', (
     tester,
   ) async {
     await pump(tester);
-    expect(find.textContaining('either side of the session'), findsOneWidget);
-    expect(find.text('Before training'), findsOneWidget);
-    expect(find.text('Straight after'), findsOneWidget);
+    for (final meal in ['Breakfast', 'Lunch', 'Evening snack', 'Dinner']) {
+      expect(find.text(meal), findsOneWidget, reason: meal);
+    }
+    expect(find.textContaining('fuel for the session'), findsOneWidget);
   });
 
   testWidgets('logging a meal moves the ring and sticks', (tester) async {
@@ -182,8 +185,8 @@ void main() {
     tester,
   ) async {
     // Two weeks past the last day, before a new cycle is built. v3 fell
-    // back to week one's 2,600 kcal: 300 a day gone the week the programme
-    // finished.
+    // back to week one's numbers: food gone the week the programme finished.
+    // v4 eats the same all twelve weeks, so the day stays at 2,300.
     final programme = await repo.loadProgramme();
     trainingDay = DateTime(
       programme.startDate.year,
@@ -196,25 +199,26 @@ void main() {
     final kcal = int.parse(
       (tester.widget<Text>(target).data ?? '').replaceFirst('of ', ''),
     );
-    expect(kcal, greaterThan(2800));
+    expect(kcal, inInclusiveRange(2200, 2400));
   });
 
-  testWidgets('a rest day swaps the session meals for one afternoon meal', (
+  testWidgets('a rest day eats the same four meals, none of them timed', (
     tester,
   ) async {
-    // Saturday of week 2 is the programme's rest day.
-    trainingDay = trainingDay.add(const Duration(days: 5));
+    // Wednesday of week 2 is a rest day.
+    trainingDay = trainingDay.add(const Duration(days: 1));
     await pump(tester);
 
-    expect(find.text('Afternoon'), findsOneWidget);
-    expect(find.text('Before training'), findsNothing);
-    expect(find.textContaining('muscle is built today'), findsOneWidget);
+    expect(find.text('Evening snack'), findsOneWidget);
+    expect(find.textContaining('fuel for the session'), findsNothing);
+    expect(find.textContaining('recovery happens today'), findsOneWidget);
   });
 
   testWidgets('a day buys one main: chicken twice, not chicken and salmon', (
     tester,
   ) async {
-    // trainingDay is a Monday: the rotation's chicken day.
+    // Monday is the rotation's chicken day.
+    trainingDay = weekStart;
     expect(trainingDay.weekday, DateTime.monday);
     await pump(tester);
     expect(find.text('Chicken thighs, rice and vegetables'), findsOneWidget);
@@ -242,11 +246,7 @@ void main() {
     expect(find.text('THE WEEK'), findsOneWidget);
     // Seven days, Monday first.
     for (var i = 0; i < 7; i++) {
-      final d = DateTime(
-        trainingDay.year,
-        trainingDay.month,
-        trainingDay.day + i,
-      );
+      final d = DateTime(weekStart.year, weekStart.month, weekStart.day + i);
       // (The prep night falls on some of them too.)
       expect(find.text(DateFormat('EEE d MMM').format(d)), findsWidgets);
     }
@@ -258,7 +258,7 @@ void main() {
     tester,
   ) async {
     await openPlan(tester);
-    final monday = DateFormat('EEE d MMM').format(trainingDay);
+    final monday = DateFormat('EEE d MMM').format(weekStart);
     expect(find.text(monday), findsOneWidget);
 
     await tester.tap(find.text('Next week'));
@@ -267,9 +267,9 @@ void main() {
     expect(find.text(monday), findsNothing);
     expect(
       find.text(
-        DateFormat('EEE d MMM').format(
-          DateTime(trainingDay.year, trainingDay.month, trainingDay.day + 7),
-        ),
+        DateFormat(
+          'EEE d MMM',
+        ).format(DateTime(weekStart.year, weekStart.month, weekStart.day + 7)),
       ),
       findsOneWidget,
     );
@@ -283,9 +283,9 @@ void main() {
     await settle(tester);
 
     final tuesday = DateTime(
-      trainingDay.year,
-      trainingDay.month,
-      trainingDay.day + 8,
+      weekStart.year,
+      weekStart.month,
+      weekStart.day + 8,
     );
     await tester.tap(find.text(DateFormat('EEE d MMM').format(tuesday)));
     await settle(tester);
@@ -332,7 +332,7 @@ void main() {
     final prefs = await tester.runAsync(
       () => PreferencesService(documentsDir: tmp).load(),
     );
-    expect(prefs!.shoppingTicksFor(trainingDay), {'magerquark'});
+    expect(prefs!.shoppingTicksFor(weekStart), {'magerquark'});
 
     // The halal buying guide sits under the list.
     await tester.scrollUntilVisible(

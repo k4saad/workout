@@ -177,6 +177,20 @@ class ProgrammeCalendar {
           .where((d) => d.isTrainingDay && !d.optional)
           .length;
 
+  /// The first training day strictly after [date], or null once the
+  /// programme has none left. Optional days (the Sunday run) are skipped
+  /// unless [includeOptional]: a rest day names the session that is due.
+  PlannedDay? nextSession(DateTime date, {bool includeOptional = false}) {
+    final from = _dateOnly(date).isBefore(_anchor)
+        ? addDays(_anchor, -1)
+        : _dateOnly(date);
+    for (var d = addDays(from, 1); !d.isAfter(lastDate); d = addDays(d, 1)) {
+      final p = forDate(d);
+      if (p.hasSession && (includeOptional || !p.day!.optional)) return p;
+    }
+    return null;
+  }
+
   /// The last date the programme covers.
   DateTime get lastDate => addDays(startOfWeek(programme.totalWeeks), 6);
 

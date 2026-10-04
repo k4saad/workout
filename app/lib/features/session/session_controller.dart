@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/database.dart';
@@ -162,6 +164,11 @@ class RunnerState {
     return now.difference(start).inMinutes;
   }
 
+  /// Ten minutes past the day's own estimate — a 28-minute day runs long at
+  /// 38 — and never sooner than 25: v3 used a fixed 45, which a half-hour
+  /// day could never reach.
+  int get runningLongAfterMinutes => math.max(25, day.estMinutes + 10);
+
   /// A session open this long was interrupted — left overnight, the app
   /// killed — not trained slowly: its clock says nothing about the budget.
   static const interruptedAfterMinutes = 180;
@@ -175,7 +182,7 @@ class RunnerState {
   /// Never for an interrupted session: resumed the next morning, it used to
   /// open on "You are 1,480 minutes in — cut the last superset".
   bool isRunningLong(DateTime now) =>
-      elapsedMinutes(now) >= 45 &&
+      elapsedMinutes(now) >= runningLongAfterMinutes &&
       !wasInterrupted(now) &&
       !shortMode &&
       shortModeCut.isNotEmpty &&

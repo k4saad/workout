@@ -12,7 +12,7 @@ import 'package:keller_twelve/data/db/database.dart';
 import 'package:keller_twelve/data/programme_repository.dart';
 
 /// The flat rule, end to end: the scale is flat, the Body page says add
-/// 250, one tap adds it, Fuel plans it, and it can be taken off again.
+/// 150, one tap adds it, Fuel plans it, and it can be taken off again.
 ///
 /// Until v0.13 the advice was a sentence with no button, and Fuel pointed
 /// at a "Body → adjustments" page that did not exist.
@@ -92,8 +92,8 @@ void main() {
   ) async {
     await pumpAt(tester, '/progress/body');
 
-    expect(find.text('Add 250 kcal'), findsOneWidget);
-    await tester.tap(find.text('Add 250 kcal a day'));
+    expect(find.text('Add 150 kcal'), findsOneWidget);
+    await tester.tap(find.text('Add 150 kcal a day'));
     await settle(tester);
     await settle(tester);
 
@@ -101,12 +101,12 @@ void main() {
       () => db.select(db.nutritionAdjustments).get(),
     );
     expect(rows, hasLength(1));
-    expect(rows!.single.kcalDelta, 250);
+    expect(rows!.single.kcalDelta, 150);
     expect(rows.single.appliedOn, today);
 
     // The advice does not ask again straight away, and the change is
     // listed with the way to take it off.
-    expect(find.text('Add 250 kcal a day'), findsNothing);
+    expect(find.text('Add 150 kcal a day'), findsNothing);
     expect(find.text('Settling in'), findsOneWidget);
     expect(find.text('Calorie changes in force'), findsOneWidget);
 
@@ -114,11 +114,11 @@ void main() {
     router.go('/fuel');
     await settle(tester);
     await settle(tester);
-    expect(find.text('+250 kcal a day, applied'), findsOneWidget);
+    expect(find.text('+150 kcal a day, applied'), findsOneWidget);
     expect(find.textContaining('As food:'), findsOneWidget);
 
     // Its banner leads back to the page that takes it off.
-    await tester.tap(find.text('+250 kcal a day, applied'));
+    await tester.tap(find.text('+150 kcal a day, applied'));
     await settle(tester);
     await settle(tester);
     await tester.tap(find.text('Take it off'));
