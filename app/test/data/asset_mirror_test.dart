@@ -16,6 +16,7 @@ void main() {
     '../data/quotes.json': 'assets/content/quotes.json',
     '../data/fuel.json': 'assets/nutrition/fuel.json',
     '../data/motions.json': 'assets/exercises/motions.json',
+    '../data/timetable.json': 'assets/content/timetable.json',
   };
 
   String norm(File f) => f.readAsStringSync().replaceAll('\r\n', '\n');

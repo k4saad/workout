@@ -41,7 +41,7 @@ void main() {
   // Tuesday: squat, a dumbbell superset, then straight knee raises.
   Day tuesday() => resolver
       .resolveDays(programme.blockById('build')!, 5)
-      .firstWhere((d) => d.id == 'b-tue');
+      .firstWhere((d) => d.id == 'b-mon');
 
   setUp(() {
     now = DateTime(2026, 11, 14, 9, 30);
@@ -136,9 +136,9 @@ void main() {
       // The incline press at 7 kg crept to 14. v2 logged the prescription's
       // 10, so next week crept to 14 again, forever (the v1 A1 deadlock).
       var s = await withSuggestions({
-        'b-tue-2a': suggestion(kg: 7, min: 10, max: 14, creep: true),
+        'b-mon-2a': suggestion(kg: 7, min: 10, max: 14, creep: true),
       }, on: tuesday());
-      final press = s.items.firstWhere((i) => i.prescription.id == 'b-tue-2a');
+      final press = s.items.firstWhere((i) => i.prescription.id == 'b-mon-2a');
       s = await controller.logSet(
         s,
         prescription: press.prescription,
@@ -149,12 +149,12 @@ void main() {
         exerciseName: 'Incline dumbbell press',
       );
       final row = (await db.setsForSession(s.session.id))
-          .firstWhere((l) => l.prescriptionId == 'b-tue-2a');
+          .firstWhere((l) => l.prescriptionId == 'b-mon-2a');
       expect(row.targetRepsMin, 10);
       expect(row.targetRepsMax, 14);
       expect(row.targetLoadKg, 7);
       expect(
-        s.suggestions['b-tue-2a'],
+        s.suggestions['b-mon-2a'],
         isNotNull,
         reason: 'suggestions survive the reload after a set',
       );
@@ -431,7 +431,7 @@ void main() {
     });
 
     test('never the main lift, and only the LAST superset', () async {
-      for (final id in ['b-tue', 'b-thu', 'b-sat']) {
+      for (final id in ['b-mon', 'b-wed', 'b-sat']) {
         final day = resolver
             .resolveDays(programme.blockById('push')!, 9)
             .firstWhere((d) => d.id == id);

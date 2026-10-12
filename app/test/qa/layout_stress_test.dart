@@ -19,7 +19,7 @@ const routes = <(String, String)>[
   ('history', '/history'),
   ('week', '/week'),
   ('calendar', '/week/calendar'),
-  ('day', '/week/3/day/f-tue'),
+  ('day', '/week/3/day/f-mon'),
   ('fuel', '/fuel'),
   ('fuel-plan', '/fuel#plan'),
   ('progress', '/progress'),
@@ -38,7 +38,7 @@ const routes = <(String, String)>[
   ('editor', '/more/settings/programme'),
   ('files', '/more/settings/files'),
   ('next-cycle', '/more/settings/next-cycle'),
-  ('runner', '/run/3/f-tue'),
+  ('runner', '/run/3/f-mon'),
 ];
 
 const configs = <(String, Size, double)>[

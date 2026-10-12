@@ -54,7 +54,7 @@ void main() {
     });
 
     test('week 1 squat starts on the empty bar', () {
-      final squat = find(days, 'f-tue-1');
+      final squat = find(days, 'f-mon-1');
       expect(squat.exerciseId, 'barbell-back-squat');
       expect(emptyBar, 10.0, reason: 'the definitive kit: a 10 kg bar');
       expect(squat.startLoadKg, emptyBar);
@@ -69,17 +69,17 @@ void main() {
       expect(ids, contains('barbell-deadlift'));
       expect(ids, contains('barbell-overhead-press'));
       expect(ids, contains('barbell-bent-over-row'));
-      expect(find(days, 'f-thu-1').startLoadKg, emptyBar);
-      expect(find(days, 'f-thu-2').startLoadKg, emptyBar);
+      expect(find(days, 'f-wed-1').startLoadKg, emptyBar);
+      expect(find(days, 'f-wed-2').startLoadKg, emptyBar);
     });
 
     test('defaultRir 3 is inherited where targetRir is null', () {
       // 3, not 4: a logged RIR 3 must not block the jump (coach review M4).
-      expect(find(days, 'f-tue-1').targetRir, 3);
+      expect(find(days, 'f-mon-1').targetRir, 3);
     });
 
     test('the main lifts ramp from week 1', () {
-      for (final id in ['f-tue-1', 'f-thu-1', 'f-sat-1']) {
+      for (final id in ['f-mon-1', 'f-wed-1', 'f-sat-1']) {
         expect(find(days, id).warmupRamp, isTrue, reason: id);
       }
     });
@@ -95,8 +95,8 @@ void main() {
     test('three training days, half an hour each, and the rest is rest', () {
       final training = days.where((d) => d.kind == DayKind.lift).toList();
       expect(training.map((d) => d.weekday), [
-        Weekday.tue,
-        Weekday.thu,
+        Weekday.mon,
+        Weekday.wed,
         Weekday.sat,
       ]);
       for (final d in training) {
@@ -107,13 +107,13 @@ void main() {
     });
 
     test('defaultRir 2 is inherited by the main lifts', () {
-      expect(find(days, 'b-tue-1').targetRir, 2);
+      expect(find(days, 'b-mon-1').targetRir, 2);
       expect(find(days, 'b-sat-1').targetRir, 2);
     });
 
     test('supersets survive', () {
-      expect(find(days, 'b-tue-2a').groupId, isNotNull);
-      expect(find(days, 'b-tue-2a').groupId, find(days, 'b-tue-2b').groupId);
+      expect(find(days, 'b-mon-2a').groupId, isNotNull);
+      expect(find(days, 'b-mon-2a').groupId, find(days, 'b-mon-2b').groupId);
     });
 
     test('every training day presses and pulls — the v1 B1 bug', () {
@@ -121,7 +121,7 @@ void main() {
       const pull = {'horizontalPull', 'verticalPull', 'curl'};
       final library = Fixtures.library;
 
-      for (final id in ['b-tue', 'b-thu', 'b-sat']) {
+      for (final id in ['b-mon', 'b-wed', 'b-sat']) {
         final day = days.firstWhere((d) => d.id == id);
         var pushSets = 0, pullSets = 0;
         for (final p in day.loggedPrescriptions.where((p) => !p.optional)) {
@@ -146,9 +146,9 @@ void main() {
 
     test('sets scale by 0.60, rounded UP, never below 1', () {
       // 3 sets * 0.6 = 1.8 -> 2; 2 sets * 0.6 = 1.2 -> 2.
-      expect(find(days, 'b-tue-1').sets, 2);
-      expect(find(days, 'b-thu-1').sets, 2);
-      expect(find(days, 'b-tue-3').sets, 2);
+      expect(find(days, 'b-mon-1').sets, 2);
+      expect(find(days, 'b-wed-1').sets, 2);
+      expect(find(days, 'b-mon-3').sets, 2);
       for (final p in days.expand((d) => d.allPrescriptions)) {
         expect(p.sets, greaterThanOrEqualTo(1), reason: p.id);
       }
@@ -156,7 +156,7 @@ void main() {
 
     test('loads scale to 70%', () {
       final build = resolver.resolveDays(programme.blockById('build')!, 5);
-      for (final id in ['b-tue-1', 'b-thu-1']) {
+      for (final id in ['b-mon-1', 'b-wed-1']) {
         expect(
           find(days, id).startLoadKg,
           closeTo(find(build, id).startLoadKg! * 0.7, 1e-9),
@@ -180,22 +180,22 @@ void main() {
     test('defaultRir 4 reaches the main lifts — the audit C2 fix', () {
       // In build these leave targetRir null, so the deload actually softens
       // them. If every prescription restated its RIR, this would be 2.
-      expect(find(days, 'b-tue-1').targetRir, 4);
-      expect(find(days, 'b-thu-1').targetRir, 4);
+      expect(find(days, 'b-mon-1').targetRir, 4);
+      expect(find(days, 'b-wed-1').targetRir, 4);
       expect(find(days, 'b-sat-1').targetRir, 4);
     });
 
     test('an explicitly harder accessory is NOT softened', () {
       // Knee raises are RIR 1 by intent, not by default.
-      expect(find(days, 'b-tue-3').targetRir, 1);
+      expect(find(days, 'b-mon-3').targetRir, 1);
     });
 
     test('the source block is not mutated', () {
       final build = programme.blockById('build')!;
       final again = resolver.resolveDays(build, 5);
-      expect(find(again, 'b-tue-1').sets, 3);
-      expect(find(again, 'b-tue-1').startLoadKg, 21.0);
-      expect(find(again, 'b-tue-1').targetRir, 2);
+      expect(find(again, 'b-mon-1').sets, 3);
+      expect(find(again, 'b-mon-1').startLoadKg, 21.0);
+      expect(find(again, 'b-mon-1').targetRir, 2);
     });
   });
 
@@ -205,7 +205,7 @@ void main() {
 
     test('the lead lift of each day drops to RIR 1, same sets', () {
       // v4: no added set — the sessions stay half an hour.
-      for (final id in ['b-tue-1', 'b-thu-1', 'b-sat-1']) {
+      for (final id in ['b-mon-1', 'b-wed-1', 'b-sat-1']) {
         expect(find(days, id).sets, 3, reason: id);
         expect(find(days, id).targetRir, 1, reason: id);
       }
@@ -213,10 +213,10 @@ void main() {
 
     test('loads are unchanged — push adds effort, not weight', () {
       final build = resolver.resolveDays(programme.blockById('build')!, 5);
-      expect(find(days, 'b-tue-1').startLoadKg, 21.0);
+      expect(find(days, 'b-mon-1').startLoadKg, 21.0);
       expect(
-        find(days, 'b-thu-1').startLoadKg,
-        find(build, 'b-thu-1').startLoadKg,
+        find(days, 'b-wed-1').startLoadKg,
+        find(build, 'b-wed-1').startLoadKg,
       );
     });
 
@@ -228,16 +228,16 @@ void main() {
           .cast<Map<String, dynamic>>()
           .firstWhere((b) => b['id'] == 'push');
       push['dayOverrides'] = {
-        'b-thu': {
+        'b-wed': {
           'prescriptionOverrides': {
-            'b-thu-3b': {'exerciseId': 'step-up', 'repsMin': 8, 'repsMax': 10},
+            'b-wed-3b': {'exerciseId': 'step-up', 'repsMin': 8, 'repsMax': 10},
           },
         },
       };
       final edited = Programme.fromJson(json);
       final swapped = find(
         BlockResolver(edited).resolveDays(edited.blockById('push')!, 9),
-        'b-thu-3b',
+        'b-wed-3b',
       );
       expect(swapped.exerciseId, 'step-up');
       expect(swapped.repsMax, 10);
@@ -245,11 +245,11 @@ void main() {
     });
 
     test('supersets are kept', () {
-      expect(find(days, 'b-tue-2a').groupId, isNotNull);
+      expect(find(days, 'b-mon-2a').groupId, isNotNull);
     });
 
     test('non-overridden accessories keep the block default RIR of 2', () {
-      expect(find(days, 'b-tue-2b').targetRir, 2);
+      expect(find(days, 'b-mon-2b').targetRir, 2);
     });
   });
 
@@ -267,10 +267,10 @@ void main() {
 
     test('the five barbell lifts are each tested for a single set of 5', () {
       for (final id in [
-        't-tue-1',
-        't-tue-2',
-        't-thu-1',
-        't-thu-2',
+        't-mon-1',
+        't-mon-2',
+        't-wed-1',
+        't-wed-2',
         't-sat-1',
       ]) {
         final p = find(days, id);
@@ -279,14 +279,14 @@ void main() {
         expect(p.targetRir, 0, reason: id);
       }
       // The first lift of each day ramps up to it.
-      for (final id in ['t-tue-1', 't-thu-1', 't-sat-1']) {
+      for (final id in ['t-mon-1', 't-wed-1', 't-sat-1']) {
         expect(find(days, id).warmupRamp, isTrue, reason: '$id needs a ramp');
       }
     });
 
-    test('Thursday is the deadlift and the press, nothing else', () {
-      final thu = days.firstWhere((d) => d.weekday == Weekday.thu);
-      expect(thu.loggedPrescriptions, hasLength(2));
+    test('Wednesday is the deadlift and the press, nothing else', () {
+      final wed = days.firstWhere((d) => d.weekday == Weekday.wed);
+      expect(wed.loggedPrescriptions, hasLength(2));
     });
 
     test('max strict pull-ups are tested as an open rep range', () {
@@ -308,8 +308,8 @@ void main() {
       expect(detached.dayOverrides, isEmpty);
 
       // The overrides are baked in.
-      expect(find(detached.days, 'b-tue-1').sets, 3);
-      expect(find(detached.days, 'b-tue-1').targetRir, 1);
+      expect(find(detached.days, 'b-mon-1').sets, 3);
+      expect(find(detached.days, 'b-mon-1').targetRir, 1);
       expect(find(detached.days, 'b-sat-1').targetRir, 1);
     });
 

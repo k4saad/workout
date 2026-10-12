@@ -33,13 +33,13 @@ void main() {
     await repo.loadInventory();
     await repo.loadFuel();
     final programme = await repo.loadProgramme();
-    // Week 2, comfortably inside the programme. Tuesday is a lift day.
+    // Week 2, comfortably inside the programme. Monday is a lift day.
     weekStart = DateTime(
       programme.startDate.year,
       programme.startDate.month,
       programme.startDate.day + 7,
     );
-    trainingDay = DateTime(weekStart.year, weekStart.month, weekStart.day + 1);
+    trainingDay = weekStart;
   });
 
   tearDown(() async {
@@ -205,7 +205,7 @@ void main() {
   testWidgets('a rest day eats the same four meals, none of them timed', (
     tester,
   ) async {
-    // Wednesday of week 2 is a rest day.
+    // Tuesday of week 2 is a rest day.
     trainingDay = trainingDay.add(const Duration(days: 1));
     await pump(tester);
 

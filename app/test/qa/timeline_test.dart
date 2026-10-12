@@ -14,7 +14,7 @@ import 'qa_harness.dart';
 ///     flutter test --dart-define=QA=true test/qa/timeline_test.dart
 final moments = <(String, DateTime)>[
   ('pre-start', DateTime(2026, 10, 11)), // Sunday before week 1
-  ('day-1', DateTime(2026, 10, 13)), // Tuesday, week 1: the first session
+  ('day-1', DateTime(2026, 10, 12)), // Monday, week 1: the first session
   ('deload', DateTime(2026, 12, 2)), // Wednesday, week 8
   ('test-week', DateTime(2026, 12, 30)), // Wednesday, week 12
   ('last-day', DateTime(2027, 1, 3)), // Sunday, week 12

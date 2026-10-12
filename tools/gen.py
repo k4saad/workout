@@ -399,9 +399,10 @@ WARN_PAD = {"title": "Pad the hip thrust bar",
 
 # ----------------------------------------------------------------------------
 # v4: a working student's week. Three full-body sessions of about half an
-# hour — Tuesday and Thursday evening, Saturday morning — and an optional
-# run or hike on Sunday. Monday (job, lectures and a German course from 07:00
-# to 19:45) and the days between are rest. docs/11-v4-plan.md.
+# hour — Monday after work, Wednesday after Spatial Justice, Saturday morning —
+# and an optional run or hike on Sunday. Tuesday and Thursday, the two long
+# days (07:00-17:45 and 09:00-17:45), and Friday are rest.
+# docs/11-v4-plan.md, moved by docs/12-semester-plan.md.
 # ----------------------------------------------------------------------------
 def rest_day(did, weekday, note):
     return D(did, weekday, "Rest", "rest", [], note=note)
@@ -450,28 +451,28 @@ WARMUP_UPPER = [
 # ============================================================================
 # FOUNDATION — weeks 1-4
 # ============================================================================
-f_mon = rest_day("f-mon", "mon", "Your long day: job, lectures, the German course. Nothing "
-                 "else. Eat your four meals.")
+f_tue = rest_day("f-tue", "tue", "Your long day: Job 2 from 07:00, lectures until 17:45. "
+                 "Nothing else. Eat all four meals, lunch included.")
 
-f_tue = D("f-tue", "tue", "Full Body A", "lift", [
+f_mon = D("f-mon", "mon", "Full Body A", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_LOWER),
     S("main", "Main work", prescriptions=[
         # maxjump is wide in Foundation only: 10% of a 10 kg bar is 1 kg, which
         # would cap an empty-bar squat at +1 kg a week for all four weeks.
-        P("f-tue-1", "barbell-back-squat", 1, 3, 8, 8, 90, "barbell", BAR["barbell"], rir=None,
+        P("f-mon-1", "barbell-back-squat", 1, 3, 8, 8, 90, "barbell", BAR["barbell"], rir=None,
           prog=DP(3.0, maxjump=0.35), subs=["goblet-squat", "dumbbell-squat",
                                             "barbell-front-squat"], ramp=True,
           note="EMPTY BAR (10 kg) in week 1. Brace as if someone is about to punch your stomach, "
                "then sit down and stand up."),
-        P("f-tue-2a", "push-up-handles", 2, 3, 8, 12, 0, "bodyweight", None, rir=3,
+        P("f-mon-2a", "push-up-handles", 2, 3, 8, 12, 0, "bodyweight", None, rir=3,
           prog=REPS, subs=["incline-push-up", "dumbbell-floor-press", "dumbbell-bench-press",
-                           "incline-dumbbell-press"], group="f-tue-ss1", creep=20,
+                           "incline-dumbbell-press"], group="f-mon-ss1", creep=20,
           note="If you can't get 8, put your hands on the bench and do them at an incline."),
-        P("f-tue-2b", "one-arm-dumbbell-row", 3, 3, 10, 10, 75, "dumbbellSingle", 7.0, rir=None,
-          prog=DP(1.0), subs=["chest-supported-dumbbell-row", "ring-row"], group="f-tue-ss1",
+        P("f-mon-2b", "one-arm-dumbbell-row", 3, 3, 10, 10, 75, "dumbbellSingle", 7.0, rir=None,
+          prog=DP(1.0), subs=["chest-supported-dumbbell-row", "ring-row"], group="f-mon-ss1",
           uni=True, per_side=True,
           note="Pull to the hip pocket, not the armpit. One full second at the top."),
-        P("f-tue-3", "plank", 4, 2, 30, 30, 30, "timed", None, unit="sec",
+        P("f-mon-3", "plank", 4, 2, 30, 30, 30, "timed", None, unit="sec",
           prog=TIME(5), subs=["dead-bug", "hollow-hold", "side-plank", "ab-wheel-knees",
                               "hanging-knee-raise"], creep=60,
           note="The second your lower back sags, the set is over."),
@@ -483,29 +484,30 @@ f_tue = D("f-tue", "tue", "Full Body A", "lift", [
 ], note="Squat-led, about half an hour. Light on purpose — you are learning the patterns.",
    warnings=[WARN_PINS_SQ, WARN_COLLAR])
 
-f_wed = rest_day("f-wed", "wed", "Rest. A walk between lectures counts.")
+f_thu = rest_day("f-thu", "thu", "Rest. Job 1, then SII until 17:45. A walk between "
+                 "lectures counts.")
 
-f_thu = D("f-thu", "thu", "Full Body B", "lift", [
+f_wed = D("f-wed", "wed", "Full Body B", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_HINGE),
     S("main", "Main work", prescriptions=[
         # +5 kg a week, not +10: the lift with the most spinal load, and no
         # coach watching. maxjump 0.50 lets the first jump off the bar happen.
-        P("f-thu-1", "barbell-deadlift", 1, 3, 5, 5, 105, "barbell", BAR["barbell"], rir=None,
+        P("f-wed-1", "barbell-deadlift", 1, 3, 5, 5, 105, "barbell", BAR["barbell"], rir=None,
           prog=DP(5.0, maxjump=0.50), subs=["dumbbell-deadlift", "barbell-romanian-deadlift",
                                             "single-leg-rdl", "barbell-hip-thrust"],
           ramp=True,
           note="EMPTY BAR (10 kg) from the blocks in week 1. Take the slack out of the bar "
                "before you pull — you should hear it click. Set it down and reset every rep."),
-        P("f-thu-2", "barbell-overhead-press", 2, 3, 8, 8, 90, "barbell", BAR["barbell"],
+        P("f-wed-2", "barbell-overhead-press", 2, 3, 8, 8, 90, "barbell", BAR["barbell"],
           rir=None, prog=DP(1.0, maxjump=0.15),
           subs=["dumbbell-overhead-press", "seated-dumbbell-press"],
           note="Empty 10 kg bar in week 1. Ribs down, glutes and abs locked."),
-        P("f-thu-3a", "ring-row", 3, 3, 8, 12, 0, "bodyweight", None, rir=3, prog=REPS,
-          subs=["one-arm-dumbbell-row", "chest-supported-dumbbell-row"], group="f-thu-ss1",
+        P("f-wed-3a", "ring-row", 3, 3, 8, 12, 0, "bodyweight", None, rir=3, prog=REPS,
+          subs=["one-arm-dumbbell-row", "chest-supported-dumbbell-row"], group="f-wed-ss1",
           creep=15,
           note="The more horizontal your body, the harder it gets. Log your foot position."),
-        P("f-thu-3b", "goblet-squat", 4, 3, 10, 10, 60, "kettlebell", 8.0, prog=REPS,
-          subs=["dumbbell-squat", "step-up", "walking-lunge"], group="f-thu-ss1", creep=15,
+        P("f-wed-3b", "goblet-squat", 4, 3, 10, 10, 60, "kettlebell", 8.0, prog=REPS,
+          subs=["dumbbell-squat", "step-up", "walking-lunge"], group="f-wed-ss1", creep=15,
           tempo="3s eccentric",
           note="One bell, so it progresses by reps: 10 up to 15, three seconds down every rep."),
     ]),
@@ -516,7 +518,8 @@ f_thu = D("f-thu", "thu", "Full Body B", "lift", [
 ], note="Hinge-led: the deadlift and the overhead press, then a quick pull-and-squat superset.",
    warnings=[WARN_BAR_HT, WARN_CEIL, WARN_COLLAR])
 
-f_fri = rest_day("f-fri", "fri", "Rest. Jumu'ah, the study project, home.")
+f_fri = rest_day("f-fri", "fri", "Rest. Spatio-temporal data, Jumu'ah, the study "
+                 "project, home. Tomorrow morning is a session.")
 
 f_sat = D("f-sat", "sat", "Full Body C", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_UPPER),
@@ -577,25 +580,25 @@ def from_week4(pid, prog, rmin, rmax, creep):
     return handoff(pres(FOUNDATION_DAYS, pid), prog, rmin, rmax, creep)
 
 
-b_mon = rest_day("b-mon", "mon", "Rest. Your long day: work, lectures, the German "
-                 "course. Eat your four meals and sleep.")
+b_tue = rest_day("b-tue", "tue", "Rest. Your long day: Job 2 from 07:00, lectures "
+                 "until 17:45. Eat your four meals and sleep.")
 
-b_tue = D("b-tue", "tue", "Full Body A · Squat", "lift", [
+b_mon = D("b-mon", "mon", "Full Body A · Squat", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_LOWER),
     S("main", "Main work", prescriptions=[
-        P("b-tue-1", "barbell-back-squat", 1, 3, 6, 6, 105, "barbell",
-          from_week4("f-tue-1", PROG_SQUAT, 6, 6, 8), ramp=True,
+        P("b-mon-1", "barbell-back-squat", 1, 3, 6, 6, 105, "barbell",
+          from_week4("f-mon-1", PROG_SQUAT, 6, 6, 8), ramp=True,
           prog=PROG_SQUAT, subs=["barbell-front-squat", "goblet-squat"], creep=8,
           note="Drive the whole foot through the floor coming up — don't let the hips shoot "
                "up first."),
-        P("b-tue-2a", "incline-dumbbell-press", 2, 3, 10, 10, 0, "dumbbellPair", 7.0, rir=None,
-          prog=DP(1.0), subs=["push-up-handles", "dumbbell-bench-press"], group="b-tue-ss1",
+        P("b-mon-2a", "incline-dumbbell-press", 2, 3, 10, 10, 0, "dumbbellPair", 7.0, rir=None,
+          prog=DP(1.0), subs=["push-up-handles", "dumbbell-bench-press"], group="b-mon-ss1",
           creep=14, note="Bench at its lower incline notch, roughly 30 degrees."),
-        P("b-tue-2b", "chest-supported-dumbbell-row", 3, 3, 10, 10, 75, "dumbbellPair", 7.0,
+        P("b-mon-2b", "chest-supported-dumbbell-row", 3, 3, 10, 10, 75, "dumbbellPair", 7.0,
           rir=None, prog=DP(1.0), subs=["one-arm-dumbbell-row", "ring-row"],
-          group="b-tue-ss1", creep=14,
+          group="b-mon-ss1", creep=14,
           note="Same dumbbells as the press: no re-plate inside the superset."),
-        P("b-tue-3", "hanging-knee-raise", 4, 2, 8, 12, 45, "bodyweight", None, rir=1,
+        P("b-mon-3", "hanging-knee-raise", 4, 2, 8, 12, 45, "bodyweight", None, rir=1,
           prog=REPS, subs=["dead-bug", "hollow-hold", "plank"], creep=18,
           note="No swinging. Curl the pelvis up towards the ribs."),
     ]),
@@ -606,26 +609,26 @@ b_tue = D("b-tue", "tue", "Full Body A · Squat", "lift", [
 ], note="Squat-led. The most important set of your week is the first one.",
    warnings=[WARN_PINS_SQ, WARN_COLLAR])
 
-b_wed = rest_day("b-wed", "wed", "Complete rest. A walk between lectures counts; "
-                 "nothing else is asked of you today.")
+b_thu = rest_day("b-thu", "thu", "Complete rest. Job 1 and SII fill the day; nothing "
+                 "else is asked of you.")
 
-b_thu = D("b-thu", "thu", "Full Body B · Deadlift", "lift", [
+b_wed = D("b-wed", "wed", "Full Body B · Deadlift", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_HINGE),
     S("main", "Main work", prescriptions=[
-        P("b-thu-1", "barbell-deadlift", 1, 3, 5, 5, 120, "barbell",
-          from_week4("f-thu-1", PROG_DEADLIFT, 5, 5, 6), ramp=True,
+        P("b-wed-1", "barbell-deadlift", 1, 3, 5, 5, 120, "barbell",
+          from_week4("f-wed-1", PROG_DEADLIFT, 5, 5, 6), ramp=True,
           prog=PROG_DEADLIFT, subs=["barbell-romanian-deadlift", "dumbbell-deadlift"],
           creep=6,
           note="Same setup every rep: bar over mid-foot, shins to the bar, chest up, pull."),
-        P("b-thu-2", "barbell-overhead-press", 2, 3, 6, 6, 90, "barbell",
-          from_week4("f-thu-2", PROG_OHP, 6, 6, 8), prog=PROG_OHP,
+        P("b-wed-2", "barbell-overhead-press", 2, 3, 6, 6, 90, "barbell",
+          from_week4("f-wed-2", PROG_OHP, 6, 6, 8), prog=PROG_OHP,
           subs=["dumbbell-overhead-press", "seated-dumbbell-press"], creep=8,
           note="Ribs down. If you lean back to move it, it is too heavy."),
-        P("b-thu-3a", "pull-up-negative", 3, 3, 4, 4, 0, "bodyweight", None, prog=REPS,
-          subs=["pull-up-assisted", "ring-row"], group="b-thu-ss1", tempo="5s eccentric",
+        P("b-wed-3a", "pull-up-negative", 3, 3, 4, 4, 0, "bodyweight", None, prog=REPS,
+          subs=["pull-up-assisted", "ring-row"], group="b-wed-ss1", tempo="5s eccentric",
           creep=6, note="A second vertical pull in the week buys the first strict pull-up."),
-        P("b-thu-3b", "goblet-squat", 4, 3, 12, 12, 60, "kettlebell", 8.0, prog=REPS,
-          subs=["dumbbell-squat", "step-up"], group="b-thu-ss1", creep=15,
+        P("b-wed-3b", "goblet-squat", 4, 3, 12, 12, 60, "kettlebell", 8.0, prog=REPS,
+          subs=["dumbbell-squat", "step-up"], group="b-wed-ss1", creep=15,
           tempo="3s eccentric"),
     ]),
     S("cooldown", "Cool-down", drills=[
@@ -672,10 +675,10 @@ BUILD_DAYS = [b_mon, b_tue, b_wed, b_thu, b_fri, b_sat, b_sun]
 # test loads and strengthTargets come from here.
 # ----------------------------------------------------------------------------
 LIFTS = [  # exercise, Foundation id, Build id, 5RM-tested in week 12
-    ("barbell-back-squat",     "f-tue-1", "b-tue-1", True),
-    ("barbell-deadlift",       "f-thu-1", "b-thu-1", True),
+    ("barbell-back-squat",     "f-mon-1", "b-mon-1", True),
+    ("barbell-deadlift",       "f-wed-1", "b-wed-1", True),
     ("barbell-bench-press",    "f-sat-1", "b-sat-1", True),
-    ("barbell-overhead-press", "f-thu-2", "b-thu-2", True),
+    ("barbell-overhead-press", "f-wed-2", "b-wed-2", True),
     ("barbell-bent-over-row",  "f-sat-2", "b-sat-2", True),
 ]
 PROJECTION = {}
@@ -694,27 +697,27 @@ TEST_NOTE = ("Work up in singles and doubles to one hard set of 5. HARD means th
              "but the bar still moves and the shape holds. NOT a failed rep, NOT a maximal single "
              "— you train alone. The number below is the target; beat it if it is there.")
 
-t_mon = rest_day("t-mon", "mon", "Test week. Rest today.")
+t_tue = rest_day("t-tue", "tue", "Test week. Rest today: the deadlift is tomorrow.")
 
-t_tue = D("t-tue", "tue", "Test · Squat & Row", "lift", [
+t_mon = D("t-mon", "mon", "Test · Squat & Row", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_LOWER),
     S("main", "Test", prescriptions=[
-        P("t-tue-1", "barbell-back-squat", 1, 1, 5, 5, 240, "barbell",
+        P("t-mon-1", "barbell-back-squat", 1, 1, 5, 5, 240, "barbell",
           TARGET_5RM["barbell-back-squat"], rir=0, ramp=True, prog=NONE, note=TEST_NOTE),
-        P("t-tue-2", "barbell-bent-over-row", 2, 1, 5, 5, 180, "barbell",
+        P("t-mon-2", "barbell-bent-over-row", 2, 1, 5, 5, 180, "barbell",
           TARGET_5RM["barbell-bent-over-row"], rir=0, prog=NONE, note=TEST_NOTE),
     ]),
 ], note="Test week. Nothing to prove except what twelve weeks bought you.",
    warnings=[WARN_PINS_SQ, WARN_COLLAR])
 
-t_wed = rest_day("t-wed", "wed", "Rest. Thursday is the heavy one.")
+t_thu = rest_day("t-thu", "thu", "Rest. Two tests done, one to go.")
 
-t_thu = D("t-thu", "thu", "Test · Deadlift & Press", "lift", [
+t_wed = D("t-wed", "wed", "Test · Deadlift & Press", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_HINGE),
     S("main", "Test", prescriptions=[
-        P("t-thu-1", "barbell-deadlift", 1, 1, 5, 5, 240, "barbell",
+        P("t-wed-1", "barbell-deadlift", 1, 1, 5, 5, 240, "barbell",
           TARGET_5RM["barbell-deadlift"], rir=0, ramp=True, prog=NONE, note=TEST_NOTE),
-        P("t-thu-2", "barbell-overhead-press", 2, 1, 5, 5, 180, "barbell",
+        P("t-wed-2", "barbell-overhead-press", 2, 1, 5, 5, 180, "barbell",
           TARGET_5RM["barbell-overhead-press"], rir=0, prog=NONE, note=TEST_NOTE),
     ]),
 ], note="Two lifts, then go home and eat.", warnings=[WARN_BAR_HT, WARN_CEIL, WARN_COLLAR])
@@ -753,7 +756,7 @@ def _sets(p, set_mult=1.0):
 # The cardio table's skipping and bag text is DERIVED from the days it
 # describes. v2 typed it, and it promised a Foundation bag and 10 x 30 s
 # skipping intervals that no session prescribed.
-_WARMUP_SKIP = next(dr["text"] for s in b_tue["sections"] for dr in s["drills"]
+_WARMUP_SKIP = next(dr["text"] for s in b_mon["sections"] for dr in s["drills"]
                     if dr["exerciseId"] == "rope-skipping")
 SKIP_LIFT_WARMUP = f"Warm-up {_WARMUP_SKIP} on lift days"
 DELOAD_SETS = 0.60
@@ -765,14 +768,16 @@ PROGRAMME = {
     # 2 = v3: the definitive kit, the coach's programme changes, table-driven
     # runs. An installed copy with a lower revision is upgraded by the app.
     # 3 = v4: three 30-minute sessions for a working student's week.
-    "revision": 3,
+    # 4 = v4.1: the same sessions moved to Mon/Wed/Sat for the final timetable.
+    "revision": 4,
     # v4 is a new plan, chosen to start with the semester: the phone takes
-    # this start date on upgrade instead of keeping its old one.
+    # this start date on upgrade instead of keeping its old one. Still true
+    # for v4.1: a phone on v3 skips straight here.
     "startsFresh": True,
     "startDate": "2026-10-12",
     "totalWeeks": 12,
     "notes": ("A fitness block for a working student: 167 cm / 50 kg, training alone in a "
-              "basement gym three times a week -- Tuesday and Thursday evening, Saturday morning -- "
+              "basement gym three times a week -- Monday and Wednesday evening, Saturday morning -- "
               "for about half an hour, with an optional run or hike on Sunday. Every load in this "
               "file is snapped to the plate lattice described in inventory.json -- change the "
               "inventory and regenerate with tools/gen.py rather than editing loads by hand."),
@@ -869,8 +874,8 @@ PROGRAMME = {
          # jump the moment he logged the RIR 3 the doc allows.
          "defaultRir": 3, "loadMultiplier": 1.0, "setMultiplier": 1.0, "setRounding": "up",
          "includeSupersets": True, "includeFinishers": True,
-         "summary": "Full body three times a week, about half an hour each: Tuesday and "
-                    "Thursday evening, Saturday morning. Light loads, perfect reps, every barbell "
+         "summary": "Full body three times a week, about half an hour each: Monday and "
+                    "Wednesday after work and class, Saturday morning. Light loads, perfect reps, every barbell "
                     "lift introduced with the empty 10 kg bar.",
          "inheritsDaysFrom": None, "dayOverrides": {}, "days": FOUNDATION_DAYS},
 
@@ -897,8 +902,8 @@ PROGRAMME = {
                     "Still half an hour.",
          "inheritsDaysFrom": "build",
          "dayOverrides": {
-             "b-tue": {"prescriptionOverrides": {"b-tue-1": {"targetRir": 1}}},
-             "b-thu": {"prescriptionOverrides": {"b-thu-1": {"targetRir": 1}}},
+             "b-mon": {"prescriptionOverrides": {"b-mon-1": {"targetRir": 1}}},
+             "b-wed": {"prescriptionOverrides": {"b-wed-1": {"targetRir": 1}}},
              "b-sat": {"prescriptionOverrides": {"b-sat-1": {"targetRir": 1}}},
          },
          "days": []},
@@ -1191,6 +1196,7 @@ MIRRORED = {
     "quotes.json": os.path.join(ROOT, "app", "assets", "content"),
     "fuel.json": os.path.join(ROOT, "app", "assets", "nutrition"),
     "motions.json": os.path.join(ROOT, "app", "assets", "exercises"),
+    "timetable.json": os.path.join(ROOT, "app", "assets", "content"),
 }
 for name, target in MIRRORED.items():
     src = os.path.join(OUT, name)

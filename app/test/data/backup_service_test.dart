@@ -32,7 +32,7 @@ void main() {
           SessionsCompanion.insert(
             programmeId: 'keller-twelve',
             blockId: 'build',
-            dayId: 'b-mon',
+            dayId: 'b-tue',
             weekNo: 5,
             plannedDate: DateTime(2026, 11, 2),
             scheduledDate: DateTime(2026, 11, 2),
@@ -45,7 +45,7 @@ void main() {
           .insert(
             SetLogsCompanion.insert(
               sessionId: id,
-              prescriptionId: 'b-mon-1',
+              prescriptionId: 'b-tue-1',
               exerciseId: 'barbell-back-squat',
               setIndex: i,
               reps: Value(5),
@@ -127,7 +127,7 @@ void main() {
     final weights = await db.select(db.bodyweights).get();
 
     expect(sessions, hasLength(1));
-    expect(sessions.single.dayId, 'b-mon');
+    expect(sessions.single.dayId, 'b-tue');
     expect(sessions.single.status, SessionStatus.completed);
     expect(sets, hasLength(4));
     expect(sets.every((s) => s.loadKg == 21), isTrue);

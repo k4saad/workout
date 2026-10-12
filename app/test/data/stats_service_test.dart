@@ -25,7 +25,7 @@ void main() {
 
   Future<int> session({
     int weekNo = 5,
-    String dayId = 'b-tue',
+    String dayId = 'b-mon',
     String blockId = 'build',
     DateTime? started,
     DateTime? finished,
@@ -59,7 +59,7 @@ void main() {
       .insert(
         SetLogsCompanion.insert(
           sessionId: sessionId,
-          prescriptionId: 'b-tue-1',
+          prescriptionId: 'b-mon-1',
           exerciseId: exerciseId,
           setIndex: setIndex,
           completedAt: at ?? DateTime(2026, 11, 2, 19),

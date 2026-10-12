@@ -15,7 +15,7 @@ const drillDowns = <(String, String, int)>[
   // (page, the parent it must come back to, its tab)
   ('/history', '/', 0),
   ('/week/calendar', '/week', 1),
-  ('/week/3/day/f-tue', '/week', 1),
+  ('/week/3/day/f-mon', '/week', 1),
   ('/progress/body', '/progress', 3),
   ('/progress/photos', '/progress', 3),
   ('/progress/runs', '/progress', 3),

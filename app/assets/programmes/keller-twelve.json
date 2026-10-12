@@ -2,11 +2,11 @@
   "id": "keller-twelve",
   "name": "The Keller Twelve",
   "schemaVersion": 2,
-  "revision": 3,
+  "revision": 4,
   "startsFresh": true,
   "startDate": "2026-10-12",
   "totalWeeks": 12,
-  "notes": "A fitness block for a working student: 167 cm / 50 kg, training alone in a basement gym three times a week -- Tuesday and Thursday evening, Saturday morning -- for about half an hour, with an optional run or hike on Sunday. Every load in this file is snapped to the plate lattice described in inventory.json -- change the inventory and regenerate with tools/gen.py rather than editing loads by hand.",
+  "notes": "A fitness block for a working student: 167 cm / 50 kg, training alone in a basement gym three times a week -- Monday and Wednesday evening, Saturday morning -- for about half an hour, with an optional run or hike on Sunday. Every load in this file is snapped to the plate lattice described in inventory.json -- change the inventory and regenerate with tools/gen.py rather than editing loads by hand.",
   "athlete": {
     "startWeightKg": 50.0,
     "heightCm": 167,
@@ -353,24 +353,13 @@
       "setRounding": "up",
       "includeSupersets": true,
       "includeFinishers": true,
-      "summary": "Full body three times a week, about half an hour each: Tuesday and Thursday evening, Saturday morning. Light loads, perfect reps, every barbell lift introduced with the empty 10 kg bar.",
+      "summary": "Full body three times a week, about half an hour each: Monday and Wednesday after work and class, Saturday morning. Light loads, perfect reps, every barbell lift introduced with the empty 10 kg bar.",
       "inheritsDaysFrom": null,
       "dayOverrides": {},
       "days": [
         {
           "id": "f-mon",
           "weekday": "mon",
-          "title": "Rest",
-          "kind": "rest",
-          "optional": false,
-          "estMinutes": 0,
-          "note": "Your long day: job, lectures, the German course. Nothing else. Eat your four meals.",
-          "warnings": [],
-          "sections": []
-        },
-        {
-          "id": "f-tue",
-          "weekday": "tue",
           "title": "Full Body A",
           "kind": "lift",
           "optional": false,
@@ -426,7 +415,7 @@
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "f-tue-1",
+                  "id": "f-mon-1",
                   "exerciseId": "barbell-back-squat",
                   "order": 1,
                   "groupId": null,
@@ -460,10 +449,10 @@
                   "tempo": null
                 },
                 {
-                  "id": "f-tue-2a",
+                  "id": "f-mon-2a",
                   "exerciseId": "push-up-handles",
                   "order": 2,
-                  "groupId": "f-tue-ss1",
+                  "groupId": "f-mon-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 8,
@@ -492,10 +481,10 @@
                   "tempo": null
                 },
                 {
-                  "id": "f-tue-2b",
+                  "id": "f-mon-2b",
                   "exerciseId": "one-arm-dumbbell-row",
                   "order": 3,
-                  "groupId": "f-tue-ss1",
+                  "groupId": "f-mon-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 10,
@@ -525,7 +514,7 @@
                   "tempo": null
                 },
                 {
-                  "id": "f-tue-3",
+                  "id": "f-mon-3",
                   "exerciseId": "plank",
                   "order": 4,
                   "groupId": null,
@@ -583,19 +572,19 @@
           ]
         },
         {
-          "id": "f-wed",
-          "weekday": "wed",
+          "id": "f-tue",
+          "weekday": "tue",
           "title": "Rest",
           "kind": "rest",
           "optional": false,
           "estMinutes": 0,
-          "note": "Rest. A walk between lectures counts.",
+          "note": "Your long day: Job 2 from 07:00, lectures until 17:45. Nothing else. Eat all four meals, lunch included.",
           "warnings": [],
           "sections": []
         },
         {
-          "id": "f-thu",
-          "weekday": "thu",
+          "id": "f-wed",
+          "weekday": "wed",
           "title": "Full Body B",
           "kind": "lift",
           "optional": false,
@@ -655,7 +644,7 @@
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "f-thu-1",
+                  "id": "f-wed-1",
                   "exerciseId": "barbell-deadlift",
                   "order": 1,
                   "groupId": null,
@@ -690,7 +679,7 @@
                   "tempo": null
                 },
                 {
-                  "id": "f-thu-2",
+                  "id": "f-wed-2",
                   "exerciseId": "barbell-overhead-press",
                   "order": 2,
                   "groupId": null,
@@ -723,10 +712,10 @@
                   "tempo": null
                 },
                 {
-                  "id": "f-thu-3a",
+                  "id": "f-wed-3a",
                   "exerciseId": "ring-row",
                   "order": 3,
-                  "groupId": "f-thu-ss1",
+                  "groupId": "f-wed-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 8,
@@ -753,10 +742,10 @@
                   "tempo": null
                 },
                 {
-                  "id": "f-thu-3b",
+                  "id": "f-wed-3b",
                   "exerciseId": "goblet-squat",
                   "order": 4,
-                  "groupId": "f-thu-ss1",
+                  "groupId": "f-wed-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 10,
@@ -808,13 +797,24 @@
           ]
         },
         {
+          "id": "f-thu",
+          "weekday": "thu",
+          "title": "Rest",
+          "kind": "rest",
+          "optional": false,
+          "estMinutes": 0,
+          "note": "Rest. Job 1, then SII until 17:45. A walk between lectures counts.",
+          "warnings": [],
+          "sections": []
+        },
+        {
           "id": "f-fri",
           "weekday": "fri",
           "title": "Rest",
           "kind": "rest",
           "optional": false,
           "estMinutes": 0,
-          "note": "Rest. Jumu'ah, the study project, home.",
+          "note": "Rest. Spatio-temporal data, Jumu'ah, the study project, home. Tomorrow morning is a session.",
           "warnings": [],
           "sections": []
         },
@@ -1121,17 +1121,6 @@
         {
           "id": "b-mon",
           "weekday": "mon",
-          "title": "Rest",
-          "kind": "rest",
-          "optional": false,
-          "estMinutes": 0,
-          "note": "Rest. Your long day: work, lectures, the German course. Eat your four meals and sleep.",
-          "warnings": [],
-          "sections": []
-        },
-        {
-          "id": "b-tue",
-          "weekday": "tue",
           "title": "Full Body A · Squat",
           "kind": "lift",
           "optional": false,
@@ -1187,7 +1176,7 @@
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "b-tue-1",
+                  "id": "b-mon-1",
                   "exerciseId": "barbell-back-squat",
                   "order": 1,
                   "groupId": null,
@@ -1220,10 +1209,10 @@
                   "tempo": null
                 },
                 {
-                  "id": "b-tue-2a",
+                  "id": "b-mon-2a",
                   "exerciseId": "incline-dumbbell-press",
                   "order": 2,
-                  "groupId": "b-tue-ss1",
+                  "groupId": "b-mon-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 10,
@@ -1253,10 +1242,10 @@
                   "tempo": null
                 },
                 {
-                  "id": "b-tue-2b",
+                  "id": "b-mon-2b",
                   "exerciseId": "chest-supported-dumbbell-row",
                   "order": 3,
-                  "groupId": "b-tue-ss1",
+                  "groupId": "b-mon-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 10,
@@ -1286,7 +1275,7 @@
                   "tempo": null
                 },
                 {
-                  "id": "b-tue-3",
+                  "id": "b-mon-3",
                   "exerciseId": "hanging-knee-raise",
                   "order": 4,
                   "groupId": null,
@@ -1341,19 +1330,19 @@
           ]
         },
         {
-          "id": "b-wed",
-          "weekday": "wed",
+          "id": "b-tue",
+          "weekday": "tue",
           "title": "Rest",
           "kind": "rest",
           "optional": false,
           "estMinutes": 0,
-          "note": "Complete rest. A walk between lectures counts; nothing else is asked of you today.",
+          "note": "Rest. Your long day: Job 2 from 07:00, lectures until 17:45. Eat your four meals and sleep.",
           "warnings": [],
           "sections": []
         },
         {
-          "id": "b-thu",
-          "weekday": "thu",
+          "id": "b-wed",
+          "weekday": "wed",
           "title": "Full Body B · Deadlift",
           "kind": "lift",
           "optional": false,
@@ -1413,7 +1402,7 @@
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "b-thu-1",
+                  "id": "b-wed-1",
                   "exerciseId": "barbell-deadlift",
                   "order": 1,
                   "groupId": null,
@@ -1446,7 +1435,7 @@
                   "tempo": null
                 },
                 {
-                  "id": "b-thu-2",
+                  "id": "b-wed-2",
                   "exerciseId": "barbell-overhead-press",
                   "order": 2,
                   "groupId": null,
@@ -1479,10 +1468,10 @@
                   "tempo": null
                 },
                 {
-                  "id": "b-thu-3a",
+                  "id": "b-wed-3a",
                   "exerciseId": "pull-up-negative",
                   "order": 3,
-                  "groupId": "b-thu-ss1",
+                  "groupId": "b-wed-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 4,
@@ -1509,10 +1498,10 @@
                   "tempo": "5s eccentric"
                 },
                 {
-                  "id": "b-thu-3b",
+                  "id": "b-wed-3b",
                   "exerciseId": "goblet-squat",
                   "order": 4,
-                  "groupId": "b-thu-ss1",
+                  "groupId": "b-wed-ss1",
                   "unit": "reps",
                   "sets": 3,
                   "repsMin": 12,
@@ -1561,6 +1550,17 @@
               "prescriptions": []
             }
           ]
+        },
+        {
+          "id": "b-thu",
+          "weekday": "thu",
+          "title": "Rest",
+          "kind": "rest",
+          "optional": false,
+          "estMinutes": 0,
+          "note": "Complete rest. Job 1 and SII fill the day; nothing else is asked of you.",
+          "warnings": [],
+          "sections": []
         },
         {
           "id": "b-fri",
@@ -1895,16 +1895,16 @@
       "summary": "Same three days, the lead lift of each one taken to 1 rep in reserve. Still half an hour.",
       "inheritsDaysFrom": "build",
       "dayOverrides": {
-        "b-tue": {
+        "b-mon": {
           "prescriptionOverrides": {
-            "b-tue-1": {
+            "b-mon-1": {
               "targetRir": 1
             }
           }
         },
-        "b-thu": {
+        "b-wed": {
           "prescriptionOverrides": {
-            "b-thu-1": {
+            "b-wed-1": {
               "targetRir": 1
             }
           }
@@ -1939,17 +1939,6 @@
         {
           "id": "t-mon",
           "weekday": "mon",
-          "title": "Rest",
-          "kind": "rest",
-          "optional": false,
-          "estMinutes": 0,
-          "note": "Test week. Rest today.",
-          "warnings": [],
-          "sections": []
-        },
-        {
-          "id": "t-tue",
-          "weekday": "tue",
           "title": "Test · Squat & Row",
           "kind": "lift",
           "optional": false,
@@ -2005,7 +1994,7 @@
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "t-tue-1",
+                  "id": "t-mon-1",
                   "exerciseId": "barbell-back-squat",
                   "order": 1,
                   "groupId": null,
@@ -2030,7 +2019,7 @@
                   "tempo": null
                 },
                 {
-                  "id": "t-tue-2",
+                  "id": "t-mon-2",
                   "exerciseId": "barbell-bent-over-row",
                   "order": 2,
                   "groupId": null,
@@ -2059,19 +2048,19 @@
           ]
         },
         {
-          "id": "t-wed",
-          "weekday": "wed",
+          "id": "t-tue",
+          "weekday": "tue",
           "title": "Rest",
           "kind": "rest",
           "optional": false,
           "estMinutes": 0,
-          "note": "Rest. Thursday is the heavy one.",
+          "note": "Test week. Rest today: the deadlift is tomorrow.",
           "warnings": [],
           "sections": []
         },
         {
-          "id": "t-thu",
-          "weekday": "thu",
+          "id": "t-wed",
+          "weekday": "wed",
           "title": "Test · Deadlift & Press",
           "kind": "lift",
           "optional": false,
@@ -2131,7 +2120,7 @@
               "drills": [],
               "prescriptions": [
                 {
-                  "id": "t-thu-1",
+                  "id": "t-wed-1",
                   "exerciseId": "barbell-deadlift",
                   "order": 1,
                   "groupId": null,
@@ -2156,7 +2145,7 @@
                   "tempo": null
                 },
                 {
-                  "id": "t-thu-2",
+                  "id": "t-wed-2",
                   "exerciseId": "barbell-overhead-press",
                   "order": 2,
                   "groupId": null,
@@ -2183,6 +2172,17 @@
               ]
             }
           ]
+        },
+        {
+          "id": "t-thu",
+          "weekday": "thu",
+          "title": "Rest",
+          "kind": "rest",
+          "optional": false,
+          "estMinutes": 0,
+          "note": "Rest. Two tests done, one to go.",
+          "warnings": [],
+          "sections": []
         },
         {
           "id": "t-fri",

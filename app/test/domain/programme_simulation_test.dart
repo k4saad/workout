@@ -258,7 +258,7 @@ void main() {
   });
 
   test('light dumbbell work actually gets heavier by week 11', () {
-    for (final id in ['b-tue-2a', 'b-tue-2b', 'b-sat-3a']) {
+    for (final id in ['b-mon-2a', 'b-mon-2b', 'b-sat-3a']) {
       final list = exposures[id]!;
       expect(
         list.last.kg,
@@ -281,7 +281,7 @@ void main() {
   test('a timed hold grows instead of resetting every week', () {
     // timeOnly logged the prescription's own seconds as the target, so the
     // plank added 5 s to 30 every week and never got past 35.
-    final plank = target['f-tue-3']!;
+    final plank = target['f-mon-3']!;
     expect(plank[4], greaterThan(plank[2]!), reason: '$plank');
   });
 

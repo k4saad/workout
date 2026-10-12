@@ -220,7 +220,7 @@ void main() {
   group('session duration', () {
     SessionDuration d(int day, int actual, {int est = 55}) => SessionDuration(
       date: DateTime(2026, 11, day),
-      dayId: 'b-mon',
+      dayId: 'b-tue',
       actualMinutes: actual,
       estimatedMinutes: est,
     );

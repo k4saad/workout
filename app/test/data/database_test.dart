@@ -10,7 +10,7 @@ void main() {
   tearDown(() => db.close());
 
   Future<int> makeSession({
-    String dayId = 'b-mon',
+    String dayId = 'b-tue',
     int week = 5,
     DateTime? date,
     SessionStatus status = SessionStatus.inProgress,
@@ -34,7 +34,7 @@ void main() {
 
   Future<void> logSet(
     int sessionId, {
-    String prescriptionId = 'b-mon-1',
+    String prescriptionId = 'b-tue-1',
     String exerciseId = 'barbell-back-squat',
     required int setIndex,
     required int reps,
@@ -70,7 +70,7 @@ void main() {
     final id = await makeSession();
     final s = await db.sessionById(id);
     expect(s, isNotNull);
-    expect(s!.dayId, 'b-mon');
+    expect(s!.dayId, 'b-tue');
     expect(s.status, SessionStatus.inProgress);
     expect(s.loggedRetroactively, isFalse);
   });
@@ -121,7 +121,7 @@ void main() {
         );
 
         final sets = await db.lastSetsForPrescription(
-          'b-mon-1',
+          'b-tue-1',
           'barbell-back-squat',
         );
         expect(sets, hasLength(2));
@@ -139,7 +139,7 @@ void main() {
       await logSet(id, setIndex: 1, reps: 5, loadKg: 21);
 
       final sets = await db.lastSetsForPrescription(
-        'b-mon-1',
+        'b-tue-1',
         'barbell-back-squat',
       );
       expect(sets, hasLength(1));
@@ -151,19 +151,19 @@ void main() {
       // The real case: single-leg calf raise is 3x15 on Monday and 3x20 on
       // Thursday. Keying history on exerciseId alone would have Monday's
       // 15-rep sets drive Thursday's 20-rep target.
-      final mon = await makeSession(dayId: 'b-mon');
+      final mon = await makeSession(dayId: 'b-tue');
       await logSet(
         mon,
-        prescriptionId: 'b-mon-3b',
+        prescriptionId: 'b-tue-3b',
         exerciseId: 'single-leg-calf-raise',
         setIndex: 1,
         reps: 15,
         at: DateTime(2026, 11, 2, 19),
       );
-      final thu = await makeSession(dayId: 'b-thu');
+      final thu = await makeSession(dayId: 'b-wed');
       await logSet(
         thu,
-        prescriptionId: 'b-thu-3b',
+        prescriptionId: 'b-wed-3b',
         exerciseId: 'single-leg-calf-raise',
         setIndex: 1,
         reps: 20,
@@ -171,11 +171,11 @@ void main() {
       );
 
       final monHistory = await db.lastSetsForPrescription(
-        'b-mon-3b',
+        'b-tue-3b',
         'single-leg-calf-raise',
       );
       final thuHistory = await db.lastSetsForPrescription(
-        'b-thu-3b',
+        'b-wed-3b',
         'single-leg-calf-raise',
       );
       expect(monHistory.single.reps, 15);
@@ -191,7 +191,7 @@ void main() {
       final id = await makeSession();
       await logSet(
         id,
-        prescriptionId: 'b-mon-3a',
+        prescriptionId: 'b-tue-3a',
         exerciseId: 'reverse-lunge',
         setIndex: 1,
         reps: 8,
@@ -200,7 +200,7 @@ void main() {
 
       // A brand-new prescription id has no history of its own...
       expect(
-        await db.lastSetsForPrescription('b-mon-3a-v2', 'reverse-lunge'),
+        await db.lastSetsForPrescription('b-tue-3a-v2', 'reverse-lunge'),
         isEmpty,
       );
       // ...but the exercise does.
@@ -212,14 +212,14 @@ void main() {
 
   group('stall counters', () {
     test('upsert by (exercise, prescription)', () async {
-      await db.setStall('barbell-bench-press', 'b-tue-1', 1);
-      expect((await db.stallFor('barbell-bench-press', 'b-tue-1'))?.count, 1);
+      await db.setStall('barbell-bench-press', 'b-mon-1', 1);
+      expect((await db.stallFor('barbell-bench-press', 'b-mon-1'))?.count, 1);
 
-      await db.setStall('barbell-bench-press', 'b-tue-1', 2);
-      expect((await db.stallFor('barbell-bench-press', 'b-tue-1'))?.count, 2);
+      await db.setStall('barbell-bench-press', 'b-mon-1', 2);
+      expect((await db.stallFor('barbell-bench-press', 'b-mon-1'))?.count, 2);
 
       // A different prescription of the same lift stalls independently.
-      expect(await db.stallFor('barbell-bench-press', 't-tue-1'), isNull);
+      expect(await db.stallFor('barbell-bench-press', 't-mon-1'), isNull);
     });
   });
 

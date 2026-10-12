@@ -56,7 +56,7 @@ void main() {
           SessionsCompanion.insert(
             programmeId: 'keller-twelve',
             blockId: 'build',
-            dayId: 'b-mon',
+            dayId: 'b-tue',
             weekNo: 5,
             plannedDate: DateTime(2026, 11, 2),
             scheduledDate: DateTime(2026, 11, 2),
@@ -69,7 +69,7 @@ void main() {
           .insert(
             SetLogsCompanion.insert(
               sessionId: sessionId,
-              prescriptionId: 'b-mon-1',
+              prescriptionId: 'b-tue-1',
               exerciseId: 'barbell-back-squat',
               setIndex: i,
               completedAt: DateTime(2026, 11, 2, 19, i),
@@ -77,7 +77,7 @@ void main() {
           );
     }
     await db.upsertBodyweight(DateTime(2026, 11, 2), 52.4);
-    await db.setStall('barbell-back-squat', 'b-mon-1', 1);
+    await db.setStall('barbell-back-squat', 'b-tue-1', 1);
 
     // Wind back to v1: drop the five tables Phase 5 added and reset the
     // recorded schema version.
@@ -113,7 +113,7 @@ void main() {
     final sessions = await db.select(db.sessions).get();
     final sets = await db.select(db.setLogs).get();
     final weights = await db.bodyweightHistory();
-    final stall = await db.stallFor('barbell-back-squat', 'b-mon-1');
+    final stall = await db.stallFor('barbell-back-squat', 'b-tue-1');
 
     expect(sessions, hasLength(1));
     expect(sets, hasLength(4));
@@ -190,7 +190,7 @@ void main() {
           SessionsCompanion.insert(
             programmeId: 'keller-twelve',
             blockId: 'foundation',
-            dayId: 'f-mon',
+            dayId: 'f-tue',
             weekNo: 1,
             plannedDate: DateTime(2026, 9, 28),
             scheduledDate: DateTime(2026, 9, 28),
@@ -202,7 +202,7 @@ void main() {
         .insert(
           SetLogsCompanion.insert(
             sessionId: sessionId,
-            prescriptionId: 'f-mon-1',
+            prescriptionId: 'f-tue-1',
             exerciseId: 'barbell-back-squat',
             setIndex: 1,
             completedAt: DateTime(2026, 9, 28, 19),

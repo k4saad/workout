@@ -41,7 +41,7 @@ void main() {
       .expand((d) => d.allPrescriptions)
       .firstWhere((p) => p.id == id);
 
-  Future<int> session(String blockId, int week, {String dayId = 'b-tue'}) => db
+  Future<int> session(String blockId, int week, {String dayId = 'b-mon'}) => db
       .into(db.sessions)
       .insert(
         SessionsCompanion.insert(
@@ -62,7 +62,7 @@ void main() {
     required double kg,
     required int sets,
     int rir = 2,
-    String prescriptionId = 'b-tue-1',
+    String prescriptionId = 'b-mon-1',
   }) async {
     for (var i = 1; i <= sets; i++) {
       await db
@@ -91,7 +91,7 @@ void main() {
       await squats(await session('deload', 8), 8, kg: 18.5, sets: 3, rir: 4);
 
       final s = await svc.suggest(
-        pres('push', 9, 'b-tue-1'),
+        pres('push', 9, 'b-mon-1'),
         now: monday(9).add(const Duration(hours: 18)),
       );
       expect(s.suggestedKg, 27, reason: s.reason);
@@ -102,7 +102,7 @@ void main() {
       await squats(await session('deload', 8), 8, kg: 18.5, sets: 3, rir: 4);
 
       // A prescription with no history of its own, e.g. after an edit.
-      final renamed = pres('push', 9, 'b-tue-1').copyWith(id: 'b-tue-1-new');
+      final renamed = pres('push', 9, 'b-mon-1').copyWith(id: 'b-mon-1-new');
       final history = await svc.historyFor(renamed);
       expect(history.map((s) => s.loadKg).toSet(), {25.0});
     });
@@ -110,15 +110,15 @@ void main() {
     test('a 5RM test week is not training history either', () async {
       await squats(await session('build', 7), 7, kg: 25, sets: 3);
       await squats(
-        await session('test', 12, dayId: 't-tue'),
+        await session('test', 12, dayId: 't-mon'),
         12,
         kg: 34,
         sets: 1,
         rir: 0,
-        prescriptionId: 't-tue-1',
+        prescriptionId: 't-mon-1',
       );
       final history = await svc.historyFor(
-        pres('push', 9, 'b-tue-1').copyWith(id: 'cycle-2-squat'),
+        pres('push', 9, 'b-mon-1').copyWith(id: 'cycle-2-squat'),
       );
       expect(history.map((s) => s.loadKg).toSet(), {25.0});
     });
@@ -131,7 +131,7 @@ void main() {
     await squats(today, 9, kg: 27, sets: 2);
 
     final s = await svc.suggest(
-      pres('push', 9, 'b-tue-1'),
+      pres('push', 9, 'b-mon-1'),
       now: monday(9).add(const Duration(hours: 19)),
       excludeSessionId: today,
     );
@@ -143,7 +143,7 @@ void main() {
       await squats(await session('build', 7), 7, kg: 25, sets: 3);
       final deloadId = await session('deload', 8);
       final row = (await db.sessionById(deloadId))!;
-      final tuesday8 = day('deload', 8, 'b-tue');
+      final tuesday8 = day('deload', 8, 'b-mon');
 
       final map = await svc.forSession(
         row,
@@ -156,22 +156,22 @@ void main() {
       );
       // One earned jump on from week 7 (25 -> 27), then the deload's 70%,
       // snapped down: 18.9 -> 18.5. Scaled once.
-      expect(map['b-tue-1']!.suggestedKg, 18.5);
-      expect(map['b-tue-1']!.reason.toLowerCase(), contains('deload'));
+      expect(map['b-mon-1']!.suggestedKg, 18.5);
+      expect(map['b-mon-1']!.reason.toLowerCase(), contains('deload'));
     });
 
     test('a cold start in the deload is not scaled twice', () async {
       final row = (await db.sessionById(await session('deload', 8)))!;
       final map = await svc.forSession(
         row,
-        day('deload', 8, 'b-tue'),
+        day('deload', 8, 'b-mon'),
         now: monday(8),
       );
-      final start = pres('deload', 8, 'b-tue-1').startLoadKg!;
+      final start = pres('deload', 8, 'b-mon-1').startLoadKg!;
       expect(
-        map['b-tue-1']!.suggestedKg,
+        map['b-mon-1']!.suggestedKg,
         svc.solver
-            .solve(start, pres('deload', 8, 'b-tue-1').loadMode)
+            .solve(start, pres('deload', 8, 'b-mon-1').loadMode)
             .achievableKg,
       );
     });
@@ -180,7 +180,7 @@ void main() {
   test('without a programme nothing is excluded (older callers)', () async {
     final plain = SuggestionService(db: db, inventory: Fixtures.inventory);
     await squats(await session('deload', 8), 8, kg: 18.5, sets: 3, rir: 4);
-    final history = await plain.historyFor(pres('push', 9, 'b-tue-1'));
+    final history = await plain.historyFor(pres('push', 9, 'b-mon-1'));
     expect(history, hasLength(3));
   });
 }

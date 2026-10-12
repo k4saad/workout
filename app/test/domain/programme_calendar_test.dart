@@ -95,13 +95,13 @@ void main() {
 
   group('C-5 / C-6 / C-7 — week 8 resolves as a deload', () {
     // Tuesday: v4's squat day.
-    final tuesday = cal.forDate(
-      ProgrammeCalendar.addDays(cal.startOfWeek(8), 1),
+    final monday = cal.forDate(
+      ProgrammeCalendar.addDays(cal.startOfWeek(8), 0),
     );
 
     test('multipliers are applied through the calendar', () {
-      final squat = tuesday.day!.allPrescriptions.firstWhere(
-        (p) => p.id == 'b-tue-1',
+      final squat = monday.day!.allPrescriptions.firstWhere(
+        (p) => p.id == 'b-mon-1',
       );
       expect(squat.sets, 2); // 3 * 0.6 -> 1.8 -> ceil 2
       expect(squat.startLoadKg, closeTo(21.0 * 0.7, 1e-9));
@@ -109,14 +109,14 @@ void main() {
 
     test('supersets are unwound', () {
       expect(
-        tuesday.day!.allPrescriptions.every((p) => p.groupId == null),
+        monday.day!.allPrescriptions.every((p) => p.groupId == null),
         isTrue,
       );
     });
 
     test('defaultRir 4 reaches the main lift', () {
-      final squat = tuesday.day!.allPrescriptions.firstWhere(
-        (p) => p.id == 'b-tue-1',
+      final squat = monday.day!.allPrescriptions.firstWhere(
+        (p) => p.id == 'b-mon-1',
       );
       expect(squat.targetRir, 4);
     });
@@ -233,20 +233,21 @@ void main() {
   group('the next session', () {
     DateTime d(int offset) => ProgrammeCalendar.addDays(start, offset);
 
-    test('day one is a rest day: the next session is Tuesday', () {
-      expect(cal.forDate(start).hasSession, isFalse);
+    test('day one is a session; the one after it is Wednesday', () {
+      expect(cal.forDate(start).hasSession, isTrue);
       final next = cal.nextSession(start)!;
-      expect(next.date, d(1));
-      expect(next.day!.id, 'f-tue');
+      expect(next.date, d(2));
+      expect(next.day!.id, 'f-wed');
     });
 
     test('is strictly after the date asked about', () {
-      expect(cal.nextSession(d(1))!.date, d(3), reason: 'Tue -> Thu');
+      expect(cal.nextSession(d(2))!.date, d(5), reason: 'Wed -> Sat');
+      expect(cal.nextSession(d(1))!.date, d(2), reason: 'Tue -> Wed');
     });
 
     test('skips the optional Sunday unless asked for it', () {
       final sat = d(5);
-      expect(cal.nextSession(sat)!.date, d(8), reason: 'Sat -> next Tue');
+      expect(cal.nextSession(sat)!.date, d(7), reason: 'Sat -> next Mon');
       expect(cal.nextSession(sat)!.weekNo, 2);
       expect(
         cal.nextSession(sat, includeOptional: true)!.date,
@@ -257,7 +258,7 @@ void main() {
 
     test('before the start it is the first session of week 1', () {
       final next = cal.nextSession(d(-10))!;
-      expect(next.date, d(1));
+      expect(next.date, d(0));
     });
 
     test('there is none after the last session of the programme', () {

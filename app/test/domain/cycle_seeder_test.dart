@@ -137,7 +137,7 @@ void main() {
       final squat = seed.changes.firstWhere(
         (c) =>
             c.exerciseId == 'barbell-back-squat' &&
-            c.prescriptionId == 'b-tue-1',
+            c.prescriptionId == 'b-mon-1',
       );
       expect(squat.oldKg, 21.0);
       expect(squat.newKg, isNotNull);
@@ -202,8 +202,8 @@ void main() {
 
     test('no test result and no history keeps what was there', () {
       final seed = seeder.seed(programme: programme, results: results());
-      final before = allOf(programme).firstWhere((p) => p.id == 'b-tue-2a');
-      final after = allOf(seed.programme).firstWhere((p) => p.id == 'b-tue-2a');
+      final before = allOf(programme).firstWhere((p) => p.id == 'b-mon-2a');
+      final after = allOf(seed.programme).firstWhere((p) => p.id == 'b-mon-2a');
       expect(after.startLoadKg, before.startLoadKg);
       expect(after.exerciseId, before.exerciseId);
     });
@@ -222,7 +222,7 @@ void main() {
   group('E-6  role decides the multiplier', () {
     test('a lead lift seeds near 0.75 of e1RM', () {
       final seed = seeder.seed(programme: programme, results: results());
-      final squat = allOf(seed.programme).firstWhere((p) => p.id == 'b-tue-1');
+      final squat = allOf(seed.programme).firstWhere((p) => p.id == 'b-mon-1');
       const e1rm = 36 * (1 + 5 / 30);
       final target = CycleSeeder.leadFactor * e1rm;
       expect(squat.startLoadKg, lessThanOrEqualTo(target + 1e-9));

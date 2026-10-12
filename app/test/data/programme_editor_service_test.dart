@@ -56,7 +56,7 @@ void main() {
       final before = await repo.loadProgramme();
       final edited = editor.updatePrescription(
         before,
-        'b-tue-1',
+        'b-mon-1',
         (p) => p.copyWith(sets: 5),
       );
 
@@ -67,14 +67,14 @@ void main() {
       // And it is on disk, not just in memory.
       final reloaded = await ProgrammeRepository(documentsDir: docs)
           .loadProgramme();
-      expect(find(reloaded, 'b-tue-1').sets, 5);
+      expect(find(reloaded, 'b-mon-1').sets, 5);
     });
 
     test('a broken edit is still saved, and reported', () async {
       final before = await repo.loadProgramme();
       final broken = editor.updatePrescription(
         before,
-        'b-tue-1',
+        'b-mon-1',
         (p) => p.copyWith(startLoadKg: 20.3),
       );
 
@@ -85,7 +85,7 @@ void main() {
       final reloaded = await ProgrammeRepository(documentsDir: docs)
           .loadProgramme();
       expect(
-        find(reloaded, 'b-tue-1').startLoadKg,
+        find(reloaded, 'b-mon-1').startLoadKg,
         20.3,
         reason:
             'a half-finished edit the app refuses to store is worse than one '
@@ -139,7 +139,7 @@ void main() {
       final broken = editor
           .updatePrescription(
             before,
-            'b-tue-1',
+            'b-mon-1',
             (p) => p.copyWith(startLoadKg: 20.3),
           )
           .copyWith(revision: before.revision + 1);
@@ -165,12 +165,12 @@ void main() {
     test('applying an import keeps the revision moving forward', () async {
       final before = await repo.loadProgramme();
       final incoming = editor
-          .updatePrescription(before, 'b-tue-1', (p) => p.copyWith(sets: 6))
+          .updatePrescription(before, 'b-mon-1', (p) => p.copyWith(sets: 6))
           .copyWith(revision: 99);
 
       final applied = await service.applyImport(incoming);
       expect(applied.revision, 99);
-      expect(find(applied, 'b-tue-1').sets, 6);
+      expect(find(applied, 'b-mon-1').sets, 6);
     });
   });
 
@@ -182,7 +182,7 @@ void main() {
             SessionsCompanion.insert(
               programmeId: 'keller-twelve',
               blockId: 'test',
-              dayId: 't-mon',
+              dayId: 't-tue',
               weekNo: 12,
               plannedDate: DateTime(2026, 12, 14),
               scheduledDate: DateTime(2026, 12, 14),
@@ -193,7 +193,7 @@ void main() {
           .insert(
             SetLogsCompanion.insert(
               sessionId: sessionId,
-              prescriptionId: 't-mon-1',
+              prescriptionId: 't-tue-1',
               exerciseId: exerciseId,
               setIndex: 1,
               completedAt: DateTime(2026, 12, 14, 19),
@@ -251,7 +251,7 @@ void main() {
             SessionsCompanion.insert(
               programmeId: 'keller-twelve',
               blockId: 'build',
-              dayId: 'b-tue',
+              dayId: 'b-mon',
               weekNo: 7,
               plannedDate: DateTime(2026, 11, 10),
               scheduledDate: DateTime(2026, 11, 10),
@@ -266,7 +266,7 @@ void main() {
             .insert(
               SetLogsCompanion.insert(
                 sessionId: sessionId,
-                prescriptionId: 'b-tue-2a',
+                prescriptionId: 'b-mon-2a',
                 exerciseId: 'incline-dumbbell-press',
                 setIndex: 1,
                 completedAt: at,
@@ -282,7 +282,7 @@ void main() {
       );
 
       final seed = await service.proposeNextCycle();
-      final press = find(seed.programme, 'b-tue-2a');
+      final press = find(seed.programme, 'b-mon-2a');
       expect(press.startLoadKg, 9.0);
     });
   });

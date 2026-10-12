@@ -48,7 +48,7 @@ void main() {
             SessionsCompanion.insert(
               programmeId: programme.id,
               blockId: 'foundation',
-              dayId: 'f-tue',
+              dayId: 'f-mon',
               weekNo: 1,
               plannedDate: yesterday,
               scheduledDate: yesterday,

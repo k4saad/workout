@@ -90,7 +90,7 @@ void main() {
   testWidgets('the session to do is the one thing on the screen', (
     tester,
   ) async {
-    await draw(tester, day(1, 1));
+    await draw(tester, day(1, 0));
     expect(find.text('TODAY'), findsOneWidget);
     expect(find.text('Full Body A'), findsOneWidget);
     expect(find.text('Start session'), findsOneWidget);
@@ -104,20 +104,20 @@ void main() {
           SessionsCompanion.insert(
             programmeId: 'keller-twelve',
             blockId: 'foundation',
-            dayId: 'f-tue',
+            dayId: 'f-mon',
             weekNo: 1,
-            plannedDate: day(1, 1),
-            scheduledDate: day(1, 1),
+            plannedDate: day(1, 0),
+            scheduledDate: day(1, 0),
             status: const Value(SessionStatus.completed),
           ),
         );
-    await draw(tester, day(1, 1));
+    await draw(tester, day(1, 0));
     expect(find.text('Done today. Eat, and sleep.'), findsOneWidget);
     expect(find.text('Start session'), findsNothing);
   });
 
   testWidgets('a rest day says rest, and offers no session', (tester) async {
-    await draw(tester, day(1, 2));
+    await draw(tester, day(1, 1));
     expect(find.text('Rest'), findsWidgets);
     expect(find.text('Start session'), findsNothing);
     // It names what is due, so a rest day is not a blank.

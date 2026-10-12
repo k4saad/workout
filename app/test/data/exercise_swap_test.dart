@@ -152,14 +152,14 @@ void main() {
 
   test('two slots of the same lift still do not drive each other', () async {
     await logWork(
-      prescriptionId: 'f-thu-3b',
+      prescriptionId: 'f-wed-3b',
       exerciseId: 'goblet-squat',
       kg: 8,
       reps: 10,
       on: DateTime(2026, 11, 2),
     );
     await logWork(
-      prescriptionId: 'b-thu-3b',
+      prescriptionId: 'b-wed-3b',
       exerciseId: 'goblet-squat',
       kg: 8,
       reps: 12,
@@ -167,7 +167,7 @@ void main() {
     );
 
     final foundation = await suggestions.historyFor(
-      find(programme, 'f-thu-3b'),
+      find(programme, 'f-wed-3b'),
     );
     expect(
       foundation.first.reps,

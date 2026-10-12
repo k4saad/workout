@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Validation gates V1-V13 from docs/02-data-model.md, section 1.6, plus V14-V20
-added in v3 (docs/06-v3-plan.md) and V21 in v3.1 (docs/08-v3.1-plan.md).
+added in v3 (docs/06-v3-plan.md), V21 in v3.1 (docs/08-v3.1-plan.md) and V22
+in v4.1 (docs/12-semester-plan.md).
 
 These are the same assertions Phase 1 ports to `flutter test`. Run this after any
 edit to data/*.json, and after any change to tools/gen.py.
@@ -733,6 +734,74 @@ print(f"V21 fuel budget: the default week EUR {week_total['training']:.2f} "
       f"(training) / {week_total['rest']:.2f} (rest), ceiling "
       f"EUR {per_day:.2f} a day, {len(prep.get('sessions', []))} prep nights")
 
+# ============ V22 the semester's week is a week that can be lived ==========
+# data/timetable.json (docs/12-semester-plan.md): valid times, nothing on top
+# of anything else, and the travel time between campus and work respected.
+tt_path = os.path.join(DATA, "timetable.json")
+if os.path.exists(tt_path):
+    tt = load("timetable.json")
+    WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+    KINDS = {"lecture", "job", "prayer"}
+
+    def mins(hhmm, where):
+        try:
+            h, m = hhmm.split(":")
+            h, m = int(h), int(m)
+            assert 0 <= h < 24 and 0 <= m < 60 and len(hhmm) == 5
+            return h * 60 + m
+        except Exception:
+            fail("V22", f"{where}: '{hhmm}' is not HH:MM")
+            return 0
+
+    def day(iso, where):
+        try:
+            return datetime.date.fromisoformat(iso)
+        except Exception:
+            fail("V22", f"{where}: '{iso}' is not a date")
+            return datetime.date.min
+
+    lec_from = day(tt["lectures"]["from"], "lectures.from")
+    lec_to = day(tt["lectures"]["to"], "lectures.to")
+    if lec_from > lec_to:
+        fail("V22", "the lecture period ends before it starts")
+    for b in tt.get("breaks", []):
+        f, t = day(b["from"], b["name"]), day(b["to"], b["name"])
+        if f > t or f < lec_from or t > lec_to:
+            fail("V22", f"{b['name']}: {f}..{t} is not inside the lecture period")
+    travel = tt["travelMinutes"]
+    if not 0 < travel <= 120:
+        fail("V22", f"travelMinutes {travel}")
+    places = set(tt["places"])
+    ids = collections.Counter(b["id"] for b in tt["blocks"])
+    for i, n in ids.items():
+        if n > 1:
+            fail("V22", f"block id {i} used {n} times")
+    by_day = collections.defaultdict(list)
+    for b in tt["blocks"]:
+        w = f"{b['id']}"
+        if b["weekday"] not in WEEKDAYS:
+            fail("V22", f"{w}: weekday {b['weekday']}")
+        if b["kind"] not in KINDS:
+            fail("V22", f"{w}: kind {b['kind']}")
+        if b["place"] not in places:
+            fail("V22", f"{w}: place {b['place']} is not one of {sorted(places)}")
+        if not b.get("title"):
+            fail("V22", f"{w}: no title")
+        s0, e0 = mins(b["start"], w), mins(b["end"], w)
+        if e0 <= s0:
+            fail("V22", f"{w}: ends {b['end']} before it starts {b['start']}")
+        by_day[b["weekday"]].append((s0, e0, b))
+    for wd, items in by_day.items():
+        items.sort(key=lambda x: x[0])
+        for (s1, e1, a1), (s2, e2, a2) in zip(items, items[1:]):
+            if s2 < e1:
+                fail("V22", f"{wd}: {a1['id']} and {a2['id']} overlap")
+            elif a1["place"] != a2["place"] and s2 - e1 < travel:
+                fail("V22", f"{wd}: {s2 - e1} min from {a1['id']} to {a2['id']}, "
+                            f"under the {travel} min to get there")
+    print(f"V22 timetable: {len(tt['blocks'])} weekly blocks, lectures "
+          f"{lec_from}..{lec_to}, {len(tt.get('breaks', []))} break(s)")
+
 # --------------------------------------------------------------- verdict ----
 print()
 print("=" * 74)
@@ -746,5 +815,5 @@ if failures:
     for f in failures:
         print(f"  X {f}")
     sys.exit(1)
-print("ALL GATES PASSED (V1-V21)")
+print("ALL GATES PASSED (V1-V22)")
 sys.exit(0)

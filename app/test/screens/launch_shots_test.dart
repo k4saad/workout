@@ -90,7 +90,7 @@ void main() {
   }
 
   testWidgets('today, mid-programme', skip: !_enabled, (tester) async {
-    final today = DateTime(2026, 10, 29);
+    final today = DateTime(2026, 10, 28);
     await tester.runAsync(
       () => Screenshot.seedHistory(db, repo: repo, today: today),
     );
@@ -111,7 +111,7 @@ void main() {
   });
 
   testWidgets('today, trained', skip: !_enabled, (tester) async {
-    final today = DateTime(2026, 10, 29);
+    final today = DateTime(2026, 10, 28);
     await tester.runAsync(() async {
       await Screenshot.seedHistory(db, repo: repo, today: today);
       final programme = await repo.loadProgramme();
@@ -121,7 +121,7 @@ void main() {
             SessionsCompanion.insert(
               programmeId: programme.id,
               blockId: 'foundation',
-              dayId: 'f-thu',
+              dayId: 'f-wed',
               weekNo: 3,
               plannedDate: today,
               scheduledDate: today,

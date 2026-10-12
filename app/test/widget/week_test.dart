@@ -89,13 +89,13 @@ void main() {
   }
 
   testWidgets('each day says what happened to it', (tester) async {
-    await seed(5, 1, 'b-tue', SessionStatus.completed);
-    await seed(5, 3, 'b-thu', SessionStatus.skipped);
+    await seed(5, 0, 'b-mon', SessionStatus.completed);
+    await seed(5, 2, 'b-wed', SessionStatus.skipped);
     await seed(5, 5, 'b-sat', SessionStatus.completed, movedTo: 4);
     await draw(tester, day(5, 6));
 
-    expect(find.text('done'), findsOneWidget, reason: 'Tuesday');
-    expect(find.text('skipped'), findsOneWidget, reason: 'Thursday');
+    expect(find.text('done'), findsOneWidget, reason: 'Monday');
+    expect(find.text('skipped'), findsOneWidget, reason: 'Wednesday');
     expect(find.textContaining('moved to'), findsOneWidget, reason: 'Sat');
     expect(find.textContaining('session done here'), findsOneWidget);
     expect(find.text('✕'), findsNothing, reason: 'nothing was missed');
@@ -105,10 +105,10 @@ void main() {
   testWidgets('the week counts sessions against the required ones', (
     tester,
   ) async {
-    await seed(5, 1, 'b-tue', SessionStatus.completed);
+    await seed(5, 0, 'b-mon', SessionStatus.completed);
     await draw(tester, day(5, 4));
     expect(find.text('1 of 3 sessions done'), findsOneWidget);
-    expect(find.textContaining('✕ 1 missed'), findsOneWidget, reason: 'Thu');
+    expect(find.textContaining('✕ 1 missed'), findsOneWidget, reason: 'Wed');
     expect(find.textContaining('1 to come'), findsOneWidget, reason: 'Sat');
   });
 
@@ -155,8 +155,8 @@ void main() {
   });
 
   testWidgets('tapping a day opens its sheet', (tester) async {
-    await draw(tester, day(5, 3));
-    await tester.tap(find.text('THU ${day(5, 3).day}'));
+    await draw(tester, day(5, 2));
+    await tester.tap(find.text('WED ${day(5, 2).day}'));
     await _settle(tester);
     expect(find.text('Start session'), findsOneWidget);
     expect(find.text('See the session'), findsOneWidget);

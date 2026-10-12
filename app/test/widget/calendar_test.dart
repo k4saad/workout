@@ -119,7 +119,7 @@ void main() {
   });
 
   testWidgets('a completed session gets a tick', (tester) async {
-    await seedSession(5, 1, 'b-tue', SessionStatus.completed);
+    await seedSession(5, 0, 'b-mon', SessionStatus.completed);
     await draw(tester, today: day(6, 0));
     expect(inGrid(find.text('✓')), findsOneWidget);
   });
@@ -133,14 +133,14 @@ void main() {
   });
 
   testWidgets('a moved session shows the moved glyph', (tester) async {
-    await seedSession(5, 1, 'b-tue', SessionStatus.completed, movedTo: 2);
+    await seedSession(5, 0, 'b-mon', SessionStatus.completed, movedTo: 1);
     await draw(tester, today: day(6, 0));
     expect(inGrid(find.text('↷')), findsOneWidget);
   });
 
   testWidgets('adherence and streak are shown', (tester) async {
-    await seedSession(5, 1, 'b-tue', SessionStatus.completed);
-    await seedSession(5, 3, 'b-thu', SessionStatus.completed);
+    await seedSession(5, 0, 'b-mon', SessionStatus.completed);
+    await seedSession(5, 2, 'b-wed', SessionStatus.completed);
     await draw(tester, today: day(5, 4));
     // Against what was due, not against all thirty-six sessions.
     expect(find.textContaining('of what was due'), findsOneWidget);
@@ -153,8 +153,8 @@ void main() {
   ) async {
     await draw(tester, today: day(6, 0));
 
-    // Week 5 Tuesday is in the past and unlogged.
-    final target = day(5, 1);
+    // Week 5 Monday is in the past and unlogged.
+    final target = day(5, 0);
     await tester.tap(find.text('${target.day}').first);
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 50));
@@ -166,7 +166,7 @@ void main() {
   });
 
   testWidgets('tapping today offers to start the session', (tester) async {
-    final today = day(5, 1);
+    final today = day(5, 0);
     await draw(tester, today: today);
     await tester.tap(find.text('${today.day}').first);
     for (var i = 0; i < 10; i++) {
@@ -178,9 +178,9 @@ void main() {
   testWidgets('tapping a rest day explains rather than offering a session', (
     tester,
   ) async {
-    final wed = day(5, 2);
-    await draw(tester, today: wed);
-    await tester.tap(find.text('${wed.day}').first);
+    final thu = day(5, 3);
+    await draw(tester, today: thu);
+    await tester.tap(find.text('${thu.day}').first);
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 50));
     }
@@ -215,27 +215,27 @@ void main() {
   });
 
   testWidgets('skipped and missed read differently', (tester) async {
-    await seedSession(5, 1, 'b-tue', SessionStatus.skipped);
+    await seedSession(5, 0, 'b-mon', SessionStatus.skipped);
     await draw(tester, today: day(5, 4));
-    expect(inGrid(find.text('⊘')), findsOneWidget, reason: 'Tuesday, skipped');
+    expect(inGrid(find.text('⊘')), findsOneWidget, reason: 'Monday, skipped');
     expect(
       inGrid(find.text('✕')),
       findsWidgets,
-      reason: 'Thursday, never logged',
+      reason: 'Wednesday, never logged',
     );
   });
 
   testWidgets('a moved session leaves an arrow, not a cross', (tester) async {
-    await seedSession(5, 1, 'b-tue', SessionStatus.completed, movedTo: 2);
+    await seedSession(5, 0, 'b-mon', SessionStatus.completed, movedTo: 1);
     await draw(tester, today: day(5, 2));
-    expect(inGrid(find.text('→')), findsOneWidget, reason: 'Tuesday: away');
-    // A cell carries one glyph, so Tuesday's arrow is Tuesday not being ✕.
-    expect(inGrid(find.text('↷')), findsOneWidget, reason: 'Wednesday: here');
+    expect(inGrid(find.text('→')), findsOneWidget, reason: 'Monday: away');
+    // A cell carries one glyph, so Monday's arrow is Monday not being ✕.
+    expect(inGrid(find.text('↷')), findsOneWidget, reason: 'Tuesday: here');
   });
 
   testWidgets('two sessions on one date are both on the sheet', (tester) async {
-    await seedSession(5, 1, 'b-tue', SessionStatus.completed, movedTo: 3);
-    await seedSession(5, 3, 'b-thu', SessionStatus.completed);
+    await seedSession(5, 0, 'b-mon', SessionStatus.completed, movedTo: 2);
+    await seedSession(5, 2, 'b-wed', SessionStatus.completed);
     await draw(tester, today: day(5, 4));
     expect(find.text('✓+1'), findsOneWidget, reason: 'the cell counts both');
 
@@ -247,7 +247,7 @@ void main() {
   });
 
   testWidgets('the date a session left says where it went', (tester) async {
-    await seedSession(5, 1, 'b-tue', SessionStatus.completed, movedTo: 2);
+    await seedSession(5, 0, 'b-mon', SessionStatus.completed, movedTo: 1);
     await draw(tester, today: day(5, 3));
     await tester.tap(inGrid(find.text('→')));
     await settle(tester);
@@ -272,7 +272,7 @@ void main() {
   });
 
   testWidgets('the month is summed up under the grid', (tester) async {
-    await seedSession(5, 1, 'b-tue', SessionStatus.completed);
+    await seedSession(5, 0, 'b-mon', SessionStatus.completed);
     final today = day(5, 2);
     await draw(tester, today: today);
     expect(

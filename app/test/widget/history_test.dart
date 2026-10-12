@@ -71,15 +71,10 @@ void main() {
     tester,
   ) async {
     final programme = await repo.loadProgramme();
-    // v3's Monday, a week before v4 began.
-    await logged('f-mon', DateTime(2026, 9, 28), 1);
-    // v4's first Tuesday.
-    final tue = DateTime(
-      programme.startDate.year,
-      programme.startDate.month,
-      programme.startDate.day + 1,
-    );
-    await logged('f-tue', tue, 1);
+    // v3's Tuesday, two weeks before v4 began: a day the plan has no more.
+    await logged('f-tue', DateTime(2026, 9, 29), 1);
+    // v4's first Monday.
+    await logged('f-mon', programme.startDate, 1);
 
     tester.view.physicalSize = const Size(412, 2000);
     tester.view.devicePixelRatio = 1.0;
@@ -101,7 +96,7 @@ void main() {
     }
 
     expect(find.text('Week 1 · Earlier plan'), findsOneWidget);
-    expect(find.textContaining('f-mon'), findsNothing);
+    expect(find.textContaining('f-tue'), findsNothing);
     expect(find.text('Week 1 · Full Body A'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

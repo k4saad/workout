@@ -40,7 +40,7 @@ void main() {
     int? rir = 2,
     ProgressionType type = ProgressionType.doubleProgression,
   }) => Prescription(
-    id: 'b-mon-1',
+    id: 'b-tue-1',
     exerciseId: 'barbell-back-squat',
     order: 1,
     sets: sets,
@@ -356,7 +356,7 @@ void main() {
     test('a substitute with no history of its own starts at its own load', () {
       final s = fineEngine.suggest(
         prescription: squat(start: 12)
-            .copyWith(id: 'b-mon-1-sub', exerciseId: 'barbell-front-squat'),
+            .copyWith(id: 'b-tue-1-sub', exerciseId: 'barbell-front-squat'),
         history: const [],
         now: now,
       );
@@ -370,7 +370,7 @@ void main() {
     test('a substitute WITH history uses it', () {
       final s = fineEngine.suggest(
         prescription: squat(start: 12)
-            .copyWith(id: 'b-mon-1-sub', exerciseId: 'barbell-front-squat'),
+            .copyWith(id: 'b-tue-1-sub', exerciseId: 'barbell-front-squat'),
         history: sets([8, 8, 8, 8], load: 16),
         now: now,
       );
@@ -542,9 +542,9 @@ void main() {
       // At 10 kg a 10% cap is 1 kg; the data widens maxJumpPct in
       // Foundation so the empty-bar lifts can actually climb (item 1).
       for (final id in [
-        'f-tue-1',
-        'f-thu-1',
-        'f-thu-2',
+        'f-mon-1',
+        'f-wed-1',
+        'f-wed-2',
         'f-sat-1',
         'f-sat-2',
       ]) {
@@ -565,7 +565,7 @@ void main() {
     });
 
     test('logging RIR 3 in Foundation earns the jump (item 6)', () {
-      final p = resolved('foundation', 2, 'f-tue-1');
+      final p = resolved('foundation', 2, 'f-mon-1');
       expect(p.targetRir, 3);
       final s = shipped.suggest(
         prescription: p,
@@ -577,8 +577,8 @@ void main() {
 
     test('a deload cold start is scaled once, not 0.7 x 0.7 (minor)', () {
       // The resolver has already put the 70% into startLoadKg.
-      final p = resolved('deload', 8, 'b-tue-1');
-      final build = resolved('build', 5, 'b-tue-1');
+      final p = resolved('deload', 8, 'b-mon-1');
+      final build = resolved('build', 5, 'b-mon-1');
       expect(p.startLoadKg, closeTo(build.startLoadKg! * 0.7, 1e-9));
       final s = shipped.suggest(
         prescription: p,
@@ -713,7 +713,7 @@ void main() {
       required double increment,
       required double maxJumpPct,
     }) => squat(repsMin: repsMin, repsMax: repsMax, creep: creep).copyWith(
-      id: 'b-tue-1',
+      id: 'b-mon-1',
       exerciseId: 'barbell-bench-press',
       progression: Progression(
         type: ProgressionType.doubleProgression,
@@ -841,7 +841,7 @@ void main() {
     test('the overhead press is 70% of the earned load at 6 reps', () {
       // Earned 17; 70% is 11.9 -> 11, the same plates as 70% of 16. That
       // used to trip rule 8 and creep the DELOAD to 6-8.
-      final p = deload('b-thu-2');
+      final p = deload('b-wed-2');
       final s = shipped.suggest(
         prescription: p,
         history: week7(3, 6, 16, 6, 6),

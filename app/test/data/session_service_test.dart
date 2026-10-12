@@ -19,7 +19,7 @@ void main() {
       .firstWhere((d) => d.id == id);
 
   /// Build-block Tuesday: squat, a dumbbell superset, knee raises.
-  Day tuesday() => buildDay('b-tue');
+  Day tuesday() => buildDay('b-mon');
 
   setUp(() {
     db = AppDatabase.memory();
@@ -41,7 +41,7 @@ void main() {
     test('creates one in-progress session', () async {
       final s = await startTuesday();
       expect(s.status, SessionStatus.inProgress);
-      expect(s.dayId, 'b-tue');
+      expect(s.dayId, 'b-mon');
       expect(s.weekNo, 5);
       expect(s.startedAt, isNotNull);
     });
@@ -70,7 +70,7 @@ void main() {
         await svc.logSet(
           s.id,
           const SetEntry(
-            prescriptionId: 'b-tue-1',
+            prescriptionId: 'b-mon-1',
             exerciseId: 'barbell-back-squat',
             setIndex: 1,
             reps: 5,
@@ -94,7 +94,7 @@ void main() {
       await svc.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-tue-1',
+          prescriptionId: 'b-mon-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 1,
           reps: 5,
@@ -129,7 +129,7 @@ void main() {
       await clocked.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-tue-1',
+          prescriptionId: 'b-mon-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 1,
           reps: 5,
@@ -145,7 +145,7 @@ void main() {
       await svc.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-tue-1',
+          prescriptionId: 'b-mon-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 1,
           reps: 5,
@@ -155,7 +155,7 @@ void main() {
 
       final resumed = await svc.resumable();
       expect(resumed?.id, s.id);
-      expect(await svc.loggedSetCount(s.id, 'b-tue-1'), 1);
+      expect(await svc.loggedSetCount(s.id, 'b-mon-1'), 1);
     });
 
     test('ramp sets are logged but do not count as working sets', () async {
@@ -163,7 +163,7 @@ void main() {
       await svc.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-tue-1',
+          prescriptionId: 'b-mon-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 0,
           reps: 8,
@@ -171,7 +171,7 @@ void main() {
           isWarmup: true,
         ),
       );
-      expect(await svc.loggedSetCount(s.id, 'b-tue-1'), 0);
+      expect(await svc.loggedSetCount(s.id, 'b-mon-1'), 0);
       expect(await db.setsForSession(s.id), hasLength(1));
     });
 
@@ -180,7 +180,7 @@ void main() {
       final id = await svc.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-tue-1',
+          prescriptionId: 'b-mon-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 1,
           reps: 50,
@@ -206,7 +206,7 @@ void main() {
 
     test('a bilateral prescription plans one entry per set', () {
       final squat = tuesday().allPrescriptions.firstWhere(
-        (p) => p.id == 'b-tue-1',
+        (p) => p.id == 'b-mon-1',
       );
       expect(squat.perSide, isFalse);
       expect(SessionService.plannedSets(squat), hasLength(3));
@@ -220,14 +220,14 @@ void main() {
   group('input kind', () {
     test('a loaded barbell lift asks for reps and load', () {
       final squat = tuesday().allPrescriptions.firstWhere(
-        (p) => p.id == 'b-tue-1',
+        (p) => p.id == 'b-mon-1',
       );
       expect(SessionService.inputKindFor(squat), SetInputKind.repsAndLoad);
     });
 
     test('a bodyweight movement asks for reps only', () {
       final raise = tuesday().allPrescriptions.firstWhere(
-        (p) => p.id == 'b-tue-3',
+        (p) => p.id == 'b-mon-3',
       );
       expect(raise.loadMode, LoadMode.bodyweight);
       expect(SessionService.inputKindFor(raise), SetInputKind.reps);
@@ -280,7 +280,7 @@ void main() {
       await svc.logSet(
         s.id,
         const SetEntry(
-          prescriptionId: 'b-tue-1',
+          prescriptionId: 'b-mon-1',
           exerciseId: 'barbell-back-squat',
           setIndex: 1,
           reps: 5,

@@ -75,7 +75,7 @@ void main() {
         SessionsCompanion.insert(
           programmeId: 'keller-twelve',
           blockId: 'foundation',
-          dayId: 'f-tue',
+          dayId: 'f-mon',
           weekNo: weekNo,
           plannedDate: DateTime(2026, 9, 28),
           scheduledDate: DateTime(2026, 9, 28),
@@ -97,7 +97,7 @@ void main() {
       .insert(
         SetLogsCompanion.insert(
           sessionId: sessionId,
-          prescriptionId: 'f-tue-1',
+          prescriptionId: 'f-mon-1',
           exerciseId: exerciseId,
           setIndex: setIndex,
           completedAt: at ?? DateTime(2026, 9, 28, 19),
