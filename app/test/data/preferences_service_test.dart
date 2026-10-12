@@ -202,4 +202,17 @@ void main() {
       expect(Preferences.fromJson({'captureTimerSec': 7}).captureTimerSec, 10);
     });
   });
+
+  test('the planner reminders are on until switched off, and stay off', () {
+    const fresh = Preferences();
+    expect(fresh.remindClasses, isTrue);
+    expect(fresh.remindWork, isTrue);
+    expect(fresh.remindSessions, isTrue);
+    final off = fresh.copyWith(remindWork: false);
+    final back = Preferences.fromJson(off.toJson());
+    expect(back.remindWork, isFalse);
+    expect(back.remindClasses, isTrue);
+    // A file from before v4.1 has none of them: on.
+    expect(Preferences.fromJson(const {}).remindSessions, isTrue);
+  });
 }

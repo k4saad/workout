@@ -59,8 +59,8 @@ void main() {
       );
 
   test('opens an in-memory database and creates every table', () async {
-    // 7 training tables + 5 progress tables (schema v2).
-    expect(db.allTables, hasLength(18));
+    // 7 training, 5 progress (v2), 6 runs and fuel (v3), 1 planner (v5).
+    expect(db.allTables, hasLength(19));
     for (final t in db.allTables) {
       await db.select(t).get(); // must not throw
     }

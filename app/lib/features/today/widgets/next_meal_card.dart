@@ -109,7 +109,7 @@ class _NextMealCardState extends ConsumerState<NextMealCard> {
           Row(
             children: [
               Text(
-                next.slot.time,
+                next.time,
                 style: t.titleMedium?.copyWith(color: AppTheme.crimson),
               ),
               Gap.s,

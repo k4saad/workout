@@ -579,7 +579,7 @@
     {
       "id": "breakfast",
       "name": "Breakfast",
-      "time": "06:45",
+      "time": "07:30",
       "days": "both",
       "kcal": 600,
       "proteinG": 25,
@@ -588,7 +588,7 @@
     {
       "id": "lunch",
       "name": "Lunch",
-      "time": "13:30",
+      "time": "13:00",
       "days": "both",
       "kcal": 750,
       "proteinG": 35,
@@ -596,8 +596,8 @@
     },
     {
       "id": "snack",
-      "name": "Evening snack",
-      "time": "17:15",
+      "name": "Snack",
+      "time": "16:30",
       "days": "both",
       "kcal": 250,
       "proteinG": 5,
@@ -606,7 +606,7 @@
     {
       "id": "dinner",
       "name": "Dinner",
-      "time": "20:00",
+      "time": "19:30",
       "days": "both",
       "kcal": 700,
       "proteinG": 30,
@@ -912,7 +912,7 @@
       "id": "banana_dates",
       "slotId": "snack",
       "name": "Banana and dates",
-      "note": "Before the session or the German course. Nothing heavy.",
+      "note": "Before a session, or to bridge a long afternoon. Nothing heavy.",
       "items": [
         {
           "foodId": "banane",

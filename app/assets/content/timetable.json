@@ -45,7 +45,7 @@
 
     {"id": "job2-fri", "weekday": "fri", "start": "07:00", "end": "09:30",
      "kind": "job", "title": "Job 2", "place": "job2", "onlyWhenMarked": true,
-     "note": "Every fifth week: mark the Fridays you work in the planner."},
+     "note": "Every fifth week."},
     {"id": "astd-fri", "weekday": "fri", "start": "10:15", "end": "13:45",
      "kind": "lecture", "title": "Analysis of Spatio-Temporal Data",
      "place": "campus", "room": "StudLab 126", "who": "Pebesma / Niraula"},

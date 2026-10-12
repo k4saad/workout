@@ -19,6 +19,7 @@ const routes = <(String, String)>[
   ('history', '/history'),
   ('week', '/week'),
   ('calendar', '/week/calendar'),
+  ('planner', '/week/planner'),
   ('day', '/week/3/day/f-mon'),
   ('fuel', '/fuel'),
   ('fuel-plan', '/fuel#plan'),

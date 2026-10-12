@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/settings_providers.dart';
 import '../../core/ui/ui.dart';
-import '../../data/preferences_service.dart';
 
 /// The few things worth switching on or off.
 class SettingsScreen extends ConsumerWidget {
@@ -23,9 +22,10 @@ class SettingsScreen extends ConsumerWidget {
           Text('Reminders', style: t.titleLarge),
           Gap.xs,
           Text(
-            'One quiet nudge on evenings the programme plans a session. '
-            'Never on a rest day, never on an optional day, and never after '
-            'you have already trained.',
+            'From the planner, two weeks ahead: a class 15 minutes before '
+            'with its room, work when it is time to leave, a session half an '
+            'hour before. Nothing for a class you skipped, a session already '
+            'done or a rest day.',
             style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
           ),
           Gap.m,
@@ -34,25 +34,34 @@ class SettingsScreen extends ConsumerWidget {
           else ...[
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              value: prefs.eveningReminder,
-              title: const Text('Evening reminder'),
-              subtitle: Text(
-                prefs.eveningReminder
-                    ? 'At ${prefs.reminderLabel} on training days'
-                    : 'Off',
-              ),
+              secondary: const Icon(Icons.school_outlined),
+              value: prefs.remindClasses,
+              title: const Text('Classes'),
+              subtitle: const Text('15 minutes before, with the room'),
               onChanged: (on) => ref
                   .read(preferencesProvider.notifier)
-                  .set(prefs.copyWith(eveningReminder: on)),
+                  .set(prefs.copyWith(remindClasses: on)),
             ),
-            if (prefs.eveningReminder)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Time'),
-                subtitle: Text(prefs.reminderLabel),
-                trailing: const Icon(Icons.schedule),
-                onTap: () => _pickTime(context, ref, prefs),
-              ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              secondary: const Icon(Icons.work_outline),
+              value: prefs.remindWork,
+              title: const Text('Work'),
+              subtitle: const Text('When to leave: 30 minutes to get there'),
+              onChanged: (on) => ref
+                  .read(preferencesProvider.notifier)
+                  .set(prefs.copyWith(remindWork: on)),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              secondary: const Icon(Icons.fitness_center),
+              value: prefs.remindSessions,
+              title: const Text('Training sessions'),
+              subtitle: const Text('Half an hour before'),
+              onChanged: (on) => ref
+                  .read(preferencesProvider.notifier)
+                  .set(prefs.copyWith(remindSessions: on)),
+            ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               value: prefs.launchQuote,
@@ -100,29 +109,6 @@ class SettingsScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  Future<void> _pickTime(
-    BuildContext context,
-    WidgetRef ref,
-    Preferences prefs,
-  ) async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(
-        hour: prefs.reminderHour,
-        minute: prefs.reminderMinute,
-      ),
-    );
-    if (picked == null) return;
-    await ref
-        .read(preferencesProvider.notifier)
-        .set(
-          prefs.copyWith(
-            reminderHour: picked.hour,
-            reminderMinute: picked.minute,
-          ),
-        );
   }
 }
 

@@ -35,6 +35,8 @@ part 'database.g.dart';
     WaterLogs,
     SupplementLogs,
     NutritionAdjustments,
+    // v5
+    PlannerEntries,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -54,7 +56,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Bump this and add an `onUpgrade` branch. Never drop a column that holds
   /// logged sets.
-  static const currentSchema = 4;
+  static const currentSchema = 5;
 
   @override
   int get schemaVersion => currentSchema;
@@ -96,6 +98,11 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(runs, runs.kind);
         await m.addColumn(runs, runs.elevLossM);
         await m.addColumn(runs, runs.maxAltM);
+      }
+      // v5: the planner. A new table only: CREATE TABLE IF NOT EXISTS, safe
+      // from any version.
+      if (from < 5) {
+        await m.createTable(plannerEntries);
       }
     },
     beforeOpen: (details) async {
@@ -378,6 +385,29 @@ class AppDatabase extends _$AppDatabase {
   }
 
   // ----------------------------------------------------------------- admin
+
+  // ----------------------------------------------------------------- planner
+
+  /// Planner entries dated [from]..[to] inclusive, live.
+  Stream<List<PlannerRow>> watchPlannerEntries(DateTime from, DateTime to) =>
+      (select(plannerEntries)
+            ..where(
+              (e) => e.onDate.isBetweenValues(
+                DateTime(from.year, from.month, from.day),
+                DateTime(to.year, to.month, to.day),
+              ),
+            )
+            ..orderBy([(e) => OrderingTerm.asc(e.onDate)]))
+          .watch();
+
+  Future<List<PlannerRow>> plannerEntriesBetween(DateTime from, DateTime to) =>
+      (select(plannerEntries)..where(
+            (e) => e.onDate.isBetweenValues(
+              DateTime(from.year, from.month, from.day),
+              DateTime(to.year, to.month, to.day),
+            ),
+          ))
+          .get();
 
   /// Every table, cleared. Used by restore before importing a backup.
   Future<void> wipe() async {

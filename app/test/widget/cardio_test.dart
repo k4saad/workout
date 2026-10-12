@@ -175,11 +175,13 @@ class _Cues implements NotificationService {
     int max = 24,
   }) async => scheduled++;
   @override
-  Future<void> scheduleSessionReminders(
+  Future<void> cancelSessionReminders() async {}
+  @override
+  Future<void> schedulePlannerReminders(
     List<({DateTime at, String title, String body})> reminders,
   ) async {}
   @override
-  Future<void> cancelSessionReminders() async {}
+  Future<void> cancelPlannerReminders() async {}
   @override
   Future<void> cancelRest() async {}
   @override

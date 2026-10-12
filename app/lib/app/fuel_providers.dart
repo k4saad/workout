@@ -5,6 +5,8 @@ import '../data/db/database.dart';
 import '../data/db/tables.dart';
 import '../data/fuel_service.dart';
 import '../domain/fuel/fuel_plan.dart';
+import '../domain/planner/planner.dart';
+import 'planner_providers.dart';
 import 'providers.dart';
 import 'session_providers.dart';
 
@@ -42,6 +44,8 @@ final fuelDayProvider = FutureProvider.family<FuelDay, DateTime>((
   final plan = await ref.watch(fuelPlanProvider.future);
   final bundle = await ref.watch(bundleProvider.future);
   final planned = bundle.calendar.forDate(day);
+  // When each meal falls today: around the timetable and the session.
+  final dayPlan = await ref.watch(dayPlanProvider(day).future);
 
   return plan.forDay(
     // Before the programme starts, and after it ends, eat like week one and
@@ -56,6 +60,15 @@ final fuelDayProvider = FutureProvider.family<FuelDay, DateTime>((
     extraKcal: await ref.watch(extraKcalProvider(day).future),
     chosen: await ref.watch(chosenMealsProvider(day).future),
     weekday: day.weekday,
+    timing: {
+      for (final m in dayPlan.meals)
+        m.id.substring('meal:'.length): MealTiming(
+          time: formatHhmm(m.start),
+          packed: m.packed,
+          quick: m.quick,
+          sessionFuel: m.sessionFuel,
+        ),
+    },
   );
 });
 

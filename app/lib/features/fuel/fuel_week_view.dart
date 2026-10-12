@@ -581,7 +581,7 @@ class _SlotRow extends StatelessWidget {
           SizedBox(
             width: 52,
             child: Text(
-              slot.slot.time,
+              slot.time,
               style: AppTheme.numeric(15, color: AppTheme.textDim),
             ),
           ),

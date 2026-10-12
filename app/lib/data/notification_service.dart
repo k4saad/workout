@@ -44,6 +44,15 @@ class NotificationService {
   /// problems than a missing nudge.
   static const reminderHorizonDays = 14;
 
+  /// The planner's reminders: classes, work, sessions, his own entries.
+  static const plannerChannelId = 'planner';
+  static const plannerChannelName = 'Planner reminders';
+  static const plannerBaseId = 4000;
+
+  /// Two weeks of a busy semester is about fifty; Android caps an app's
+  /// alarms well above this.
+  static const plannerMax = 64;
+
   bool _ready = false;
   bool _canScheduleExact = false;
 
@@ -236,31 +245,39 @@ class NotificationService {
     }
   }
 
-  /// An evening nudge on days the programme plans a session.
-  ///
-  /// Off by default, and deliberately quiet: one line saying what is on, at a
-  /// time you chose. It never nags on a rest day and it never fires for a
-  /// session already logged.
-  Future<void> scheduleSessionReminders(
+  /// Clears v3's evening nudges, which the planner's reminders replaced.
+  Future<void> cancelSessionReminders() => _guard(_cancelReminders);
+
+  /// "Spatial Justice · 14:15 — Room 147": the next week of the planner,
+  /// replacing whatever was laid before. Re-laid on every launch and every
+  /// change in the planner, so a skipped class goes quiet at once.
+  Future<void> schedulePlannerReminders(
     List<({DateTime at, String title, String body})> reminders,
   ) => _guard(() async {
-    await _cancelReminders();
+    await _cancelPlanner();
     final now = DateTime.now();
-    var id = reminderBaseId;
-    for (final r in reminders.take(reminderHorizonDays)) {
+    var id = plannerBaseId;
+    for (final r in reminders) {
+      if (id >= plannerBaseId + plannerMax) break;
       if (!r.at.isAfter(now)) continue;
       await _zonedSchedule(
         id: id++,
         at: r.at,
-        channelId: reminderChannelId,
-        channelName: reminderChannelName,
+        channelId: plannerChannelId,
+        channelName: plannerChannelName,
         title: r.title,
         body: r.body,
       );
     }
   });
 
-  Future<void> cancelSessionReminders() => _guard(_cancelReminders);
+  Future<void> cancelPlannerReminders() => _guard(_cancelPlanner);
+
+  Future<void> _cancelPlanner() async {
+    for (var i = 0; i < plannerMax; i++) {
+      await _plugin.cancel(plannerBaseId + i);
+    }
+  }
 
   Future<void> _cancelReminders() async {
     for (var i = 0; i < reminderHorizonDays + 2; i++) {

@@ -17,6 +17,7 @@ import '../features/progress/progress_screen.dart';
 import '../features/progress/shoot_viewer_screen.dart';
 import '../features/progress_hub/progress_hub_screen.dart';
 import '../features/runs/hikes_screen.dart';
+import '../features/planner/planner_screen.dart';
 import '../features/runs/live_run_screen.dart';
 import '../features/runs/runs_screen.dart';
 import '../features/session/session_runner_screen.dart';
@@ -86,6 +87,14 @@ GoRouter buildRouter() {
                   GoRoute(
                     path: 'calendar',
                     builder: (_, _) => const CalendarScreen(),
+                  ),
+                  GoRoute(
+                    path: 'planner',
+                    builder: (_, state) => PlannerScreen(
+                      initialDate: DateTime.tryParse(
+                        state.uri.queryParameters['date'] ?? '',
+                      ),
+                    ),
                   ),
                   GoRoute(
                     path: ':week/day/:dayId',

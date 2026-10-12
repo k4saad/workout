@@ -64,19 +64,20 @@ void main() {
       db.sessions,
     )..where((s) => s.plannedDate.equals(d(week, offset)))).getSingleOrNull();
 
-    // Wednesday of week 4, done on Thursday's rest day instead.
-    final wed = (await at(4, 2))!;
-    await (db.update(db.sessions)..where((s) => s.id.equals(wed.id))).write(
-      SessionsCompanion(scheduledDate: Value(d(4, 3))),
+    // Monday of week 5, done on Tuesday's rest day instead. (Dates from
+    // 9 on: a day numbered like a week label is two cells to tap.)
+    final mon = (await at(5, 0))!;
+    await (db.update(db.sessions)..where((s) => s.id.equals(mon.id))).write(
+      SessionsCompanion(scheduledDate: Value(d(5, 1))),
     );
     // Saturday of week 4, skipped on purpose.
     final sat = (await at(4, 5))!;
     await (db.update(db.sessions)..where((s) => s.id.equals(sat.id))).write(
       const SessionsCompanion(status: Value(SessionStatus.skipped)),
     );
-    // Monday of week 5, never logged.
-    final mon = (await at(5, 0))!;
-    await (db.delete(db.sessions)..where((s) => s.id.equals(mon.id))).go();
+    // Wednesday of week 5, never logged.
+    final wed = (await at(5, 2))!;
+    await (db.delete(db.sessions)..where((s) => s.id.equals(wed.id))).go();
 
     for (final (day, km, minutes) in [(d(4, 6), 4.6, 27), (d(5, 1), 5.2, 30)]) {
       await db
@@ -166,20 +167,20 @@ void main() {
 
     Screenshot.phone(tester);
     await Screenshot.settle(tester);
-    // Wednesday of week 4: its session went to Thursday.
-    await tapDay(tester, 4);
-    await Screenshot.capture(tester, 'cal_sheet_moved_away');
-    Navigator.of(tester.element(find.text('Wednesday 4 November'))).pop();
-    await Screenshot.settle(tester);
-
-    // Thursday: a rest day that took Wednesday's session.
-    await tapDay(tester, 5);
-    await Screenshot.capture(tester, 'cal_sheet_moved_here');
-    Navigator.of(tester.element(find.text('Thursday 5 November'))).pop();
-    await Screenshot.settle(tester);
-
-    // Monday of week 5: missed.
+    // Monday of week 5: its session went to Tuesday.
     await tapDay(tester, 9);
+    await Screenshot.capture(tester, 'cal_sheet_moved_away');
+    Navigator.of(tester.element(find.text('Monday 9 November'))).pop();
+    await Screenshot.settle(tester);
+
+    // Tuesday: a rest day that took Monday's session.
+    await tapDay(tester, 10);
+    await Screenshot.capture(tester, 'cal_sheet_moved_here');
+    Navigator.of(tester.element(find.text('Tuesday 10 November'))).pop();
+    await Screenshot.settle(tester);
+
+    // Wednesday of week 5: missed.
+    await tapDay(tester, 11);
     await Screenshot.capture(tester, 'cal_sheet_missed');
   });
 

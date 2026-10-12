@@ -85,3 +85,33 @@ A pure-Dart day planner (`lib/domain/planner/`), tested first:
 
 0.16.0+18, same key, permissions unchanged, schema 5 rehearsed, every gate,
 screens looked at.
+
+## As built
+
+- **J, K** as planned: `data/timetable.json` (15 weekly blocks, V22), and
+  programme revision 4 with A/B/C on Mon/Wed/Sat. Still `startsFresh` on
+  12 October, so a phone on v3 lands on the right date.
+- **L**: `lib/domain/planner/`, tested first (`day_planner_test.dart`):
+  - travel 30 minutes to the first place, between places and home;
+  - the session starts after the last commitment, the ride home and 30
+    minutes, rounded to the quarter hour: Mon 18:00, Wed 16:45, Sat 10:00;
+  - meals at the free time nearest their targets (07:30, 13:00, 16:30,
+    19:30), 90 minutes apart, never in a lecture, on the road or in the
+    session;
+  - a shorter slot when the gap is short ("quick": Friday's lunch before
+    Jumu'ah);
+  - inside a shift only when nothing else fits ("packed": Mon/Wed/Thu
+    lunch).
+
+  Fuel shows the planner's times; the session's fuel is the last meal
+  before it.
+- **M**: Week → Planner (`/week/planner`), Today's "Your day", and
+  `planner_entries` (schema 5) for his own entries, skips, the Friday
+  shift and moved sessions.
+- **N**: `PlannerReminders`, tested first; laid two weeks ahead on launch
+  and on every change. The v3 evening reminder is gone.
+  - Re-laying it once hung waiting on a live provider nobody was watching.
+    It reads the database directly now.
+  - A History session on a day that became a rest day reads "Earlier plan",
+    not "Rest".
+

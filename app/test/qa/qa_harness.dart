@@ -95,6 +95,7 @@ class QaApp {
       await repo.loadProgramme();
       await repo.loadMotions();
       await repo.loadFuel();
+      await repo.loadTimetable();
     });
     router = buildRouter();
     await tester.pumpWidget(
@@ -182,11 +183,13 @@ class QuietNotifications implements NotificationService {
     int max = 24,
   }) async {}
   @override
-  Future<void> scheduleSessionReminders(
+  Future<void> cancelSessionReminders() async {}
+  @override
+  Future<void> schedulePlannerReminders(
     List<({DateTime at, String title, String body})> reminders,
   ) async {}
   @override
-  Future<void> cancelSessionReminders() async {}
+  Future<void> cancelPlannerReminders() async {}
   @override
   Future<void> cancelRest() async {}
   @override

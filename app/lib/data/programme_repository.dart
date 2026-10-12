@@ -10,6 +10,7 @@ import '../domain/fuel/fuel_plan.dart';
 import '../domain/motion/motion.dart';
 import '../domain/models/inventory.dart';
 import '../domain/models/programme.dart';
+import '../domain/planner/timetable.dart';
 import '../domain/content/quotes.dart';
 
 /// Reads a bundled asset as a string. [rootBundle] on a phone; a disk read or
@@ -184,6 +185,7 @@ class ProgrammeRepository {
   static const assetFuel = 'assets/nutrition/fuel.json';
   static const assetMotions = 'assets/exercises/motions.json';
   static const assetQuotes = 'assets/content/quotes.json';
+  static const assetTimetable = 'assets/content/timetable.json';
 
   static const _programmeFile = 'programme.json';
   static const _inventoryFile = 'inventory.json';
@@ -204,6 +206,7 @@ class ProgrammeRepository {
   FuelPlan? _fuel;
   MotionLibrary? _motions;
   QuoteBook? _quotes;
+  Timetable? _timetable;
   Inventory? _inventory;
 
   ProgrammeUpgrade? _lastUpgrade;
@@ -496,6 +499,16 @@ class ProgrammeRepository {
     if (_quotes != null && !force) return _quotes!;
     final raw = await _loadAsset(assetQuotes);
     return _quotes = QuoteBook.fromJson(
+      jsonDecode(raw) as Map<String, dynamic>,
+    );
+  }
+
+  /// The semester's week. Always the asset: authored in data/timetable.json
+  /// from his timetable, checked by V22, mirrored by tools/gen.py.
+  Future<Timetable> loadTimetable({bool force = false}) async {
+    if (_timetable != null && !force) return _timetable!;
+    final raw = await _loadAsset(assetTimetable);
+    return _timetable = Timetable.fromJson(
       jsonDecode(raw) as Map<String, dynamic>,
     );
   }

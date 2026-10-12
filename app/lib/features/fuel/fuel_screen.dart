@@ -81,6 +81,22 @@ class _FuelScreenState extends ConsumerState<FuelScreen> {
   }
 }
 
+/// What kind of day it is, in one line: the meal that fuels the session,
+/// and when; or that rest is the point.
+String _dayLine(FuelDay day) {
+  if (!day.isTrainingDay) {
+    return 'Rest day. Same four meals, fitted around your day — recovery '
+        'happens today.';
+  }
+  final fuel = day.slots.where((s) => s.timing?.sessionFuel ?? false);
+  if (fuel.isEmpty) {
+    return 'Training day. Eat something an hour before the session.';
+  }
+  final f = fuel.first;
+  return 'Training day. ${f.slot.name} at ${f.time} is your fuel for the '
+      'session — timed, not optional.';
+}
+
 class _Body extends ConsumerWidget {
   const _Body({required this.day, required this.date});
 
@@ -99,10 +115,7 @@ class _Body extends ConsumerWidget {
         _Rings(target: target, eaten: eaten),
         Gap.m,
         Text(
-          day.isTrainingDay
-              ? 'Training day. The evening snack is your fuel for the session — '
-                    'timed, not optional.'
-              : 'Rest day. Same four meals — recovery happens today.',
+          _dayLine(day),
           style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
         ),
 
@@ -114,7 +127,9 @@ class _Body extends ConsumerWidget {
           MealCard(
             slot: slot,
             date: date,
-            isAroundSession: day.isTrainingDay && slot.slot.aroundSession,
+            isAroundSession:
+                slot.timing?.sessionFuel ??
+                (day.isTrainingDay && slot.slot.aroundSession),
             onSwap: () => _swap(context, ref, slot),
           ),
 

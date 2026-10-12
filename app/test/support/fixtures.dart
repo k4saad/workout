@@ -26,6 +26,14 @@ class Fixtures {
   static Map<String, dynamic> get inventoryJson =>
       _json('assets/programmes/inventory.json');
 
+  /// The semester's week: assets/content/timetable.json.
+  static Map<String, dynamic> get timetableJson =>
+      _json('assets/content/timetable.json');
+
+  /// The eating plan: assets/nutrition/fuel.json.
+  static Map<String, dynamic> get fuelJson =>
+      _json('assets/nutrition/fuel.json');
+
   static Programme get programme => Programme.fromJson(programmeJson);
 
   static ExerciseLibrary get library => ExerciseLibrary.fromJson(exercisesJson);

@@ -76,10 +76,13 @@ class SessionCard extends ConsumerWidget {
     final bundle = ref.watch(bundleProvider).asData?.value;
     final library = bundle?.library;
     // The day's name as the programme had it on the date it was planned for.
-    // A session from a plan since replaced (v3's Monday, before v4) is named
-    // as that, not by an id; its sets below still say what was done.
+    // A session from a plan since replaced is named as that, not by an id —
+    // nor as "Rest", when a moved week made its day a rest day (a Tuesday
+    // trained on v4, before v4.1 moved training to Monday). Its sets below
+    // still say what was done.
     final planned = bundle?.calendar.forDate(session.plannedDate).day;
-    final title = planned != null && planned.id == session.dayId
+    final title =
+        planned != null && planned.id == session.dayId && planned.isTrainingDay
         ? planned.title
         : 'Earlier plan';
 

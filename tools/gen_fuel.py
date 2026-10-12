@@ -202,13 +202,14 @@ HARAM = ["schwein", "schinken", "speck", "bacon", "pork", "ham ", "lard",
 # wastes the training. The only ceiling is a sanity one, because protein
 # crowding out carbohydrate is a real way to stall a hardgainer.
 SLOTS = [
-    # The four times he eats, placed around a timetable (docs/11-v4-plan.md):
-    # breakfast before the 07:00 job; lunch in the gap after the morning; a
-    # small snack before the evening session or the German course; dinner.
-    ("breakfast", "Breakfast",     "06:45", "both", 600, 25),
-    ("lunch",     "Lunch",         "13:30", "both", 750, 35),
-    ("snack",     "Evening snack", "17:15", "both", 250, 5),
-    ("dinner",    "Dinner",        "20:00", "both", 700, 30),
+    # The four times he eats. These are TARGETS: the app's day planner
+    # (lib/domain/planner, docs/12-semester-plan.md) moves each meal to the
+    # free time nearest its target on the day's timetable -- 06:10 before a
+    # 07:00 shift, a packed lunch at work, the snack before the session.
+    ("breakfast", "Breakfast",     "07:30", "both", 600, 25),
+    ("lunch",     "Lunch",         "13:00", "both", 750, 35),
+    ("snack",     "Snack",         "16:30", "both", 250, 5),
+    ("dinner",    "Dinner",        "19:30", "both", 700, 30),
 ]
 # On a training evening the snack is the session's fuel: Fuel says so.
 AROUND_SESSION = {"snack"}
@@ -264,9 +265,9 @@ TEMPLATES = [
      [("rinderhack", 150), ("karotten", 100), ("zwiebel", 50)], "kartoffeln"),
 
     # ---- evening snack: 250 kcal ------------------------------------------
-    # Before the evening session or the German course: light, quick, carbs.
+    # Before a session, or to bridge a long afternoon: light, quick, carbs.
     ("snack", "banana_dates", "Banana and dates",
-     "Before the session or the German course. Nothing heavy.",
+     "Before a session, or to bridge a long afternoon. Nothing heavy.",
      [("banane", 120)], "datteln"),
     ("snack", "apple_nuts", "An apple and almonds",
      "Pocket food for a day of lectures.",

@@ -151,12 +151,41 @@ void main() {
     });
 
     test('a meal two hours gone gives way to the one coming', () {
-      expect(next('15:40'), 'snack');
-      expect(next('15:20'), 'lunch');
+      // Lunch's target is 13:00.
+      expect(next('15:10'), 'snack');
+      expect(next('14:50'), 'lunch');
     });
 
     test('with everything logged, the day is done', () {
       expect(next('23:00', {for (final s in day.slots) s.slot.id}), isNull);
+    });
+
+    test('the time the day planner gives wins over the slot target', () {
+      // Tuesday: Job 2 from 07:00, so breakfast at 06:10.
+      final planned = plan.forDay(
+        weekNo: 1,
+        isTrainingDay: false,
+        weekday: 2,
+        timing: const {
+          'breakfast': MealTiming(time: '06:10'),
+          'lunch': MealTiming(time: '13:45'),
+          'snack': MealTiming(time: '16:05'),
+          'dinner': MealTiming(time: '19:30', packed: false),
+        },
+      );
+      expect(planned.slots.first.time, '06:10');
+      expect(planned.slots.first.slot.time, '07:30', reason: 'the target');
+      String? at(String now) => planned.nextToEat(now: now)?.slot.id;
+      // Lunch at 13:45 is still due at 15:40; against its 13:00 target it
+      // would have gone.
+      expect(at('15:40'), 'lunch');
+      expect(at('15:50'), 'snack');
+      // A swap keeps the day's timing.
+      final swapped = planned.choosing(
+        'breakfast',
+        planned.slots.first.chosen.id,
+      );
+      expect(swapped.slots.first.time, '06:10');
     });
   });
 

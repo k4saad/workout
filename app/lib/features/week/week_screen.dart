@@ -81,6 +81,11 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
               label: const Text('This week'),
             ),
           IconButton(
+            tooltip: 'Planner',
+            icon: const Icon(Icons.view_agenda_outlined),
+            onPressed: () => context.go('/week/planner'),
+          ),
+          IconButton(
             tooltip: 'Calendar',
             icon: const Icon(Icons.calendar_month_outlined),
             onPressed: () => context.go('/week/calendar'),

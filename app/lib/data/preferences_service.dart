@@ -15,6 +15,9 @@ class Preferences {
     this.eveningReminder = false,
     this.reminderHour = 18,
     this.reminderMinute = 30,
+    this.remindClasses = true,
+    this.remindWork = true,
+    this.remindSessions = true,
     this.lastBackupAt,
     this.athleteName = defaultAthleteName,
     this.launchQuote = true,
@@ -29,11 +32,19 @@ class Preferences {
 
   static const defaultAthleteName = 'Saad';
 
-  /// Off by default. An app that starts by nagging gets uninstalled.
+  /// v3's fixed-time evening nudge. Replaced in v4.1 by the planner's
+  /// reminders, which know when the session is; kept so an old file reads.
   final bool eveningReminder;
 
   final int reminderHour;
   final int reminderMinute;
+
+  /// The planner's reminders (docs/12-semester-plan.md): a class 15 minutes
+  /// before, work when it is time to leave, a session 30 minutes before. On
+  /// by default: he asked for them.
+  final bool remindClasses;
+  final bool remindWork;
+  final bool remindSessions;
 
   /// When a full backup was last written. Null means never.
   final DateTime? lastBackupAt;
@@ -140,6 +151,9 @@ class Preferences {
 
   Preferences copyWith({
     bool? eveningReminder,
+    bool? remindClasses,
+    bool? remindWork,
+    bool? remindSessions,
     int? reminderHour,
     int? reminderMinute,
     DateTime? lastBackupAt,
@@ -154,6 +168,9 @@ class Preferences {
     List<String>? shoppingTicks,
   }) => Preferences(
     eveningReminder: eveningReminder ?? this.eveningReminder,
+    remindClasses: remindClasses ?? this.remindClasses,
+    remindWork: remindWork ?? this.remindWork,
+    remindSessions: remindSessions ?? this.remindSessions,
     reminderHour: reminderHour ?? this.reminderHour,
     reminderMinute: reminderMinute ?? this.reminderMinute,
     lastBackupAt: lastBackupAt ?? this.lastBackupAt,
@@ -181,6 +198,9 @@ class Preferences {
 
   factory Preferences.fromJson(Map<String, dynamic> j) => Preferences(
     eveningReminder: j['eveningReminder'] as bool? ?? false,
+    remindClasses: j['remindClasses'] as bool? ?? true,
+    remindWork: j['remindWork'] as bool? ?? true,
+    remindSessions: j['remindSessions'] as bool? ?? true,
     reminderHour: (j['reminderHour'] as num?)?.toInt() ?? 18,
     reminderMinute: (j['reminderMinute'] as num?)?.toInt() ?? 30,
     lastBackupAt: j['lastBackupAt'] == null
@@ -217,6 +237,9 @@ class Preferences {
 
   Map<String, dynamic> toJson() => {
     'eveningReminder': eveningReminder,
+    'remindClasses': remindClasses,
+    'remindWork': remindWork,
+    'remindSessions': remindSessions,
     'reminderHour': reminderHour,
     'reminderMinute': reminderMinute,
     'lastBackupAt': lastBackupAt?.toIso8601String(),

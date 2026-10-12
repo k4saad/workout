@@ -25,6 +25,7 @@ const places = <(String, String)>[
   ('today', '/'),
   ('week', '/week'),
   ('calendar', '/week/calendar'),
+  ('planner', '/week/planner'),
   ('fuel', '/fuel'),
   ('plan', '/fuel#plan'),
   ('progress', '/progress'),

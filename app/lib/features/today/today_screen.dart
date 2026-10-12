@@ -27,6 +27,7 @@ import '../runs/live_run_screen.dart' show RunLaunch;
 import 'widgets/backup_nag.dart';
 import 'widgets/next_meal_card.dart';
 import 'widgets/upgrade_notice.dart';
+import 'widgets/your_day_card.dart';
 
 /// The day, in the order it is lived: what to train, a line to take into
 /// it, what to eat next, the scale, and where the week stands.
@@ -96,6 +97,7 @@ class TodayScreen extends ConsumerWidget {
                   ),
                 },
               ),
+              if (active) const YourDayCard(),
               const _QuoteCard(),
               if (active)
                 // The plan he has to go and look for is the plan he stops

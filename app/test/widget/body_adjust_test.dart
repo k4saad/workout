@@ -33,6 +33,7 @@ void main() {
     await repo.loadLibrary();
     await repo.loadInventory();
     await repo.loadFuel();
+    await repo.loadTimetable();
     final programme = await repo.loadProgramme();
     // A Wednesday in week 5: four weeks of a flat scale behind it.
     today = DateTime(

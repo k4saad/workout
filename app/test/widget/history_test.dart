@@ -75,6 +75,16 @@ void main() {
     await logged('f-tue', DateTime(2026, 9, 29), 1);
     // v4's first Monday.
     await logged('f-mon', programme.startDate, 1);
+    // Trained on v4's Tuesday, which v4.1 made a rest day.
+    await logged(
+      'f-tue',
+      DateTime(
+        programme.startDate.year,
+        programme.startDate.month,
+        programme.startDate.day + 1,
+      ),
+      1,
+    );
 
     tester.view.physicalSize = const Size(412, 2000);
     tester.view.devicePixelRatio = 1.0;
@@ -95,7 +105,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 20));
     }
 
-    expect(find.text('Week 1 · Earlier plan'), findsOneWidget);
+    expect(find.text('Week 1 · Earlier plan'), findsNWidgets(2));
+    expect(find.text('Week 1 · Rest'), findsNothing);
     expect(find.textContaining('f-tue'), findsNothing);
     expect(find.text('Week 1 · Full Body A'), findsOneWidget);
     expect(tester.takeException(), isNull);

@@ -51,7 +51,7 @@ class MealCard extends ConsumerWidget {
                 SizedBox(
                   width: 52,
                   child: Text(
-                    slot.slot.time,
+                    slot.time,
                     style: t.titleMedium?.copyWith(
                       color: isAroundSession
                           ? AppTheme.crimson
@@ -87,6 +87,37 @@ class MealCard extends ConsumerWidget {
               ],
             ),
 
+            // Where the day put it: a shift with no gap, a short one.
+            if (slot.timing case final timing?
+                when timing.packed || timing.quick || isAroundSession) ...[
+              Gap.s,
+              Row(
+                children: [
+                  Icon(
+                    timing.packed
+                        ? Icons.work_outline
+                        : isAroundSession
+                        ? Icons.bolt
+                        : Icons.timer_outlined,
+                    size: 16,
+                    color: isAroundSession
+                        ? AppTheme.crimson
+                        : AppTheme.textDim,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      [
+                        if (timing.packed) 'Packed — eat it at work',
+                        if (timing.quick) 'Quick — a short gap',
+                        if (isAroundSession) 'Fuel for the session',
+                      ].join(' · '),
+                      style: t.bodySmall?.copyWith(color: AppTheme.textDim),
+                    ),
+                  ),
+                ],
+              ),
+            ],
             Gap.s,
             Text(
               '${slot.chosen.kcal} kcal  ·  ${slot.chosen.proteinG.round()} g protein',

@@ -9379,6 +9379,554 @@ class NutritionAdjustmentsCompanion
   }
 }
 
+class $PlannerEntriesTable extends PlannerEntries
+    with TableInfo<$PlannerEntriesTable, PlannerRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlannerEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _onDateMeta = const VerificationMeta('onDate');
+  @override
+  late final GeneratedColumn<DateTime> onDate = GeneratedColumn<DateTime>(
+    'on_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _blockIdMeta = const VerificationMeta(
+    'blockId',
+  );
+  @override
+  late final GeneratedColumn<String> blockId = GeneratedColumn<String>(
+    'block_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startMinMeta = const VerificationMeta(
+    'startMin',
+  );
+  @override
+  late final GeneratedColumn<int> startMin = GeneratedColumn<int>(
+    'start_min',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _endMinMeta = const VerificationMeta('endMin');
+  @override
+  late final GeneratedColumn<int> endMin = GeneratedColumn<int>(
+    'end_min',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _remindMeta = const VerificationMeta('remind');
+  @override
+  late final GeneratedColumn<bool> remind = GeneratedColumn<bool>(
+    'remind',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("remind" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    onDate,
+    kind,
+    blockId,
+    title,
+    startMin,
+    endMin,
+    remind,
+    category,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'planner_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PlannerRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('on_date')) {
+      context.handle(
+        _onDateMeta,
+        onDate.isAcceptableOrUnknown(data['on_date']!, _onDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_onDateMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('block_id')) {
+      context.handle(
+        _blockIdMeta,
+        blockId.isAcceptableOrUnknown(data['block_id']!, _blockIdMeta),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    }
+    if (data.containsKey('start_min')) {
+      context.handle(
+        _startMinMeta,
+        startMin.isAcceptableOrUnknown(data['start_min']!, _startMinMeta),
+      );
+    }
+    if (data.containsKey('end_min')) {
+      context.handle(
+        _endMinMeta,
+        endMin.isAcceptableOrUnknown(data['end_min']!, _endMinMeta),
+      );
+    }
+    if (data.containsKey('remind')) {
+      context.handle(
+        _remindMeta,
+        remind.isAcceptableOrUnknown(data['remind']!, _remindMeta),
+      );
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PlannerRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PlannerRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      onDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}on_date'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      blockId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}block_id'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      ),
+      startMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_min'],
+      ),
+      endMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}end_min'],
+      ),
+      remind: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}remind'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      ),
+    );
+  }
+
+  @override
+  $PlannerEntriesTable createAlias(String alias) {
+    return $PlannerEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class PlannerRow extends DataClass implements Insertable<PlannerRow> {
+  final int id;
+
+  /// Local midnight of the date it applies to.
+  final DateTime onDate;
+  final String kind;
+  final String? blockId;
+  final String? title;
+  final int? startMin;
+  final int? endMin;
+  final bool remind;
+  final String? category;
+  const PlannerRow({
+    required this.id,
+    required this.onDate,
+    required this.kind,
+    this.blockId,
+    this.title,
+    this.startMin,
+    this.endMin,
+    required this.remind,
+    this.category,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['on_date'] = Variable<DateTime>(onDate);
+    map['kind'] = Variable<String>(kind);
+    if (!nullToAbsent || blockId != null) {
+      map['block_id'] = Variable<String>(blockId);
+    }
+    if (!nullToAbsent || title != null) {
+      map['title'] = Variable<String>(title);
+    }
+    if (!nullToAbsent || startMin != null) {
+      map['start_min'] = Variable<int>(startMin);
+    }
+    if (!nullToAbsent || endMin != null) {
+      map['end_min'] = Variable<int>(endMin);
+    }
+    map['remind'] = Variable<bool>(remind);
+    if (!nullToAbsent || category != null) {
+      map['category'] = Variable<String>(category);
+    }
+    return map;
+  }
+
+  PlannerEntriesCompanion toCompanion(bool nullToAbsent) {
+    return PlannerEntriesCompanion(
+      id: Value(id),
+      onDate: Value(onDate),
+      kind: Value(kind),
+      blockId: blockId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(blockId),
+      title: title == null && nullToAbsent
+          ? const Value.absent()
+          : Value(title),
+      startMin: startMin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startMin),
+      endMin: endMin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endMin),
+      remind: Value(remind),
+      category: category == null && nullToAbsent
+          ? const Value.absent()
+          : Value(category),
+    );
+  }
+
+  factory PlannerRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PlannerRow(
+      id: serializer.fromJson<int>(json['id']),
+      onDate: serializer.fromJson<DateTime>(json['onDate']),
+      kind: serializer.fromJson<String>(json['kind']),
+      blockId: serializer.fromJson<String?>(json['blockId']),
+      title: serializer.fromJson<String?>(json['title']),
+      startMin: serializer.fromJson<int?>(json['startMin']),
+      endMin: serializer.fromJson<int?>(json['endMin']),
+      remind: serializer.fromJson<bool>(json['remind']),
+      category: serializer.fromJson<String?>(json['category']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'onDate': serializer.toJson<DateTime>(onDate),
+      'kind': serializer.toJson<String>(kind),
+      'blockId': serializer.toJson<String?>(blockId),
+      'title': serializer.toJson<String?>(title),
+      'startMin': serializer.toJson<int?>(startMin),
+      'endMin': serializer.toJson<int?>(endMin),
+      'remind': serializer.toJson<bool>(remind),
+      'category': serializer.toJson<String?>(category),
+    };
+  }
+
+  PlannerRow copyWith({
+    int? id,
+    DateTime? onDate,
+    String? kind,
+    Value<String?> blockId = const Value.absent(),
+    Value<String?> title = const Value.absent(),
+    Value<int?> startMin = const Value.absent(),
+    Value<int?> endMin = const Value.absent(),
+    bool? remind,
+    Value<String?> category = const Value.absent(),
+  }) => PlannerRow(
+    id: id ?? this.id,
+    onDate: onDate ?? this.onDate,
+    kind: kind ?? this.kind,
+    blockId: blockId.present ? blockId.value : this.blockId,
+    title: title.present ? title.value : this.title,
+    startMin: startMin.present ? startMin.value : this.startMin,
+    endMin: endMin.present ? endMin.value : this.endMin,
+    remind: remind ?? this.remind,
+    category: category.present ? category.value : this.category,
+  );
+  PlannerRow copyWithCompanion(PlannerEntriesCompanion data) {
+    return PlannerRow(
+      id: data.id.present ? data.id.value : this.id,
+      onDate: data.onDate.present ? data.onDate.value : this.onDate,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      blockId: data.blockId.present ? data.blockId.value : this.blockId,
+      title: data.title.present ? data.title.value : this.title,
+      startMin: data.startMin.present ? data.startMin.value : this.startMin,
+      endMin: data.endMin.present ? data.endMin.value : this.endMin,
+      remind: data.remind.present ? data.remind.value : this.remind,
+      category: data.category.present ? data.category.value : this.category,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlannerRow(')
+          ..write('id: $id, ')
+          ..write('onDate: $onDate, ')
+          ..write('kind: $kind, ')
+          ..write('blockId: $blockId, ')
+          ..write('title: $title, ')
+          ..write('startMin: $startMin, ')
+          ..write('endMin: $endMin, ')
+          ..write('remind: $remind, ')
+          ..write('category: $category')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    onDate,
+    kind,
+    blockId,
+    title,
+    startMin,
+    endMin,
+    remind,
+    category,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PlannerRow &&
+          other.id == this.id &&
+          other.onDate == this.onDate &&
+          other.kind == this.kind &&
+          other.blockId == this.blockId &&
+          other.title == this.title &&
+          other.startMin == this.startMin &&
+          other.endMin == this.endMin &&
+          other.remind == this.remind &&
+          other.category == this.category);
+}
+
+class PlannerEntriesCompanion extends UpdateCompanion<PlannerRow> {
+  final Value<int> id;
+  final Value<DateTime> onDate;
+  final Value<String> kind;
+  final Value<String?> blockId;
+  final Value<String?> title;
+  final Value<int?> startMin;
+  final Value<int?> endMin;
+  final Value<bool> remind;
+  final Value<String?> category;
+  const PlannerEntriesCompanion({
+    this.id = const Value.absent(),
+    this.onDate = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.blockId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.startMin = const Value.absent(),
+    this.endMin = const Value.absent(),
+    this.remind = const Value.absent(),
+    this.category = const Value.absent(),
+  });
+  PlannerEntriesCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime onDate,
+    required String kind,
+    this.blockId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.startMin = const Value.absent(),
+    this.endMin = const Value.absent(),
+    this.remind = const Value.absent(),
+    this.category = const Value.absent(),
+  }) : onDate = Value(onDate),
+       kind = Value(kind);
+  static Insertable<PlannerRow> custom({
+    Expression<int>? id,
+    Expression<DateTime>? onDate,
+    Expression<String>? kind,
+    Expression<String>? blockId,
+    Expression<String>? title,
+    Expression<int>? startMin,
+    Expression<int>? endMin,
+    Expression<bool>? remind,
+    Expression<String>? category,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (onDate != null) 'on_date': onDate,
+      if (kind != null) 'kind': kind,
+      if (blockId != null) 'block_id': blockId,
+      if (title != null) 'title': title,
+      if (startMin != null) 'start_min': startMin,
+      if (endMin != null) 'end_min': endMin,
+      if (remind != null) 'remind': remind,
+      if (category != null) 'category': category,
+    });
+  }
+
+  PlannerEntriesCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? onDate,
+    Value<String>? kind,
+    Value<String?>? blockId,
+    Value<String?>? title,
+    Value<int?>? startMin,
+    Value<int?>? endMin,
+    Value<bool>? remind,
+    Value<String?>? category,
+  }) {
+    return PlannerEntriesCompanion(
+      id: id ?? this.id,
+      onDate: onDate ?? this.onDate,
+      kind: kind ?? this.kind,
+      blockId: blockId ?? this.blockId,
+      title: title ?? this.title,
+      startMin: startMin ?? this.startMin,
+      endMin: endMin ?? this.endMin,
+      remind: remind ?? this.remind,
+      category: category ?? this.category,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (onDate.present) {
+      map['on_date'] = Variable<DateTime>(onDate.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (blockId.present) {
+      map['block_id'] = Variable<String>(blockId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (startMin.present) {
+      map['start_min'] = Variable<int>(startMin.value);
+    }
+    if (endMin.present) {
+      map['end_min'] = Variable<int>(endMin.value);
+    }
+    if (remind.present) {
+      map['remind'] = Variable<bool>(remind.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlannerEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('onDate: $onDate, ')
+          ..write('kind: $kind, ')
+          ..write('blockId: $blockId, ')
+          ..write('title: $title, ')
+          ..write('startMin: $startMin, ')
+          ..write('endMin: $endMin, ')
+          ..write('remind: $remind, ')
+          ..write('category: $category')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -9401,6 +9949,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SupplementLogsTable supplementLogs = $SupplementLogsTable(this);
   late final $NutritionAdjustmentsTable nutritionAdjustments =
       $NutritionAdjustmentsTable(this);
+  late final $PlannerEntriesTable plannerEntries = $PlannerEntriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -9424,6 +9973,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     waterLogs,
     supplementLogs,
     nutritionAdjustments,
+    plannerEntries,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -14963,6 +15513,278 @@ typedef $$NutritionAdjustmentsTableProcessedTableManager =
       NutritionAdjustment,
       PrefetchHooks Function()
     >;
+typedef $$PlannerEntriesTableCreateCompanionBuilder =
+    PlannerEntriesCompanion Function({
+      Value<int> id,
+      required DateTime onDate,
+      required String kind,
+      Value<String?> blockId,
+      Value<String?> title,
+      Value<int?> startMin,
+      Value<int?> endMin,
+      Value<bool> remind,
+      Value<String?> category,
+    });
+typedef $$PlannerEntriesTableUpdateCompanionBuilder =
+    PlannerEntriesCompanion Function({
+      Value<int> id,
+      Value<DateTime> onDate,
+      Value<String> kind,
+      Value<String?> blockId,
+      Value<String?> title,
+      Value<int?> startMin,
+      Value<int?> endMin,
+      Value<bool> remind,
+      Value<String?> category,
+    });
+
+class $$PlannerEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $PlannerEntriesTable> {
+  $$PlannerEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get onDate => $composableBuilder(
+    column: $table.onDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get blockId => $composableBuilder(
+    column: $table.blockId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startMin => $composableBuilder(
+    column: $table.startMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endMin => $composableBuilder(
+    column: $table.endMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get remind => $composableBuilder(
+    column: $table.remind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PlannerEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlannerEntriesTable> {
+  $$PlannerEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get onDate => $composableBuilder(
+    column: $table.onDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get blockId => $composableBuilder(
+    column: $table.blockId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startMin => $composableBuilder(
+    column: $table.startMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endMin => $composableBuilder(
+    column: $table.endMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get remind => $composableBuilder(
+    column: $table.remind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PlannerEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlannerEntriesTable> {
+  $$PlannerEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get onDate =>
+      $composableBuilder(column: $table.onDate, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get blockId =>
+      $composableBuilder(column: $table.blockId, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<int> get startMin =>
+      $composableBuilder(column: $table.startMin, builder: (column) => column);
+
+  GeneratedColumn<int> get endMin =>
+      $composableBuilder(column: $table.endMin, builder: (column) => column);
+
+  GeneratedColumn<bool> get remind =>
+      $composableBuilder(column: $table.remind, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+}
+
+class $$PlannerEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PlannerEntriesTable,
+          PlannerRow,
+          $$PlannerEntriesTableFilterComposer,
+          $$PlannerEntriesTableOrderingComposer,
+          $$PlannerEntriesTableAnnotationComposer,
+          $$PlannerEntriesTableCreateCompanionBuilder,
+          $$PlannerEntriesTableUpdateCompanionBuilder,
+          (
+            PlannerRow,
+            BaseReferences<_$AppDatabase, $PlannerEntriesTable, PlannerRow>,
+          ),
+          PlannerRow,
+          PrefetchHooks Function()
+        > {
+  $$PlannerEntriesTableTableManager(
+    _$AppDatabase db,
+    $PlannerEntriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlannerEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlannerEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlannerEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> onDate = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String?> blockId = const Value.absent(),
+                Value<String?> title = const Value.absent(),
+                Value<int?> startMin = const Value.absent(),
+                Value<int?> endMin = const Value.absent(),
+                Value<bool> remind = const Value.absent(),
+                Value<String?> category = const Value.absent(),
+              }) => PlannerEntriesCompanion(
+                id: id,
+                onDate: onDate,
+                kind: kind,
+                blockId: blockId,
+                title: title,
+                startMin: startMin,
+                endMin: endMin,
+                remind: remind,
+                category: category,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required DateTime onDate,
+                required String kind,
+                Value<String?> blockId = const Value.absent(),
+                Value<String?> title = const Value.absent(),
+                Value<int?> startMin = const Value.absent(),
+                Value<int?> endMin = const Value.absent(),
+                Value<bool> remind = const Value.absent(),
+                Value<String?> category = const Value.absent(),
+              }) => PlannerEntriesCompanion.insert(
+                id: id,
+                onDate: onDate,
+                kind: kind,
+                blockId: blockId,
+                title: title,
+                startMin: startMin,
+                endMin: endMin,
+                remind: remind,
+                category: category,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PlannerEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PlannerEntriesTable,
+      PlannerRow,
+      $$PlannerEntriesTableFilterComposer,
+      $$PlannerEntriesTableOrderingComposer,
+      $$PlannerEntriesTableAnnotationComposer,
+      $$PlannerEntriesTableCreateCompanionBuilder,
+      $$PlannerEntriesTableUpdateCompanionBuilder,
+      (
+        PlannerRow,
+        BaseReferences<_$AppDatabase, $PlannerEntriesTable, PlannerRow>,
+      ),
+      PlannerRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -15002,4 +15824,6 @@ class $AppDatabaseManager {
       $$SupplementLogsTableTableManager(_db, _db.supplementLogs);
   $$NutritionAdjustmentsTableTableManager get nutritionAdjustments =>
       $$NutritionAdjustmentsTableTableManager(_db, _db.nutritionAdjustments);
+  $$PlannerEntriesTableTableManager get plannerEntries =>
+      $$PlannerEntriesTableTableManager(_db, _db.plannerEntries);
 }

@@ -411,3 +411,24 @@ class NutritionAdjustments extends Table {
   TextColumn get reason => text()();
   DateTimeColumn get revertedOn => dateTime().nullable()();
 }
+
+/// One change he made to one date in the planner (v5): an entry of his own,
+/// a class skipped, Friday's shift marked, the session moved. The timetable
+/// itself is bundled data and never changes; these rows are laid over it.
+///
+/// `kind` is the domain's EntryKind name; minutes are after midnight. Rows
+/// are `PlannerRow`: `PlannerEntry` is the domain's.
+@DataClassName('PlannerRow')
+class PlannerEntries extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  /// Local midnight of the date it applies to.
+  DateTimeColumn get onDate => dateTime()();
+  TextColumn get kind => text()();
+  TextColumn get blockId => text().nullable()();
+  TextColumn get title => text().nullable()();
+  IntColumn get startMin => integer().nullable()();
+  IntColumn get endMin => integer().nullable()();
+  BoolColumn get remind => boolean().withDefault(const Constant(false))();
+  TextColumn get category => text().nullable()();
+}

@@ -32,6 +32,7 @@ void main() {
     await repo.loadLibrary();
     await repo.loadInventory();
     await repo.loadFuel();
+    await repo.loadTimetable();
     final programme = await repo.loadProgramme();
     // Week 2, comfortably inside the programme. Monday is a lift day.
     weekStart = DateTime(
@@ -92,9 +93,10 @@ void main() {
 
     expect(find.text('Fuel'), findsOneWidget);
     expect(find.text('THE DAY'), findsOneWidget);
-    // Every meal shows a real time, so the plan reads as a day.
-    expect(find.text('06:45'), findsOneWidget);
-    expect(find.text('20:00'), findsOneWidget);
+    // Every meal shows a real time, so the plan reads as a day: Monday's,
+    // fitted around Geoinformation, Job 2 and the 18:00 session.
+    expect(find.text('07:30'), findsOneWidget);
+    expect(find.text('19:30'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -109,10 +111,13 @@ void main() {
     tester,
   ) async {
     await pump(tester);
-    for (final meal in ['Breakfast', 'Lunch', 'Evening snack', 'Dinner']) {
+    for (final meal in ['Breakfast', 'Lunch', 'Snack', 'Dinner']) {
       expect(find.text(meal), findsOneWidget, reason: meal);
     }
     expect(find.textContaining('fuel for the session'), findsOneWidget);
+    expect(find.textContaining('Snack at 17:30'), findsOneWidget);
+    // Job 2 runs 12:15-17:00 with nowhere else to eat lunch.
+    expect(find.text('Packed — eat it at work'), findsOneWidget);
   });
 
   testWidgets('logging a meal moves the ring and sticks', (tester) async {
@@ -209,7 +214,7 @@ void main() {
     trainingDay = trainingDay.add(const Duration(days: 1));
     await pump(tester);
 
-    expect(find.text('Evening snack'), findsOneWidget);
+    expect(find.text('Snack'), findsOneWidget);
     expect(find.textContaining('fuel for the session'), findsNothing);
     expect(find.textContaining('recovery happens today'), findsOneWidget);
   });

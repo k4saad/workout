@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/preferences_service.dart';
-import '../domain/calendar/session_reminders.dart';
-import 'calendar_providers.dart';
+import '../domain/calendar/programme_calendar.dart';
+import '../domain/planner/planner.dart';
+import 'planner_providers.dart';
 import 'providers.dart';
 import 'session_providers.dart';
 
@@ -12,6 +13,9 @@ final preferencesServiceProvider = Provider<PreferencesService>(
 
 /// The athlete's own switches. Small, and never training data.
 class PreferencesNotifier extends AsyncNotifier<Preferences> {
+  /// How far ahead reminders are laid.
+  static const _days = 14;
+
   @override
   Future<Preferences> build() => ref.watch(preferencesServiceProvider).load();
 
@@ -22,23 +26,35 @@ class PreferencesNotifier extends AsyncNotifier<Preferences> {
     await _reschedule();
   }
 
-  /// Re-lays the next fortnight of reminders.
+  /// Re-lays the next two weeks of reminders from the planner: classes,
+  /// work, sessions and his own entries. Two, so a week without opening the
+  /// app still rings.
   ///
-  /// Called on every change and on launch: a reminder scheduled two weeks ago
-  /// against a programme that has since been edited would announce the wrong
-  /// session.
+  /// Called on every change, on launch and from the planner: a reminder laid
+  /// a week ago for a class he has since skipped would still ring.
   Future<void> _reschedule() async {
     final prefs = state.asData?.value;
     final notifications = ref.read(notificationServiceProvider);
-    if (prefs == null || !prefs.eveningReminder) {
-      await notifications.cancelSessionReminders();
+    // v3's fixed-time evening nudge is gone: the planner knows the time.
+    await notifications.cancelSessionReminders();
+    if (prefs == null ||
+        !(prefs.remindClasses || prefs.remindWork || prefs.remindSessions)) {
+      await notifications.cancelPlannerReminders();
       return;
     }
 
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final planner = await ref.read(dayPlannerProvider.future);
     final bundle = await ref.read(bundleProvider.future);
-    final records = await ref.read(allRecordsProvider.future);
-    final logged = {
-      for (final r in records)
+    final entries = await ref
+        .read(plannerRepositoryProvider)
+        .between(today, ProgrammeCalendar.addDays(today, _days));
+    // Straight from the database, not a live provider: one nobody on
+    // screen is listening to is paused, and its future never arrives.
+    final db = ref.read(databaseProvider);
+    final trained = {
+      for (final r in await db.select(db.sessions).get())
         DateTime(
           r.scheduledDate.year,
           r.scheduledDate.month,
@@ -46,13 +62,27 @@ class PreferencesNotifier extends AsyncNotifier<Preferences> {
         ),
     };
 
-    final reminders = SessionReminders(bundle.calendar).upcoming(
-      from: DateTime.now(),
-      loggedDates: logged,
-      hour: prefs.reminderHour,
-      minute: prefs.reminderMinute,
+    final plans = [
+      for (var i = 0; i < _days; i++)
+        () {
+          final day = ProgrammeCalendar.addDays(today, i);
+          return planner.plan(
+            day,
+            session: bundle.calendar.forDate(day).day,
+            entries: entries,
+          );
+        }(),
+    ];
+    final reminders = const PlannerReminders().build(
+      plans,
+      from: now,
+      travelMinutes: planner.timetable.travelMinutes,
+      classes: prefs.remindClasses,
+      work: prefs.remindWork,
+      sessions: prefs.remindSessions,
+      trained: trained,
     );
-    await notifications.scheduleSessionReminders(reminders);
+    await notifications.schedulePlannerReminders(reminders);
   }
 
   /// Ticks a line of a week's shopping list. Saved without re-laying the

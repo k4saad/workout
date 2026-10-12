@@ -426,16 +426,46 @@ class PrepNight {
 }
 
 /// One slot on one day: what is planned, and what else it could be.
+/// When a meal is eaten on one particular day, from the day planner: the
+/// slot's time is only a target, and a 07:00 shift moves breakfast.
+class MealTiming {
+  const MealTiming({
+    required this.time,
+    this.packed = false,
+    this.quick = false,
+    this.sessionFuel = false,
+  });
+
+  /// `HH:mm`.
+  final String time;
+
+  /// Nowhere free to eat it but a shift: take it to work.
+  final bool packed;
+
+  /// Squeezed into a short gap.
+  final bool quick;
+
+  /// The last meal before the session.
+  final bool sessionFuel;
+}
+
 class PlannedMeal {
   const PlannedMeal({
     required this.slot,
     required this.chosen,
     required this.choices,
+    this.timing,
   });
 
   final MealSlot slot;
   final Meal chosen;
   final List<Meal> choices;
+
+  /// Today's timing, when the day was planned; the slot's target otherwise.
+  final MealTiming? timing;
+
+  /// `HH:mm`: when it is eaten today.
+  String get time => timing?.time ?? slot.time;
 }
 
 /// One food to buy, and how many packets that is.
@@ -536,6 +566,7 @@ class FuelDay {
             chosen:
                 s.choices.firstWhereOrNull((c) => c.id == mealId) ?? s.chosen,
             choices: s.choices,
+            timing: s.timing,
           ),
     ],
   );
@@ -558,7 +589,7 @@ class FuelDay {
 
     final from = minutes(now) - graceMinutes;
     return slots.firstWhereOrNull(
-      (s) => !logged.contains(s.slot.id) && minutes(s.slot.time) >= from,
+      (s) => !logged.contains(s.slot.id) && minutes(s.time) >= from,
     );
   }
 }
@@ -653,6 +684,9 @@ class FuelPlan {
   /// rotation, else the slot's first meal. v3 always took the first — which
   /// put chicken at lunch AND salmon at dinner, every day of the week.
   ///
+  /// [timing] is the day planner's, by slot id: when each meal is eaten on
+  /// that date. Without it each meal sits at its slot's target.
+  ///
   /// [extraKcal] is an adjustment he has APPLIED and that is still standing —
   /// v2 recomputed the bump on every read and stored nothing, so the moment it
   /// worked the target silently fell back to where it had stalled.
@@ -662,6 +696,7 @@ class FuelPlan {
     int extraKcal = 0,
     Map<String, String> chosen = const {},
     int? weekday,
+    Map<String, MealTiming> timing = const {},
   }) {
     final phase = phaseForWeek(weekNo);
     final defaults = weekday == null ? null : rotationFor(weekday)?.meals;
@@ -693,6 +728,7 @@ class FuelPlan {
                     find(chosen[s.id]) ??
                     find(defaults?[s.id]) ??
                     options.first,
+                timing: timing[s.id],
               );
             }(),
       ],

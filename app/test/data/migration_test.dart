@@ -418,7 +418,7 @@ void main() {
       expect(run.maxAltM, isNull);
       expect(await db.select(db.runPoints).get(), hasLength(3));
       await db.close();
-      expect(schemaVersionOf(dbFile), 4);
+      expect(schemaVersionOf(dbFile), AppDatabase.currentSchema);
     });
 
     test('a hike can be recorded on the upgraded database', () async {
@@ -459,8 +459,64 @@ void main() {
             );
         expect((await db.select(db.runs).get()).single.kind, RunKind.hike);
         await db.close();
-        expect(schemaVersionOf(dbFile), 4);
+        expect(schemaVersionOf(dbFile), AppDatabase.currentSchema);
       },
     );
+  });
+
+  group('v4 -> v5 (the planner)', () {
+    /// A phone on v0.15: schema v4, a hike, a session, no planner table.
+    Future<void> makeV4Database() async {
+      final db = AppDatabase(NativeDatabase(dbFile));
+      await db
+          .into(db.sessions)
+          .insert(
+            SessionsCompanion.insert(
+              programmeId: 'keller-twelve',
+              blockId: 'foundation',
+              dayId: 'f-mon',
+              weekNo: 1,
+              plannedDate: DateTime(2026, 10, 12),
+              scheduledDate: DateTime(2026, 10, 12),
+              status: const Value(SessionStatus.completed),
+            ),
+          );
+      await db
+          .into(db.runs)
+          .insert(
+            RunsCompanion.insert(
+              kind: const Value(RunKind.hike),
+              runOn: DateTime(2026, 10, 11),
+              startedAtMs: DateTime(2026, 10, 11, 9).millisecondsSinceEpoch,
+              maxAltM: const Value(187),
+            ),
+          );
+      await db.customStatement('DROP TABLE IF EXISTS planner_entries');
+      await db.customStatement('PRAGMA user_version = 4');
+      await db.close();
+    }
+
+    test('keeps what the phone holds, and the planner takes rows', () async {
+      await makeV4Database();
+      expect(schemaVersionOf(dbFile), 4);
+
+      final db = AppDatabase(NativeDatabase(dbFile));
+      expect(await db.select(db.sessions).get(), hasLength(1));
+      expect((await db.select(db.runs).get()).single.maxAltM, 187);
+      await db
+          .into(db.plannerEntries)
+          .insert(
+            PlannerEntriesCompanion.insert(
+              onDate: DateTime(2026, 10, 16),
+              kind: 'mark',
+              blockId: const Value('job2-fri'),
+            ),
+          );
+      final row = (await db.select(db.plannerEntries).get()).single;
+      expect(row.kind, 'mark');
+      expect(row.remind, isFalse);
+      await db.close();
+      expect(schemaVersionOf(dbFile), 5);
+    });
   });
 }
