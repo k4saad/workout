@@ -1,25 +1,34 @@
-# On-device checklist — v0.15.0+17
+# On-device checklist — v0.16.0+18
 
 What the tests cannot prove, because it needs the phone, the camera, the GPS
-or a night passing. Everything else is covered by `flutter test` (1,600-odd
-tests), the QA robots and the data gates V1–V21.
+or a night passing. Everything else is covered by `flutter test` (1,700-odd
+tests), the QA robots and the data gates V1–V22.
 
-v0.15 is v4 (docs/11-v4-plan.md): a working student's week — three half-hour
-sessions (Tue, Thu evening, Saturday morning) from **Monday 12 October** —
-four meals at about 2,300 kcal, and hikes, drawn in 3D on the hills they
-crossed. **This update migrates the database** (schema 3 → 4: runs learn
-whether they were a hike). The app copies the database before it migrates;
-a backup you hold yourself is still the first step.
+v0.16 is v4.1, the semester (docs/12-semester-plan.md), on top of v4
+(docs/11-v4-plan.md):
+
+- the final WS 26/27 timetable built in;
+- training moved to **Mon · Wed · Sat**;
+- every meal timed around the day;
+- a **planner** under Week;
+- notifications before classes, work and sessions.
+
+v4 itself brought four meals at about 2,300 kcal and hikes in 3D.
+
+**This update migrates the database**, from schema 3 or 4 to 5: runs learn
+whether they were a hike, and the planner gets its table. The app copies the
+database before it migrates. A backup you hold yourself is still the first
+step.
 
 Tick these in order. The first two protect everything else.
 
 ## Before installing
 
-- [ ] **Export a backup on v0.14**, and copy the zip off the phone (More →
+- [ ] **Export a backup first**, and copy the zip off the phone (More →
       Settings → Backup and files → Export full backup). This update
       migrates the database; a backup you hold yourself is the one that
       cannot be lost with the phone.
-- [ ] Install **`apk/keller-twelve-0.15.0+17-arm64.apk`** over the old app —
+- [ ] Install **`apk/keller-twelve-0.16.0+18-arm64.apk`** over the old app —
       do **not** uninstall first. (`-arm32` is only for a phone older than
       about 2017.) It is signed with the same key as v0.11 and v0.12
       (`389b93bc…b7b5`), so Android installs it as an update and keeps the data.
@@ -30,22 +39,22 @@ Tick these in order. The first two protect everything else.
       the same sessions as before, with the same sets.
 - [ ] The progress photos are still there and open.
 - [ ] Bodyweight history and measurements are unchanged.
-- [ ] Android asks for no new permission: v0.15 has exactly the
-      permissions v0.14 had (the elevation tiles use the internet
-      permission the map already has).
-- [ ] Every run is still in Progress → Runs, with its trail; Hikes is empty.
-- [ ] Today shows **"Programme updated to revision 3 — a new plan, starting
+- [ ] Android asks for no new permission: v0.16 has exactly the
+      permissions v0.14 and v0.15 had (the elevation tiles use the internet
+      permission the map already has; reminders use the notification and
+      exact-alarm permissions the rest timer already has).
+- [ ] Every run is still in Progress → Runs, with its trail.
+- [ ] Today shows **"Programme updated to revision 4 — a new plan, starting
       Monday 12 October"** once; dismissed, it stays gone. The sessions you
       logged on the old plan are in History as **"Earlier plan"**, sets
       intact.
 
-## The new week (v4 Phase G)
+## The new week (v4.1 Phase K)
 
-- [ ] Until 12 October, Today says **Week 1 starts Monday 12 October**.
-- [ ] Week shows Mon rest · **Tue Full Body A** · Wed rest · **Thu Full
-      Body B** · Fri rest · **Sat Full Body C** · Sun *Run or hike*
-      (optional). Each session says under half an hour.
-- [ ] A rest day on Today names the next session ("Next: Full Body A,
+- [ ] Week shows **Mon Full Body A** · Tue rest · **Wed Full Body B** · Thu
+      rest · Fri rest · **Sat Full Body C** · Sun *Run or hike* (optional).
+      Each session says under half an hour.
+- [ ] A rest day on Today names the next session ("Next: Full Body B,
       tomorrow").
 - [ ] Time one real session start to finish: under 30 minutes, warm-up
       included. If it runs over, tell me which part; the cure is less
@@ -53,13 +62,47 @@ Tick these in order. The first two protect everything else.
 - [ ] Past the estimate plus ten minutes, the runner offers to cut the last
       superset.
 
-## Four meals (v4 Phase H)
+## Four meals, around the day (v4 Phase H, v4.1 Phase L)
 
-- [ ] Fuel shows **Breakfast 06:45 · Lunch 13:30 · Evening snack 17:15 ·
-      Dinner 20:00** every day, about 2,300 kcal and 90 g protein or more.
-- [ ] On a training day the snack is marked as the session's fuel.
+- [ ] Fuel's times follow the day, about 2,300 kcal and 90 g protein or more:
+  - Monday: breakfast 07:30, lunch 13:00 **packed, at work**, snack 17:30
+    (fuel for the session), dinner 19:30;
+  - Tuesday: breakfast **06:10** before Job 2, lunch 13:45.
+- [ ] On Saturday, breakfast is the fuel for the 10:00 session.
 - [ ] The portions are food you would actually eat at those times; tell me
       any that are not, and the generator changes.
+
+## The planner (v4.1 Phase M)
+
+- [ ] **Week → the planner button** (or Today's **Your day** card) opens
+      the planner: seven days at a glance, each with its day drawn in, then
+      the chosen day as a timeline, with the free time in it.
+  - Monday has Geoinformation (Room 242), the ride to Job 2, the shift, the
+    ride home, the session at **18:00**.
+  - Tuesday has its free afternoon.
+- [ ] Tap a class: room and lecturer; **Skip this one** takes it off that
+      day only, and **Bring back** returns it.
+- [ ] On a Friday, **Job 2 this Friday** switches the 07:00 shift on, and
+      breakfast moves earlier.
+- [ ] Tap the session: **Start session** today; − / + and **Move to …**
+      move it, and its reminder moves with it.
+- [ ] **Add to this day**: an exam or a meeting, with chips and steppers,
+      reminded 15 minutes before.
+- [ ] The winter break (23 Dec – 3 Jan) shows work but no lectures.
+
+## Reminders (v4.1 Phase N)
+
+- [ ] Android asks to allow notifications if it never has. Allow them.
+- [ ] A class rings **15 minutes before**, with its room: "Spatial Justice ·
+      14:15", "Room 147 · Feitosa · in 15 minutes".
+- [ ] Work rings **when to leave**. Monday's Job 2 rings as Geoinformation
+      ends, not in the middle of it.
+- [ ] A session rings **half an hour before**, and not at all once you have
+      trained, or on the optional Sunday.
+- [ ] Skip a class in the planner: its reminder goes. Settings → Reminders
+      switches each kind off.
+- [ ] With the phone locked and the app closed, they still ring (exact
+      alarms). They are laid two weeks ahead each time you open the app.
 
 ## Hikes, in 3D (v4 Phase I)
 
@@ -216,5 +259,5 @@ Tick these in order. The first two protect everything else.
 When this list is ticked, tag the build so it can always be returned to:
 
 ```bash
-git tag v0.15-v4
+git tag v0.16-v4.1
 ```
