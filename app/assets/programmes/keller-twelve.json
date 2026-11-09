@@ -2,9 +2,9 @@
   "id": "keller-twelve",
   "name": "The Keller Twelve",
   "schemaVersion": 2,
-  "revision": 4,
+  "revision": 5,
   "startsFresh": true,
-  "startDate": "2026-10-12",
+  "startDate": "2026-11-09",
   "totalWeeks": 12,
   "notes": "A fitness block for a working student: 167 cm / 50 kg, training alone in a basement gym three times a week -- Monday and Wednesday evening, Saturday morning -- for about half an hour, with an optional run or hike on Sunday. Every load in this file is snapped to the plate lattice described in inventory.json -- change the inventory and regenerate with tools/gen.py rather than editing loads by hand.",
   "athlete": {
@@ -578,7 +578,7 @@
           "kind": "rest",
           "optional": false,
           "estMinutes": 0,
-          "note": "Your long day: Job 2 from 07:00, lectures until 17:45. Nothing else. Eat all four meals, lunch included.",
+          "note": "Rest. An early start: eat all four meals, lunch included, and nothing else is asked of you.",
           "warnings": [],
           "sections": []
         },
@@ -803,7 +803,7 @@
           "kind": "rest",
           "optional": false,
           "estMinutes": 0,
-          "note": "Rest. Job 1, then SII until 17:45. A walk between lectures counts.",
+          "note": "Rest. A walk between lectures counts.",
           "warnings": [],
           "sections": []
         },
@@ -814,7 +814,7 @@
           "kind": "rest",
           "optional": false,
           "estMinutes": 0,
-          "note": "Rest. Spatio-temporal data, Jumu'ah, the study project, home. Tomorrow morning is a session.",
+          "note": "Rest. Tomorrow morning is a session.",
           "warnings": [],
           "sections": []
         },
@@ -1336,7 +1336,7 @@
           "kind": "rest",
           "optional": false,
           "estMinutes": 0,
-          "note": "Rest. Your long day: Job 2 from 07:00, lectures until 17:45. Eat your four meals and sleep.",
+          "note": "Rest. Eat your four meals and sleep.",
           "warnings": [],
           "sections": []
         },
@@ -1558,7 +1558,7 @@
           "kind": "rest",
           "optional": false,
           "estMinutes": 0,
-          "note": "Complete rest. Job 1 and SII fill the day; nothing else is asked of you.",
+          "note": "Complete rest. Nothing else is asked of you today.",
           "warnings": [],
           "sections": []
         },
@@ -1569,7 +1569,7 @@
           "kind": "rest",
           "optional": false,
           "estMinutes": 0,
-          "note": "Rest. Jumu'ah, the study project, home. Tomorrow morning is a session: get to bed.",
+          "note": "Rest. Tomorrow morning is a session: get to bed.",
           "warnings": [],
           "sections": []
         },

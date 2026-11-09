@@ -433,6 +433,7 @@ class MealTiming {
     required this.time,
     this.packed = false,
     this.quick = false,
+    this.takeAlong = false,
     this.sessionFuel = false,
   });
 
@@ -444,6 +445,9 @@ class MealTiming {
 
   /// Squeezed into a short gap.
   final bool quick;
+
+  /// Eaten on a break in his study away from home: take it with you.
+  final bool takeAlong;
 
   /// The last meal before the session.
   final bool sessionFuel;

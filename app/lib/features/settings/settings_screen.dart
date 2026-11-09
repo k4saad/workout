@@ -24,8 +24,8 @@ class SettingsScreen extends ConsumerWidget {
           Text(
             'From the planner, two weeks ahead: a class 15 minutes before '
             'with its room, work when it is time to leave, a session half an '
-            'hour before. Nothing for a class you skipped, a session already '
-            'done or a rest day.',
+            'hour before, your study before it starts. Nothing for a class '
+            'you skipped, a session already done or a rest day.',
             style: t.bodyMedium?.copyWith(color: AppTheme.textDim),
           ),
           Gap.m,
@@ -64,6 +64,19 @@ class SettingsScreen extends ConsumerWidget {
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
+              secondary: const Icon(Icons.menu_book_outlined),
+              value: prefs.remindStudy,
+              title: const Text('Study'),
+              subtitle: const Text(
+                'German 15 minutes before; the library when it is time to '
+                'leave',
+              ),
+              onChanged: (on) => ref
+                  .read(preferencesProvider.notifier)
+                  .set(prefs.copyWith(remindStudy: on)),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
               value: prefs.launchQuote,
               title: const Text('A quote to open the day'),
               subtitle: const Text(
@@ -76,6 +89,17 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ],
 
+          Gap.xl,
+          Text('Your week', style: t.titleLarge),
+          Gap.s,
+          _Link(
+            icon: Icons.edit_calendar_outlined,
+            title: 'Your week',
+            body:
+                'Classes, work, German, the library: the timetable the '
+                'planner, Fuel and the reminders read. Change it here.',
+            onTap: () => context.go('/more/settings/timetable'),
+          ),
           Gap.xl,
           Text('The gym', style: t.titleLarge),
           Gap.s,

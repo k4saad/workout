@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
 import '../../app/planner_providers.dart';
@@ -16,7 +17,8 @@ import 'planner_style.dart';
 /// The semester, a week at a time: seven days at a glance, then the chosen
 /// day as a timeline — classes, work, the ride between, the session, the
 /// meals, and the free time left. Tap anything to see it or change it; add
-/// your own.
+/// your own. The week underneath is his to change too: "Your week", top
+/// right.
 class PlannerScreen extends ConsumerStatefulWidget {
   const PlannerScreen({super.key, this.initialDate});
 
@@ -51,7 +53,16 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
     void go(DateTime d) => setState(() => _selected = _day(d));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Planner')),
+      appBar: AppBar(
+        title: const Text('Planner'),
+        actions: [
+          IconButton(
+            tooltip: 'Your week',
+            icon: const Icon(Icons.edit_calendar_outlined),
+            onPressed: () => context.go('/week/planner/timetable'),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showEventSheet(context, ref, date: selected),
         icon: const Icon(Icons.add),
@@ -208,7 +219,7 @@ class _WeekStrip extends ConsumerWidget {
 }
 
 /// A day from 07:00 to 21:00 as a column of bars: classes and work grey,
-/// the session crimson, travel faint.
+/// the session crimson, travel faint, his own study an outline.
 class _MiniDayPainter extends CustomPainter {
   _MiniDayPainter(this.plan);
 
@@ -241,6 +252,12 @@ class _MiniDayPainter extends CustomPainter {
           _ => AppTheme.textDim,
         };
       final inset = i.kind == PlanKind.travel ? size.width * 0.3 : 3.0;
+      // Study is drawn hollow: told apart by its shape, not its grey.
+      if (i.kind == PlanKind.study) {
+        paint
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5;
+      }
       canvas.drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromLTRB(
@@ -250,7 +267,7 @@ class _MiniDayPainter extends CustomPainter {
             math.max(bottom, top + 2),
           ),
           const Radius.circular(3),
-        ),
+        ).deflate(i.kind == PlanKind.study ? 0.75 : 0),
         paint,
       );
     }
@@ -317,7 +334,9 @@ class _DayAgenda extends ConsumerWidget {
             tone: Tone.info,
             icon: Icons.beach_access_outlined,
             title: plan.breakName!,
-            body: 'No lectures. Work and everything of your own still are.',
+            body:
+                'No lectures. Work, study and everything of your own still '
+                'are.',
           ),
         ] else if (!plan.lectures &&
             timetable != null &&
@@ -327,7 +346,7 @@ class _DayAgenda extends ConsumerWidget {
             tone: Tone.info,
             icon: Icons.school_outlined,
             title: 'Lectures are over',
-            body: 'Work and everything of your own still are.',
+            body: 'Work, study and everything of your own still are.',
           ),
         ],
         for (final b in markable) ...[
@@ -453,6 +472,7 @@ class _ItemRow extends ConsumerWidget {
           ? [
               i.title,
               if (i.packed) 'packed, at work',
+              if (i.takeAlong) 'take it with you',
               if (i.quick) 'quick',
               if (i.sessionFuel) 'fuel for the session',
             ].join(' · ')

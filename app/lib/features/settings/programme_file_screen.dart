@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -12,6 +13,7 @@ import '../../app/editor_providers.dart';
 import '../../app/settings_providers.dart';
 import '../../app/session_providers.dart';
 import '../../app/restart_scope.dart';
+import '../../app/timetable_providers.dart';
 import '../../core/ui/ui.dart';
 import '../../data/backup_service.dart';
 import '../../data/programme_editor_service.dart';
@@ -269,6 +271,11 @@ class _ProgrammeFileScreenState extends ConsumerState<ProgrammeFileScreen> {
     // over the restored ones at the next toggle.
     if (!RestartScope.restart(context)) {
       ref.read(programmeEditControllerProvider.notifier).refreshAfterRestore();
+      unawaited(
+        ref
+            .read(timetableEditControllerProvider.notifier)
+            .refreshAfterRestore(),
+      );
       _say('Restored ${manifest.summary}.');
     }
   });

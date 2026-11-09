@@ -75,6 +75,7 @@ class _BlockSheet extends ConsumerWidget {
     final skipLabel = switch (i.kind) {
       PlanKind.job => 'Not working this time',
       PlanKind.prayer => 'Not this time',
+      PlanKind.study => 'Not today',
       _ => 'Skip this one',
     };
     return Padding(
@@ -145,6 +146,29 @@ class _BlockSheet extends ConsumerWidget {
             'goes.',
             style: t.bodySmall!.copyWith(color: AppTheme.textFaint),
           ),
+          if (i.blockId case final blockId?) ...[
+            Gap.m,
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                style: TextButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
+                icon: const Icon(Icons.edit_calendar_outlined),
+                label: const Text('Change it every week'),
+                onPressed: () {
+                  final router = GoRouter.of(context);
+                  Navigator.of(context).pop();
+                  router.go(
+                    Uri(
+                      path: '/week/planner/timetable',
+                      queryParameters: {'block': blockId},
+                    ).toString(),
+                  );
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -443,9 +467,10 @@ class _EventSheetState extends ConsumerState<_EventSheet> {
   }
 }
 
-/// A time (or a length) on two big buttons, fifteen minutes a tap: no
-/// keyboard, no clock face.
-class TimeStepper extends StatelessWidget {
+/// A time (or a length) on big buttons, fifteen minutes a tap, and held to
+/// keep going: no keyboard, no clock face. With [bigStep], an hour either
+/// side as well, so a timetable's 14:25 is a few taps from 10:00.
+class TimeStepper extends StatefulWidget {
   const TimeStepper({
     super.key,
     required this.minutes,
@@ -453,6 +478,7 @@ class TimeStepper extends StatelessWidget {
     this.min = 6 * 60,
     this.max = 23 * 60,
     this.step = 15,
+    this.bigStep,
     this.asLength = false,
   });
 
@@ -461,32 +487,112 @@ class TimeStepper extends StatelessWidget {
   final int min;
   final int max;
   final int step;
+  final int? bigStep;
 
   /// Shown as a length ("1 h 30") rather than a time of day.
   final bool asLength;
 
   @override
+  State<TimeStepper> createState() => _TimeStepperState();
+}
+
+class _TimeStepperState extends State<TimeStepper> {
+  Timer? _repeat;
+
+  @override
+  void dispose() {
+    _repeat?.cancel();
+    super.dispose();
+  }
+
+  void _bump(int delta) {
+    final next = (widget.minutes + delta).clamp(widget.min, widget.max);
+    if (next != widget.minutes) widget.onChanged(next);
+  }
+
+  void _hold(int delta) {
+    _repeat?.cancel();
+    _repeat = Timer.periodic(
+      const Duration(milliseconds: 120),
+      (_) => _bump(delta),
+    );
+  }
+
+  void _release() {
+    _repeat?.cancel();
+    _repeat = null;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Widget button(IconData icon, String tip, int delta) => SizedBox(
-      width: 56,
-      height: 56,
-      child: IconButton.filledTonal(
-        tooltip: tip,
-        onPressed: () => onChanged((minutes + delta).clamp(min, max)),
-        icon: Icon(icon),
+    final asLength = widget.asLength;
+    Widget button(IconData icon, String tip, int delta) => GestureDetector(
+      onLongPressStart: (_) => _hold(delta),
+      onLongPressEnd: (_) => _release(),
+      onLongPressCancel: _release,
+      child: SizedBox(
+        width: 56,
+        height: 56,
+        child: IconButton.filledTonal(
+          tooltip: tip,
+          onPressed: () => _bump(delta),
+          icon: Icon(icon),
+        ),
       ),
     );
-    return Row(
-      children: [
-        button(Icons.remove, asLength ? 'Shorter' : 'Earlier', -step),
-        Expanded(
+    Widget hour(String label, String tip, int delta) => SizedBox(
+      width: 52,
+      height: 56,
+      child: Tooltip(
+        message: tip,
+        child: OutlinedButton(
+          style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+          onPressed: () => _bump(delta),
           child: Text(
-            asLength ? plannerLength(minutes) : formatHhmm(minutes),
-            textAlign: TextAlign.center,
-            style: AppTheme.numeric(32),
+            label,
+            style: AppTheme.numeric(15, color: AppTheme.textDim),
           ),
         ),
-        button(Icons.add, asLength ? 'Longer' : 'Later', step),
+      ),
+    );
+    final big = widget.bigStep;
+    final bigLabel = big == null
+        ? ''
+        : big % 60 == 0
+        ? '${big ~/ 60} h'
+        : '$big';
+    return Row(
+      children: [
+        if (big != null) ...[
+          hour(
+            '−$bigLabel',
+            asLength ? 'An hour shorter' : 'An hour earlier',
+            -big,
+          ),
+          const SizedBox(width: 6),
+        ],
+        button(Icons.remove, asLength ? 'Shorter' : 'Earlier', -widget.step),
+        Expanded(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              asLength
+                  ? plannerLength(widget.minutes)
+                  : formatHhmm(widget.minutes),
+              textAlign: TextAlign.center,
+              style: AppTheme.numeric(32),
+            ),
+          ),
+        ),
+        button(Icons.add, asLength ? 'Longer' : 'Later', widget.step),
+        if (big != null) ...[
+          const SizedBox(width: 6),
+          hour(
+            '+$bigLabel',
+            asLength ? 'An hour longer' : 'An hour later',
+            big,
+          ),
+        ],
       ],
     );
   }

@@ -18,6 +18,7 @@ class Preferences {
     this.remindClasses = true,
     this.remindWork = true,
     this.remindSessions = true,
+    this.remindStudy = true,
     this.lastBackupAt,
     this.athleteName = defaultAthleteName,
     this.launchQuote = true,
@@ -45,6 +46,10 @@ class Preferences {
   final bool remindClasses;
   final bool remindWork;
   final bool remindSessions;
+
+  /// His own study (docs/13-your-week-plan.md): German 15 minutes before,
+  /// the library when it is time to leave. On by default, like the rest.
+  final bool remindStudy;
 
   /// When a full backup was last written. Null means never.
   final DateTime? lastBackupAt;
@@ -154,6 +159,7 @@ class Preferences {
     bool? remindClasses,
     bool? remindWork,
     bool? remindSessions,
+    bool? remindStudy,
     int? reminderHour,
     int? reminderMinute,
     DateTime? lastBackupAt,
@@ -171,6 +177,7 @@ class Preferences {
     remindClasses: remindClasses ?? this.remindClasses,
     remindWork: remindWork ?? this.remindWork,
     remindSessions: remindSessions ?? this.remindSessions,
+    remindStudy: remindStudy ?? this.remindStudy,
     reminderHour: reminderHour ?? this.reminderHour,
     reminderMinute: reminderMinute ?? this.reminderMinute,
     lastBackupAt: lastBackupAt ?? this.lastBackupAt,
@@ -201,6 +208,7 @@ class Preferences {
     remindClasses: j['remindClasses'] as bool? ?? true,
     remindWork: j['remindWork'] as bool? ?? true,
     remindSessions: j['remindSessions'] as bool? ?? true,
+    remindStudy: j['remindStudy'] as bool? ?? true,
     reminderHour: (j['reminderHour'] as num?)?.toInt() ?? 18,
     reminderMinute: (j['reminderMinute'] as num?)?.toInt() ?? 30,
     lastBackupAt: j['lastBackupAt'] == null
@@ -240,6 +248,7 @@ class Preferences {
     'remindClasses': remindClasses,
     'remindWork': remindWork,
     'remindSessions': remindSessions,
+    'remindStudy': remindStudy,
     'reminderHour': reminderHour,
     'reminderMinute': reminderMinute,
     'lastBackupAt': lastBackupAt?.toIso8601String(),

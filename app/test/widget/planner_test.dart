@@ -24,8 +24,8 @@ void main() {
   late ProgrammeRepository repo;
   late _Recorder notifications;
 
-  // Week 1: Monday 12 October 2026, the first day of term.
-  final monday = DateTime(2026, 10, 12);
+  // Week 1: Monday 9 November 2026, the week he restarted on.
+  final monday = DateTime(2026, 11, 9);
   DateTime day(int offset) =>
       DateTime(monday.year, monday.month, monday.day + offset);
 
@@ -70,6 +70,9 @@ void main() {
           programmeRepositoryProvider.overrideWithValue(repo),
           databaseProvider.overrideWithValue(db),
           todayProvider.overrideWith(() => _Today(monday)),
+          // Monday morning, so the fortnight of reminders starts here
+          // whatever day the test runs.
+          clockProvider.overrideWithValue(() => DateTime(2026, 11, 9, 7)),
           preferencesServiceProvider.overrideWithValue(
             PreferencesService(documentsDir: tmp),
           ),
@@ -117,28 +120,35 @@ void main() {
     ],
   );
 
-  testWidgets('Monday: the class, the shift, the ride, the session', (
+  testWidgets('Monday: the shift, the ride, the session, German', (
     tester,
   ) async {
     await pump(tester);
     expect(find.text('Week 1 of 12'), findsOneWidget);
-    expect(find.text('Monday 12 October'), findsOneWidget);
-    expect(find.text('Geoinformation in Society'), findsOneWidget);
+    expect(find.text('Monday 9 November'), findsOneWidget);
+    expect(find.text('Geoinformation in Society'), findsNothing);
     expect(find.text('Job 2'), findsOneWidget);
     expect(find.text('Full Body A'), findsOneWidget);
-    expect(find.text('10:15'), findsWidgets);
+    expect(find.text('German'), findsOneWidget);
+    expect(find.text('12:15'), findsWidgets);
     expect(find.text('18:00'), findsWidgets);
-    expect(find.textContaining('Room 242'), findsOneWidget);
+    expect(find.text('20:00'), findsWidgets);
     expect(find.textContaining('packed, at work'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('a tap on Tuesday shows its free afternoon', (tester) async {
+  testWidgets('Tuesday: the library, the snack taken along, then German', (
+    tester,
+  ) async {
     await pump(tester);
-    await tester.tap(find.text('13'));
+    await tester.tap(find.text('10'));
     await settle(tester);
-    expect(find.text('Tuesday 13 October'), findsOneWidget);
-    expect(find.text('Free 13:45–16:15 · 2 h 30'), findsOneWidget);
+    expect(find.text('Tuesday 10 November'), findsOneWidget);
+    expect(find.text('Geoinformatics Forum / GeoAI Primer'), findsOneWidget);
+    expect(find.text('Library'), findsOneWidget);
+    expect(find.textContaining('take it with you'), findsOneWidget);
+    expect(find.text('German'), findsOneWidget);
+    expect(find.text('Free 18:30–20:00 · 1 h 30'), findsOneWidget);
   });
 
   testWidgets('Friday: Job 2 is off until he marks it', (tester) async {
@@ -178,8 +188,8 @@ void main() {
       tester,
       // This Thursday's; next Thursday's exercise still rings.
       (b) =>
-          b.any((r) => r.title.startsWith('SII lecture') && r.at.day == 15) &&
-          !b.any((r) => r.title.startsWith('SII exercise') && r.at.day == 15),
+          b.any((r) => r.title.startsWith('SII lecture') && r.at.day == 12) &&
+          !b.any((r) => r.title.startsWith('SII exercise') && r.at.day == 12),
     );
     expect(laid, isNotEmpty, reason: 'the lecture rings, the exercise not');
 
@@ -240,7 +250,28 @@ void main() {
     await pump(tester, open: DateTime(2026, 12, 23));
     expect(find.text('Winter break'), findsOneWidget);
     expect(find.text('Job 1'), findsOneWidget);
+    expect(find.text('German'), findsOneWidget);
     expect(find.text('Spatial Justice'), findsNothing);
+  });
+
+  testWidgets('German skipped tonight goes quiet tonight only', (tester) async {
+    await pump(tester);
+    await tester.tap(find.text('German'));
+    await settle(tester);
+    await tester.pump(const Duration(milliseconds: 400)); // sheet open
+    expect(find.text('Change it every week'), findsOneWidget);
+    await tester.tap(find.text('Not today'));
+    await settle(tester, rounds: 12);
+
+    expect(find.text('SKIPPED'), findsOneWidget);
+    expect((await rows()).single.blockId, 'german');
+    final laid = await laidWhere(
+      tester,
+      (b) =>
+          !b.any((r) => r.title == 'German · 20:00' && r.at.day == 9) &&
+          b.any((r) => r.title == 'German · 20:00' && r.at.day == 10),
+    );
+    expect(laid, isNotEmpty, reason: 'tomorrow\'s still rings');
   });
 }
 

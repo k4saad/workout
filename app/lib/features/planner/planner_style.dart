@@ -12,11 +12,32 @@ const plannerCategories = <(String, String, IconData)>[
   ('other', 'Other', Icons.push_pin_outlined),
 ];
 
-/// Every kind of stretch has its own glyph: colour never carries it alone.
-IconData plannerIcon(PlanItem i) => switch (i.kind) {
+/// What a weekly block can be, as the editor offers it: a word and a glyph.
+String blockKindLabel(PlanKind kind) => switch (kind) {
+  PlanKind.lecture => 'Lecture',
+  PlanKind.job => 'Work',
+  PlanKind.study => 'Study',
+  PlanKind.prayer => 'Prayer',
+  _ => kind.name,
+};
+
+/// The glyph of a block of [kind]; study somewhere (the library) has its
+/// own.
+IconData blockKindIcon(PlanKind kind, {bool away = false}) => switch (kind) {
   PlanKind.lecture => Icons.school_outlined,
   PlanKind.job => Icons.work_outline,
   PlanKind.prayer => Icons.mosque_outlined,
+  PlanKind.study =>
+    away ? Icons.local_library_outlined : Icons.menu_book_outlined,
+  _ => Icons.push_pin_outlined,
+};
+
+/// Every kind of stretch has its own glyph: colour never carries it alone.
+IconData plannerIcon(PlanItem i) => switch (i.kind) {
+  PlanKind.lecture ||
+  PlanKind.job ||
+  PlanKind.prayer ||
+  PlanKind.study => blockKindIcon(i.kind, away: i.place != null),
   PlanKind.travel => Icons.directions_bike,
   PlanKind.session => Icons.fitness_center,
   PlanKind.meal => Icons.restaurant,
@@ -35,6 +56,7 @@ Color plannerColour(PlanKind kind) => switch (kind) {
   PlanKind.lecture => AppTheme.text,
   PlanKind.job => AppTheme.textDim,
   PlanKind.prayer => AppTheme.text,
+  PlanKind.study => AppTheme.text,
   PlanKind.event => AppTheme.text,
   PlanKind.travel || PlanKind.meal => AppTheme.textFaint,
 };
@@ -44,6 +66,7 @@ String plannerKindLabel(PlanItem i) => switch (i.kind) {
   PlanKind.lecture => i.optional ? 'Lecture · optional' : 'Lecture',
   PlanKind.job => 'Work',
   PlanKind.prayer => 'Prayer',
+  PlanKind.study => i.optional ? 'Study · optional' : 'Study',
   PlanKind.travel => 'Travel',
   PlanKind.session => i.optional ? 'Training · optional' : 'Training',
   PlanKind.meal => 'Meal',

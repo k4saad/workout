@@ -6,3 +6,4 @@ export 'day_planner.dart';
 export 'planner_entry.dart';
 export 'planner_reminders.dart';
 export 'timetable.dart';
+export 'timetable_validator.dart';

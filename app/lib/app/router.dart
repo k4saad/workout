@@ -18,6 +18,7 @@ import '../features/progress/shoot_viewer_screen.dart';
 import '../features/progress_hub/progress_hub_screen.dart';
 import '../features/runs/hikes_screen.dart';
 import '../features/planner/planner_screen.dart';
+import '../features/planner/timetable_screen.dart';
 import '../features/runs/live_run_screen.dart';
 import '../features/runs/runs_screen.dart';
 import '../features/session/session_runner_screen.dart';
@@ -95,6 +96,15 @@ GoRouter buildRouter() {
                         state.uri.queryParameters['date'] ?? '',
                       ),
                     ),
+                    routes: [
+                      // His week, to change: nested, so back is the planner.
+                      GoRoute(
+                        path: 'timetable',
+                        builder: (_, state) => TimetableScreen(
+                          openBlock: state.uri.queryParameters['block'],
+                        ),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: ':week/day/:dayId',
@@ -222,6 +232,10 @@ GoRouter buildRouter() {
                       GoRoute(
                         path: 'next-cycle',
                         builder: (_, _) => const CycleSeedScreen(),
+                      ),
+                      GoRoute(
+                        path: 'timetable',
+                        builder: (_, _) => const TimetableScreen(),
                       ),
                     ],
                   ),

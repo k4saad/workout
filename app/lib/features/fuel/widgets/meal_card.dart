@@ -87,15 +87,21 @@ class MealCard extends ConsumerWidget {
               ],
             ),
 
-            // Where the day put it: a shift with no gap, a short one.
+            // Where the day put it: a shift with no gap, a short one, a
+            // break in the library.
             if (slot.timing case final timing?
-                when timing.packed || timing.quick || isAroundSession) ...[
+                when timing.packed ||
+                    timing.quick ||
+                    timing.takeAlong ||
+                    isAroundSession) ...[
               Gap.s,
               Row(
                 children: [
                   Icon(
                     timing.packed
                         ? Icons.work_outline
+                        : timing.takeAlong
+                        ? Icons.backpack_outlined
                         : isAroundSession
                         ? Icons.bolt
                         : Icons.timer_outlined,
@@ -109,6 +115,7 @@ class MealCard extends ConsumerWidget {
                     child: Text(
                       [
                         if (timing.packed) 'Packed — eat it at work',
+                        if (timing.takeAlong) 'Take it with you',
                         if (timing.quick) 'Quick — a short gap',
                         if (isAroundSession) 'Fuel for the session',
                       ].join(' · '),

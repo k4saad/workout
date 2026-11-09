@@ -5,7 +5,8 @@ One user, one programme, no backend, no accounts, no network except open
 map and elevation data (OpenStreetMap tiles, AWS Terrain Tiles).
 
 **Plan:** `docs/03-build-plan.md` (v1/v2), `docs/06-v3-plan.md` (v3),
-`docs/11-v4-plan.md` (v4) and `docs/12-semester-plan.md` (v4.1, current).
+`docs/11-v4-plan.md` (v4), `docs/12-semester-plan.md` (v4.1) and
+`docs/13-your-week-plan.md` (v4.2, current).
 Follow the phases in order; do not skip ahead.
 **Programme:** `docs/01-programme.md`. **Specs:** `docs/02-data-model.md`.
 **Why things are the way they are:** `docs/00-audit.md`.
@@ -70,10 +71,14 @@ Follow the phases in order; do not skip ahead.
   week for a working student; v4.1 (docs/12-semester-plan.md) put them on Monday and
   Wednesday after work and class, and Saturday morning. V11 fails any session over
   35 minutes. If a change pushes a day over, cut volume — do not raise the estimate.
-- **His week is data too.** `data/timetable.json` (authored, V22, mirrored) holds the
-  semester: lectures, shifts, rooms, the break, the travel time. The day planner
-  (`lib/domain/planner/`) lays each date out from it — travel, the session, the meals —
-  and Fuel, Today, the planner and the reminders all read that one plan.
+- **His week is data too, and his to change.** He edits it on the phone (Week →
+  Planner → Your week): lectures, shifts, prayer, study (German, the library), the
+  break, the travel time, places. That copy lives in app-private storage and goes into
+  backups; `data/timetable.json` (authored, V22, mirrored) is only what a fresh install
+  starts from. A timetable change is his to make in the app — do not hardcode one in
+  Dart. The day planner (`lib/domain/planner/`) lays each date out from it — travel, the
+  session, the meals — and Fuel, Today, the planner and the reminders all read that one
+  plan.
 
 ## Progress photos — non-negotiable
 

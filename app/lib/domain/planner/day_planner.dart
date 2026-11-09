@@ -20,6 +20,7 @@ class PlanItem {
     this.optional = false,
     this.packed = false,
     this.quick = false,
+    this.takeAlong = false,
     this.sessionFuel = false,
     this.moved = false,
     this.remind = false,
@@ -50,6 +51,10 @@ class PlanItem {
 
   /// A meal squeezed into a short gap.
   final bool quick;
+
+  /// A meal in the middle of his own study away from home — the library —
+  /// eaten on a break there: take it with you.
+  final bool takeAlong;
 
   /// The last meal before the session: its fuel.
   final bool sessionFuel;
@@ -186,9 +191,34 @@ class MealTarget {
   final int quickMinutes;
 }
 
+/// One place a meal could go, and what it costs to eat it there.
+class _MealSlot {
+  _MealSlot(
+    this.start,
+    this.length,
+    this.cost, {
+    this.packed = false,
+    this.quick = false,
+    this.along = false,
+  });
+
+  final int start;
+  final int length;
+
+  /// Minutes from the meal's time, plus what eating it there is worth.
+  final int cost;
+  final bool packed;
+  final bool quick;
+  final bool along;
+
+  /// The cheapest way to get here, the meals before it included.
+  int total = 0;
+  _MealSlot? before;
+}
+
 /// Plans a date: the timetable's blocks for it, his own entries, the travel
-/// between places, the session after the last commitment (or on a free
-/// morning), and each meal at the free time nearest its target.
+/// between places, the session after the day's commitments (or on a free
+/// morning), and the day's meals as near their times as the day allows.
 ///
 /// Pure: hand it a date, the programme's day and his entries; it touches
 /// no clock, no database and no plugin.
@@ -201,6 +231,7 @@ class DayPlanner {
     this.mealGapMinutes = 90,
     this.earliestMeal = 6 * 60,
     this.latestSession = 20 * 60 + 30,
+    this.homeMinutes = 60,
   });
 
   final Timetable timetable;
@@ -217,7 +248,26 @@ class DayPlanner {
   final int earliestMeal;
   final int latestSession;
 
+  /// The least time at home that makes going home between two things worth
+  /// the two rides: with 30 minutes' travel, a gap of two hours.
+  final int homeMinutes;
+
+  /// What eating a meal somewhere other than at home or between things is
+  /// worth, in minutes from its time. A short gap costs a little; a break
+  /// in the library a little more; a meal packed for work is worth it only
+  /// to save the day's meals an hour and a half of lateness between them.
+  /// So Tuesday's breakfast is at 06:10, before the 07:00 shift (80 minutes
+  /// early beats one at work), and Thursday's lunch is packed (eaten at
+  /// 15:45 instead, it would push dinner past German).
+  static const _quickCost = 15;
+  static const _alongCost = 20;
+  static const _packedCost = 90;
+
+  /// A meal the day has no room for at all.
+  static const _nowhereCost = 100000;
+
   static int _roundUp15(int m) => (m + 14) ~/ 15 * 15;
+  static int _roundUp5(int m) => (m + 4) ~/ 5 * 5;
 
   DayPlan plan(
     DateTime date, {
@@ -257,7 +307,7 @@ class DayPlanner {
     final commitments = <PlanItem>[];
     final skipped = <PlanItem>[];
     for (final b in timetable.on(weekday)) {
-      if (b.kind == PlanKind.lecture && !lectures) continue;
+      if (!timetable.runsOn(b, day)) continue;
       if (b.onlyWhenMarked && !markedIds.contains(b.id)) continue;
       if (skippedIds.contains(b.id)) {
         skipped.add(fromBlock(b));
@@ -284,72 +334,132 @@ class DayPlanner {
     }
     commitments.sort((a, b) => a.start.compareTo(b.start));
 
-    // Travel: to the first place, between two places, and home.
+    // Travel: to the first place, between two places, and home. A gap long
+    // enough to be worth the two rides is spent at home.
     final t = timetable.travelMinutes;
     final placed = [
       for (final c in commitments)
         if (c.place != null) c,
     ];
     final travel = <PlanItem>[];
-    PlanItem leg(int start, int end, String to) => PlanItem(
-      id: 'travel:${travel.length}',
-      kind: PlanKind.travel,
-      title: to == 'home' ? 'Home' : 'To ${timetable.places[to] ?? to}',
-      start: start,
-      end: end,
-      place: to,
-    );
-    if (placed.isNotEmpty) {
+    void leg(int start, int end, String to) {
+      if (end <= start) return;
       travel.add(
-        leg(placed.first.start - t, placed.first.start, placed.first.place!),
+        PlanItem(
+          id: 'travel:${travel.length}',
+          kind: PlanKind.travel,
+          title: to == 'home' ? 'Home' : 'To ${timetable.places[to] ?? to}',
+          start: start,
+          end: end,
+          place: to,
+        ),
       );
-      for (var i = 1; i < placed.length; i++) {
-        final a = placed[i - 1], b = placed[i];
-        if (a.place == b.place) continue;
-        final from = math.max(a.end, b.start - t);
-        if (b.start > from) travel.add(leg(from, b.start, b.place!));
+    }
+
+    if (placed.isNotEmpty) {
+      leg(placed.first.start - t, placed.first.start, placed.first.place!);
+      var at = placed.first;
+      for (final next in placed.skip(1)) {
+        final gap = next.start - at.end;
+        if (gap >= 2 * t + homeMinutes) {
+          leg(at.end, at.end + t, 'home');
+          leg(next.start - t, next.start, next.place!);
+        } else if (next.place != at.place) {
+          leg(math.max(at.end, next.start - t), next.start, next.place!);
+        }
+        if (next.end > at.end) at = next;
       }
-      travel.add(leg(placed.last.end, placed.last.end + t, 'home'));
+      leg(at.end, at.end + t, 'home');
+    }
+
+    // Out of the house: from leaving to getting back.
+    final out = <(int, int)>[];
+    int? leftAt;
+    for (final l in travel) {
+      if (l.place == 'home') {
+        if (leftAt != null) out.add((leftAt, l.end));
+        leftAt = null;
+      } else {
+        leftAt ??= l.start;
+      }
     }
 
     // Hard: nothing else can happen in it. A shift is soft: a meal can be
-    // taken to work when there is nowhere else to eat it.
+    // taken to work when there is nowhere else to eat it. His own study
+    // somewhere — the library — is open: a meal can be eaten on a break
+    // there. German, anywhere, is his hour: hard.
+    bool isOpen(PlanItem c) => c.kind == PlanKind.study && c.place != null;
     final hard = [
       for (final c in commitments)
-        if (c.kind != PlanKind.job) c,
+        if (c.kind != PlanKind.job && !isOpen(c)) c,
       ...travel,
     ];
     final jobs = [
       for (final c in commitments)
         if (c.kind == PlanKind.job) c,
     ];
-    bool free(int s, int e, {bool allowJobs = false}) =>
-        !hard.any((h) => h.overlaps(s, e)) &&
-        (allowJobs || !jobs.any((j) => j.overlaps(s, e)));
+    final open = [
+      for (final c in commitments)
+        if (isOpen(c)) c,
+    ];
+    bool clear(List<PlanItem> xs, int s, int e) =>
+        !xs.any((x) => x.overlaps(s, e));
 
-    // The session.
+    // The session: in the basement, so at home, with time to settle after
+    // getting back.
     PlanItem? sessionItem;
     if (session != null && session.isTrainingDay) {
       final length = math.max(15, session.estMinutes);
       final moved = mine.where(
         (e) => e.kind == EntryKind.sessionTime && e.start != null,
       );
+      bool atHome(int s, int e) =>
+          out.every((o) => e <= o.$1 || s >= o.$2 + settleMinutes);
+      bool fits(int s) =>
+          clear(hard, s, s + length) &&
+          clear(jobs, s, s + length) &&
+          clear(open, s, s + length) &&
+          atHome(s, s + length);
+      int? first(int from, int to) {
+        for (var s = from; s <= to; s += 15) {
+          if (fits(s)) return s;
+        }
+        return null;
+      }
+
       int start;
       if (moved.isNotEmpty) {
         start = moved.last.start!;
       } else {
         final weekend = weekday == Weekday.sat || weekday == Weekday.sun;
-        final morningFree = free(
-          freeMorningSession,
-          freeMorningSession + length + settleMinutes,
-        );
-        if (commitments.isEmpty || (weekend && morningFree)) {
-          start = freeMorningSession;
+        // What the day is built around: classes, work, prayer, his own
+        // entries. His weekly study is not: German in the evening comes
+        // after the session, it does not push it later.
+        final obligations = [
+          for (final c in commitments)
+            if (c.kind != PlanKind.study) c,
+        ];
+        final m = freeMorningSession;
+        final morningFree =
+            fits(m) &&
+            clear([...hard, ...jobs, ...open], m, m + length + settleMinutes);
+        if ((obligations.isEmpty || weekend) && morningFree) {
+          start = m;
         } else {
-          final lastEnd = commitments
-              .map((c) => c.end + (c.place != null ? t : 0))
-              .reduce(math.max);
-          start = math.min(_roundUp15(lastEnd + settleMinutes), latestSession);
+          final base = obligations.isEmpty
+              ? m
+              : _roundUp15(
+                  obligations
+                          .map((c) => c.end + (c.place != null ? t : 0))
+                          .reduce(math.max) +
+                      settleMinutes,
+                );
+          // The first free time after them; later than usual rather than
+          // on top of anything; where it always went when nothing is free.
+          start =
+              first(base, latestSession) ??
+              first(math.max(base, latestSession + 15), 23 * 60 - length) ??
+              math.min(base, latestSession);
         }
       }
       sessionItem = PlanItem(
@@ -364,11 +474,12 @@ class DayPlanner {
       hard.add(sessionItem);
     }
 
-    // The meals, in order, each at the free time nearest its target.
+    // The meals: the day's four as near their times as it allows, chosen
+    // together. One at a time, a late lunch pushed the snack and the snack
+    // pushed dinner past German.
     final s = sessionItem;
     final morningSession = s != null && s.start < 12 * 60;
-    final placedMeals = <PlanItem>[];
-    int? previousStart;
+    List<_MealSlot>? previous;
     for (final m in meals) {
       var target = m.target;
       var earliest = earliestMeal;
@@ -381,57 +492,96 @@ class DayPlanner {
           if (m.id == meals.last.id) earliest = s.end + 20;
         }
       }
-      earliest = math.max(earliest, target - 150);
-      if (previousStart != null) {
-        earliest = math.max(earliest, previousStart + mealGapMinutes);
-      }
-      final latest = math.max(earliest, target + 180);
+      final lo = _roundUp5(math.max(earliest, target - 150));
+      final hi = math.max(lo, target + 180);
 
-      int? best(int length, {bool atWork = false}) {
-        int? pick;
-        for (var t0 = earliest; t0 <= latest; t0 += 5) {
-          final t1 = t0 + length;
-          final ok = atWork
-              ? !hard.any((h) => h.overlaps(t0, t1)) &&
-                    jobs.any((j) => t0 >= j.start && t1 <= j.end)
-              : free(t0, t1);
-          if (!ok) continue;
-          if (pick == null || (t0 - target).abs() < (pick - target).abs()) {
-            pick = t0;
+      _MealSlot? slotAt(int t0) {
+        final full = t0 + m.minutes, short = t0 + m.quickMinutes;
+        final dev = (t0 - target).abs();
+        final calm = clear(hard, t0, full);
+        if (calm && clear(jobs, t0, full) && clear(open, t0, full)) {
+          return _MealSlot(t0, m.minutes, dev);
+        }
+        if (clear(hard, t0, short) &&
+            clear(jobs, t0, short) &&
+            clear(open, t0, short)) {
+          return _MealSlot(t0, m.quickMinutes, dev + _quickCost, quick: true);
+        }
+        if (calm &&
+            clear(jobs, t0, full) &&
+            open.any((o) => t0 >= o.start && full <= o.end)) {
+          return _MealSlot(t0, m.minutes, dev + _alongCost, along: true);
+        }
+        if (calm && jobs.any((j) => t0 >= j.start && full <= j.end)) {
+          return _MealSlot(t0, m.minutes, dev + _packedCost, packed: true);
+        }
+        return null;
+      }
+
+      final options = [
+        for (var t0 = lo; t0 <= hi; t0 += 5) ?slotAt(t0),
+        // Nowhere free at all: its time anyway. The day is simply full.
+        _MealSlot(target.clamp(lo, hi), m.minutes, _nowhereCost),
+      ];
+      final layer = <_MealSlot>[];
+      if (previous == null) {
+        for (final o in options) {
+          layer.add(o..total = o.cost);
+        }
+      } else {
+        for (final o in options) {
+          _MealSlot? best;
+          for (final p in previous) {
+            if (p.start + mealGapMinutes > o.start) continue;
+            if (best == null || p.total < best.total) best = p;
+          }
+          if (best == null) continue;
+          layer.add(
+            o
+              ..before = best
+              ..total = best.total + o.cost,
+          );
+        }
+        if (layer.isEmpty) {
+          // Nothing in its window comes late enough after the meal before:
+          // the first minute that does.
+          for (final p in previous) {
+            final at = p.start + mealGapMinutes;
+            final cost = _nowhereCost + (at - target).abs();
+            layer.add(
+              _MealSlot(at, m.minutes, cost)
+                ..before = p
+                ..total = p.total + cost,
+            );
           }
         }
-        return pick;
       }
-
-      var start = best(m.minutes);
-      var length = m.minutes;
-      var packed = false;
-      var quick = false;
-      if (start == null) {
-        start = best(m.quickMinutes);
-        if (start != null) {
-          length = m.quickMinutes;
-          quick = true;
-        }
-      }
-      if (start == null) {
-        start = best(m.minutes, atWork: true);
-        packed = start != null;
-      }
-      start ??= target.clamp(earliest, latest);
-      placedMeals.add(
-        PlanItem(
-          id: 'meal:${m.id}',
-          kind: PlanKind.meal,
-          title: m.name,
-          start: start,
-          end: start + length,
-          packed: packed,
-          quick: quick,
-        ),
-      );
-      previousStart = start;
+      previous = layer;
     }
+
+    final chosen = <_MealSlot>[];
+    if (previous != null && previous.isNotEmpty) {
+      _MealSlot? cheapest;
+      for (final o in previous) {
+        if (cheapest == null || o.total < cheapest.total) cheapest = o;
+      }
+      for (_MealSlot? o = cheapest; o != null; o = o.before) {
+        chosen.insert(0, o);
+      }
+    }
+    final placedMeals = [
+      for (var i = 0; i < chosen.length; i++)
+        PlanItem(
+          id: 'meal:${meals[i].id}',
+          kind: PlanKind.meal,
+          title: meals[i].name,
+          start: chosen[i].start,
+          end: chosen[i].start + chosen[i].length,
+          packed: chosen[i].packed,
+          quick: chosen[i].quick,
+          takeAlong: chosen[i].along,
+        ),
+    ];
 
     // The session's fuel: the last meal finished before it starts.
     if (s != null) {
@@ -446,6 +596,7 @@ class DayPlanner {
           end: f.end,
           packed: f.packed,
           quick: f.quick,
+          takeAlong: f.takeAlong,
           sessionFuel: true,
         );
       }
@@ -456,6 +607,7 @@ class DayPlanner {
       PlanKind.lecture: 1,
       PlanKind.job: 1,
       PlanKind.prayer: 1,
+      PlanKind.study: 1,
       PlanKind.event: 1,
       PlanKind.session: 2,
       PlanKind.meal: 3,

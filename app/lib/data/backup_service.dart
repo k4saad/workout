@@ -88,6 +88,9 @@ class BackupService {
   static const manifestEntry = 'manifest.json';
   static const programmeEntry = 'programmes/programme.json';
   static const inventoryEntry = 'programmes/inventory.json';
+
+  /// His week, once he has changed it (docs/13-your-week-plan.md).
+  static const timetableEntry = 'programmes/timetable.json';
   static const preferencesEntry = 'preferences.json';
   static const photosPrefix = 'photos/';
   static const clipsPrefix = 'clips/';
@@ -151,6 +154,7 @@ class BackupService {
     for (final (path, entry) in [
       (p.join(docs.path, 'programmes', 'programme.json'), programmeEntry),
       (p.join(docs.path, 'programmes', 'inventory.json'), inventoryEntry),
+      (p.join(docs.path, 'programmes', 'timetable.json'), timetableEntry),
       (p.join(docs.path, 'preferences.json'), preferencesEntry),
     ]) {
       final f = File(path);
@@ -251,6 +255,7 @@ class BackupService {
     final known =
         name == programmeEntry ||
         name == inventoryEntry ||
+        name == timetableEntry ||
         name == preferencesEntry ||
         name.startsWith(photosPrefix) ||
         name.startsWith(clipsPrefix);

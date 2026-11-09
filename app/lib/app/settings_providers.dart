@@ -27,8 +27,8 @@ class PreferencesNotifier extends AsyncNotifier<Preferences> {
   }
 
   /// Re-lays the next two weeks of reminders from the planner: classes,
-  /// work, sessions and his own entries. Two, so a week without opening the
-  /// app still rings.
+  /// work, sessions, his study and his own entries. Two, so a week without
+  /// opening the app still rings.
   ///
   /// Called on every change, on launch and from the planner: a reminder laid
   /// a week ago for a class he has since skipped would still ring.
@@ -38,12 +38,15 @@ class PreferencesNotifier extends AsyncNotifier<Preferences> {
     // v3's fixed-time evening nudge is gone: the planner knows the time.
     await notifications.cancelSessionReminders();
     if (prefs == null ||
-        !(prefs.remindClasses || prefs.remindWork || prefs.remindSessions)) {
+        !(prefs.remindClasses ||
+            prefs.remindWork ||
+            prefs.remindSessions ||
+            prefs.remindStudy)) {
       await notifications.cancelPlannerReminders();
       return;
     }
 
-    final now = DateTime.now();
+    final now = ref.read(clockProvider)();
     final today = DateTime(now.year, now.month, now.day);
     final planner = await ref.read(dayPlannerProvider.future);
     final bundle = await ref.read(bundleProvider.future);
@@ -80,6 +83,7 @@ class PreferencesNotifier extends AsyncNotifier<Preferences> {
       classes: prefs.remindClasses,
       work: prefs.remindWork,
       sessions: prefs.remindSessions,
+      study: prefs.remindStudy,
       trained: trained,
     );
     await notifications.schedulePlannerReminders(reminders);

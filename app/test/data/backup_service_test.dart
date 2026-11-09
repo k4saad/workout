@@ -220,6 +220,20 @@ void main() {
     expect(photo.lengthSync(), 512);
   });
 
+  test('his week, once changed, goes into the backup and comes back', () async {
+    await seed();
+    final week = File(p.join(docs.path, 'programmes', 'timetable.json'))
+      ..writeAsStringSync(jsonEncode({'name': 'Mine', 'blocks': []}));
+    final zip = File(p.join(docs.path, 'backup.zip'));
+    await backup.export(zip, includeMedia: false);
+
+    week.deleteSync();
+    await backup.restore(zip);
+
+    expect(week.existsSync(), isTrue);
+    expect((jsonDecode(week.readAsStringSync()) as Map)['name'], 'Mine');
+  });
+
   test('restoring a file that is not a backup fails loudly', () async {
     final junk = File(p.join(docs.path, 'holiday.zip'));
     // A valid zip, but not ours.

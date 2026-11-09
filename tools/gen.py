@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the Keller Twelve data files (v3: programme revision 2).
+"""Generate the Keller Twelve data files (v4.2: programme revision 5).
 
 Everything numeric is computed, never typed:
   - every startLoadKg is snapped onto the plate lattice for its loadMode
@@ -400,9 +400,12 @@ WARN_PAD = {"title": "Pad the hip thrust bar",
 # ----------------------------------------------------------------------------
 # v4: a working student's week. Three full-body sessions of about half an
 # hour — Monday after work, Wednesday after Spatial Justice, Saturday morning —
-# and an optional run or hike on Sunday. Tuesday and Thursday, the two long
-# days (07:00-17:45 and 09:00-17:45), and Friday are rest.
+# and an optional run or hike on Sunday. Tuesday, Thursday and Friday are rest.
 # docs/11-v4-plan.md, moved by docs/12-semester-plan.md.
+#
+# A rest day's note says what rest is for, never what is on the timetable:
+# the week lives on the phone now (docs/13-your-week-plan.md), he changes it
+# there, and a note naming a class would be wrong the day he does.
 # ----------------------------------------------------------------------------
 def rest_day(did, weekday, note):
     return D(did, weekday, "Rest", "rest", [], note=note)
@@ -451,8 +454,8 @@ WARMUP_UPPER = [
 # ============================================================================
 # FOUNDATION — weeks 1-4
 # ============================================================================
-f_tue = rest_day("f-tue", "tue", "Your long day: Job 2 from 07:00, lectures until 17:45. "
-                 "Nothing else. Eat all four meals, lunch included.")
+f_tue = rest_day("f-tue", "tue", "Rest. An early start: eat all four meals, lunch "
+                 "included, and nothing else is asked of you.")
 
 f_mon = D("f-mon", "mon", "Full Body A", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_LOWER),
@@ -484,8 +487,7 @@ f_mon = D("f-mon", "mon", "Full Body A", "lift", [
 ], note="Squat-led, about half an hour. Light on purpose — you are learning the patterns.",
    warnings=[WARN_PINS_SQ, WARN_COLLAR])
 
-f_thu = rest_day("f-thu", "thu", "Rest. Job 1, then SII until 17:45. A walk between "
-                 "lectures counts.")
+f_thu = rest_day("f-thu", "thu", "Rest. A walk between lectures counts.")
 
 f_wed = D("f-wed", "wed", "Full Body B", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_HINGE),
@@ -518,8 +520,7 @@ f_wed = D("f-wed", "wed", "Full Body B", "lift", [
 ], note="Hinge-led: the deadlift and the overhead press, then a quick pull-and-squat superset.",
    warnings=[WARN_BAR_HT, WARN_CEIL, WARN_COLLAR])
 
-f_fri = rest_day("f-fri", "fri", "Rest. Spatio-temporal data, Jumu'ah, the study "
-                 "project, home. Tomorrow morning is a session.")
+f_fri = rest_day("f-fri", "fri", "Rest. Tomorrow morning is a session.")
 
 f_sat = D("f-sat", "sat", "Full Body C", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_UPPER),
@@ -580,8 +581,7 @@ def from_week4(pid, prog, rmin, rmax, creep):
     return handoff(pres(FOUNDATION_DAYS, pid), prog, rmin, rmax, creep)
 
 
-b_tue = rest_day("b-tue", "tue", "Rest. Your long day: Job 2 from 07:00, lectures "
-                 "until 17:45. Eat your four meals and sleep.")
+b_tue = rest_day("b-tue", "tue", "Rest. Eat your four meals and sleep.")
 
 b_mon = D("b-mon", "mon", "Full Body A · Squat", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_LOWER),
@@ -609,8 +609,7 @@ b_mon = D("b-mon", "mon", "Full Body A · Squat", "lift", [
 ], note="Squat-led. The most important set of your week is the first one.",
    warnings=[WARN_PINS_SQ, WARN_COLLAR])
 
-b_thu = rest_day("b-thu", "thu", "Complete rest. Job 1 and SII fill the day; nothing "
-                 "else is asked of you.")
+b_thu = rest_day("b-thu", "thu", "Complete rest. Nothing else is asked of you today.")
 
 b_wed = D("b-wed", "wed", "Full Body B · Deadlift", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_HINGE),
@@ -638,8 +637,7 @@ b_wed = D("b-wed", "wed", "Full Body B · Deadlift", "lift", [
 ], note="Hinge and press. Short, heavy-ish, done.",
    warnings=[WARN_BAR_HT, WARN_CEIL, WARN_COLLAR])
 
-b_fri = rest_day("b-fri", "fri", "Rest. Jumu'ah, the study project, home. Tomorrow "
-                 "morning is a session: get to bed.")
+b_fri = rest_day("b-fri", "fri", "Rest. Tomorrow morning is a session: get to bed.")
 
 b_sat = D("b-sat", "sat", "Full Body C · Bench", "lift", [
     S("warmup", "Warm-up", drills=WARMUP_UPPER),
@@ -769,12 +767,14 @@ PROGRAMME = {
     # runs. An installed copy with a lower revision is upgraded by the app.
     # 3 = v4: three 30-minute sessions for a working student's week.
     # 4 = v4.1: the same sessions moved to Mon/Wed/Sat for the final timetable.
-    "revision": 4,
-    # v4 is a new plan, chosen to start with the semester: the phone takes
-    # this start date on upgrade instead of keeping its old one. Still true
-    # for v4.1: a phone on v3 skips straight here.
+    # 5 = v4.2: the same plan again from Monday 9 November, when Saad's week
+    #     changed (docs/13-your-week-plan.md); rest notes free of the timetable.
+    "revision": 5,
+    # A new start, so the phone takes this date on upgrade instead of keeping
+    # its old one (v4 started on 12 October; Saad restarted week 1 on
+    # 9 November). A phone on v3 skips straight here.
     "startsFresh": True,
-    "startDate": "2026-10-12",
+    "startDate": "2026-11-09",
     "totalWeeks": 12,
     "notes": ("A fitness block for a working student: 167 cm / 50 kg, training alone in a "
               "basement gym three times a week -- Monday and Wednesday evening, Saturday morning -- "

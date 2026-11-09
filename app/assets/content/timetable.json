@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "name": "Winter Semester 2026/27",
-  "note": "Authored from WS_26_27_Timetable_A3_v7 (2026-10-12). Class times are c.t.: they already include the academic quarter. Mirrored into app/assets/content/ by tools/gen.py; checked by tools/validate.py (V22).",
+  "note": "Authored from WS_26_27_Timetable_A3_v7 (2026-10-12), changed by Saad on 2026-11-09: Geoinformation in Society dropped, Spatial Justice on Wednesday only, no study project; German every day and the library on Tuesday and Friday added. Class times are c.t.: they already include the academic quarter. The phone's copy is his to edit (Week > Planner > Your week); this file is only what a fresh install starts from. Mirrored into app/assets/content/ by tools/gen.py; checked by tools/validate.py (V22).",
   "lectures": {"from": "2026-10-12", "to": "2027-02-05"},
   "breaks": [
     {"name": "Winter break", "from": "2026-12-23", "to": "2027-01-03"}
@@ -10,52 +10,50 @@
   "places": {
     "campus": "Campus",
     "job1": "Job 1",
-    "job2": "Job 2"
+    "job2": "Job 2",
+    "library": "Library"
   },
   "blocks": [
-    {"id": "gis-mon", "weekday": "mon", "start": "10:15", "end": "11:45",
-     "kind": "lecture", "title": "Geoinformation in Society",
-     "place": "campus", "room": "Room 242", "who": "Kray"},
-    {"id": "job2-mon", "weekday": "mon", "start": "12:15", "end": "17:00",
+    {"id": "job2-mon", "days": ["mon"], "start": "12:15", "end": "17:00",
      "kind": "job", "title": "Job 2", "place": "job2"},
 
-    {"id": "job2-tue", "weekday": "tue", "start": "07:00", "end": "11:45",
+    {"id": "job2-tue", "days": ["tue"], "start": "07:00", "end": "11:45",
      "kind": "job", "title": "Job 2", "place": "job2"},
-    {"id": "forum-tue", "weekday": "tue", "start": "12:15", "end": "13:45",
+    {"id": "forum-tue", "days": ["tue"], "start": "12:15", "end": "13:45",
      "kind": "lecture", "title": "Geoinformatics Forum / GeoAI Primer",
      "place": "campus", "room": "Room 242"},
-    {"id": "gis-tue", "weekday": "tue", "start": "16:15", "end": "17:45",
-     "kind": "lecture", "title": "Geoinformation in Society",
-     "place": "campus", "room": "Room 242", "who": "Kray"},
 
-    {"id": "job1-wed", "weekday": "wed", "start": "09:00", "end": "13:45",
+    {"id": "job1-wed", "days": ["wed"], "start": "09:00", "end": "13:45",
      "kind": "job", "title": "Job 1", "place": "job1"},
-    {"id": "sj-wed", "weekday": "wed", "start": "14:15", "end": "15:45",
+    {"id": "sj-wed", "days": ["wed"], "start": "14:15", "end": "15:45",
      "kind": "lecture", "title": "Spatial Justice",
      "place": "campus", "room": "Room 147", "who": "Feitosa"},
 
-    {"id": "job1-thu", "weekday": "thu", "start": "09:00", "end": "13:45",
+    {"id": "job1-thu", "days": ["thu"], "start": "09:00", "end": "13:45",
      "kind": "job", "title": "Job 1", "place": "job1"},
-    {"id": "sii-thu", "weekday": "thu", "start": "14:15", "end": "15:45",
+    {"id": "sii-thu", "days": ["thu"], "start": "14:15", "end": "15:45",
      "kind": "lecture", "title": "SII lecture", "optional": true,
      "place": "campus", "room": "Room 242", "who": "Jirka"},
-    {"id": "sii-ex-thu", "weekday": "thu", "start": "16:15", "end": "17:45",
+    {"id": "sii-ex-thu", "days": ["thu"], "start": "16:15", "end": "17:45",
      "kind": "lecture", "title": "SII exercise", "optional": true,
      "place": "campus", "room": "StudLab 130", "who": "Jirka"},
 
-    {"id": "job2-fri", "weekday": "fri", "start": "07:00", "end": "09:30",
+    {"id": "job2-fri", "days": ["fri"], "start": "07:00", "end": "09:30",
      "kind": "job", "title": "Job 2", "place": "job2", "onlyWhenMarked": true,
      "note": "Every fifth week."},
-    {"id": "astd-fri", "weekday": "fri", "start": "10:15", "end": "13:45",
+    {"id": "astd-fri", "days": ["fri"], "start": "10:15", "end": "13:45",
      "kind": "lecture", "title": "Analysis of Spatio-Temporal Data",
      "place": "campus", "room": "StudLab 126", "who": "Pebesma / Niraula"},
-    {"id": "jumuah-fri", "weekday": "fri", "start": "14:00", "end": "14:25",
+    {"id": "jumuah-fri", "days": ["fri"], "start": "14:00", "end": "14:25",
      "kind": "prayer", "title": "Jumu'ah", "place": "campus"},
-    {"id": "sj-fri", "weekday": "fri", "start": "14:30", "end": "15:15",
-     "kind": "lecture", "title": "Spatial Justice",
-     "place": "campus", "room": "Room 147", "who": "Feitosa"},
-    {"id": "sp-fri", "weekday": "fri", "start": "15:15", "end": "16:45",
-     "kind": "lecture", "title": "Study Project: Spatial 3D Reconstructions",
-     "place": "campus", "room": "Room 147", "who": "Modlich / Risse"}
+
+    {"id": "library", "days": ["tue", "fri"], "start": "15:00", "end": "18:00",
+     "kind": "study", "title": "Library", "place": "library", "offInBreaks": true,
+     "note": "Your subjects, properly: straight after the last class of a day with no session, so it is one trip, and you are home by half six."},
+
+    {"id": "german", "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+     "start": "20:00", "end": "21:00",
+     "kind": "study", "title": "German",
+     "note": "An hour every day, after dinner. Anywhere: no travel."}
   ]
 }

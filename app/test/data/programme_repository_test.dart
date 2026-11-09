@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:keller_twelve/data/programme_repository.dart';
+import 'package:keller_twelve/domain/planner/planner.dart';
 import 'package:path/path.dart' as p;
 
 import '../support/fixtures.dart';
@@ -418,13 +419,14 @@ void main() {
     });
   });
 
-  group('a new plan (startsFresh, v4)', () {
-    test('the shipped v4 file is a new plan starting 12 October', () async {
+  group('a new plan (startsFresh: v4, and v4.2 again)', () {
+    test('the shipped file starts again on Monday 9 November', () async {
       final shipped = jsonDecode(
         await diskAsset(ProgrammeRepository.assetProgramme),
       ) as Map<String, dynamic>;
       expect(shipped['startsFresh'], isTrue);
-      expect(shipped['startDate'], '2026-10-12');
+      expect(shipped['startDate'], '2026-11-09');
+      expect(shipped['revision'], 5);
     });
 
     test('takes its own start date over the old one, and says so', () async {
@@ -434,21 +436,51 @@ void main() {
       final programme = await r.loadProgramme();
 
       expect(programme.revision, shippedRevision);
-      expect(programme.startDate, DateTime(2026, 10, 12));
-      expect(json('programme.json')['startDate'], '2026-10-12');
+      expect(programme.startDate, DateTime(2026, 11, 9));
+      expect(json('programme.json')['startDate'], '2026-11-09');
       final up = r.lastUpgrade!;
-      expect(up.newStartDate, DateTime(2026, 10, 12));
+      expect(up.newStartDate, DateTime(2026, 11, 9));
       expect(up.keptStartDate, isNull);
       // The old plan, with its old date, is kept beside it.
       expect(file(up.programmeBackup!).readAsStringSync(), oldRaw);
     });
+
+    test(
+      'his phone on v4.1 (week 1 on 12 October) moves to 9 November',
+      () async {
+        // What 0.16.0 seeded: revision 4, starting with the semester.
+        final v41 = Fixtures.programmeJson
+          ..['revision'] = 4
+          ..['startDate'] = '2026-10-12';
+        final oldRaw = const JsonEncoder.withIndent('  ').convert(v41);
+        file('programme.json').writeAsStringSync(oldRaw);
+        file('seeded.json').writeAsStringSync(
+          jsonEncode({
+            'programmeRevision': 4,
+            'inventoryRevision': shippedInventoryRevision,
+          }),
+        );
+
+        final r = repo();
+        final programme = await r.loadProgramme();
+
+        expect(programme.startDate, DateTime(2026, 11, 9));
+        expect(r.lastUpgrade!.programmeFrom, 4);
+        expect(r.lastUpgrade!.programmeTo, 5);
+        expect(r.lastUpgrade!.newStartDate, DateTime(2026, 11, 9));
+        expect(
+          file(r.lastUpgrade!.programmeBackup!).readAsStringSync(),
+          oldRaw,
+        );
+      },
+    );
 
     test('the notice survives a restart', () async {
       installV011(startDate: '2026-09-28', revision: 2);
       await repo().loadProgramme();
       final again = repo();
       await again.loadProgramme();
-      expect(again.lastUpgrade?.newStartDate, DateTime(2026, 10, 12));
+      expect(again.lastUpgrade?.newStartDate, DateTime(2026, 11, 9));
     });
 
     test('a later corrected revision keeps the date again', () async {
@@ -461,6 +493,77 @@ void main() {
         loader: shippedAt(programmeRevision: shippedRevision + 1),
       ).loadProgramme();
       expect(programme.startDate, DateTime(2026, 10, 19));
+    });
+  });
+
+  group('his week (docs/13-your-week-plan.md)', () {
+    Future<Map<String, dynamic>> shippedWeek() async =>
+        jsonDecode(await diskAsset(ProgrammeRepository.assetTimetable))
+            as Map<String, dynamic>;
+
+    test('the shipped week until he changes it, and no copy', () async {
+      final r = repo();
+      final week = await r.loadTimetable();
+      expect(week.toJson(), Timetable.fromJson(await shippedWeek()).toJson());
+      expect(file('timetable.json').existsSync(), isFalse);
+      expect(await r.timetableIsEdited, isFalse);
+    });
+
+    test('his saved week is the one read, after a restart too', () async {
+      final r = repo();
+      final week = await r.loadTimetable();
+      await r.saveTimetable(week.withoutBlock('library'));
+
+      expect(file('timetable.json').existsSync(), isTrue);
+      expect(await r.timetableIsEdited, isTrue);
+      final again = await repo().loadTimetable();
+      expect(again.block('library'), isNull);
+      expect(again.blocks, hasLength(week.blocks.length - 1));
+    });
+
+    test('a newer shipped week never overwrites his', () async {
+      final r = repo();
+      await r.saveTimetable((await r.loadTimetable()).copyWith(name: 'Mine'));
+      final week = await repo(
+        loader: (key) async {
+          if (key != ProgrammeRepository.assetTimetable) {
+            return diskAsset(key);
+          }
+          return jsonEncode((await shippedWeek())..['name'] = 'Summer 2027');
+        },
+      ).loadTimetable();
+      expect(week.name, 'Mine');
+    });
+
+    test('back to the shipped week: his copy goes', () async {
+      final r = repo();
+      final shipped = await r.loadTimetable();
+      await r.saveTimetable(shipped.copyWith(travelMinutes: 20));
+      final reset = await r.resetTimetable();
+      expect(reset.travelMinutes, shipped.travelMinutes);
+      expect(file('timetable.json').existsSync(), isFalse);
+      expect(await r.timetableIsEdited, isFalse);
+    });
+
+    test('a copy that no longer reads is set aside, never deleted', () async {
+      file('timetable.json').writeAsStringSync('{"blocks": "not a week"');
+      final week = await repo().loadTimetable();
+      expect(week.name, (await shippedWeek())['name']);
+      expect(file('timetable.json').existsSync(), isFalse);
+      expect(
+        file('timetable.unreadable.$stamp.json').readAsStringSync(),
+        '{"blocks": "not a week"',
+      );
+    });
+
+    test('an upgrade of the programme never touches his week', () async {
+      final r = repo();
+      await r.saveTimetable((await r.loadTimetable()).copyWith(name: 'Mine'));
+      installV011(revision: 2);
+      final again = repo();
+      await again.loadProgramme();
+      expect(again.lastUpgrade, isNotNull);
+      expect((await again.loadTimetable()).name, 'Mine');
     });
   });
 

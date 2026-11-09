@@ -153,7 +153,8 @@ class _SeedRecord {
   };
 }
 
-/// Loads the programme, the exercise library and the plate inventory.
+/// Loads the programme, the exercise library and the plate inventory — and
+/// the semester's week, which is his to change too.
 ///
 /// The shipped asset is the pristine Keller Twelve. On first launch it is
 /// copied into the app documents directory, and every later read prefers that
@@ -189,6 +190,7 @@ class ProgrammeRepository {
 
   static const _programmeFile = 'programme.json';
   static const _inventoryFile = 'inventory.json';
+  static const _timetableFile = 'timetable.json';
   static const _recordFile = 'seeded.json';
 
   /// v0.11 wrote no record. It shipped revision 1 of both files.
@@ -503,15 +505,61 @@ class ProgrammeRepository {
     );
   }
 
-  /// The semester's week. Always the asset: authored in data/timetable.json
-  /// from his timetable, checked by V22, mirrored by tools/gen.py.
+  /// The semester's week: his copy if he has changed it, otherwise the
+  /// shipped one (data/timetable.json, V22).
+  ///
+  /// The copy is written only when he saves, so until then a newer release
+  /// can still bring a corrected week. A copy that no longer reads is set
+  /// aside, never deleted, and the shipped week is used.
   Future<Timetable> loadTimetable({bool force = false}) async {
     if (_timetable != null && !force) return _timetable!;
-    final raw = await _loadAsset(assetTimetable);
-    return _timetable = Timetable.fromJson(
-      jsonDecode(raw) as Map<String, dynamic>,
-    );
+    try {
+      final f = await _file(_timetableFile);
+      if (f.existsSync()) {
+        final raw = await f.readAsString();
+        try {
+          return _timetable = Timetable.fromJson(
+            jsonDecode(raw) as Map<String, dynamic>,
+          );
+        } catch (_) {
+          await _backup(f, 'timetable.unreadable.${_stamp(_clock())}.json');
+        }
+      }
+    } catch (_) {
+      // A disk that cannot be read must not stop the planner: the shipped
+      // week below still can be.
+    }
+    return _timetable = await loadShippedTimetable();
   }
+
+  /// The week a fresh install starts from.
+  Future<Timetable> loadShippedTimetable() async => Timetable.fromJson(
+    jsonDecode(await _loadAsset(assetTimetable)) as Map<String, dynamic>,
+  );
+
+  /// Writes his week. The shipped one is never touched.
+  Future<Timetable> saveTimetable(Timetable timetable) async {
+    await _write(
+      await _file(_timetableFile),
+      _pretty.convert(timetable.toJson()),
+    );
+    return _timetable = timetable;
+  }
+
+  /// Back to the shipped week: his copy goes, and the asset is read again.
+  Future<Timetable> resetTimetable() async {
+    final f = await _file(_timetableFile);
+    if (f.existsSync()) await f.delete();
+    _timetable = null;
+    return loadTimetable(force: true);
+  }
+
+  /// True once he has saved a week of his own.
+  Future<bool> get timetableIsEdited async =>
+      (await _file(_timetableFile)).existsSync();
+
+  /// Forget the cached week: a restore has just put another on disk.
+  void invalidateTimetable() => _timetable = null;
 
   /// Bar weights and plate counts: the kit every suggested load is built
   /// from. Editable in Settings → Your equipment.

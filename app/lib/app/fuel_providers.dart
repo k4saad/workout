@@ -66,6 +66,7 @@ final fuelDayProvider = FutureProvider.family<FuelDay, DateTime>((
           time: formatHhmm(m.start),
           packed: m.packed,
           quick: m.quick,
+          takeAlong: m.takeAlong,
           sessionFuel: m.sessionFuel,
         ),
     },

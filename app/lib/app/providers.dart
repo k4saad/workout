@@ -86,6 +86,11 @@ class TodayNotifier extends Notifier<DateTime> {
   }
 }
 
+/// The time now, for what is laid against the clock — the reminders. The
+/// real clock on the phone; a fixed one in a test, so a test about Monday 9
+/// November still passes in December.
+final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+
 /// The midnight after [t], by the calendar rather than by adding 24 hours:
 /// the night the clocks change is 23 or 25 hours long.
 DateTime nextMidnight(DateTime t) => DateTime(t.year, t.month, t.day + 1);

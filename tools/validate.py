@@ -735,13 +735,17 @@ print(f"V21 fuel budget: the default week EUR {week_total['training']:.2f} "
       f"EUR {per_day:.2f} a day, {len(prep.get('sessions', []))} prep nights")
 
 # ============ V22 the semester's week is a week that can be lived ==========
-# data/timetable.json (docs/12-semester-plan.md): valid times, nothing on top
-# of anything else, and the travel time between campus and work respected.
+# data/timetable.json (docs/12-semester-plan.md, docs/13-your-week-plan.md):
+# valid times, nothing on top of anything else, and the travel time between
+# two places respected. A block is on one day or several (`days`; v1 files
+# had one `weekday`), and a block with no place (German) can be done
+# anywhere, so it needs no travel. The phone runs the same gate on the copy
+# he edits (lib/domain/planner/timetable_validator.dart).
 tt_path = os.path.join(DATA, "timetable.json")
 if os.path.exists(tt_path):
     tt = load("timetable.json")
     WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
-    KINDS = {"lecture", "job", "prayer"}
+    KINDS = {"lecture", "job", "prayer", "study"}
 
     def mins(hhmm, where):
         try:
@@ -769,7 +773,7 @@ if os.path.exists(tt_path):
         if f > t or f < lec_from or t > lec_to:
             fail("V22", f"{b['name']}: {f}..{t} is not inside the lecture period")
     travel = tt["travelMinutes"]
-    if not 0 < travel <= 120:
+    if not 0 <= travel <= 120:
         fail("V22", f"travelMinutes {travel}")
     places = set(tt["places"])
     ids = collections.Counter(b["id"] for b in tt["blocks"])
@@ -779,27 +783,44 @@ if os.path.exists(tt_path):
     by_day = collections.defaultdict(list)
     for b in tt["blocks"]:
         w = f"{b['id']}"
-        if b["weekday"] not in WEEKDAYS:
-            fail("V22", f"{w}: weekday {b['weekday']}")
+        days = b["days"] if "days" in b else [b.get("weekday")]
+        if not days:
+            fail("V22", f"{w}: no days")
+        if len(set(days)) != len(days):
+            fail("V22", f"{w}: a day named twice in {days}")
+        for wd in days:
+            if wd not in WEEKDAYS:
+                fail("V22", f"{w}: weekday {wd}")
         if b["kind"] not in KINDS:
             fail("V22", f"{w}: kind {b['kind']}")
-        if b["place"] not in places:
-            fail("V22", f"{w}: place {b['place']} is not one of {sorted(places)}")
+        place = b.get("place")
+        if place is not None and place not in places:
+            fail("V22", f"{w}: place {place} is not one of {sorted(places)}")
         if not b.get("title"):
             fail("V22", f"{w}: no title")
+        for flag in ("optional", "onlyWhenMarked", "offInBreaks"):
+            if not isinstance(b.get(flag, False), bool):
+                fail("V22", f"{w}: {flag} is not true or false")
         s0, e0 = mins(b["start"], w), mins(b["end"], w)
         if e0 <= s0:
             fail("V22", f"{w}: ends {b['end']} before it starts {b['start']}")
-        by_day[b["weekday"]].append((s0, e0, b))
+        for wd in set(days):
+            by_day[wd].append((s0, e0, b))
     for wd, items in by_day.items():
         items.sort(key=lambda x: x[0])
-        for (s1, e1, a1), (s2, e2, a2) in zip(items, items[1:]):
-            if s2 < e1:
-                fail("V22", f"{wd}: {a1['id']} and {a2['id']} overlap")
-            elif a1["place"] != a2["place"] and s2 - e1 < travel:
+        for i, (s1, e1, a1) in enumerate(items):
+            for s2, e2, a2 in items[i + 1:]:
+                if s2 < e1:
+                    fail("V22", f"{wd}: {a1['id']} and {a2['id']} overlap")
+        # Travel: between consecutive blocks that are somewhere.
+        placed = [x for x in items if x[2].get("place") is not None]
+        for (s1, e1, a1), (s2, e2, a2) in zip(placed, placed[1:]):
+            if a1["place"] != a2["place"] and 0 <= s2 - e1 < travel:
                 fail("V22", f"{wd}: {s2 - e1} min from {a1['id']} to {a2['id']}, "
                             f"under the {travel} min to get there")
-    print(f"V22 timetable: {len(tt['blocks'])} weekly blocks, lectures "
+    kinds = collections.Counter(b["kind"] for b in tt["blocks"])
+    print(f"V22 timetable: {len(tt['blocks'])} weekly blocks "
+          f"({', '.join(f'{k} {n}' for k, n in sorted(kinds.items()))}), lectures "
           f"{lec_from}..{lec_to}, {len(tt.get('breaks', []))} break(s)")
 
 # --------------------------------------------------------------- verdict ----

@@ -33,12 +33,22 @@ class YourDayCard extends ConsumerWidget {
         if (i.kind != PlanKind.travel && i.start >= minute && i != now) i,
     ].take(4).toList();
 
+    // When to set off for something, from the ride the plan has to it.
+    String? leave(PlanItem i) {
+      if (i.kind != PlanKind.job && i.kind != PlanKind.study) return null;
+      for (final r in plan.travel) {
+        if (r.end == i.start && r.place != 'home') return formatHhmm(r.start);
+      }
+      return null;
+    }
+
     String line(PlanItem i) => [
       formatHhmm(i.start),
       i.title,
       if (i.room != null) i.room!,
       if (i.packed) 'packed',
-      if (i.kind == PlanKind.job) 'leave ${formatHhmm(i.start - 30)}',
+      if (i.takeAlong) 'take it with you',
+      if (leave(i) case final at?) 'leave $at',
     ].join(' · ');
 
     return Padding(
